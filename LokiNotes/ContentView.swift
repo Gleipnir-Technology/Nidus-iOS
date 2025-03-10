@@ -14,6 +14,7 @@ struct ContentView: View {
                 .font(.title)
             HStack {
                 Text("You're great");
+                Spacer();
                 Text("And very capable")
             }
                 
