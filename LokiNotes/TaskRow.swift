@@ -10,6 +10,7 @@ struct TaskRow: View {
     var task: Task
     var body: some View {
         HStack {
+            task.image.resizable().frame(width: 50, height: 50)
             Text(String(task.id))
             Spacer()
             Text(task.title)

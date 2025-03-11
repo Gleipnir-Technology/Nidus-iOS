@@ -17,6 +17,12 @@ struct Task: Hashable, Codable, Identifiable {
     var title: String
     var type: TaskType
     
+    var image: Image {
+        switch(type) {
+           case .info:
+            return Image("TaskTypeIconInfo")
+        }
+    }
     private var coordinates: Coordinates
     
     struct Coordinates: Hashable, Codable {

@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "task-icon-info.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
