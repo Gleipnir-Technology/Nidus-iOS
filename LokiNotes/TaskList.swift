@@ -8,9 +8,7 @@
 import SwiftUI
 struct TaskList: View {
     var body: some View {
-        List {
-            TaskRow(task: tasks[0])
-            TaskRow(task: tasks[1])
+        List(tasks) { task in TaskRow(task: task)
         }
     }
 }
