@@ -1,0 +1,22 @@
+[{
+	"id": 1,
+	"coordinates": {
+		"latitude": 33.301019,
+		"longitude": -111.734607
+	},
+	"title": "Get the mail"
+},{
+	"id": 2,
+	"coordinates": {
+		"latitude": 33.308121,
+		"longitude": -111.741152
+	},
+	"title": "Buy a phone"
+},{
+	"id": 3,
+	"coordinates": {
+		"latitude":33.331162, 
+		"longitude":-111.722269
+	},
+	"title": "Drop off Zippy"
+}]
