@@ -19,9 +19,9 @@ struct TaskRow: View {
 }
 
 #Preview("task 1") {
-    TaskRow(task: tasks[0])
+    Group {
+        TaskRow(task: tasks[0])
+        TaskRow(task: tasks[1])
+    }
 }
 
-#Preview("task 2") {
-    TaskRow(task: tasks[1])
-}
