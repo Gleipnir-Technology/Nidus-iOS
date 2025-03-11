@@ -8,9 +8,14 @@
 import Foundation
 import SwiftUI
 
+enum TaskType: String, Codable {
+    case info = "info"
+}
+
 struct Task: Hashable, Codable, Identifiable {
     var id: Int
     var title: String
+    var type: TaskType
     
     private var coordinates: Coordinates
     
