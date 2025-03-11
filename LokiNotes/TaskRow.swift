@@ -18,6 +18,10 @@ struct TaskRow: View {
     }
 }
 
-#Preview {
+#Preview("task 1") {
     TaskRow(task: tasks[0])
+}
+
+#Preview("task 2") {
+    TaskRow(task: tasks[1])
 }
