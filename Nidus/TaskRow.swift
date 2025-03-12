@@ -7,20 +7,20 @@
 
 import SwiftUI
 struct TaskRow: View {
-    var task: Task
+    var note: Note
     var body: some View {
         HStack() {
-            task.image.resizable().frame(width: 50, height: 50)
-            Text(task.title)
+            note.image.resizable().frame(width: 50, height: 50)
+            Text(note.title)
             Spacer()
         }
         .padding()
     }
 }
 
-#Preview("task 1") {
+#Preview("note 1") {
     Group {
-        TaskRow(task: ModelData().tasks[0])
-        TaskRow(task: ModelData().tasks[1])
+        TaskRow(note: ModelData().notes[0])
+        TaskRow(note: ModelData().notes[1])
     }
 }

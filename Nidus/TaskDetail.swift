@@ -8,41 +8,41 @@
 import SwiftUI
 
 struct TaskDetail: View {
-    var task: Task
+    var note: Note
     var body: some View {
         ScrollView {
-            MapView(coordinate: task.locationCoordinate)
+            MapView(coordinate: note.locationCoordinate)
                 .frame(height: 300)
 
-            CircleImage(image: task.image)
+            CircleImage(image: note.image)
                 .offset(y: -130)
                 .padding(.bottom, -130)
 
             VStack(alignment: .leading) {
-                Text(task.title)
+                Text(note.title)
                     .font(.title)
 
                 HStack {
-                    Text(String(task.id))
+                    Text(String(note.id))
                     Spacer()
-                    Text(String(task.locationCoordinate.longitude))
-                    Text(String(task.locationCoordinate.latitude))
+                    Text(String(note.locationCoordinate.longitude))
+                    Text(String(note.locationCoordinate.latitude))
                 }
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
                 Divider()
 
-                Text("About task")
+                Text("About note")
                     .font(.title2)
             }
             .padding()
         }
-        .navigationTitle(task.title)
+        .navigationTitle(note.title)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    TaskDetail(task: ModelData().tasks[0])
+    TaskDetail(note: ModelData().notes[0])
 }

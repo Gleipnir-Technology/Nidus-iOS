@@ -11,11 +11,11 @@ struct TaskList: View {
 	@Environment(ModelData.self) var modelData
 
 	var body: some View {
-		List(modelData.tasks) { task in
+		List(modelData.notes) { note in
 			NavigationLink {
-				TaskDetail(task: task)
+				TaskDetail(note: note)
 			} label: {
-				TaskRow(task: task)
+				TaskRow(note: note)
 			}
 		}
 	}
