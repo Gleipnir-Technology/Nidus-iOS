@@ -9,15 +9,24 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        ZStack {
-            TaskList()
-            VStack {
-                Spacer()
-                HStack {
+        NavigationSplitView {
+            ZStack {
+                TaskList()
+                VStack {
                     Spacer()
-                    ButtonAddTask()
+                    HStack {
+                        Spacer()
+                        NavigationLink {
+                            TaskCreation()
+                        } label: {
+                            ButtonAddTask()
+                        }
+                    }
                 }
             }
+            .navigationTitle("Notes")
+        } detail: {
+            Text("Nidus")
         }
     }
 }

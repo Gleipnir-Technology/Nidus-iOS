@@ -6,25 +6,21 @@
 //
 
 import SwiftUI
+
 struct TaskList: View {
-    @Environment(ModelData.self) var modelData
-    
-    var body: some View {
-        NavigationSplitView {
-            List(modelData.tasks) { task in
-                NavigationLink {
-                    TaskDetail(task: task)
-                } label: {
-                    TaskRow(task: task)
-                }
-            }
-            .navigationTitle("Notes")
-        } detail: {
-            Text("Select a task")
-        }
-    }
+	@Environment(ModelData.self) var modelData
+
+	var body: some View {
+		List(modelData.tasks) { task in
+			NavigationLink {
+				TaskDetail(task: task)
+			} label: {
+				TaskRow(task: task)
+			}
+		}
+	}
 }
 
 #Preview {
-    TaskList().environment(ModelData())
+	TaskList().environment(ModelData())
 }
