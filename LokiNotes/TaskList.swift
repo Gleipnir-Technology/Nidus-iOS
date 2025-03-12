@@ -11,7 +11,7 @@ struct TaskList: View {
         NavigationSplitView {
             List(tasks) { task in
                 NavigationLink {
-                    TaskDetail()
+                    TaskDetail(task: task)
                 } label: {
                     TaskRow(task: task)
                 }
