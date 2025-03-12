@@ -11,15 +11,15 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView {
             ZStack {
-                TaskList()
+                NoteList()
                 VStack {
                     Spacer()
                     HStack {
                         Spacer()
                         NavigationLink {
-                            TaskCreation()
+                            NoteCreation()
                         } label: {
-                            ButtonAddTask()
+                            ButtonAddNote()
                         }
                     }
                 }

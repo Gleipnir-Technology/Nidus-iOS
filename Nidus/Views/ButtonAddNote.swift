@@ -1,5 +1,5 @@
 //
-//  ButtonAddTask.swift
+//  ButtonAddNote.swift
 //  Nidus
 //
 //  Created by Eli Ribble on 3/11/25.
@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct ButtonAddTask: View {
+struct ButtonAddNote: View {
 	var body: some View {
-		Label("Add Task", systemImage: "plus")
+		Label("Add Note", systemImage: "plus")
 			.font(.system(.largeTitle))
 			.labelStyle(.iconOnly)
 			.frame(width: 65, height: 65)
@@ -28,5 +28,5 @@ struct ButtonAddTask: View {
 }
 
 #Preview {
-	ButtonAddTask()
+	ButtonAddNote()
 }

@@ -1,5 +1,5 @@
 //
-//  TaskList.swift
+//  NoteList.swift
 //  Nidus
 //
 //  Created by Eli Ribble on 3/11/25.
@@ -7,20 +7,20 @@
 
 import SwiftUI
 
-struct TaskList: View {
+struct NoteList: View {
 	@Environment(ModelData.self) var modelData
 
 	var body: some View {
 		List(modelData.notes) { note in
 			NavigationLink {
-				TaskDetail(note: note)
+				NoteDetail(note: note)
 			} label: {
-				TaskRow(note: note)
+				NoteRow(note: note)
 			}
 		}
 	}
 }
 
 #Preview {
-	TaskList().environment(ModelData())
+	NoteList().environment(ModelData())
 }

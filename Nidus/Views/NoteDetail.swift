@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TaskDetail: View {
+struct NoteDetail: View {
     var note: Note
     var body: some View {
         ScrollView {
@@ -44,5 +44,5 @@ struct TaskDetail: View {
 }
 
 #Preview {
-    TaskDetail(note: ModelData().notes[0])
+    NoteDetail(note: ModelData().notes[0])
 }

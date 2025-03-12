@@ -18,5 +18,5 @@ struct CircleImage: View {
 }
 
 #Preview {
-    CircleImage(image: Image("TaskTypeIconInfo"))
+    CircleImage(image: Image("NoteTypeIconInfo"))
 }

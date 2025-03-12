@@ -1,12 +1,12 @@
 //
-//  TaskRow.swift
+//  NoteRow.swift
 //  Nidus
 //
 //  Created by Eli Ribble on 3/11/25.
 //
 
 import SwiftUI
-struct TaskRow: View {
+struct NoteRow: View {
     var note: Note
     var body: some View {
         HStack() {
@@ -20,7 +20,7 @@ struct TaskRow: View {
 
 #Preview("note 1") {
     Group {
-        TaskRow(note: ModelData().notes[0])
-        TaskRow(note: ModelData().notes[1])
+        NoteRow(note: ModelData().notes[0])
+        NoteRow(note: ModelData().notes[1])
     }
 }
