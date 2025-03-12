@@ -24,9 +24,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		53D57B4A2D79E2A20094740D /* LokiNotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LokiNotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		53D57B5B2D79E2A30094740D /* LokiNotesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LokiNotesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		53D57B652D79E2A30094740D /* LokiNotesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LokiNotesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		53D57B4A2D79E2A20094740D /* Nidus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nidus.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		53D57B5B2D79E2A30094740D /* NidusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NidusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		53D57B652D79E2A30094740D /* NidusUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NidusUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -85,9 +85,9 @@
 		53D57B4B2D79E2A20094740D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				53D57B4A2D79E2A20094740D /* LokiNotes.app */,
-				53D57B5B2D79E2A30094740D /* LokiNotesTests.xctest */,
-				53D57B652D79E2A30094740D /* LokiNotesUITests.xctest */,
+				53D57B4A2D79E2A20094740D /* Nidus.app */,
+				53D57B5B2D79E2A30094740D /* NidusTests.xctest */,
+				53D57B652D79E2A30094740D /* NidusUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		53D57B492D79E2A20094740D /* LokiNotes */ = {
+		53D57B492D79E2A20094740D /* Nidus */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 53D57B6F2D79E2A30094740D /* Build configuration list for PBXNativeTarget "LokiNotes" */;
+			buildConfigurationList = 53D57B6F2D79E2A30094740D /* Build configuration list for PBXNativeTarget "Nidus" */;
 			buildPhases = (
 				53D57B462D79E2A20094740D /* Sources */,
 				53D57B472D79E2A20094740D /* Frameworks */,
@@ -110,16 +110,16 @@
 			fileSystemSynchronizedGroups = (
 				53D57B4C2D79E2A20094740D /* LokiNotes */,
 			);
-			name = LokiNotes;
+			name = Nidus;
 			packageProductDependencies = (
 			);
 			productName = LokiNotes;
-			productReference = 53D57B4A2D79E2A20094740D /* LokiNotes.app */;
+			productReference = 53D57B4A2D79E2A20094740D /* Nidus.app */;
 			productType = "com.apple.product-type.application";
 		};
-		53D57B5A2D79E2A30094740D /* LokiNotesTests */ = {
+		53D57B5A2D79E2A30094740D /* NidusTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 53D57B722D79E2A30094740D /* Build configuration list for PBXNativeTarget "LokiNotesTests" */;
+			buildConfigurationList = 53D57B722D79E2A30094740D /* Build configuration list for PBXNativeTarget "NidusTests" */;
 			buildPhases = (
 				53D57B572D79E2A30094740D /* Sources */,
 				53D57B582D79E2A30094740D /* Frameworks */,
@@ -133,16 +133,16 @@
 			fileSystemSynchronizedGroups = (
 				53D57B5E2D79E2A30094740D /* LokiNotesTests */,
 			);
-			name = LokiNotesTests;
+			name = NidusTests;
 			packageProductDependencies = (
 			);
 			productName = LokiNotesTests;
-			productReference = 53D57B5B2D79E2A30094740D /* LokiNotesTests.xctest */;
+			productReference = 53D57B5B2D79E2A30094740D /* NidusTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		53D57B642D79E2A30094740D /* LokiNotesUITests */ = {
+		53D57B642D79E2A30094740D /* NidusUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 53D57B752D79E2A30094740D /* Build configuration list for PBXNativeTarget "LokiNotesUITests" */;
+			buildConfigurationList = 53D57B752D79E2A30094740D /* Build configuration list for PBXNativeTarget "NidusUITests" */;
 			buildPhases = (
 				53D57B612D79E2A30094740D /* Sources */,
 				53D57B622D79E2A30094740D /* Frameworks */,
@@ -156,11 +156,11 @@
 			fileSystemSynchronizedGroups = (
 				53D57B682D79E2A30094740D /* LokiNotesUITests */,
 			);
-			name = LokiNotesUITests;
+			name = NidusUITests;
 			packageProductDependencies = (
 			);
 			productName = LokiNotesUITests;
-			productReference = 53D57B652D79E2A30094740D /* LokiNotesUITests.xctest */;
+			productReference = 53D57B652D79E2A30094740D /* NidusUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 53D57B452D79E2A20094740D /* Build configuration list for PBXProject "LokiNotes" */;
+			buildConfigurationList = 53D57B452D79E2A20094740D /* Build configuration list for PBXProject "Nidus" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +200,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				53D57B492D79E2A20094740D /* LokiNotes */,
-				53D57B5A2D79E2A30094740D /* LokiNotesTests */,
-				53D57B642D79E2A30094740D /* LokiNotesUITests */,
+				53D57B492D79E2A20094740D /* Nidus */,
+				53D57B5A2D79E2A30094740D /* NidusTests */,
+				53D57B642D79E2A30094740D /* NidusUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		53D57B5D2D79E2A30094740D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 53D57B492D79E2A20094740D /* LokiNotes */;
+			target = 53D57B492D79E2A20094740D /* Nidus */;
 			targetProxy = 53D57B5C2D79E2A30094740D /* PBXContainerItemProxy */;
 		};
 		53D57B672D79E2A30094740D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 53D57B492D79E2A20094740D /* LokiNotes */;
+			target = 53D57B492D79E2A20094740D /* Nidus */;
 			targetProxy = 53D57B662D79E2A30094740D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -476,7 +476,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LokiNotes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LokiNotes";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nidus.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nidus";
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Debug;
@@ -498,7 +498,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LokiNotes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LokiNotes";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nidus.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nidus";
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Release;
@@ -548,7 +548,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		53D57B452D79E2A20094740D /* Build configuration list for PBXProject "LokiNotes" */ = {
+		53D57B452D79E2A20094740D /* Build configuration list for PBXProject "Nidus" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				53D57B6D2D79E2A30094740D /* Debug */,
@@ -557,7 +557,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		53D57B6F2D79E2A30094740D /* Build configuration list for PBXNativeTarget "LokiNotes" */ = {
+		53D57B6F2D79E2A30094740D /* Build configuration list for PBXNativeTarget "Nidus" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				53D57B702D79E2A30094740D /* Debug */,
@@ -566,7 +566,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		53D57B722D79E2A30094740D /* Build configuration list for PBXNativeTarget "LokiNotesTests" */ = {
+		53D57B722D79E2A30094740D /* Build configuration list for PBXNativeTarget "NidusTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				53D57B732D79E2A30094740D /* Debug */,
@@ -575,7 +575,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		53D57B752D79E2A30094740D /* Build configuration list for PBXNativeTarget "LokiNotesUITests" */ = {
+		53D57B752D79E2A30094740D /* Build configuration list for PBXNativeTarget "NidusUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				53D57B762D79E2A30094740D /* Debug */,
