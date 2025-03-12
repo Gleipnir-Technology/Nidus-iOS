@@ -20,7 +20,7 @@ struct TaskRow: View {
 
 #Preview("task 1") {
     Group {
-        TaskRow(task: tasks[0])
-        TaskRow(task: tasks[1])
+        TaskRow(task: ModelData().tasks[0])
+        TaskRow(task: ModelData().tasks[1])
     }
 }

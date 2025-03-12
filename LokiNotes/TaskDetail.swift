@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+
 struct TaskDetail: View {
     var task: Task
     var body: some View {
@@ -43,5 +44,5 @@ struct TaskDetail: View {
 }
 
 #Preview {
-    TaskDetail(task: tasks[0])
+    TaskDetail(task: ModelData().tasks[0])
 }

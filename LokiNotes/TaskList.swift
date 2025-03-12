@@ -7,9 +7,11 @@
 
 import SwiftUI
 struct TaskList: View {
+    @Environment(ModelData.self) var modelData
+    
     var body: some View {
         NavigationSplitView {
-            List(tasks) { task in
+            List(modelData.tasks) { task in
                 NavigationLink {
                     TaskDetail(task: task)
                 } label: {
@@ -24,5 +26,5 @@ struct TaskList: View {
 }
 
 #Preview {
-    TaskList()
+    TaskList().environment(ModelData())
 }
