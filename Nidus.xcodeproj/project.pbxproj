@@ -6,6 +6,23 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5375609F2D820A5A00D8528B /* Preview Assets.xcassets */; };
+		537560B12D820A5A00D8528B /* tasks.json in Resources */ = {isa = PBXBuildFile; fileRef = 537560AE2D820A5A00D8528B /* tasks.json */; };
+		537560B22D820A5A00D8528B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 537560A12D820A5A00D8528B /* Assets.xcassets */; };
+		537560B32D820A5A00D8528B /* TaskDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560AB2D820A5A00D8528B /* TaskDetail.swift */; };
+		537560B42D820A5A00D8528B /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A82D820A5A00D8528B /* ModelData.swift */; };
+		537560B52D820A5A00D8528B /* TaskRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560AD2D820A5A00D8528B /* TaskRow.swift */; };
+		537560B62D820A5A00D8528B /* CircleImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A32D820A5A00D8528B /* CircleImage.swift */; };
+		537560B72D820A5A00D8528B /* ButtonAddTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A22D820A5A00D8528B /* ButtonAddTask.swift */; };
+		537560B82D820A5A00D8528B /* TaskCreation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560AA2D820A5A00D8528B /* TaskCreation.swift */; };
+		537560B92D820A5A00D8528B /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A92D820A5A00D8528B /* Task.swift */; };
+		537560BA2D820A5A00D8528B /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A72D820A5A00D8528B /* MapView.swift */; };
+		537560BB2D820A5A00D8528B /* LokiNotesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A62D820A5A00D8528B /* LokiNotesApp.swift */; };
+		537560BC2D820A5A00D8528B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A42D820A5A00D8528B /* ContentView.swift */; };
+		537560BD2D820A5A00D8528B /* TaskList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560AC2D820A5A00D8528B /* TaskList.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		53D57B5C2D79E2A30094740D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +41,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5375609F2D820A5A00D8528B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		537560A12D820A5A00D8528B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		537560A22D820A5A00D8528B /* ButtonAddTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonAddTask.swift; sourceTree = "<group>"; };
+		537560A32D820A5A00D8528B /* CircleImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleImage.swift; sourceTree = "<group>"; };
+		537560A42D820A5A00D8528B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		537560A52D820A5A00D8528B /* LokiNotes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LokiNotes.entitlements; sourceTree = "<group>"; };
+		537560A62D820A5A00D8528B /* LokiNotesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LokiNotesApp.swift; sourceTree = "<group>"; };
+		537560A72D820A5A00D8528B /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		537560A82D820A5A00D8528B /* ModelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelData.swift; sourceTree = "<group>"; };
+		537560A92D820A5A00D8528B /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		537560AA2D820A5A00D8528B /* TaskCreation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCreation.swift; sourceTree = "<group>"; };
+		537560AB2D820A5A00D8528B /* TaskDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetail.swift; sourceTree = "<group>"; };
+		537560AC2D820A5A00D8528B /* TaskList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskList.swift; sourceTree = "<group>"; };
+		537560AD2D820A5A00D8528B /* TaskRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRow.swift; sourceTree = "<group>"; };
+		537560AE2D820A5A00D8528B /* tasks.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = tasks.json; sourceTree = "<group>"; };
 		53D57B4A2D79E2A20094740D /* Nidus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nidus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B5B2D79E2A30094740D /* NidusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NidusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B652D79E2A30094740D /* NidusUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NidusUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,9 +104,40 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		537560A02D820A5A00D8528B /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				5375609F2D820A5A00D8528B /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		537560AF2D820A5A00D8528B /* Nidus */ = {
+			isa = PBXGroup;
+			children = (
+				537560A02D820A5A00D8528B /* Preview Content */,
+				537560A12D820A5A00D8528B /* Assets.xcassets */,
+				537560A22D820A5A00D8528B /* ButtonAddTask.swift */,
+				537560A32D820A5A00D8528B /* CircleImage.swift */,
+				537560A42D820A5A00D8528B /* ContentView.swift */,
+				537560A52D820A5A00D8528B /* LokiNotes.entitlements */,
+				537560A62D820A5A00D8528B /* LokiNotesApp.swift */,
+				537560A72D820A5A00D8528B /* MapView.swift */,
+				537560A82D820A5A00D8528B /* ModelData.swift */,
+				537560A92D820A5A00D8528B /* Task.swift */,
+				537560AA2D820A5A00D8528B /* TaskCreation.swift */,
+				537560AB2D820A5A00D8528B /* TaskDetail.swift */,
+				537560AC2D820A5A00D8528B /* TaskList.swift */,
+				537560AD2D820A5A00D8528B /* TaskRow.swift */,
+				537560AE2D820A5A00D8528B /* tasks.json */,
+			);
+			path = Nidus;
+			sourceTree = "<group>";
+		};
 		53D57B412D79E2A20094740D = {
 			isa = PBXGroup;
 			children = (
+				537560AF2D820A5A00D8528B /* Nidus */,
 				53D57B4C2D79E2A20094740D /* LokiNotes */,
 				53D57B5E2D79E2A30094740D /* LokiNotesTests */,
 				53D57B682D79E2A30094740D /* LokiNotesUITests */,
@@ -212,6 +275,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */,
+				537560B12D820A5A00D8528B /* tasks.json in Resources */,
+				537560B22D820A5A00D8528B /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,6 +302,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				537560B32D820A5A00D8528B /* TaskDetail.swift in Sources */,
+				537560B42D820A5A00D8528B /* ModelData.swift in Sources */,
+				537560B52D820A5A00D8528B /* TaskRow.swift in Sources */,
+				537560B62D820A5A00D8528B /* CircleImage.swift in Sources */,
+				537560B72D820A5A00D8528B /* ButtonAddTask.swift in Sources */,
+				537560B82D820A5A00D8528B /* TaskCreation.swift in Sources */,
+				537560B92D820A5A00D8528B /* Task.swift in Sources */,
+				537560BA2D820A5A00D8528B /* MapView.swift in Sources */,
+				537560BB2D820A5A00D8528B /* LokiNotesApp.swift in Sources */,
+				537560BC2D820A5A00D8528B /* ContentView.swift in Sources */,
+				537560BD2D820A5A00D8528B /* TaskList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -388,10 +465,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LokiNotes/LokiNotes.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Nidus/LokiNotes.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LokiNotes/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Nidus/Preview Content\"";
 				DEVELOPMENT_TEAM = XAP2N849QA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -410,7 +487,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.LokiNotes;
+				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.Nidus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -426,10 +503,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LokiNotes/LokiNotes.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Nidus/LokiNotes.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LokiNotes/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Nidus/Preview Content\"";
 				DEVELOPMENT_TEAM = XAP2N849QA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -448,7 +525,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.LokiNotes;
+				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.Nidus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
