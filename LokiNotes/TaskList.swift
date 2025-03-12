@@ -8,7 +8,17 @@
 import SwiftUI
 struct TaskList: View {
     var body: some View {
-        List(tasks) { task in TaskRow(task: task)
+        NavigationSplitView {
+            List(tasks) { task in
+                NavigationLink {
+                    TaskDetail()
+                } label: {
+                    TaskRow(task: task)
+                }
+            }
+            .navigationTitle("Notes")
+        } detail: {
+            Text("Select a task")
         }
     }
 }
