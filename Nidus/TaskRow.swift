@@ -1,6 +1,6 @@
 //
 //  TaskRow.swift
-//  LokiNotes
+//  Nidus
 //
 //  Created by Eli Ribble on 3/11/25.
 //

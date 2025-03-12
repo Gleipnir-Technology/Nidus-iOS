@@ -29,14 +29,14 @@
 			containerPortal = 53D57B422D79E2A20094740D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 53D57B492D79E2A20094740D;
-			remoteInfo = LokiNotes;
+			remoteInfo = Nidus;
 		};
 		53D57B662D79E2A30094740D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 53D57B422D79E2A20094740D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 53D57B492D79E2A20094740D;
-			remoteInfo = LokiNotes;
+			remoteInfo = Nidus;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -152,7 +152,7 @@
 			name = Nidus;
 			packageProductDependencies = (
 			);
-			productName = LokiNotes;
+			productName = Nidus;
 			productReference = 53D57B4A2D79E2A20094740D /* Nidus.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -172,7 +172,7 @@
 			name = NidusTests;
 			packageProductDependencies = (
 			);
-			productName = LokiNotesTests;
+			productName = NidusTests;
 			productReference = 53D57B5B2D79E2A30094740D /* NidusTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -192,7 +192,7 @@
 			name = NidusUITests;
 			packageProductDependencies = (
 			);
-			productName = LokiNotesUITests;
+			productName = NidusUITests;
 			productReference = 53D57B652D79E2A30094740D /* NidusUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
@@ -516,7 +516,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.LokiNotesTests;
+				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.NidusTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -538,7 +538,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.LokiNotesTests;
+				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.NidusTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -559,14 +559,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.LokiNotesUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.NidusUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = LokiNotes;
+				TEST_TARGET_NAME = Nidus;
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Debug;
@@ -580,14 +580,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.LokiNotesUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.NidusUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = LokiNotes;
+				TEST_TARGET_NAME = Nidus;
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Release;

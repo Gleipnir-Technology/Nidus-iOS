@@ -1,6 +1,6 @@
 //
 //  MapView.swift
-//  LokiNotes
+//  Nidus
 //
 //  Created by Eli Ribble on 3/12/25.
 //
