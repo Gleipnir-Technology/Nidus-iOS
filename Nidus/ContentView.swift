@@ -17,6 +17,7 @@ struct ContentView: View {
                 Text("Your current location is:")
                 Text("Latitude: \(locationDataManager.locationManager.location?.coordinate.latitude.description ?? "Error loading")")
                 Text("Longitude: \(locationDataManager.locationManager.location?.coordinate.longitude.description ?? "Error loading")")
+                Text("Precision: \(locationDataManager.locationManager.location?.horizontalAccuracy.formatted() ?? "Error loading")")
             case .restricted, .denied: // Not available
                 Text("Current location data was restricted or denied.")
             case .notDetermined: // not determined yet
