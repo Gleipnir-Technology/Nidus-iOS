@@ -4,7 +4,7 @@
 //
 //  Created by Eli Ribble on 3/6/25.
 //
-
+import CoreLocation
 import SwiftUI
 
 @main

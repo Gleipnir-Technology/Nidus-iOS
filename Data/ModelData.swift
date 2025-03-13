@@ -9,7 +9,7 @@ import Foundation
 
 @Observable
 class ModelData {
-    var notes: [Note] = load("notes.json")
+    var notes: [Note] = []
 }
 
 func load<T: Decodable>(_ filename: String) -> T {

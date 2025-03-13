@@ -8,7 +8,25 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject var locationDataManager = LocationDataManager()
+    
     var body: some View {
+        VStack {
+            switch locationDataManager.locationManager.authorizationStatus {
+            case .authorizedWhenInUse: // location services are available.
+                Text("Your current location is:")
+                Text("Latitude: \(locationDataManager.locationManager.location?.coordinate.latitude.description ?? "Error loading")")
+                Text("Longitude: \(locationDataManager.locationManager.location?.coordinate.longitude.description ?? "Error loading")")
+            case .restricted, .denied: // Not available
+                Text("Current location data was restricted or denied.")
+            case .notDetermined: // not determined yet
+                Text("Finding your location...")
+                ProgressView()
+            default:
+                ProgressView()
+            }
+        }
+        /*
         NavigationSplitView {
             ZStack {
                 NoteList()
@@ -27,7 +45,7 @@ struct ContentView: View {
             .navigationTitle("Notes")
         } detail: {
             Text("Nidus")
-        }
+        }*/
     }
 }
 

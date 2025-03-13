@@ -7,7 +7,9 @@
 import SwiftUI
 struct NoteCreation: View {
     var body: some View {
-        Text("hey there")
+        VStack {
+            Text("hey there")
+        }
     }
 }
 

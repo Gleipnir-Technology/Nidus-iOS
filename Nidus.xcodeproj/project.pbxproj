@@ -15,12 +15,17 @@
 		537560BA2D820A5A00D8528B /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A72D820A5A00D8528B /* MapView.swift */; };
 		537560BC2D820A5A00D8528B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A42D820A5A00D8528B /* ContentView.swift */; };
 		537560C02D820F3D00D8528B /* NidusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560BF2D820F3D00D8528B /* NidusApp.swift */; };
-		537560C32D82115900D8528B /* notes.json in Resources */ = {isa = PBXBuildFile; fileRef = 537560C22D82115900D8528B /* notes.json */; };
 		537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C52D82127100D8528B /* ButtonAddNote.swift */; };
 		537560CB2D82127100D8528B /* NoteDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C72D82127100D8528B /* NoteDetail.swift */; };
 		537560CC2D82127100D8528B /* NoteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C92D82127100D8528B /* NoteRow.swift */; };
 		537560CD2D82127100D8528B /* NoteCreation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C62D82127100D8528B /* NoteCreation.swift */; };
 		537560CE2D82127100D8528B /* NoteList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C82D82127100D8528B /* NoteList.swift */; };
+		537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560CF2D821BD500D8528B /* NoteEditor.swift */; };
+		537560D32D8223F900D8528B /* ModelContainerPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560D22D8223F300D8528B /* ModelContainerPreview.swift */; };
+		537560D52D82242500D8528B /* Preview+ModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560D42D82241F00D8528B /* Preview+ModelContainer.swift */; };
+		537560D82D8224AB00D8528B /* SampleData+Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560D72D8224A000D8528B /* SampleData+Note.swift */; };
+		537560DA2D82293500D8528B /* SampleData+NoteType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560D92D82292D00D8528B /* SampleData+NoteType.swift */; };
+		537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560DB2D83306C00D8528B /* LocationDataManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,12 +55,17 @@
 		537560A92D820A5A00D8528B /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		537560BE2D820F0A00D8528B /* Nidus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Nidus.entitlements; sourceTree = "<group>"; };
 		537560BF2D820F3D00D8528B /* NidusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NidusApp.swift; sourceTree = "<group>"; };
-		537560C22D82115900D8528B /* notes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = notes.json; sourceTree = "<group>"; };
 		537560C52D82127100D8528B /* ButtonAddNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonAddNote.swift; sourceTree = "<group>"; };
 		537560C62D82127100D8528B /* NoteCreation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCreation.swift; sourceTree = "<group>"; };
 		537560C72D82127100D8528B /* NoteDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetail.swift; sourceTree = "<group>"; };
 		537560C82D82127100D8528B /* NoteList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteList.swift; sourceTree = "<group>"; };
 		537560C92D82127100D8528B /* NoteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteRow.swift; sourceTree = "<group>"; };
+		537560CF2D821BD500D8528B /* NoteEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditor.swift; sourceTree = "<group>"; };
+		537560D22D8223F300D8528B /* ModelContainerPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContainerPreview.swift; sourceTree = "<group>"; };
+		537560D42D82241F00D8528B /* Preview+ModelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preview+ModelContainer.swift"; sourceTree = "<group>"; };
+		537560D72D8224A000D8528B /* SampleData+Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SampleData+Note.swift"; sourceTree = "<group>"; };
+		537560D92D82292D00D8528B /* SampleData+NoteType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SampleData+NoteType.swift"; sourceTree = "<group>"; };
+		537560DB2D83306C00D8528B /* LocationDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDataManager.swift; sourceTree = "<group>"; };
 		53D57B4A2D79E2A20094740D /* Nidus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nidus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B5B2D79E2A30094740D /* NidusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NidusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B652D79E2A30094740D /* NidusUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NidusUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -97,8 +107,10 @@
 		537560AF2D820A5A00D8528B /* Nidus */ = {
 			isa = PBXGroup;
 			children = (
+				537560DB2D83306C00D8528B /* LocationDataManager.swift */,
+				537560D62D82248F00D8528B /* SampleData */,
+				537560D12D8223E800D8528B /* PreviewHelper */,
 				537560C42D82125200D8528B /* Views */,
-				537560C22D82115900D8528B /* notes.json */,
 				537560BF2D820F3D00D8528B /* NidusApp.swift */,
 				537560BE2D820F0A00D8528B /* Nidus.entitlements */,
 				537560A02D820A5A00D8528B /* Preview Content */,
@@ -122,6 +134,7 @@
 		537560C42D82125200D8528B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				537560CF2D821BD500D8528B /* NoteEditor.swift */,
 				537560C52D82127100D8528B /* ButtonAddNote.swift */,
 				537560C62D82127100D8528B /* NoteCreation.swift */,
 				537560C72D82127100D8528B /* NoteDetail.swift */,
@@ -129,6 +142,24 @@
 				537560C92D82127100D8528B /* NoteRow.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		537560D12D8223E800D8528B /* PreviewHelper */ = {
+			isa = PBXGroup;
+			children = (
+				537560D42D82241F00D8528B /* Preview+ModelContainer.swift */,
+				537560D22D8223F300D8528B /* ModelContainerPreview.swift */,
+			);
+			path = PreviewHelper;
+			sourceTree = "<group>";
+		};
+		537560D62D82248F00D8528B /* SampleData */ = {
+			isa = PBXGroup;
+			children = (
+				537560D92D82292D00D8528B /* SampleData+NoteType.swift */,
+				537560D72D8224A000D8528B /* SampleData+Note.swift */,
+			);
+			path = SampleData;
 			sourceTree = "<group>";
 		};
 		53D57B412D79E2A20094740D = {
@@ -263,7 +294,6 @@
 			files = (
 				537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */,
 				537560B22D820A5A00D8528B /* Assets.xcassets in Resources */,
-				537560C32D82115900D8528B /* notes.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,11 +321,17 @@
 				537560B42D820A5A00D8528B /* ModelData.swift in Sources */,
 				537560B62D820A5A00D8528B /* CircleImage.swift in Sources */,
 				537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */,
+				537560DA2D82293500D8528B /* SampleData+NoteType.swift in Sources */,
 				537560CB2D82127100D8528B /* NoteDetail.swift in Sources */,
+				537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */,
+				537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */,
+				537560D82D8224AB00D8528B /* SampleData+Note.swift in Sources */,
 				537560CC2D82127100D8528B /* NoteRow.swift in Sources */,
 				537560CD2D82127100D8528B /* NoteCreation.swift in Sources */,
 				537560CE2D82127100D8528B /* NoteList.swift in Sources */,
+				537560D52D82242500D8528B /* Preview+ModelContainer.swift in Sources */,
 				537560C02D820F3D00D8528B /* NidusApp.swift in Sources */,
+				537560D32D8223F900D8528B /* ModelContainerPreview.swift in Sources */,
 				537560B92D820A5A00D8528B /* Note.swift in Sources */,
 				537560BA2D820A5A00D8528B /* MapView.swift in Sources */,
 				537560BC2D820A5A00D8528B /* ContentView.swift in Sources */,
@@ -458,6 +494,7 @@
 				DEVELOPMENT_TEAM = XAP2N849QA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Because it's super important";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -496,6 +533,7 @@
 				DEVELOPMENT_TEAM = XAP2N849QA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Because it's super important";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
