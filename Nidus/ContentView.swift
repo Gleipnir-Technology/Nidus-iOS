@@ -34,14 +34,16 @@ struct ContentView: View {
 			case .authorizedWhenInUse:  // location services are available.
 				Text("Your current location is:")
 				Text(
-					"Latitude: \(locationDataManager.locationManager.location?.coordinate.latitude.description ?? "Error loading")"
+					"Latitude: \(locationDataManager.location?.coordinate.latitude.description ?? "Error loading")"
 				)
 				Text(
-					"Longitude: \(locationDataManager.locationManager.location?.coordinate.longitude.description ?? "Error loading")"
+					"Longitude: \(locationDataManager.location?.coordinate.longitude.description ?? "Error loading")"
 				)
 				Text(
-					"Precision: \(locationDataManager.locationManager.location?.horizontalAccuracy.formatted() ?? "Error loading")"
+					"Precision: \(locationDataManager.location?.horizontalAccuracy.formatted() ?? "Error loading")"
 				)
+				Text("Is Precise: \(locationDataManager.isPrecise)")
+				Text("Updates: \(locationDataManager.updates)")
 			case .restricted, .denied:  // Not available
 				Text("Current location data was restricted or denied.")
 			case .notDetermined:  // not determined yet

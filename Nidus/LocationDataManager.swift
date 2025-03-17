@@ -11,9 +11,12 @@ import Foundation
 
 @Observable
 class LocationDataManager: NSObject, CLLocationManagerDelegate {
-	var locationManager = CLLocationManager()
 	var authorizationStatus: CLAuthorizationStatus
 	var allowAuthorizationChange: Bool
+	var isPrecise: Bool = false
+	var location: CLLocation? = nil
+	var updates: Int = 0
+	private var locationManager = CLLocationManager()
 
 	init(authorizationStatus: CLAuthorizationStatus? = nil) {
 		// Used to control what is shown in Preview
@@ -37,7 +40,9 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 		case .authorizedWhenInUse:  // Location services are available.
 			// Insert code here of what should happen when Location services are authorized
 			authorizationStatus = .authorizedWhenInUse
-			locationManager.requestLocation()
+			isPrecise = manager.accuracyAuthorization == .fullAccuracy
+			//locationManager.requestLocation()
+			locationManager.startUpdatingLocation()
 			break
 
 		case .restricted:  // Location services currently unavailable.
@@ -64,7 +69,9 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 		_ manager: CLLocationManager,
 		didUpdateLocations locations: [CLLocation]
 	) {
-		// Insert code to handle location updates
+		let location = locations.last
+		self.location = location
+		self.updates += 1
 	}
 
 	func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
