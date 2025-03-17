@@ -9,18 +9,19 @@ import Foundation
 import SwiftData
 
 extension NoteCategory {
-    static let info = NoteCategory(name: "info")
-    
-    static func insertSampleData(modelContext: ModelContext) {
-        modelContext.insert(info)
-    }
-    
-    static func reloadSampleData(modelContext: ModelContext) {
-        do {
-            try modelContext.delete(model: NoteCategory.self)
-            insertSampleData(modelContext: modelContext)
-        } catch {
-            fatalError(error.localizedDescription)
-        }
-    }
+	static let info = NoteCategory(name: "info")
+
+	static func insertSampleData(modelContext: ModelContext) {
+		modelContext.insert(info)
+	}
+
+	static func reloadSampleData(modelContext: ModelContext) {
+		do {
+			try modelContext.delete(model: NoteCategory.self)
+			insertSampleData(modelContext: modelContext)
+		}
+		catch {
+			fatalError(error.localizedDescription)
+		}
+	}
 }

@@ -9,11 +9,13 @@
 import CoreLocation
 import Foundation
 
-class LocationDataManager: NSObject, ObservableObject, CLLocationManagerDelegate {
+@Observable
+class LocationDataManager: NSObject, CLLocationManagerDelegate {
 	var locationManager = CLLocationManager()
-	@Published var authorizationStatus: CLAuthorizationStatus?
+	var authorizationStatus: CLAuthorizationStatus
 
-	override init() {
+	init(authorizationStatus: CLAuthorizationStatus = .notDetermined) {
+		self.authorizationStatus = authorizationStatus
 		super.init()
 		locationManager.delegate = self
 	}
@@ -55,9 +57,5 @@ class LocationDataManager: NSObject, ObservableObject, CLLocationManagerDelegate
 
 	func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
 		print("error: \(error.localizedDescription)")
-	}
-
-	func setAuthorizationStatusDeniedForTest() {
-		authorizationStatus = .denied
 	}
 }

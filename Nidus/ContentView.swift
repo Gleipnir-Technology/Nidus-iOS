@@ -7,21 +7,30 @@
 
 import SwiftUI
 
-class ViewModel: ObservableObject {
-	@Published var text: String = "Getting location..."
+@Observable
+class ViewModel {
+	var text: String
+
+	init(text: String = "Getting location...") {
+		self.text = text
+	}
 }
 
 struct ContentView: View {
-	@StateObject var locationDataManager = LocationDataManager()
-	@StateObject private var viewModel: ViewModel
+	@State private var locationDataManager: LocationDataManager
+	@State private var viewModel: ViewModel
 
-	init(viewModel: ViewModel = ViewModel()) {
-		_viewModel = StateObject(wrappedValue: viewModel)
+	init(
+		locationDataManager: LocationDataManager = LocationDataManager(),
+		viewModel: ViewModel = ViewModel()
+	) {
+		self.locationDataManager = locationDataManager
+		self.viewModel = viewModel
 	}
 
 	var body: some View {
 		VStack {
-			switch locationDataManager.locationManager.authorizationStatus {
+			switch locationDataManager.authorizationStatus {
 			case .authorizedWhenInUse:  // location services are available.
 				Text("Your current location is:")
 				Text(
@@ -36,6 +45,7 @@ struct ContentView: View {
 			case .restricted, .denied:  // Not available
 				Text("Current location data was restricted or denied.")
 			case .notDetermined:  // not determined yet
+				Text("Not determined")
 				Text(viewModel.text)
 				ProgressView()
 			default:
@@ -50,11 +60,7 @@ struct ContentView: View {
 }
 
 #Preview("After Location") {
-	ContentView(
-		viewModel: {
-			let vm = ViewModel()
-			vm.text = "Test Value"
-			return vm
-		}()
-	)
+	var vm = ViewModel(text: "Testing...")
+	var ld = LocationDataManager(authorizationStatus: .denied)
+	ContentView(locationDataManager: ld, viewModel: vm)
 }
