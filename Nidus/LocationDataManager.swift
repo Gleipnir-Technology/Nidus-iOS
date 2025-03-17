@@ -13,14 +13,26 @@ import Foundation
 class LocationDataManager: NSObject, CLLocationManagerDelegate {
 	var locationManager = CLLocationManager()
 	var authorizationStatus: CLAuthorizationStatus
+	var allowAuthorizationChange: Bool
 
-	init(authorizationStatus: CLAuthorizationStatus = .notDetermined) {
-		self.authorizationStatus = authorizationStatus
+	init(authorizationStatus: CLAuthorizationStatus? = nil) {
+		// Used to control what is shown in Preview
+		if let status = authorizationStatus {
+			self.authorizationStatus = status
+			self.allowAuthorizationChange = false
+		}
+		else {
+			self.authorizationStatus = .notDetermined
+			self.allowAuthorizationChange = true
+		}
 		super.init()
 		locationManager.delegate = self
 	}
 
 	func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+		if !allowAuthorizationChange {
+			return
+		}
 		switch manager.authorizationStatus {
 		case .authorizedWhenInUse:  // Location services are available.
 			// Insert code here of what should happen when Location services are authorized

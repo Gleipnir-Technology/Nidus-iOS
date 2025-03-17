@@ -45,7 +45,6 @@ struct ContentView: View {
 			case .restricted, .denied:  // Not available
 				Text("Current location data was restricted or denied.")
 			case .notDetermined:  // not determined yet
-				Text("Not determined")
 				Text(viewModel.text)
 				ProgressView()
 			default:
@@ -55,11 +54,11 @@ struct ContentView: View {
 	}
 }
 
-#Preview("Before Location") {
+#Preview("Loading") {
 	ContentView().environment(ModelData())
 }
 
-#Preview("After Location") {
+#Preview("Denied") {
 	var vm = ViewModel(text: "Testing...")
 	var ld = LocationDataManager(authorizationStatus: .denied)
 	ContentView(locationDataManager: ld, viewModel: vm)
