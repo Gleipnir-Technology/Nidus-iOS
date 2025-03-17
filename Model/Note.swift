@@ -4,10 +4,7 @@
 //
 //  Created by Eli Ribble on 3/10/25.
 //
-import CoreLocation
-import Foundation
 import SwiftData
-import SwiftUI
 
 @Model
 final class NoteCategory {

@@ -8,42 +8,27 @@
 import SwiftUI
 
 struct NoteList: View {
-	@Environment(ModelData.self) var modelData
+	let notes: [Note]
+	@Binding var selectedNote: Note?
 
 	var body: some View {
-		NavigationSplitView {
-			ZStack {
-				if modelData.notes.count == 0 {
-					Text("No notes yet")
+		if notes.count == 0 {
+			Text("No notes yet")
+		}
+		else {
+			List(notes, selection: $selectedNote) { note in
+				NavigationLink {
+					NoteDetail(note: note)
+				} label: {
+					NoteRow(note: note)
 				}
-				else {
-					List(modelData.notes) { note in
-						NavigationLink {
-							NoteDetail(note: note)
-						} label: {
-							NoteRow(note: note)
-						}
-					}
-				}
-				VStack {
-					Spacer()
-					HStack {
-						Spacer()
-						NavigationLink {
-							NoteCreation()
-						} label: {
-							ButtonAddNote()
-						}
-					}
-				}
-				.navigationTitle("Notes")
 			}
-		} detail: {
-			Text("Nidus")
 		}
 	}
 }
 
 #Preview {
-	NoteList().environment(ModelData())
+	let preview = Preview()
+	preview.addExamples(Note.sampleNotes)
+	return ContentView().modelContainer(preview.modelContainer)
 }

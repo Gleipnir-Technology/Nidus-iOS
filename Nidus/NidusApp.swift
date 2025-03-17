@@ -13,7 +13,8 @@ struct NidusApp: App {
 
 	var body: some Scene {
 		WindowGroup {
-			ContentView().environment(modelData)
+			ContentView()
 		}
+		.modelContainer(for: Note.self)
 	}
 }

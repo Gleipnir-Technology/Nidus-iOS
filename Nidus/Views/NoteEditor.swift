@@ -75,13 +75,4 @@ struct NoteEditor: View {
 }
 
 #Preview("Add note") {
-	ModelContainerPreview(ModelContainer.sample) {
-		NoteEditor(note: nil)
-	}
-}
-
-#Preview("Edit note") {
-	ModelContainerPreview(ModelContainer.sample) {
-		NoteEditor(note: .trap)
-	}
 }

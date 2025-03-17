@@ -5,63 +5,43 @@
 //  Created by Eli Ribble on 3/6/25.
 //
 
+import SwiftData
 import SwiftUI
 
-@Observable
-class ViewModel {
-	var text: String
-
-	init(text: String = "Getting location...") {
-		self.text = text
-	}
-}
-
 struct ContentView: View {
-	@State private var locationDataManager: LocationDataManager
-	@State private var viewModel: ViewModel
-
-	init(
-		locationDataManager: LocationDataManager = LocationDataManager(),
-		viewModel: ViewModel = ViewModel()
-	) {
-		self.locationDataManager = locationDataManager
-		self.viewModel = viewModel
-	}
+	@Query(sort: [SortDescriptor(\Note.title)]) var notes: [Note]
+	@Environment(\.modelContext) var context
+	@State private var selectedNote: Note?
 
 	var body: some View {
-		VStack {
-			switch locationDataManager.authorizationStatus {
-			case .authorizedWhenInUse:  // location services are available.
-				Text("Your current location is:")
-				Text(
-					"Latitude: \(locationDataManager.location?.coordinate.latitude.description ?? "Error loading")"
-				)
-				Text(
-					"Longitude: \(locationDataManager.location?.coordinate.longitude.description ?? "Error loading")"
-				)
-				Text(
-					"Precision: \(locationDataManager.location?.horizontalAccuracy.formatted() ?? "Error loading")"
-				)
-				Text("Is Precise: \(locationDataManager.isPrecise)")
-				Text("Updates: \(locationDataManager.updates)")
-			case .restricted, .denied:  // Not available
-				Text("Current location data was restricted or denied.")
-			case .notDetermined:  // not determined yet
-				Text(viewModel.text)
-				ProgressView()
-			default:
-				ProgressView()
+		NavigationSplitView {
+			ZStack {
+				if notes.count == 0 {
+					Text("No notes yet")
+				}
+				else {
+					NoteList(notes: notes, selectedNote: $selectedNote)
+				}
+				VStack {
+					Spacer()
+					HStack {
+						Spacer()
+						NavigationLink {
+							NoteEditor(note: nil)
+						} label: {
+							ButtonAddNote()
+						}
+					}
+				}
 			}
+		} detail: {
+			NoteEditor(note: selectedNote)
 		}
 	}
 }
 
 #Preview("Loading") {
-	ContentView().environment(ModelData())
-}
-
-#Preview("Denied") {
-	var vm = ViewModel(text: "Testing...")
-	var ld = LocationDataManager(authorizationStatus: .denied)
-	ContentView(locationDataManager: ld, viewModel: vm)
+	let preview = Preview()
+	preview.addExamples(Note.sampleNotes)
+	return ContentView().modelContainer(preview.modelContainer)
 }
