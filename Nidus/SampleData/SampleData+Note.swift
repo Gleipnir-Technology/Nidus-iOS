@@ -8,5 +8,7 @@
 import Foundation
 
 extension Note {
-	static let trap = Note(title: "Pick up trap", category: NoteCategory.info)
+	static let trap = Note(title: "Collect trap", category: NoteCategory.todo)
+	static let gate = Note(title: "Gate code", category: NoteCategory.entry)
+	static let station = Note(title: "Gas station", category: NoteCategory.info)
 }

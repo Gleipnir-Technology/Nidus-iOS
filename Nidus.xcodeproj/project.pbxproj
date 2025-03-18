@@ -21,10 +21,11 @@
 		537560CE2D82127100D8528B /* NoteList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C82D82127100D8528B /* NoteList.swift */; };
 		537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560CF2D821BD500D8528B /* NoteEditor.swift */; };
 		537560D82D8224AB00D8528B /* SampleData+Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560D72D8224A000D8528B /* SampleData+Note.swift */; };
-		537560DA2D82293500D8528B /* SampleData+NoteType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560D92D82292D00D8528B /* SampleData+NoteType.swift */; };
+		537560DA2D82293500D8528B /* SampleData+NoteCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560D92D82292D00D8528B /* SampleData+NoteCategory.swift */; };
 		537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560DB2D83306C00D8528B /* LocationDataManager.swift */; };
-		537560DF2D88D5C700D8528B /* NoteSamples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560DE2D88D5C200D8528B /* NoteSamples.swift */; };
-		537560E12D88D69D00D8528B /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560E02D88D69800D8528B /* PreviewContainer.swift */; };
+		537560E12D88D69D00D8528B /* ModelContainerPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560E02D88D69800D8528B /* ModelContainerPreview.swift */; };
+		537560E32D88EC0B00D8528B /* Preview+ModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560E22D88EC0300D8528B /* Preview+ModelContainer.swift */; };
+		537560E52D88EEC400D8528B /* NavigationContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560E42D88EEC000D8528B /* NavigationContext.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,10 +61,11 @@
 		537560C92D82127100D8528B /* NoteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteRow.swift; sourceTree = "<group>"; };
 		537560CF2D821BD500D8528B /* NoteEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditor.swift; sourceTree = "<group>"; };
 		537560D72D8224A000D8528B /* SampleData+Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SampleData+Note.swift"; sourceTree = "<group>"; };
-		537560D92D82292D00D8528B /* SampleData+NoteType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SampleData+NoteType.swift"; sourceTree = "<group>"; };
+		537560D92D82292D00D8528B /* SampleData+NoteCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SampleData+NoteCategory.swift"; sourceTree = "<group>"; };
 		537560DB2D83306C00D8528B /* LocationDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDataManager.swift; sourceTree = "<group>"; };
-		537560DE2D88D5C200D8528B /* NoteSamples.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSamples.swift; sourceTree = "<group>"; };
-		537560E02D88D69800D8528B /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
+		537560E02D88D69800D8528B /* ModelContainerPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContainerPreview.swift; sourceTree = "<group>"; };
+		537560E22D88EC0300D8528B /* Preview+ModelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preview+ModelContainer.swift"; sourceTree = "<group>"; };
+		537560E42D88EEC000D8528B /* NavigationContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationContext.swift; sourceTree = "<group>"; };
 		53D57B4A2D79E2A20094740D /* Nidus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nidus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B5B2D79E2A30094740D /* NidusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NidusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B652D79E2A30094740D /* NidusUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NidusUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -120,13 +122,14 @@
 			path = Nidus;
 			sourceTree = "<group>";
 		};
-		537560C12D820FFE00D8528B /* Model */ = {
+		537560C12D820FFE00D8528B /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				537560E42D88EEC000D8528B /* NavigationContext.swift */,
 				537560A92D820A5A00D8528B /* Note.swift */,
 				537560A82D820A5A00D8528B /* ModelData.swift */,
 			);
-			path = Model;
+			path = Models;
 			sourceTree = "<group>";
 		};
 		537560C42D82125200D8528B /* Views */ = {
@@ -144,8 +147,8 @@
 		537560D12D8223E800D8528B /* PreviewHelper */ = {
 			isa = PBXGroup;
 			children = (
-				537560E02D88D69800D8528B /* PreviewContainer.swift */,
-				537560DE2D88D5C200D8528B /* NoteSamples.swift */,
+				537560E22D88EC0300D8528B /* Preview+ModelContainer.swift */,
+				537560E02D88D69800D8528B /* ModelContainerPreview.swift */,
 			);
 			path = PreviewHelper;
 			sourceTree = "<group>";
@@ -153,7 +156,7 @@
 		537560D62D82248F00D8528B /* SampleData */ = {
 			isa = PBXGroup;
 			children = (
-				537560D92D82292D00D8528B /* SampleData+NoteType.swift */,
+				537560D92D82292D00D8528B /* SampleData+NoteCategory.swift */,
 				537560D72D8224A000D8528B /* SampleData+Note.swift */,
 			);
 			path = SampleData;
@@ -164,7 +167,7 @@
 			children = (
 				537560AF2D820A5A00D8528B /* Nidus */,
 				53D57B4B2D79E2A20094740D /* Products */,
-				537560C12D820FFE00D8528B /* Model */,
+				537560C12D820FFE00D8528B /* Models */,
 			);
 			sourceTree = "<group>";
 		};
@@ -318,13 +321,14 @@
 				537560B42D820A5A00D8528B /* ModelData.swift in Sources */,
 				537560B62D820A5A00D8528B /* CircleImage.swift in Sources */,
 				537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */,
-				537560DA2D82293500D8528B /* SampleData+NoteType.swift in Sources */,
+				537560DA2D82293500D8528B /* SampleData+NoteCategory.swift in Sources */,
+				537560E52D88EEC400D8528B /* NavigationContext.swift in Sources */,
 				537560CB2D82127100D8528B /* NoteDetail.swift in Sources */,
 				537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */,
-				537560E12D88D69D00D8528B /* PreviewContainer.swift in Sources */,
+				537560E12D88D69D00D8528B /* ModelContainerPreview.swift in Sources */,
 				537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */,
+				537560E32D88EC0B00D8528B /* Preview+ModelContainer.swift in Sources */,
 				537560D82D8224AB00D8528B /* SampleData+Note.swift in Sources */,
-				537560DF2D88D5C700D8528B /* NoteSamples.swift in Sources */,
 				537560CC2D82127100D8528B /* NoteRow.swift in Sources */,
 				537560CE2D82127100D8528B /* NoteList.swift in Sources */,
 				537560C02D820F3D00D8528B /* NidusApp.swift in Sources */,

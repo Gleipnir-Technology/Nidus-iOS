@@ -16,6 +16,8 @@ struct NoteEditor: View {
 	@Environment(\.dismiss) private var dismiss
 	@Environment(\.modelContext) private var modelContext
 
+	@Query(sort: \NoteCategory.name) var categories: [NoteCategory]
+
 	private var editorTitle: String {
 		note == nil ? "Add Note" : "Edit Note"
 	}
@@ -41,6 +43,9 @@ struct NoteEditor: View {
 
 				Picker("Category", selection: $selectedCategory) {
 					Text("Select a Category").tag(nil as NoteCategory?)
+					ForEach(categories) { category in
+						Text(category.name).tag(category as NoteCategory?)
+					}
 				}
 			}.toolbar {
 				ToolbarItem(placement: .principal) {
@@ -75,4 +80,13 @@ struct NoteEditor: View {
 }
 
 #Preview("Add note") {
+	ModelContainerPreview(ModelContainer.sample) {
+		NoteEditor(note: nil)
+	}
+}
+
+#Preview("Edit note") {
+	ModelContainerPreview(ModelContainer.sample) {
+		NoteEditor(note: .gate)
+	}
 }
