@@ -16,7 +16,6 @@
 		537560BC2D820A5A00D8528B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A42D820A5A00D8528B /* ContentView.swift */; };
 		537560C02D820F3D00D8528B /* NidusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560BF2D820F3D00D8528B /* NidusApp.swift */; };
 		537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C52D82127100D8528B /* ButtonAddNote.swift */; };
-		537560CB2D82127100D8528B /* NoteDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C72D82127100D8528B /* NoteDetail.swift */; };
 		537560CC2D82127100D8528B /* NoteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C92D82127100D8528B /* NoteRow.swift */; };
 		537560CE2D82127100D8528B /* NoteList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C82D82127100D8528B /* NoteList.swift */; };
 		537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560CF2D821BD500D8528B /* NoteEditor.swift */; };
@@ -56,7 +55,6 @@
 		537560BE2D820F0A00D8528B /* Nidus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Nidus.entitlements; sourceTree = "<group>"; };
 		537560BF2D820F3D00D8528B /* NidusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NidusApp.swift; sourceTree = "<group>"; };
 		537560C52D82127100D8528B /* ButtonAddNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonAddNote.swift; sourceTree = "<group>"; };
-		537560C72D82127100D8528B /* NoteDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetail.swift; sourceTree = "<group>"; };
 		537560C82D82127100D8528B /* NoteList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteList.swift; sourceTree = "<group>"; };
 		537560C92D82127100D8528B /* NoteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteRow.swift; sourceTree = "<group>"; };
 		537560CF2D821BD500D8528B /* NoteEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditor.swift; sourceTree = "<group>"; };
@@ -137,7 +135,6 @@
 			children = (
 				537560CF2D821BD500D8528B /* NoteEditor.swift */,
 				537560C52D82127100D8528B /* ButtonAddNote.swift */,
-				537560C72D82127100D8528B /* NoteDetail.swift */,
 				537560C82D82127100D8528B /* NoteList.swift */,
 				537560C92D82127100D8528B /* NoteRow.swift */,
 			);
@@ -323,7 +320,6 @@
 				537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */,
 				537560DA2D82293500D8528B /* SampleData+NoteCategory.swift in Sources */,
 				537560E52D88EEC400D8528B /* NavigationContext.swift in Sources */,
-				537560CB2D82127100D8528B /* NoteDetail.swift in Sources */,
 				537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */,
 				537560E12D88D69D00D8528B /* ModelContainerPreview.swift in Sources */,
 				537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */,

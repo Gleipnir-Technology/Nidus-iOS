@@ -51,7 +51,7 @@ struct NoteList: View {
 		else {
 			List(notes, selection: $navigationContext.selectedNote) { note in
 				NavigationLink {
-					NoteDetail(note: note)
+					NoteEditor(note: note)
 				} label: {
 					NoteRow(note: note)
 				}
