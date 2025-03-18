@@ -62,12 +62,6 @@ struct NoteEditor: View {
 					// Require a Category to save changes
 					.disabled($selectedCategory.wrappedValue == nil)
 				}
-
-				ToolbarItem(placement: .cancellationAction) {
-					Button("Cancel", role: .cancel) {
-						dismiss()
-					}
-				}
 			}
 		}.onAppear {
 			if let note {
