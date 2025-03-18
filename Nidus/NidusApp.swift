@@ -15,6 +15,6 @@ struct NidusApp: App {
 		WindowGroup {
 			ContentView()
 		}
-		.modelContainer(for: Note.self)
+		.modelContainer(for: [Note.self, NoteCategory.self])
 	}
 }

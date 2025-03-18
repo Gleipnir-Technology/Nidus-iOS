@@ -15,6 +15,7 @@ struct NoteEditor: View {
 
 	@Environment(\.dismiss) private var dismiss
 	@Environment(\.modelContext) private var modelContext
+	@Environment(NavigationContext.self) private var navigationContext
 
 	@Query(sort: \NoteCategory.name) var categories: [NoteCategory]
 
@@ -41,12 +42,7 @@ struct NoteEditor: View {
 			Form {
 				TextField("Title", text: $title)
 
-				Picker("Category", selection: $selectedCategory) {
-					Text("Select a Category").tag(nil as NoteCategory?)
-					ForEach(categories) { category in
-						Text(category.name).tag(category as NoteCategory?)
-					}
-				}
+				CategorySelectorView(selectedCategory: $selectedCategory)
 			}.toolbar {
 				ToolbarItem(placement: .principal) {
 					Text(editorTitle)

@@ -9,6 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
+	@Environment(\.modelContext) private var context
 	@State private var navigationContext = NavigationContext()
 
 	var body: some View {
