@@ -24,16 +24,16 @@ struct NoteEditor: View {
 	}
 
 	private func save() {
+		if selectedCategory == nil {
+			fatalError("nil selected category on save()")
+		}
 		if let note {
 			note.title = title
-			note.category = selectedCategory
-		}
-		else if selectedCategory == nil {
-			fatalError("nil selected category on save()")
+			note.category = selectedCategory!
 		}
 		else {
 			// Add a note
-			let newNote = Note(title: title, category: selectedCategory)
+			let newNote = Note(title: title, category: selectedCategory!)
 			modelContext.insert(newNote)
 		}
 	}
@@ -41,8 +41,9 @@ struct NoteEditor: View {
 		NavigationStack {
 			Form {
 				TextField("Title", text: $title)
-
-				CategorySelectorView(selectedCategory: $selectedCategory)
+				if let unwrapped = Binding($selectedCategory) {
+					CategorySelectorView(selectedCategory: unwrapped)
+				}
 			}.toolbar {
 				ToolbarItem(placement: .principal) {
 					Text(editorTitle)

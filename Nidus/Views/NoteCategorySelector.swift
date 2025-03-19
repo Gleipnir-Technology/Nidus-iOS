@@ -8,7 +8,7 @@ import SwiftData
 import SwiftUI
 
 struct CategorySelectorView: View {
-	@Binding var selectedCategory: NoteCategory?
+	@Binding var selectedCategory: NoteCategory
 	@Environment(\.modelContext) private var modelContext
 
 	@State private var newCategoryName: String = ""
@@ -22,7 +22,7 @@ struct CategorySelectorView: View {
 			ForEach(categories) { category in
 				CategoryRow(
 					category: category,
-					isSelected: selectedCategory?.id == category.id
+					isSelected: selectedCategory.id == category.id
 				)
 				.onTapGesture {
 					selectedCategory = category
@@ -72,7 +72,7 @@ struct AddCategoryView: View {
 	@Environment(\.modelContext) private var modelContext
 	@Binding var newCategoryName: String
 	@Binding var isPresented: Bool
-	@Binding var selectedCategory: NoteCategory?
+	@Binding var selectedCategory: NoteCategory
 
 	var body: some View {
 		Form {
@@ -103,14 +103,5 @@ struct AddCategoryView: View {
 					.isEmpty
 			)
 		)
-	}
-}
-
-struct NoteCategorySelector_Previews: PreviewProvider {
-	@State static var selectedCategory: NoteCategory? = nil
-	static var previews: some View {
-		ModelContainerPreview(ModelContainer.sample) {
-			CategorySelectorView(selectedCategory: $selectedCategory)
-		}
 	}
 }

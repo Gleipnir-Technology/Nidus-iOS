@@ -20,9 +20,9 @@ final class NoteCategory {
 @Model
 final class Note {
 	var title: String
-	var category: NoteCategory?
+	var category: NoteCategory
 
-	init(title: String, category: NoteCategory?) {
+	init(title: String, category: NoteCategory) {
 		self.title = title
 		self.category = category
 	}
