@@ -9,8 +9,9 @@ import SwiftUI
 
 struct NoteListView: View {
 	@Environment(\.modelContext) private var modelContext
-	@Environment(NavigationContext.self) private var navigationContext
 	@Query(sort: \Note.title) private var notes: [Note]
+	@State private var selectedNote: Note?
+
 	var body: some View {
 		NavigationSplitView {
 			ZStack {
@@ -33,23 +34,22 @@ struct NoteListView: View {
 				}
 			}
 		} detail: {
-			NoteEditor(note: navigationContext.selectedNote)
+			NoteEditor(note: selectedNote)
 		}
 	}
 }
 
 struct NoteList: View {
 	@Environment(\.modelContext) private var modelContext
-	@Environment(NavigationContext.self) private var navigationContext
 	@Query(sort: \Note.title) private var notes: [Note]
+	@State private var selectedNote: Note?
 
 	var body: some View {
-		@Bindable var navigationContext = navigationContext
 		if notes.count == 0 {
 			Text("No notes yet")
 		}
 		else {
-			List(notes, selection: $navigationContext.selectedNote) { note in
+			List(notes, selection: $selectedNote) { note in
 				NavigationLink {
 					NoteEditor(note: note)
 				} label: {
@@ -63,7 +63,7 @@ struct NoteList: View {
 #Preview {
 	ModelContainerPreview(ModelContainer.sample) {
 		NavigationStack {
-			NoteList().environment(NavigationContext())
+			NoteList()
 		}
 	}
 }

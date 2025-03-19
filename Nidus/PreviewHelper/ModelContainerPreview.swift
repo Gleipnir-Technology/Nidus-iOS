@@ -21,7 +21,6 @@ struct ModelContainerPreview<Content: View>: View {
 	///     #Preview {
 	///         ModelContainerPreview {
 	///             AnimalEditor(animal: nil)
-	///                 .environment(NavigationContext())
 	///             } modelContainer: {
 	///                 let schema = Schema([AnimalCategory.self, Animal.self])
 	///                 let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
@@ -60,7 +59,6 @@ struct ModelContainerPreview<Content: View>: View {
 	///     #Preview {
 	///         ModelContainerPreview(SampleModelContainer.main) {
 	///             AnimalEditor(animal: .kangaroo)
-	///                 .environment(NavigationContext())
 	///         }
 	///     }
 	///
