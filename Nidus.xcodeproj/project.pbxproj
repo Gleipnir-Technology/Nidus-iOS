@@ -24,7 +24,7 @@
 		537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560DB2D83306C00D8528B /* LocationDataManager.swift */; };
 		537560E12D88D69D00D8528B /* ModelContainerPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560E02D88D69800D8528B /* ModelContainerPreview.swift */; };
 		537560E32D88EC0B00D8528B /* Preview+ModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560E22D88EC0300D8528B /* Preview+ModelContainer.swift */; };
-		53E308162D8A4FD800534AB0 /* NavigationContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E308152D8A4FD800534AB0 /* NavigationContext.swift */; };
+		53E308182D8B39ED00534AB0 /* NoteCategoryAdd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E308172D8B39E800534AB0 /* NoteCategoryAdd.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,7 +66,7 @@
 		53D57B4A2D79E2A20094740D /* Nidus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nidus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B5B2D79E2A30094740D /* NidusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NidusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B652D79E2A30094740D /* NidusUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NidusUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		53E308152D8A4FD800534AB0 /* NavigationContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationContext.swift; sourceTree = "<group>"; };
+		53E308172D8B39E800534AB0 /* NoteCategoryAdd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCategoryAdd.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,7 +105,6 @@
 		537560AF2D820A5A00D8528B /* Nidus */ = {
 			isa = PBXGroup;
 			children = (
-				53E308152D8A4FD800534AB0 /* NavigationContext.swift */,
 				537560DB2D83306C00D8528B /* LocationDataManager.swift */,
 				537560D62D82248F00D8528B /* SampleData */,
 				537560D12D8223E800D8528B /* PreviewHelper */,
@@ -133,6 +132,7 @@
 		537560C42D82125200D8528B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				53E308172D8B39E800534AB0 /* NoteCategoryAdd.swift */,
 				537560CF2D821BD500D8528B /* NoteEditor.swift */,
 				537560C52D82127100D8528B /* ButtonAddNote.swift */,
 				537560C82D82127100D8528B /* NoteList.swift */,
@@ -322,13 +322,13 @@
 				537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */,
 				537560E12D88D69D00D8528B /* ModelContainerPreview.swift in Sources */,
 				537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */,
-				53E308162D8A4FD800534AB0 /* NavigationContext.swift in Sources */,
 				537560E32D88EC0B00D8528B /* Preview+ModelContainer.swift in Sources */,
 				537560D82D8224AB00D8528B /* SampleData+Note.swift in Sources */,
 				537560CC2D82127100D8528B /* NoteRow.swift in Sources */,
 				537560CE2D82127100D8528B /* NoteList.swift in Sources */,
 				537560C02D820F3D00D8528B /* NidusApp.swift in Sources */,
 				537560B92D820A5A00D8528B /* Note.swift in Sources */,
+				53E308182D8B39ED00534AB0 /* NoteCategoryAdd.swift in Sources */,
 				537560BA2D820A5A00D8528B /* MapView.swift in Sources */,
 				537560BC2D820A5A00D8528B /* ContentView.swift in Sources */,
 			);

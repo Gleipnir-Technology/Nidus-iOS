@@ -36,13 +36,32 @@ struct NoteEditor: View {
 			modelContext.insert(newNote)
 		}
 	}
+	func addCategory() {}
 	var body: some View {
 		NavigationStack {
 			Form {
 				TextField("Title", text: $title)
-				Picker("Category", selection: $selectedCategory) {
-					ForEach(categories) { category in
-						Text(category.name)
+				HStack {
+					Picker(selection: $selectedCategory) {
+						ForEach(categories) { category in
+							Text(category.name).tag(category)
+						}
+					} label: {
+						Text("Category")
+					}
+					Spacer()
+					Menu {
+						NavigationLink {
+							NoteCategoryAdd()
+						} label: {
+							Label("Add Category", systemImage: "plus")
+								.labelStyle(.iconOnly)
+
+						}
+					} label: {
+						Label("foo", systemImage: "ellipsis").labelStyle(
+							.iconOnly
+						)
 					}
 				}
 			}.toolbar {
