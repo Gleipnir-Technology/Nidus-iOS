@@ -12,7 +12,14 @@ struct ContentView: View {
 	@Environment(\.modelContext) private var context
 
 	var body: some View {
-		NoteListView()
+		TabView {
+			NoteList().tabItem {
+				Label("Notes2", systemImage: "pencil")
+			}
+			SettingView().tabItem {
+				Label("Settings", systemImage: "gearshape")
+			}
+		}
 	}
 }
 
