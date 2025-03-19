@@ -12,7 +12,7 @@ struct NoteRow: View {
 	var body: some View {
 		HStack {
 			//note.image.resizable().frame(width: 50, height: 50)
-			Text(note.title)
+			Text(note.content)
 			Spacer()
 		}
 		.padding()

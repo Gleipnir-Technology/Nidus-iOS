@@ -8,6 +8,7 @@
 
 import CoreLocation
 import Foundation
+import SwiftUI
 
 @Observable
 class LocationDataManager: NSObject, CLLocationManagerDelegate {

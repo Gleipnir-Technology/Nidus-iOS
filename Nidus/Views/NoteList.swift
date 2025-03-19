@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NoteListView: View {
 	@Environment(\.modelContext) private var modelContext
-	@Query(sort: \Note.title) private var notes: [Note]
+	@Query(sort: \Note.content) private var notes: [Note]
 	@State private var selectedNote: Note?
 
 	var body: some View {
@@ -41,29 +41,27 @@ struct NoteListView: View {
 
 struct NoteList: View {
 	@Environment(\.modelContext) private var modelContext
-	@Query(sort: \Note.title) private var notes: [Note]
+	@Query(sort: \Note.content) private var notes: [Note]
 	@State private var selectedNote: Note?
 
 	var body: some View {
-		if notes.count == 0 {
-			Text("No notes yet")
-		}
-		else {
-			List(notes, selection: $selectedNote) { note in
-				NavigationLink {
-					NoteEditor(note: note)
-				} label: {
-					NoteRow(note: note)
-				}
+		List(notes, selection: $selectedNote) { note in
+			NavigationLink {
+				NoteEditor(note: note)
+			} label: {
+				NoteRow(note: note)
 			}
 		}
 	}
 }
 
-#Preview {
+#Preview("Empty") {
+	ModelContainerPreview(ModelContainer.empty) {
+		NoteListView()
+	}
+}
+#Preview("Sample") {
 	ModelContainerPreview(ModelContainer.sample) {
-		NavigationStack {
-			NoteList()
-		}
+		NoteListView()
 	}
 }

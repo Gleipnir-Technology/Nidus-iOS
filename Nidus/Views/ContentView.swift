@@ -13,8 +13,8 @@ struct ContentView: View {
 
 	var body: some View {
 		TabView {
-			NoteList().tabItem {
-				Label("Notes2", systemImage: "pencil")
+			NoteListView().tabItem {
+				Label("Notes", systemImage: "pencil")
 			}
 			SettingView().tabItem {
 				Label("Settings", systemImage: "gearshape")

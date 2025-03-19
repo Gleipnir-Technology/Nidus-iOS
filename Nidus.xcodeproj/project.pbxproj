@@ -116,8 +116,6 @@
 				537560A02D820A5A00D8528B /* Preview Content */,
 				537560A12D820A5A00D8528B /* Assets.xcassets */,
 				537560A32D820A5A00D8528B /* CircleImage.swift */,
-				537560A42D820A5A00D8528B /* ContentView.swift */,
-				537560A72D820A5A00D8528B /* MapView.swift */,
 			);
 			path = Nidus;
 			sourceTree = "<group>";
@@ -134,12 +132,14 @@
 		537560C42D82125200D8528B /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				538784422D8B474300B3552E /* SettingView.swift */,
+				537560C52D82127100D8528B /* ButtonAddNote.swift */,
+				537560A42D820A5A00D8528B /* ContentView.swift */,
+				537560A72D820A5A00D8528B /* MapView.swift */,
 				53E308172D8B39E800534AB0 /* NoteCategoryAdd.swift */,
 				537560CF2D821BD500D8528B /* NoteEditor.swift */,
-				537560C52D82127100D8528B /* ButtonAddNote.swift */,
 				537560C82D82127100D8528B /* NoteList.swift */,
 				537560C92D82127100D8528B /* NoteRow.swift */,
+				538784422D8B474300B3552E /* SettingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -494,7 +494,8 @@
 				DEVELOPMENT_TEAM = XAP2N849QA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Because it's super important";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Nidus saves notes with their location so it can show you notes near your current position.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -533,7 +534,8 @@
 				DEVELOPMENT_TEAM = XAP2N849QA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Because it's super important";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Nidus saves notes with their location so it can show you notes near your current position.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

@@ -9,18 +9,18 @@ import Foundation
 import SwiftData
 
 extension NoteCategory {
-	static let entry = NoteCategory(name: "entry")
-	static let info = NoteCategory(name: "info")
-	static let todo = NoteCategory(name: "todo")
+	static let entry = NoteCategory(icon: "lock.circle", name: "entry")
+	static let info = NoteCategory(icon: "info.circle", name: "info")
+	static let todo = NoteCategory(icon: "checkmark.circle", name: "todo")
 
 	static func insertSampleData(modelContext: ModelContext) {
 		modelContext.insert(entry)
 		modelContext.insert(info)
 		modelContext.insert(todo)
 
-		modelContext.insert(Note.gate)
-		modelContext.insert(Note.station)
-		modelContext.insert(Note.trap)
+		modelContext.insert(Note.advise)
+		modelContext.insert(Note.dog)
+		modelContext.insert(Note.wave)
 	}
 
 	static func reloadSampleData(modelContext: ModelContext) {
