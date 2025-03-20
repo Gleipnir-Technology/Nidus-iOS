@@ -23,6 +23,8 @@ struct NoteMapView: View {
 		center: CLLocationCoordinate2D(latitude: 40.83834587046632, longitude: 14.25),
 		span: MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)
 	)
+	@Namespace var mapScope
+
 	var userLocation: CLLocation?
 
 	private let places = [
@@ -41,16 +43,25 @@ struct NoteMapView: View {
 	]
 
 	var body: some View {
-		Map {
-			ForEach(places, id: \.id) { place in
-				Marker(place.name, coordinate: place.coordinate).tint(.orange)
-			}
-			if let userLocation = userLocation {
-				Marker("you", coordinate: userLocation.coordinate).tint(.blue)
-			}
-		}.mapStyle(
-			MapStyle.standard(pointsOfInterest: PointOfInterestCategories.excludingAll)
-		)
+		ZStack(alignment: .trailing) {
+			Map(scope: mapScope) {
+				ForEach(places, id: \.id) { place in
+					Marker(place.name, coordinate: place.coordinate).tint(
+						.orange
+					)
+				}
+				if let userLocation = userLocation {
+					Marker("you", coordinate: userLocation.coordinate).tint(
+						.blue
+					)
+				}
+			}.mapStyle(
+				MapStyle.standard(
+					pointsOfInterest: PointOfInterestCategories.excludingAll
+				)
+			)
+			MapScaleView(anchorEdge: .trailing, scope: mapScope)
+		}
 	}
 }
 
