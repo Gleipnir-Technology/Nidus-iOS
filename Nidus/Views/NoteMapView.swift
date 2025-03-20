@@ -13,7 +13,7 @@ struct PointOfInterest: Identifiable {
 	let latitude: Double
 	let longitude: Double
 
-	var coordinates: CLLocationCoordinate2D {
+	var coordinate: CLLocationCoordinate2D {
 		CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
 	}
 }
@@ -39,14 +39,11 @@ struct NoteMapView: View {
 	]
 
 	var body: some View {
-		Map(coordinateRegion: $region, annotationItems: places) { place in
-			MapAnnotation(coordinate: place.coordinates) {
-				Image(systemName: "mappin.circle.fill")
-					.font(.title)
-					.foregroundColor(.blue)
+		Map {
+			ForEach(places, id: \.id) { place in
+				Marker(place.name, coordinate: place.coordinate).tint(.orange)
 			}
 		}
-		.edgesIgnoringSafeArea(.all)
 	}
 }
 
