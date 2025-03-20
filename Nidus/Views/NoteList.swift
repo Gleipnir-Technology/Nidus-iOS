@@ -28,7 +28,10 @@ struct NoteListView: View {
 					HStack {
 						Spacer()
 						NavigationLink {
-							NoteEditor(note: nil)
+							NoteEditor(
+								note: nil,
+								userLocation: userLocation
+							)
 						} label: {
 							ButtonAddNote()
 						}

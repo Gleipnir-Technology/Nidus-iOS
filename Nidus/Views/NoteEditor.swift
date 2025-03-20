@@ -14,7 +14,7 @@ struct NoteEditor: View {
 	@State private var content = ""
 	@State private var category: NoteCategory?
 	@State private var noteLocation: NoteLocation?
-	@State private var userLocation: CLLocationCoordinate2D?
+	var userLocation: CLLocation?
 
 	@Environment(\.dismiss) private var dismiss
 	@Environment(\.modelContext) private var modelContext
@@ -62,17 +62,17 @@ struct NoteEditor: View {
 					}
 				}
 				else if let ul = userLocation {
-					MapView(coordinate: ul).frame(height: 300)
+					MapView(coordinate: ul.coordinate).frame(height: 300)
 				}
 				else {
 					Text("Location unavailable")
 				}
 				if let category = category {
 					Picker(selection: $category) {
-						ForEach(categories) { category in
+						ForEach(categories) { c in
 							Label(
-								category.name,
-								systemImage: category.icon
+								c.name,
+								systemImage: c.icon
 							)
 							.tag(category)
 						}
@@ -121,5 +121,5 @@ struct NoteEditor: View {
 }
 
 #Preview("Broken", traits: .modifier(MockDataPreviewModifier())) {
-	NoteEditor(note: nil)
+	NoteEditor(note: nil, userLocation: CLLocation(latitude: 33.3, longitude: -111.0))
 }

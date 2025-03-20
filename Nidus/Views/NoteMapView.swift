@@ -6,8 +6,10 @@
 //
 import CoreLocation
 import MapKit
+import SwiftData
 import SwiftUI
 
+/*
 struct PointOfInterest: Identifiable {
 	let id = UUID()
 	let name: String
@@ -18,34 +20,25 @@ struct PointOfInterest: Identifiable {
 		CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
 	}
 }
-struct NoteMapView: View {
-	@State private var region = MKCoordinateRegion(
-		center: CLLocationCoordinate2D(latitude: 40.83834587046632, longitude: 14.25),
-		span: MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)
-	)
+*/
 
-	private let places = [
-		//2.
-		PointOfInterest(
-			name: "Galeria Umberto I",
-			latitude: 40.83859036140747,
-			longitude: 14.24945566830365
-		),
-		PointOfInterest(name: "Castel dell'Ovo", latitude: 40.828206, longitude: 14.247549),
-		PointOfInterest(
-			name: "Piazza Dante",
-			latitude: 40.848891382971985,
-			longitude: 14.250055428532933
-		),
-	]
+struct NoteMapView: View {
+	@Query() private var notes: [Note]
 
 	var body: some View {
 		ZStack(alignment: .trailing) {
 			Map {
-				ForEach(places, id: \.id) { place in
-					Marker(place.name, coordinate: place.coordinate).tint(
-						.orange
-					)
+				ForEach(notes, id: \.id) { note in
+					if let location = note.location {
+						Marker(
+							note.category.name,
+							systemImage: note.category.icon,
+							coordinate:
+								location.asCLLocationCoordinate2D()
+						).tint(
+							.orange
+						)
+					}
 				}
 			}.mapControls {
 				MapCompass()

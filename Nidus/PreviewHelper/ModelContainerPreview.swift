@@ -21,7 +21,9 @@ struct MockDataPreviewModifier: PreviewModifier {
 	}
 
 	static func populateContainer(_ container: ModelContainer) {
-		container.mainContext.insert(NoteCategory(icon: "gear", name: "Gearso"))
+		container.mainContext.insert(
+			NoteCategory(color: .blue, icon: "gear", name: "Gearso")
+		)
 	}
 
 	func body(content: Content, context: ModelContainer) -> some View {

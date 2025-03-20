@@ -9,9 +9,9 @@ import Foundation
 import SwiftData
 
 extension NoteCategory {
-	static let entry = NoteCategory(icon: "lock.circle", name: "entry")
-	static let info = NoteCategory(icon: "info.circle", name: "info")
-	static let todo = NoteCategory(icon: "checkmark.circle", name: "todo")
+	static let entry = NoteCategory(color: .green, icon: "lock.circle", name: "entry")
+	static let info = NoteCategory(color: .blue, icon: "info.circle", name: "info")
+	static let todo = NoteCategory(color: .red, icon: "checkmark.circle", name: "todo")
 
 	static func insertSampleData(modelContext: ModelContext) {
 		modelContext.insert(entry)
