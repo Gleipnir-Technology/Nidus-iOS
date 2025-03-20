@@ -16,6 +16,9 @@ struct ContentView: View {
 			NoteListView().tabItem {
 				Label("Notes", systemImage: "pencil")
 			}
+			NoteMapView().tabItem {
+				Label("Map", systemImage: "map")
+			}
 			SettingView().tabItem {
 				Label("Settings", systemImage: "gearshape")
 			}

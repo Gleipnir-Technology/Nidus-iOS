@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531B36B42D8B962900CE8BA0 /* NoteMapView.swift */; };
 		537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5375609F2D820A5A00D8528B /* Preview Assets.xcassets */; };
 		537560B22D820A5A00D8528B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 537560A12D820A5A00D8528B /* Assets.xcassets */; };
 		537560B42D820A5A00D8528B /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A82D820A5A00D8528B /* ModelData.swift */; };
@@ -46,6 +47,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		531B36B42D8B962900CE8BA0 /* NoteMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteMapView.swift; sourceTree = "<group>"; };
 		5375609F2D820A5A00D8528B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		537560A12D820A5A00D8528B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		537560A32D820A5A00D8528B /* CircleImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleImage.swift; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 		537560C42D82125200D8528B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				531B36B42D8B962900CE8BA0 /* NoteMapView.swift */,
 				537560C52D82127100D8528B /* ButtonAddNote.swift */,
 				537560A42D820A5A00D8528B /* ContentView.swift */,
 				537560A72D820A5A00D8528B /* MapView.swift */,
@@ -321,6 +324,7 @@
 				537560B42D820A5A00D8528B /* ModelData.swift in Sources */,
 				537560B62D820A5A00D8528B /* CircleImage.swift in Sources */,
 				537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */,
+				531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */,
 				537560DA2D82293500D8528B /* SampleData+NoteCategory.swift in Sources */,
 				537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */,
 				537560E12D88D69D00D8528B /* ModelContainerPreview.swift in Sources */,
