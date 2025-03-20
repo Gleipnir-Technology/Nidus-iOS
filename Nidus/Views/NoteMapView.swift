@@ -39,9 +39,14 @@ struct NoteMapView: View {
 	]
 
 	var body: some View {
-		Map(coordinateRegion: $region, annotationItems: places) {
-			place in MapMarker(coordinate: place.coordinates)
+		Map(coordinateRegion: $region, annotationItems: places) { place in
+			MapAnnotation(coordinate: place.coordinates) {
+				Image(systemName: "mappin.circle.fill")
+					.font(.title)
+					.foregroundColor(.blue)
+			}
 		}
+		.edgesIgnoringSafeArea(.all)
 	}
 }
 
