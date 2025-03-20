@@ -57,7 +57,9 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 
 		case .notDetermined:  // Authorization not determined yet.
 			authorizationStatus = .notDetermined
-			manager.requestWhenInUseAuthorization()
+			if self.allowAuthorizationChange {
+				manager.requestWhenInUseAuthorization()
+			}
 			break
 
 		default:
