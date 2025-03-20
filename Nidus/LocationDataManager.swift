@@ -16,7 +16,6 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 	var allowAuthorizationChange: Bool
 	var isPrecise: Bool = false
 	var location: CLLocation? = nil
-	var updates: Int = 0
 	private var locationManager = CLLocationManager()
 
 	init(authorizationStatus: CLAuthorizationStatus? = nil) {
@@ -72,7 +71,6 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 	) {
 		let location = locations.last
 		self.location = location
-		self.updates += 1
 	}
 
 	func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
