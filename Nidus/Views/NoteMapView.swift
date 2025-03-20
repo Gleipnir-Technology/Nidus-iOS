@@ -24,8 +24,6 @@ struct NoteMapView: View {
 		span: MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)
 	)
 
-	var userLocation: CLLocation?
-
 	private let places = [
 		//2.
 		PointOfInterest(
@@ -49,12 +47,8 @@ struct NoteMapView: View {
 						.orange
 					)
 				}
-				if let userLocation = userLocation {
-					Marker("you", coordinate: userLocation.coordinate).tint(
-						.blue
-					)
-				}
 			}.mapControls {
+				MapCompass()
 				MapScaleView()
 				MapUserLocationButton()
 			}.mapStyle(
@@ -67,5 +61,5 @@ struct NoteMapView: View {
 }
 
 #Preview("sample", traits: .modifier(MockDataPreviewModifier())) {
-	NoteMapView(userLocation: CLLocation(latitude: 40.83834587046632, longitude: 14.25))
+	NoteMapView()
 }
