@@ -8,6 +8,8 @@ import CoreLocation
 import SwiftUI
 
 struct NoteRow: View {
+	@Environment(\.locale) var locale
+
 	var note: Note
 	var userLocation: CLLocation?
 
@@ -18,8 +20,15 @@ struct NoteRow: View {
 					latitude: noteCoord.latitude,
 					longitude: noteCoord.longitude
 				)
-				let distance = noteLocation.distance(from: ul)
-				return String(format: "%.1f m", distance)
+				let distance = Measurement(
+					value: noteLocation.distance(from: ul),
+					unit: UnitLength.meters
+				)
+				return distance.formatted(
+					.measurement(width: .abbreviated, usage: .road).locale(
+						locale
+					)
+				)
 			}
 			else {
 				return "No location recorded"
@@ -39,8 +48,39 @@ struct NoteRow: View {
 	}
 }
 
-#Preview("note 1") {
-	Group {
-		NoteRow(note: Note.dog)
-	}
+#Preview("0.1m", traits: .modifier(MockDataPreviewModifier())) {
+	NoteRow(
+		note: Note.dog,
+		userLocation: CLLocation(
+			latitude: Note.dog.location!.latitude + 0.000_002,
+			longitude: Note.dog.location!.longitude + 0.000_003
+		)
+	)
+}
+#Preview("1m", traits: .modifier(MockDataPreviewModifier())) {
+	NoteRow(
+		note: Note.dog,
+		userLocation: CLLocation(
+			latitude: Note.dog.location!.latitude + 0.000_2,
+			longitude: Note.dog.location!.longitude + 0.000_3
+		)
+	)
+}
+#Preview("100m", traits: .modifier(MockDataPreviewModifier())) {
+	NoteRow(
+		note: Note.dog,
+		userLocation: CLLocation(
+			latitude: Note.dog.location!.latitude + 0.002,
+			longitude: Note.dog.location!.longitude + 0.003
+		)
+	)
+}
+#Preview("1000m", traits: .modifier(MockDataPreviewModifier())) {
+	NoteRow(
+		note: Note.dog,
+		userLocation: CLLocation(
+			latitude: Note.dog.location!.latitude + 0.02,
+			longitude: Note.dog.location!.longitude + 0.03
+		)
+	)
 }
