@@ -4,6 +4,7 @@
 //
 //  Created by Eli Ribble on 3/19/25.
 //
+import CoreLocation
 import MapKit
 import SwiftUI
 
@@ -22,6 +23,7 @@ struct NoteMapView: View {
 		center: CLLocationCoordinate2D(latitude: 40.83834587046632, longitude: 14.25),
 		span: MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)
 	)
+	var userLocation: CLLocation?
 
 	private let places = [
 		//2.
@@ -43,6 +45,9 @@ struct NoteMapView: View {
 			ForEach(places, id: \.id) { place in
 				Marker(place.name, coordinate: place.coordinate).tint(.orange)
 			}
+			if let userLocation = userLocation {
+				Marker("you", coordinate: userLocation.coordinate).tint(.blue)
+			}
 		}.mapStyle(
 			MapStyle.standard(pointsOfInterest: PointOfInterestCategories.excludingAll)
 		)
@@ -50,5 +55,5 @@ struct NoteMapView: View {
 }
 
 #Preview("sample", traits: .modifier(MockDataPreviewModifier())) {
-	NoteMapView()
+	NoteMapView(userLocation: CLLocation(latitude: 40.83834587046632, longitude: 14.25))
 }
