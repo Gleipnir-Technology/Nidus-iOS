@@ -9,6 +9,37 @@ A view to use only in previews that creates a model container before
 import SwiftData
 import SwiftUI
 
+struct MockDataPreviewModifier: PreviewModifier {
+	static func makeSharedContext() throws -> ModelContainer {
+		let container = try ModelContainer(
+			for: NoteCategory.self,
+			configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+		)
+		populateContainer(container)
+
+		return container
+	}
+
+	static func populateContainer(_ container: ModelContainer) {
+		container.mainContext.insert(NoteCategory(icon: "gear", name: "Gearso"))
+	}
+
+	func body(content: Content, context: ModelContainer) -> some View {
+		content.modelContainer(context)
+	}
+}
+
+/*
+struct MockLocationPreviewModifier: PreviewModifier {
+    static func makeSharedContext() throws -> ModelContainer {
+
+    }
+    static func body(content: Content) -> some View {
+        //content
+    }
+}
+*/
+
 struct ModelContainerPreview<Content: View>: View {
 	var content: () -> Content
 	let container: ModelContainer

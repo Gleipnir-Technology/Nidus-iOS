@@ -120,25 +120,6 @@ struct NoteEditor: View {
 	}
 }
 
-struct MockDataPreviewModifier: PreviewModifier {
-	static func makeSharedContext() throws -> ModelContainer {
-		let container = try ModelContainer(
-			for: NoteCategory.self,
-			configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-		)
-		populateContainer(container)
-
-		return container
-	}
-
-	static func populateContainer(_ container: ModelContainer) {
-		container.mainContext.insert(NoteCategory(icon: "gear", name: "Gearso"))
-	}
-
-	func body(content: Content, context: ModelContainer) -> some View {
-		content.modelContainer(context)
-	}
-}
 #Preview("Broken", traits: .modifier(MockDataPreviewModifier())) {
 	NoteEditor(note: nil)
 }
