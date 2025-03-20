@@ -4,6 +4,7 @@
 //
 //  Created by Eli Ribble on 3/11/25.
 //
+import CoreLocation
 import SwiftData
 import SwiftUI
 
@@ -11,6 +12,7 @@ struct NoteListView: View {
 	@Environment(\.modelContext) private var modelContext
 	@Query(sort: \Note.content) private var notes: [Note]
 	@State private var selectedNote: Note?
+	var userLocation: CLLocation?
 
 	var body: some View {
 		NavigationSplitView {
@@ -19,7 +21,7 @@ struct NoteListView: View {
 					Text("No notes yet")
 				}
 				else {
-					NoteList()
+					NoteList(userLocation: userLocation)
 				}
 				VStack {
 					Spacer()
@@ -43,13 +45,14 @@ struct NoteList: View {
 	@Environment(\.modelContext) private var modelContext
 	@Query(sort: \Note.content) private var notes: [Note]
 	@State private var selectedNote: Note?
+	var userLocation: CLLocation?
 
 	var body: some View {
 		List(notes, selection: $selectedNote) { note in
 			NavigationLink {
 				NoteEditor(note: note)
 			} label: {
-				NoteRow(note: note)
+				NoteRow(note: note, userLocation: userLocation)
 			}
 		}
 	}

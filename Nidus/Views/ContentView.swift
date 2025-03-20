@@ -10,10 +10,11 @@ import SwiftUI
 
 struct ContentView: View {
 	@Environment(\.modelContext) private var context
+	@State var locationDataManager: LocationDataManager = LocationDataManager()
 
 	var body: some View {
 		TabView {
-			NoteListView().tabItem {
+			NoteListView(userLocation: locationDataManager.location).tabItem {
 				Label("Notes", systemImage: "pencil")
 			}
 			NoteMapView().tabItem {
