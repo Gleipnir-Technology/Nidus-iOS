@@ -43,7 +43,9 @@ struct NoteMapView: View {
 			ForEach(places, id: \.id) { place in
 				Marker(place.name, coordinate: place.coordinate).tint(.orange)
 			}
-		}
+		}.mapStyle(
+			MapStyle.standard(pointsOfInterest: PointOfInterestCategories.excludingAll)
+		)
 	}
 }
 
