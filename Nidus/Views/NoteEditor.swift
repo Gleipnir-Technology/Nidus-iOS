@@ -4,6 +4,7 @@
 //
 //  Created by Eli Ribble on 3/12/25.
 //
+import CoreLocation
 import SwiftData
 import SwiftUI
 
@@ -12,10 +13,10 @@ struct NoteEditor: View {
 
 	@State private var content = ""
 	@State private var category: NoteCategory?
-	@State private var location: NoteLocation?
+	@State private var noteLocation: NoteLocation?
+	@State private var userLocation: CLLocationCoordinate2D?
 
 	@Environment(\.dismiss) private var dismiss
-	@Environment(LocationDataManager.self) private var locationDataManager
 	@Environment(\.modelContext) private var modelContext
 
 	@Query(sort: \NoteCategory.name) var categories: [NoteCategory]
@@ -37,10 +38,10 @@ struct NoteEditor: View {
 			let newNote = Note(
 				category: category!,
 				content: content,
-				location: locationDataManager.location?.coordinate == nil
+				location: userLocation == nil
 					? nil
 					: NoteLocation(
-						location: locationDataManager.location!.coordinate
+						location: userLocation!
 					)
 			)
 			modelContext.insert(newNote)
@@ -60,19 +61,27 @@ struct NoteEditor: View {
 						Text("Location unavailable")
 					}
 				}
-				else if let location = locationDataManager.location {
-					MapView(coordinate: location.coordinate).frame(height: 300)
+				else if let ul = userLocation {
+					MapView(coordinate: ul).frame(height: 300)
 				}
 				else {
 					Text("Location unavailable")
 				}
-				Picker(selection: $category) {
-					ForEach(categories) { category in
-						Label(category.name, systemImage: category.icon)
+				if let category = category {
+					Picker(selection: $category) {
+						ForEach(categories) { category in
+							Label(
+								category.name,
+								systemImage: category.icon
+							)
 							.tag(category)
+						}
+					} label: {
+						Text("Category")
 					}
-				} label: {
-					Text("Category")
+				}
+				else {
+					Text("No categories")
 				}
 				TextField("Note content", text: $content, axis: .vertical)
 			}.toolbar {
@@ -97,18 +106,39 @@ struct NoteEditor: View {
 				content = note.content
 				category = note.category
 			}
+			else {
+				content = ""
+				category = categories.first
+			}
 		}
 	}
 }
 
-#Preview("Add note") {
-	ModelContainerPreview(ModelContainer.sample) {
+#Preview("Empty") {
+	ModelContainerPreview(ModelContainer.empty) {
 		NoteEditor(note: nil)
 	}
 }
 
-#Preview("Edit note") {
-	ModelContainerPreview(ModelContainer.sample) {
-		NoteEditor(note: .dog)
+struct MockDataPreviewModifier: PreviewModifier {
+	static func makeSharedContext() throws -> ModelContainer {
+		let container = try ModelContainer(
+			for: NoteCategory.self,
+			configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+		)
+		populateContainer(container)
+
+		return container
 	}
+
+	static func populateContainer(_ container: ModelContainer) {
+		container.mainContext.insert(NoteCategory(icon: "gear", name: "Gearso"))
+	}
+
+	func body(content: Content, context: ModelContainer) -> some View {
+		content.modelContainer(context)
+	}
+}
+#Preview("Broken", traits: .modifier(MockDataPreviewModifier())) {
+	NoteEditor(note: nil)
 }

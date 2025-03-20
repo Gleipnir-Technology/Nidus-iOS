@@ -8,18 +8,17 @@ import CoreLocation
 import SwiftUI
 
 struct NoteRow: View {
-	@Environment(LocationDataManager.self) private var locationDataManager
-
 	var note: Note
+	var userLocation: CLLocation?
 
 	func distanceString() -> String {
-		if let location = locationDataManager.location {
+		if let ul = userLocation {
 			if let noteCoord = note.location {
 				let noteLocation = CLLocation(
 					latitude: noteCoord.latitude,
 					longitude: noteCoord.longitude
 				)
-				let distance = location.distance(from: noteLocation)
+				let distance = noteLocation.distance(from: ul)
 				return String(format: "%.1f m", distance)
 			}
 			else {
