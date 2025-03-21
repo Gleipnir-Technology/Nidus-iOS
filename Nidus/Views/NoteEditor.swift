@@ -11,9 +11,10 @@ import SwiftUI
 struct NoteEditor: View {
 	let note: Note?
 
-	@State private var content = ""
+	@State private var content: String
 	@State private var category: NoteCategory?
-	@State private var noteLocation: NoteLocation?
+	@State private var location: CLLocationCoordinate2D
+
 	var userLocation: CLLocation?
 
 	@Environment(\.dismiss) private var dismiss
@@ -21,28 +22,33 @@ struct NoteEditor: View {
 
 	@Query(sort: \NoteCategory.name) var categories: [NoteCategory]
 
+	init(note: Note?, userLocation: CLLocation?) {
+		self.note = note
+		self.content = note?.content ?? ""
+		self.location =
+			note?.location.asCLLocationCoordinate2D() ?? userLocation?.coordinate
+			?? CLLocationCoordinate2D()
+	}
+
 	private var editorTitle: String {
 		note == nil ? "Add Note" : "Edit Note"
 	}
 
 	private func save() {
 		if category == nil {
-			fatalError("nil selected category on save()")
+			fatalError("Must select a category")
 		}
 		if let note {
-			note.content = content
 			note.category = category!
+			note.content = content
+			note.location = NoteLocation(location: location)
 		}
 		else {
 			// Add a note
 			let newNote = Note(
 				category: category!,
 				content: content,
-				location: userLocation == nil
-					? nil
-					: NoteLocation(
-						location: userLocation!
-					)
+				location: NoteLocation(location: location)
 			)
 			modelContext.insert(newNote)
 		}
@@ -50,38 +56,19 @@ struct NoteEditor: View {
 	var body: some View {
 		NavigationStack {
 			Form {
-				if let note {
-					if let location = note.location {
-						MapView(
-							coordinate:
-								location.asCLLocationCoordinate2D()
-						).frame(height: 300)
+				MapView(
+					coordinate: $location
+				).frame(height: 300)
+				Picker(selection: $category) {
+					ForEach(categories) { c in
+						Label(
+							c.name,
+							systemImage: c.icon
+						)
+						.tag(category)
 					}
-					else {
-						Text("Location unavailable")
-					}
-				}
-				else if let ul = userLocation {
-					MapView(coordinate: ul.coordinate).frame(height: 300)
-				}
-				else {
-					Text("Location unavailable")
-				}
-				if let category = category {
-					Picker(selection: $category) {
-						ForEach(categories) { c in
-							Label(
-								c.name,
-								systemImage: c.icon
-							)
-							.tag(category)
-						}
-					} label: {
-						Text("Category")
-					}
-				}
-				else {
-					Text("No categories")
+				} label: {
+					Text("Category")
 				}
 				TextField("Note content", text: $content, axis: .vertical)
 			}.toolbar {
@@ -100,23 +87,13 @@ struct NoteEditor: View {
 					.disabled($category.wrappedValue == nil)
 				}
 			}
-		}.onAppear {
-			if let note {
-				// Edit the incoming note.
-				content = note.content
-				category = note.category
-			}
-			else {
-				content = ""
-				category = categories.first
-			}
 		}
 	}
 }
 
 #Preview("Empty") {
 	ModelContainerPreview(ModelContainer.empty) {
-		NoteEditor(note: nil)
+		NoteEditor(note: nil, userLocation: nil)
 	}
 }
 

@@ -1,3 +1,4 @@
+import CoreLocation
 import MapKit
 import SwiftUI
 
@@ -19,24 +20,50 @@ private struct MarkerData {
 
 struct MapView: View {
 
-	@State private var cameraPosition: MapCameraPosition = .automatic
-	var coordinate: CLLocationCoordinate2D
+	@Binding var coordinate: CLLocationCoordinate2D
+
+	@State private var cameraPosition: MapCameraPosition
+	@State private var coordinateInitial: CLLocationCoordinate2D
 	@State private var modes: MapInteractionModes = [.all]
 	@State private var isMarkerDragging = false
-	@State private var markerData: MarkerData?
+	//@State private var markerData: MarkerData?
+
+	init(coordinate: Binding<CLLocationCoordinate2D>) {
+		self._coordinate = coordinate
+		self.coordinateInitial = coordinate.wrappedValue
+		self.cameraPosition = MapCameraPosition.region(
+			MKCoordinateRegion(
+				center: coordinate.wrappedValue,
+				span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+			)
+		)
+	}
 
 	var body: some View {
-		GeometryReader { geometryProxy in
-			MapReader { mapProxy in
-				Map(position: $cameraPosition, interactionModes: modes) {
-					if let markerData {
-						Marker("Start", coordinate: markerData.coordinate)
-					}
+		MapReader { proxy in
+			Map(position: $cameraPosition, interactionModes: modes) {
+				if coordinateInitial.latitude != coordinate.latitude
+					|| coordinateInitial.longitude != coordinate.longitude
+				{
+					Marker("Current", coordinate: coordinate).tint(.red)
+					Marker("Old", coordinate: coordinateInitial).tint(.gray)
 				}
+				else {
+					Marker("New", coordinate: coordinateInitial).tint(.red)
+				}
+			}
+			.mapControls {
+				MapCompass()
+				MapScaleView()
+				MapUserLocationButton()
+			}.mapStyle(
+				MapStyle.standard(
+					pointsOfInterest: PointOfInterestCategories.excludingAll
+				)
+			) /*
 				.onTapGesture { screenCoordinate in
-					self.markerData = mapProxy.markerData(
-						screenCoordinate: screenCoordinate,
-						geometryProxy: geometryProxy
+					self.markerData = proxy.markerData(
+						screenCoordinate: screenCoordinate
 					)
 				}
 				.highPriorityGesture(
@@ -56,9 +83,8 @@ struct MapView: View {
 								return
 							}
 
-							self.markerData = mapProxy.markerData(
-								screenCoordinate: drag.location,
-								geometryProxy: geometryProxy
+							self.markerData = proxy.markerData(
+								screenCoordinate: drag.location
 							)
 						}
 						.onEnded { drag in
@@ -68,17 +94,10 @@ struct MapView: View {
 				)
 				.onMapCameraChange {
 					guard let markerData else { return }
-					self.markerData = mapProxy.markerData(
-						coordinate: markerData.coordinate,
-						geometryProxy: geometryProxy
+					self.markerData = proxy.markerData(
+						coordinate: markerData.coordinate
 					)
-				}.onAppear {
-					self.markerData = mapProxy.markerData(
-						coordinate: coordinate,
-						geometryProxy: geometryProxy
-					)
-				}
-			}
+				}*/
 		}
 	}
 
@@ -94,7 +113,7 @@ struct MapView: View {
 
 extension MapProxy {
 
-	fileprivate func markerData(screenCoordinate: CGPoint, geometryProxy: GeometryProxy)
+	fileprivate func markerData(screenCoordinate: CGPoint)
 		-> MarkerData?
 	{
 		guard let coordinate = convert(screenCoordinate, from: .local) else { return nil }
@@ -102,14 +121,24 @@ extension MapProxy {
 	}
 
 	fileprivate func markerData(
-		coordinate: CLLocationCoordinate2D,
-		geometryProxy: GeometryProxy
+		coordinate: CLLocationCoordinate2D
 	) -> MarkerData? {
 		guard let point = convert(coordinate, to: .local) else { return nil }
 		return .init(coordinate: coordinate, screenPoint: point)
 	}
 }
 
-#Preview("Broken", traits: .modifier(MockDataPreviewModifier())) {
-	MapView(coordinate: Note.dog.location!.asCLLocationCoordinate2D())
+struct MapView_Previews: PreviewProvider, View {
+	@State var coordinate: CLLocationCoordinate2D = SampleLocations.park
+
+	static var previews: some View {
+		Self()
+	}
+
+	var body: some View {
+		VStack {
+			MapView(coordinate: $coordinate)
+			Text("\(coordinate.latitude), \(coordinate.longitude)")
+		}
+	}
 }

@@ -39,7 +39,7 @@ struct NoteListView: View {
 				}
 			}
 		} detail: {
-			NoteEditor(note: selectedNote)
+			NoteEditor(note: selectedNote, userLocation: userLocation)
 		}
 	}
 }
@@ -53,7 +53,7 @@ struct NoteList: View {
 	var body: some View {
 		List(notes, selection: $selectedNote) { note in
 			NavigationLink {
-				NoteEditor(note: note)
+				NoteEditor(note: note, userLocation: userLocation)
 			} label: {
 				NoteRow(note: note, userLocation: userLocation)
 			}

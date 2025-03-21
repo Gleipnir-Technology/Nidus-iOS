@@ -29,16 +29,14 @@ struct NoteMapView: View {
 		ZStack(alignment: .trailing) {
 			Map {
 				ForEach(notes, id: \.id) { note in
-					if let location = note.location {
-						Marker(
-							note.category.name,
-							systemImage: note.category.icon,
-							coordinate:
-								location.asCLLocationCoordinate2D()
-						).tint(
-							.orange
-						)
-					}
+					Marker(
+						note.category.name,
+						systemImage: note.category.icon,
+						coordinate:
+							note.location.asCLLocationCoordinate2D()
+					).tint(
+						.orange
+					)
 				}
 			}.mapControls {
 				MapCompass()

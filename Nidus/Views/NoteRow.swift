@@ -15,24 +15,19 @@ struct NoteRow: View {
 
 	func distanceString() -> String {
 		if let ul = userLocation {
-			if let noteCoord = note.location {
-				let noteLocation = CLLocation(
-					latitude: noteCoord.latitude,
-					longitude: noteCoord.longitude
+			let noteLocation = CLLocation(
+				latitude: note.location.latitude,
+				longitude: note.location.longitude
+			)
+			let distance = Measurement(
+				value: noteLocation.distance(from: ul),
+				unit: UnitLength.meters
+			)
+			return distance.formatted(
+				.measurement(width: .abbreviated, usage: .road).locale(
+					locale
 				)
-				let distance = Measurement(
-					value: noteLocation.distance(from: ul),
-					unit: UnitLength.meters
-				)
-				return distance.formatted(
-					.measurement(width: .abbreviated, usage: .road).locale(
-						locale
-					)
-				)
-			}
-			else {
-				return "No location recorded"
-			}
+			)
 		}
 		else {
 			return "Location unavailable"
@@ -52,8 +47,8 @@ struct NoteRow: View {
 	NoteRow(
 		note: Note.dog,
 		userLocation: CLLocation(
-			latitude: Note.dog.location!.latitude + 0.000_002,
-			longitude: Note.dog.location!.longitude + 0.000_003
+			latitude: Note.dog.location.latitude + 0.000_002,
+			longitude: Note.dog.location.longitude + 0.000_003
 		)
 	)
 }
@@ -61,8 +56,8 @@ struct NoteRow: View {
 	NoteRow(
 		note: Note.dog,
 		userLocation: CLLocation(
-			latitude: Note.dog.location!.latitude + 0.000_2,
-			longitude: Note.dog.location!.longitude + 0.000_3
+			latitude: Note.dog.location.latitude + 0.000_2,
+			longitude: Note.dog.location.longitude + 0.000_3
 		)
 	)
 }
@@ -70,8 +65,8 @@ struct NoteRow: View {
 	NoteRow(
 		note: Note.dog,
 		userLocation: CLLocation(
-			latitude: Note.dog.location!.latitude + 0.002,
-			longitude: Note.dog.location!.longitude + 0.003
+			latitude: Note.dog.location.latitude + 0.002,
+			longitude: Note.dog.location.longitude + 0.003
 		)
 	)
 }
@@ -79,8 +74,8 @@ struct NoteRow: View {
 	NoteRow(
 		note: Note.dog,
 		userLocation: CLLocation(
-			latitude: Note.dog.location!.latitude + 0.02,
-			longitude: Note.dog.location!.longitude + 0.03
+			latitude: Note.dog.location.latitude + 0.02,
+			longitude: Note.dog.location.longitude + 0.03
 		)
 	)
 }

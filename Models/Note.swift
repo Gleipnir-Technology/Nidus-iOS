@@ -13,9 +13,17 @@ final class NoteLocation {
 	var latitude: Double
 	var longitude: Double
 
+	init() {
+		self.latitude = 33.2667195
+		self.longitude = -111.8209039
+	}
 	init(latitude: Double, longitude: Double) {
 		self.latitude = latitude
 		self.longitude = longitude
+	}
+	init(location: CLLocationCoordinate2D) {
+		self.latitude = location.latitude
+		self.longitude = location.longitude
 	}
 	init(location: CLLocation) {
 		self.latitude = location.coordinate.latitude
@@ -69,17 +77,16 @@ final class Note: Identifiable {
 	var category: NoteCategory
 	var content: String
 	var id: UUID = UUID()
-	var location: NoteLocation?
+	var location: NoteLocation
 	var timestamp: Date = Date()
 
-	init(category: NoteCategory, content: String, location: NoteLocation?) {
+	init(category: NoteCategory, content: String, location: NoteLocation) {
 		self.category = category
 		self.content = content
 		self.location = location
 	}
 
 	func coordinate() -> CLLocationCoordinate2D? {
-		guard let location = location else { return nil }
 		return location.asCLLocationCoordinate2D()
 	}
 }
