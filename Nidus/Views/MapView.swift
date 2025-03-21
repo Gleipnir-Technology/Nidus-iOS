@@ -4,20 +4,6 @@ import SwiftUI
 
 private let rectWidth: Double = 80
 
-private struct MarkerData {
-	let coordinate: CLLocationCoordinate2D
-	let screenPoint: CGPoint
-
-	var touchableRect: CGRect {
-		.init(
-			x: screenPoint.x - rectWidth / 2,
-			y: screenPoint.y - rectWidth / 2,
-			width: rectWidth,
-			height: rectWidth
-		)
-	}
-}
-
 struct MapView: View {
 
 	@Binding var coordinate: CLLocationCoordinate2D
@@ -26,7 +12,6 @@ struct MapView: View {
 	@State private var coordinateInitial: CLLocationCoordinate2D
 	@State private var modes: MapInteractionModes = [.all]
 	@State private var isMarkerDragging = false
-	//@State private var markerData: MarkerData?
 
 	init(coordinate: Binding<CLLocationCoordinate2D>) {
 		self._coordinate = coordinate
@@ -60,44 +45,13 @@ struct MapView: View {
 				MapStyle.standard(
 					pointsOfInterest: PointOfInterestCategories.excludingAll
 				)
-			) /*
-				.onTapGesture { screenCoordinate in
-					self.markerData = proxy.markerData(
-						screenCoordinate: screenCoordinate
-					)
+			)
+			.onTapGesture { screenCoordinate in
+				if let newCoordinate = proxy.convert(screenCoordinate, from: .local)
+				{
+					coordinate = newCoordinate
 				}
-				.highPriorityGesture(
-					DragGesture(minimumDistance: 1)
-						.onChanged { drag in
-							guard let markerData else { return }
-							if isMarkerDragging {
-
-							}
-							else if markerData.touchableRect.contains(
-								drag.startLocation
-							) {
-								isMarkerDragging = true
-								setMapInteraction(enabled: false)
-							}
-							else {
-								return
-							}
-
-							self.markerData = proxy.markerData(
-								screenCoordinate: drag.location
-							)
-						}
-						.onEnded { drag in
-							setMapInteraction(enabled: true)
-							isMarkerDragging = false
-						}
-				)
-				.onMapCameraChange {
-					guard let markerData else { return }
-					self.markerData = proxy.markerData(
-						coordinate: markerData.coordinate
-					)
-				}*/
+			}
 		}
 	}
 
@@ -108,23 +62,6 @@ struct MapView: View {
 		else {
 			modes = []
 		}
-	}
-}
-
-extension MapProxy {
-
-	fileprivate func markerData(screenCoordinate: CGPoint)
-		-> MarkerData?
-	{
-		guard let coordinate = convert(screenCoordinate, from: .local) else { return nil }
-		return .init(coordinate: coordinate, screenPoint: screenCoordinate)
-	}
-
-	fileprivate func markerData(
-		coordinate: CLLocationCoordinate2D
-	) -> MarkerData? {
-		guard let point = convert(coordinate, to: .local) else { return nil }
-		return .init(coordinate: coordinate, screenPoint: point)
 	}
 }
 
