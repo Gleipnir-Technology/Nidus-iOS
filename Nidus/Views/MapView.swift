@@ -66,7 +66,7 @@ struct MapView: View {
 }
 
 struct MapView_Previews: PreviewProvider, View {
-	@State var coordinate: CLLocationCoordinate2D = SampleLocations.park
+	@State var coordinate: CLLocationCoordinate2D = SampleLocations.park.coordinate
 
 	static var previews: some View {
 		Self()
