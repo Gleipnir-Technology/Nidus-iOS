@@ -13,15 +13,35 @@ struct ContentView: View {
 	@State var locationDataManager: LocationDataManager = LocationDataManager()
 
 	var body: some View {
-		TabView {
-			NoteListView(userLocation: locationDataManager.location).tabItem {
-				Label("Notes", systemImage: "pencil")
-			}
-			NoteMapView().tabItem {
-				Label("Map", systemImage: "map")
-			}
-			SettingView().tabItem {
-				Label("Settings", systemImage: "gearshape")
+		VStack {
+			NoteListView(userLocation: locationDataManager.location)
+			Spacer()
+			HStack {
+				Spacer()
+				Image(systemName: "clock").resizable().scaledToFill().frame(
+					width: 50,
+					height: 50
+				).foregroundColor(.blue).onTapGesture {
+				}
+				Spacer()
+				Image(systemName: "map").resizable().scaledToFill().frame(
+					width: 50,
+					height: 50
+				).foregroundColor(.blue).onTapGesture {
+				}
+				Spacer()
+				Image(systemName: "checklist").resizable().scaledToFill().frame(
+					width: 50,
+					height: 50
+				).foregroundColor(.blue).onTapGesture {
+				}
+				Spacer()
+				Image(systemName: "plus.circle").resizable().scaledToFill().frame(
+					width: 50,
+					height: 50
+				).foregroundColor(.blue).onTapGesture {
+				}
+				Spacer()
 			}
 		}
 	}
