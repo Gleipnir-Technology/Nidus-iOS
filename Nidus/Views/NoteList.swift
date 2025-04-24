@@ -16,27 +16,11 @@ struct NoteListView: View {
 
 	var body: some View {
 		NavigationSplitView {
-			ZStack {
-				if notes.count == 0 {
-					Text("No notes yet")
-				}
-				else {
-					NoteList(userLocation: userLocation)
-				}
-				VStack {
-					Spacer()
-					HStack {
-						Spacer()
-						NavigationLink {
-							NoteEditor(
-								note: nil,
-								userLocation: userLocation
-							)
-						} label: {
-							ButtonAddNote()
-						}
-					}
-				}
+			if notes.count == 0 {
+				Text("No notes yet")
+			}
+			else {
+				NoteList(userLocation: userLocation)
 			}
 		} detail: {
 			NoteEditor(note: selectedNote, userLocation: userLocation)
