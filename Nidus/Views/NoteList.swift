@@ -50,8 +50,13 @@ struct NoteList: View {
 		NoteListView()
 	}
 }
-#Preview("Sample") {
+#Preview("No location") {
 	ModelContainerPreview(ModelContainer.sample) {
 		NoteListView()
+	}
+}
+#Preview("Sample") {
+	ModelContainerPreview(ModelContainer.sample) {
+		NoteListView(userLocation: .init(latitude: 33.302, longitude: -111.7328))
 	}
 }

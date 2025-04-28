@@ -30,7 +30,7 @@ struct NoteRow: View {
 			)
 		}
 		else {
-			return "Location unavailable"
+			return "?m "
 		}
 	}
 	var body: some View {
