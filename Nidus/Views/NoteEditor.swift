@@ -25,6 +25,7 @@ struct NoteEditor: View {
 	init(note: Note?, userLocation: CLLocation?) {
 		self.note = note
 		self.content = note?.content ?? ""
+		self.category = note?.category
 		self.location =
 			note?.location.asCLLocationCoordinate2D() ?? userLocation?.coordinate
 			?? CLLocationCoordinate2D()
@@ -59,17 +60,18 @@ struct NoteEditor: View {
 				MapView(
 					coordinate: $location
 				).frame(height: 300)
-				Picker(selection: $category) {
+				Text("Location \(location.latitude), \(location.longitude)")
+				/*Picker(selection: $category) {
 					ForEach(categories) { c in
 						Label(
 							c.name,
 							systemImage: c.icon
 						)
-						.tag(category)
+						.tag(Optional(c))
 					}
 				} label: {
 					Text("Category")
-				}
+				}*/
 				TextField("Note content", text: $content, axis: .vertical)
 			}.toolbar {
 				ToolbarItem(placement: .principal) {
@@ -84,19 +86,21 @@ struct NoteEditor: View {
 						}
 					}
 					// Require a Category to save changes
-					.disabled($category.wrappedValue == nil)
+					.disabled(category == nil)
 				}
 			}
 		}
 	}
 }
 
-#Preview("Empty") {
-	ModelContainerPreview(ModelContainer.empty) {
-		NoteEditor(note: nil, userLocation: nil)
-	}
+#Preview("new no gps", traits: .modifier(MockDataPreviewModifier())) {
+	NoteEditor(note: nil, userLocation: nil)
 }
 
-#Preview("Broken", traits: .modifier(MockDataPreviewModifier())) {
-	NoteEditor(note: nil, userLocation: CLLocation(latitude: 33.3, longitude: -111.0))
+#Preview("new gps", traits: .modifier(MockDataPreviewModifier())) {
+	NoteEditor(note: nil, userLocation: SampleLocations.park)
+}
+
+#Preview("new gps", traits: .modifier(MockDataPreviewModifier())) {
+	NoteEditor(note: Note.dog, userLocation: SampleLocations.park)
 }
