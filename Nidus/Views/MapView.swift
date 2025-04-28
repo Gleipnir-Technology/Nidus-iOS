@@ -26,15 +26,25 @@ struct MapView: View {
 
 	var body: some View {
 		MapReader { proxy in
-			Map(position: $cameraPosition, interactionModes: modes) {
+			Map(
+				position: $cameraPosition,
+				interactionModes: modes
+			) {
 				if coordinateInitial.latitude != coordinate.latitude
 					|| coordinateInitial.longitude != coordinate.longitude
 				{
-					Marker("Current", coordinate: coordinate).tint(.red)
-					Marker("Old", coordinate: coordinateInitial).tint(.gray)
+					Marker("", coordinate: coordinate).tint(.red).tag(1)
+					Marker("", coordinate: coordinateInitial).tint(.gray)
+					/*Annotation("Old", coordinate: coordinateInitial) {
+                        Button("Reset", systemImage: "gear") {
+                            print("Hey")
+                        }
+                    }.annotationTitles(.hidden)*/
 				}
 				else {
-					Marker("New", coordinate: coordinateInitial).tint(.red)
+					Marker("", coordinate: coordinateInitial).tint(.red).tag(
+						1
+					)
 				}
 			}
 			.mapControls {
