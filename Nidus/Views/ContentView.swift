@@ -14,37 +14,12 @@ struct ContentView: View {
 	@State var currentValue: Float = 0.0
 
 	var body: some View {
-		VStack {
-			NoteListView(userLocation: locationDataManager.location)
-			Spacer()
-			Text("Nov 10 24 - May 10 25")
-			Slider(value: $currentValue)
-			HStack {
-				Spacer()
-				Image(systemName: "clock").resizable().scaledToFill().frame(
-					width: 50,
-					height: 50
-				).foregroundColor(.blue).onTapGesture {
-				}
-				Spacer()
-				Image(systemName: "map").resizable().scaledToFill().frame(
-					width: 50,
-					height: 50
-				).foregroundColor(.blue).onTapGesture {
-				}
-				Spacer()
-				Image(systemName: "checklist").resizable().scaledToFill().frame(
-					width: 50,
-					height: 50
-				).foregroundColor(.blue).onTapGesture {
-				}
-				Spacer()
-				Image(systemName: "plus.circle").resizable().scaledToFill().frame(
-					width: 50,
-					height: 50
-				).foregroundColor(.blue).onTapGesture {
-				}
-				Spacer()
+		TabView {
+			NoteListView(userLocation: locationDataManager.location).tabItem {
+				Label("Notes", systemImage: "clock")
+			}
+			MapOverview(userLocation: locationDataManager.location).tabItem {
+				Label("Map", systemImage: "map")
 			}
 		}
 	}
