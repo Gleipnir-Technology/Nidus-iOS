@@ -17,6 +17,7 @@ struct ContentView: View {
 		VStack {
 			NoteListView(userLocation: locationDataManager.location)
 			Spacer()
+			Text("Nov 10 24 - May 10 25")
 			Slider(value: $currentValue)
 			HStack {
 				Spacer()
