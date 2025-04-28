@@ -10,8 +10,9 @@ import SwiftData
 import SwiftUI
 
 struct MapOverview: View {
-	@Query() private var notes: [Note]
-
+	@Environment(\.modelContext) private var modelContext
+	@Query(sort: \Note.content) private var notes: [Note]
+	var userLocation: CLLocation?
 	var body: some View {
 		ZStack(alignment: .trailing) {
 			Map {
