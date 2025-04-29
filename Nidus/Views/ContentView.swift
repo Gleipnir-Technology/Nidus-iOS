@@ -21,6 +21,9 @@ struct ContentView: View {
 			MapOverview(userLocation: locationDataManager.location).tabItem {
 				Label("Map", systemImage: "map")
 			}
+			NoteEditor(note: nil, userLocation: locationDataManager.location).tabItem {
+				Label("plus.circle", systemImage: "add")
+			}
 		}
 	}
 }

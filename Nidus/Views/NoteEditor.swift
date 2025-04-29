@@ -61,7 +61,7 @@ struct NoteEditor: View {
 					coordinate: $location
 				).frame(height: 300)
 				Text("Location \(location.latitude), \(location.longitude)")
-				/*Picker(selection: $category) {
+				Picker(selection: $category) {
 					ForEach(categories) { c in
 						Label(
 							c.name,
@@ -71,7 +71,7 @@ struct NoteEditor: View {
 					}
 				} label: {
 					Text("Category")
-				}*/
+				}
 				TextField("Note content", text: $content, axis: .vertical)
 			}.toolbar {
 				ToolbarItem(placement: .principal) {
