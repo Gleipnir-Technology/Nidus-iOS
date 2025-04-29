@@ -14,7 +14,9 @@ struct MapOverview: View {
 	@Query(sort: \Note.content) private var notes: [Note]
 	@State private var geometrySize: CGSize = .zero
 
+	var onNoteSelected: ((Note) -> Void)
 	var userLocation: CLLocation?
+
 	// Convert tap location to map coordinate
 	private func convertTapToCoordinate(tapLocation: CGPoint, in geometry: GeometryProxy)
 		-> CLLocationCoordinate2D?
@@ -72,41 +74,39 @@ struct MapOverview: View {
 		}
 	}
 	var body: some View {
-		ZStack(alignment: .trailing) {
-			GeometryReader { geometry in
-				Map {
-					ForEach(notes, id: \.id) { note in
-						Marker(
-							note.category.name,
-							systemImage: note.category.icon,
-							coordinate:
-								note.location
-								.asCLLocationCoordinate2D()
-						).tint(
-							.orange
-						)
-					}
-				}.mapControls {
-					MapCompass()
-					MapScaleView()
-					MapUserLocationButton()
-				}.mapStyle(
-					MapStyle.standard(
-						pointsOfInterest: PointOfInterestCategories
-							.excludingAll
+		GeometryReader { geometry in
+			Map {
+				ForEach(notes, id: \.id) { note in
+					Marker(
+						note.category.name,
+						systemImage: note.category.icon,
+						coordinate:
+							note.location
+							.asCLLocationCoordinate2D()
+					).tint(
+						.orange
 					)
-				).onTapGesture(coordinateSpace: .local) { tapLocation in
-					geometrySize = geometry.size
+				}
+			}.mapControls {
+				MapCompass()
+				MapScaleView()
+				MapUserLocationButton()
+			}.mapStyle(
+				MapStyle.standard(
+					pointsOfInterest: PointOfInterestCategories
+						.excludingAll
+				)
+			).onTapGesture(coordinateSpace: .local) { tapLocation in
+				geometrySize = geometry.size
 
-					if let tappedCoordinate = convertTapToCoordinate(
-						tapLocation: tapLocation,
-						in: geometry
+				if let tappedCoordinate = convertTapToCoordinate(
+					tapLocation: tapLocation,
+					in: geometry
+				) {
+					if let closestNote = findClosestNote(
+						to: tappedCoordinate
 					) {
-						if let closestNote = findClosestNote(
-							to: tappedCoordinate
-						) {
-							print(closestNote.content)
-						}
+						onNoteSelected(closestNote)
 					}
 				}
 			}
@@ -114,8 +114,9 @@ struct MapOverview: View {
 	}
 }
 
-#Preview("1") {
+/*#Preview("1") {
 	ModelContainerPreview(ModelContainer.sample) {
-		MapOverview()
+        MapOverview(onNoteSelected: {(note: Note) -> Void in print(note))
+
 	}
-}
+}*/

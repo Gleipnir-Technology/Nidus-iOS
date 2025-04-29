@@ -13,6 +13,9 @@ struct ContentView: View {
 	@State var locationDataManager: LocationDataManager = LocationDataManager()
 	@State var currentValue: Float = 0.0
 
+	func onNoteSelected(_ note: Note) {
+		print(note.content)
+	}
 	var body: some View {
 		NavigationStack {
 			NavigationLink {
@@ -24,7 +27,10 @@ struct ContentView: View {
 				NoteListView(userLocation: locationDataManager.location).tabItem {
 					Label("Notes", systemImage: "clock")
 				}
-				MapOverview(userLocation: locationDataManager.location).tabItem {
+				MapOverview(
+					onNoteSelected: onNoteSelected,
+					userLocation: locationDataManager.location
+				).tabItem {
 					Label("Map", systemImage: "map")
 				}
 				NoteEditor(note: nil, userLocation: locationDataManager.location)
