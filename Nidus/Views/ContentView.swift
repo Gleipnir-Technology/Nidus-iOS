@@ -12,12 +12,14 @@ struct ContentView: View {
 	@Environment(\.modelContext) private var context
 	@State var locationDataManager: LocationDataManager = LocationDataManager()
 	@State var currentValue: Float = 0.0
+	@State private var path = NavigationPath()
+	@Query private var notes: [Note]
 
 	func onNoteSelected(_ note: Note) {
-		print(note.content)
+		path.append(note.id)
 	}
 	var body: some View {
-		NavigationStack {
+		NavigationStack(path: $path) {
 			NavigationLink {
 				NoteEditor(note: nil, userLocation: locationDataManager.location)
 			} label: {
@@ -37,6 +39,17 @@ struct ContentView: View {
 					.tabItem {
 						Label("Add", systemImage: "plus.circle")
 					}
+			}
+			.navigationDestination(for: UUID.self) { noteId in
+				if let note = notes.first(where: { $0.id == noteId }) {
+					NoteEditor(
+						note: note,
+						userLocation: locationDataManager.location
+					)
+				}
+				else {
+					Text("NOAAAAA")
+				}
 			}
 		}
 	}

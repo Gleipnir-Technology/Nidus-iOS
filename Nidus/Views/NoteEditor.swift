@@ -54,37 +54,33 @@ struct NoteEditor: View {
 		}
 	}
 	var body: some View {
-		NavigationStack {
-			Form {
-				MapView(
-					coordinate: $location
-				).frame(height: 300)
-				Text("Location \(location.latitude), \(location.longitude)")
-				Picker(selection: $category) {
-					ForEach(NoteCategory.all) { c in
-						Label(
-							c.name,
-							systemImage: c.icon
-						).tag(c)
-					}
-				} label: {
-					Text("Category")
+		Form {
+			MapView(
+				coordinate: $location
+			).frame(height: 300)
+			Text("Location \(location.latitude), \(location.longitude)")
+			Picker(selection: $category) {
+				ForEach(NoteCategory.all) { c in
+					Label(
+						c.name,
+						systemImage: c.icon
+					).tag(c)
 				}
-				TextField("Note content", text: $content, axis: .vertical)
-			}.toolbar {
-				ToolbarItem(placement: .principal) {
-					Text(editorTitle)
-				}
+			} label: {
+				Text("Category")
+			}
+			TextField("Note content", text: $content, axis: .vertical)
+		}.toolbar {
+			ToolbarItem(placement: .principal) {
+				Text(editorTitle)
+			}
 
-				ToolbarItem(placement: .confirmationAction) {
-					Button("Save") {
-						withAnimation {
-							save()
-							dismiss()
-						}
+			ToolbarItem(placement: .confirmationAction) {
+				Button("Save") {
+					withAnimation {
+						save()
+						dismiss()
 					}
-					// Require a Category to save changes
-					.disabled(category == nil)
 				}
 			}
 		}
