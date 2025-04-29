@@ -22,7 +22,7 @@ struct ContentView: View {
 				Label("Map", systemImage: "map")
 			}
 			NoteEditor(note: nil, userLocation: locationDataManager.location).tabItem {
-				Label("plus.circle", systemImage: "add")
+				Label("Add", systemImage: "plus.circle")
 			}
 		}
 	}
