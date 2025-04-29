@@ -34,9 +34,6 @@ struct NoteEditor: View {
 	}
 
 	private func save() {
-		if category == nil {
-			fatalError("Must select a category")
-		}
 		if let note {
 			note.categoryName = category.name
 			note.content = content
