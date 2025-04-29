@@ -14,15 +14,23 @@ struct ContentView: View {
 	@State var currentValue: Float = 0.0
 
 	var body: some View {
-		TabView {
-			NoteListView(userLocation: locationDataManager.location).tabItem {
-				Label("Notes", systemImage: "clock")
+		NavigationStack {
+			NavigationLink {
+				NoteEditor(note: nil, userLocation: locationDataManager.location)
+			} label: {
+				Text("Add Note")
 			}
-			MapOverview(userLocation: locationDataManager.location).tabItem {
-				Label("Map", systemImage: "map")
-			}
-			NoteEditor(note: nil, userLocation: locationDataManager.location).tabItem {
-				Label("Add", systemImage: "plus.circle")
+			TabView {
+				NoteListView(userLocation: locationDataManager.location).tabItem {
+					Label("Notes", systemImage: "clock")
+				}
+				MapOverview(userLocation: locationDataManager.location).tabItem {
+					Label("Map", systemImage: "map")
+				}
+				NoteEditor(note: nil, userLocation: locationDataManager.location)
+					.tabItem {
+						Label("Add", systemImage: "plus.circle")
+					}
 			}
 		}
 	}

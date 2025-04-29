@@ -15,15 +15,11 @@ struct NoteListView: View {
 	var userLocation: CLLocation?
 
 	var body: some View {
-		NavigationSplitView {
-			if notes.count == 0 {
-				Text("No notes yet")
-			}
-			else {
-				NoteList(userLocation: userLocation)
-			}
-		} detail: {
-			NoteEditor(note: selectedNote, userLocation: userLocation)
+		if notes.count == 0 {
+			Text("No notes yet")
+		}
+		else {
+			NoteList(userLocation: userLocation)
 		}
 	}
 }
