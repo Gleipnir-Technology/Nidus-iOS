@@ -22,12 +22,7 @@ let appContainer: ModelContainer = {
 		}
 
 		// This code only runs if the store is empty.
-		let categories = [
-			NoteCategory(color: .green, icon: "lock.circle", name: "entry"),
-			NoteCategory(color: .blue, icon: "info.circle", name: "info"),
-			NoteCategory(color: .red, icon: "checkmark.circle", name: "todo"),
-		]
-		for category in categories {
+		for category in NoteCategory.all {
 			container.mainContext.insert(category)
 		}
 		return container

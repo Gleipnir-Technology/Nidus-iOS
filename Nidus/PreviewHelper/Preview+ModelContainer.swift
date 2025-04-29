@@ -19,7 +19,7 @@ extension ModelContainer {
 		let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
 		let container = try ModelContainer(for: schema, configurations: [configuration])
 		Task { @MainActor in
-			NoteCategory.insertSampleData(modelContext: container.mainContext)
+			Note.insertSampleData(modelContext: container.mainContext)
 		}
 		return container
 	}

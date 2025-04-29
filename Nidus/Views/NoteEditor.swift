@@ -20,12 +20,10 @@ struct NoteEditor: View {
 	@Environment(\.dismiss) private var dismiss
 	@Environment(\.modelContext) private var modelContext
 
-	@Query(sort: \NoteCategory.name) var categories: [NoteCategory]
-
 	init(note: Note?, userLocation: CLLocation?) {
 		self.note = note
 		self.content = note?.content ?? ""
-		self.category = note?.category
+		self.category = note?.category ?? NoteCategory.info
 		self.location =
 			note?.location.asCLLocationCoordinate2D() ?? userLocation?.coordinate
 			?? CLLocationCoordinate2D()
@@ -62,12 +60,11 @@ struct NoteEditor: View {
 				).frame(height: 300)
 				Text("Location \(location.latitude), \(location.longitude)")
 				Picker(selection: $category) {
-					ForEach(categories) { c in
+					ForEach(NoteCategory.all) { c in
 						Label(
 							c.name,
 							systemImage: c.icon
-						)
-						.tag(Optional(c))
+						).tag(c)
 					}
 				} label: {
 					Text("Category")
