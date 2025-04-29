@@ -38,7 +38,7 @@ final class NoteLocation {
 	}
 }
 
-struct ColorComponents: Codable {
+struct ColorComponents: Codable, Hashable {
 	let red: Float
 	let green: Float
 	let blue: Float
@@ -57,18 +57,39 @@ struct ColorComponents: Codable {
 	}
 }
 
-@Model
-final class NoteCategory: Identifiable {
+struct NoteCategory: Codable, Hashable, Identifiable {
+	var id: String
+
 	var color: ColorComponents
 	var icon: String
-	@Attribute(.unique) var name: String
-	@Relationship(deleteRule: .cascade, inverse: \Note.category)
-	var notes = [Note]()
+	var name: String
 
 	init(color: Color, icon: String, name: String) {
 		self.color = ColorComponents.fromColor(color)
 		self.icon = icon
 		self.name = name
+		self.id = name
+	}
+
+	static func byName(_ name: String) -> NoteCategory? {
+		for category in all {
+			if category.name == name {
+				return category
+			}
+		}
+		return nil
+	}
+	static func byNameOrDefault(_ name: String?) -> NoteCategory {
+		if name == nil {
+			return NoteCategory.info
+		}
+		else {
+			let result = NoteCategory.byName(name!)
+			if result == nil {
+				return NoteCategory.info
+			}
+			return result!
+		}
 	}
 
 	static let entry = NoteCategory(color: .green, icon: "lock.circle", name: "entry")
@@ -80,18 +101,21 @@ final class NoteCategory: Identifiable {
 
 @Model
 final class Note: Identifiable {
-	var category: NoteCategory
+	var categoryName: String
 	var content: String
 	var id: UUID = UUID()
 	var location: NoteLocation
 	var timestamp: Date = Date()
 
 	init(category: NoteCategory, content: String, location: NoteLocation) {
-		self.category = category
+		self.categoryName = category.name
 		self.content = content
 		self.location = location
 	}
 
+	var category: NoteCategory {
+		return NoteCategory.byNameOrDefault(categoryName)
+	}
 	func coordinate() -> CLLocationCoordinate2D? {
 		return location.asCLLocationCoordinate2D()
 	}

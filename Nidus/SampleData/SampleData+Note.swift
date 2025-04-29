@@ -31,7 +31,7 @@ extension Note {
 
 	static func reloadSampleData(modelContext: ModelContext) {
 		do {
-			try modelContext.delete(model: NoteCategory.self)
+			try modelContext.delete(model: Note.self)
 			insertSampleData(modelContext: modelContext)
 		}
 		catch {

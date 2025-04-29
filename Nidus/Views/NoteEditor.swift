@@ -12,7 +12,7 @@ struct NoteEditor: View {
 	let note: Note?
 
 	@State private var content: String
-	@State private var category: NoteCategory?
+	@State private var category: NoteCategory
 	@State private var location: CLLocationCoordinate2D
 
 	var userLocation: CLLocation?
@@ -23,7 +23,7 @@ struct NoteEditor: View {
 	init(note: Note?, userLocation: CLLocation?) {
 		self.note = note
 		self.content = note?.content ?? ""
-		self.category = note?.category ?? NoteCategory.info
+		self.category = NoteCategory.byNameOrDefault(note?.categoryName)
 		self.location =
 			note?.location.asCLLocationCoordinate2D() ?? userLocation?.coordinate
 			?? CLLocationCoordinate2D()
@@ -38,14 +38,15 @@ struct NoteEditor: View {
 			fatalError("Must select a category")
 		}
 		if let note {
-			note.category = category!
+			note.categoryName = category.name
 			note.content = content
 			note.location = NoteLocation(location: location)
+
 		}
 		else {
 			// Add a note
 			let newNote = Note(
-				category: category!,
+				category: category,
 				content: content,
 				location: NoteLocation(location: location)
 			)

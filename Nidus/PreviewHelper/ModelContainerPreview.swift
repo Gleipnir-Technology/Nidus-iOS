@@ -12,7 +12,7 @@ import SwiftUI
 struct MockDataPreviewModifier: PreviewModifier {
 	static func makeSharedContext() throws -> ModelContainer {
 		let container = try ModelContainer(
-			for: NoteCategory.self,
+			for: Note.self,
 			configurations: ModelConfiguration(isStoredInMemoryOnly: true)
 		)
 		populateContainer(container)
@@ -22,7 +22,11 @@ struct MockDataPreviewModifier: PreviewModifier {
 
 	static func populateContainer(_ container: ModelContainer) {
 		container.mainContext.insert(
-			NoteCategory(color: .blue, icon: "gear", name: "Gearso")
+			Note(
+				category: NoteCategory.info,
+				content: "some content",
+				location: NoteLocation()
+			)
 		)
 	}
 

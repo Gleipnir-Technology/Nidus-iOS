@@ -10,21 +10,9 @@ import SwiftUI
 @MainActor
 let appContainer: ModelContainer = {
 	do {
-		let schema = Schema([Note.self, NoteCategory.self, NoteLocation.self])
+		let schema = Schema([Note.self, NoteLocation.self])
 		let container = try ModelContainer(for: schema)
 
-		// Make sure the persistent store is empty. If it's not, return the non-empty container.
-		var itemFetchDescriptor = FetchDescriptor<NoteCategory>()
-		itemFetchDescriptor.fetchLimit = 1
-
-		guard try container.mainContext.fetch(itemFetchDescriptor).count == 0 else {
-			return container
-		}
-
-		// This code only runs if the store is empty.
-		for category in NoteCategory.all {
-			container.mainContext.insert(category)
-		}
 		return container
 	}
 	catch {
