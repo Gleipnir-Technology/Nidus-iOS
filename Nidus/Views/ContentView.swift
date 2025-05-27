@@ -20,11 +20,6 @@ struct ContentView: View {
 	}
 	var body: some View {
 		NavigationStack(path: $path) {
-			NavigationLink {
-				NoteEditor(note: nil, userLocation: locationDataManager.location)
-			} label: {
-				Text("Add Note")
-			}
 			TabView {
 				NoteListView(userLocation: locationDataManager.location).tabItem {
 					Label("Notes", systemImage: "clock")
