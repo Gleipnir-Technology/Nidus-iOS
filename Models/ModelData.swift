@@ -11,6 +11,7 @@ import Foundation
 class ModelData {
 	var categories: [NoteCategory] = []
 	var notes: [Note] = []
+	var settings: Settings?
 }
 
 func load<T: Decodable>(_ filename: String) -> T {

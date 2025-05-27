@@ -10,7 +10,7 @@ import SwiftUI
 @MainActor
 let appContainer: ModelContainer = {
 	do {
-		let schema = Schema([Note.self, NoteLocation.self])
+		let schema = Schema([Note.self, NoteLocation.self, Settings.self])
 		let container = try ModelContainer(for: schema)
 
 		return container

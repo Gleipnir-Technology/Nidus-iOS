@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531B36B42D8B962900CE8BA0 /* NoteMapView.swift */; };
 		531B36B72D8CEAEF00CE8BA0 /* SampleLocations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531B36B62D8CEAE800CE8BA0 /* SampleLocations.swift */; };
+		532F3ACC2DE5FC67006E0E40 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3ACB2DE5FC62006E0E40 /* Settings.swift */; };
 		537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5375609F2D820A5A00D8528B /* Preview Assets.xcassets */; };
 		537560B22D820A5A00D8528B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 537560A12D820A5A00D8528B /* Assets.xcassets */; };
 		537560B42D820A5A00D8528B /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A82D820A5A00D8528B /* ModelData.swift */; };
@@ -50,6 +51,7 @@
 /* Begin PBXFileReference section */
 		531B36B42D8B962900CE8BA0 /* NoteMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteMapView.swift; sourceTree = "<group>"; };
 		531B36B62D8CEAE800CE8BA0 /* SampleLocations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleLocations.swift; sourceTree = "<group>"; };
+		532F3ACB2DE5FC62006E0E40 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		5375609F2D820A5A00D8528B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		537560A12D820A5A00D8528B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		537560A32D820A5A00D8528B /* CircleImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleImage.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 		537560C12D820FFE00D8528B /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				532F3ACB2DE5FC62006E0E40 /* Settings.swift */,
 				537560A92D820A5A00D8528B /* Note.swift */,
 				537560A82D820A5A00D8528B /* ModelData.swift */,
 			);
@@ -338,6 +341,7 @@
 				537560CE2D82127100D8528B /* NoteList.swift in Sources */,
 				537560C02D820F3D00D8528B /* NidusApp.swift in Sources */,
 				537560B92D820A5A00D8528B /* Note.swift in Sources */,
+				532F3ACC2DE5FC67006E0E40 /* Settings.swift in Sources */,
 				53E308182D8B39ED00534AB0 /* NoteCategoryAdd.swift in Sources */,
 				537560BA2D820A5A00D8528B /* MapView.swift in Sources */,
 				537E02672DC03DC5000F254F /* MapOverview.swift in Sources */,
