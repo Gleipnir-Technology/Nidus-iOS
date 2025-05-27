@@ -34,6 +34,9 @@ struct ContentView: View {
 					.tabItem {
 						Label("Add", systemImage: "plus.circle")
 					}
+				SettingView().tabItem {
+					Label("Settings", systemImage: "gear")
+				}
 			}
 			.navigationDestination(for: UUID.self) { noteId in
 				if let note = notes.first(where: { $0.id == noteId }) {
