@@ -66,10 +66,6 @@ struct SettingView: View {
 		settings.password = password
 		Logger.foreground.info("Updated settings")
 
-		let s = currentSettings
-		if s == nil {
-			Logger.foreground.info("I lied")
-		}
 		do {
 			try modelContext.save()
 			alertMessage = "Settings saved successfully!"
