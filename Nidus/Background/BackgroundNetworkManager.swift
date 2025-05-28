@@ -83,6 +83,7 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 						content: noteResponse.content,
 						location: noteResponse.location.asNoteLocation()
 					)
+					newNote.id = uuid
 					modelContext.insert(newNote)
 				}
 			}
