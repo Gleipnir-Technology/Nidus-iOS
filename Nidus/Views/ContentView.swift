@@ -13,10 +13,14 @@ struct ContentView: View {
 	@State var locationDataManager: LocationDataManager = LocationDataManager()
 	@State var currentValue: Float = 0.0
 	@State private var path = NavigationPath()
+	@State private var selection: Int = 0
 	@Query private var notes: [Note]
 
 	func onNoteSelected(_ note: Note) {
 		path.append(note.id)
+	}
+	func setTabNotes() {
+		selection = 0
 	}
 	func triggerBackgroundFetch() {
 		Task {
@@ -35,22 +39,24 @@ struct ContentView: View {
 	}
 	var body: some View {
 		NavigationStack(path: $path) {
-			TabView {
-				NoteListView(userLocation: locationDataManager.location).tabItem {
-					Label("Notes", systemImage: "clock")
+			TabView(selection: $selection) {
+				Tab("Notes", systemImage: "clock", value: 0) {
+					NoteListView(userLocation: locationDataManager.location)
 				}
-				MapOverview(
-					onNoteSelected: onNoteSelected,
-					userLocation: locationDataManager.location
-				).tabItem {
-					Label("Map", systemImage: "map")
+				Tab("Map", systemImage: "map", value: 1) {
+					MapOverview(
+						onNoteSelected: onNoteSelected,
+						userLocation: locationDataManager.location
+					)
 				}
-				NoteEditor(note: nil, userLocation: locationDataManager.location)
-					.tabItem {
-						Label("Add", systemImage: "plus.circle")
-					}
-				SettingView(onSettingsUpdated: triggerBackgroundFetch).tabItem {
-					Label("Settings", systemImage: "gear")
+				Tab("Add", systemImage: "plus.circle", value: 2) {
+					NoteAdd(
+						onSave: setTabNotes,
+						userLocation: locationDataManager.location
+					)
+				}
+				Tab("Settings", systemImage: "gear", value: 3) {
+					SettingView(onSettingsUpdated: triggerBackgroundFetch)
 				}
 			}
 			.navigationDestination(for: UUID.self) { noteId in
