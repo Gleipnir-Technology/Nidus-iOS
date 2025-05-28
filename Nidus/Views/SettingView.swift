@@ -17,6 +17,7 @@ struct SettingView: View {
 	@State private var showPassword: Bool = false
 	@State private var url: String = "https://sync.nidus.cloud"
 	@State private var username: String = ""
+	var onSettingsUpdated: (() -> Void)
 
 	private var currentSettings: Settings {
 		if let result = try! modelContext.fetch(FetchDescriptor<Settings>()).first {
@@ -82,6 +83,7 @@ struct SettingView: View {
 			alertMessage = "Failed to save settings: \(error.localizedDescription)"
 			isShowingAlert = true
 		}
+		onSettingsUpdated()
 	}
 	var body: some View {
 		NavigationView {
@@ -186,6 +188,8 @@ struct SettingView: View {
 	}
 }
 
-#Preview {
-	SettingView().modelContainer(for: Settings.self, inMemory: true)
-}
+/*
+ #Preview {
+ SettingView().modelContainer(for: Settings.self, inMemory: true)
+ }
+*/

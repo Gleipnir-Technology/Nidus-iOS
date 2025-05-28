@@ -18,6 +18,21 @@ struct ContentView: View {
 	func onNoteSelected(_ note: Note) {
 		path.append(note.id)
 	}
+	func triggerBackgroundFetch() {
+		Task {
+			let actor = BackgroundModelActor(
+				modelContainer: self.context.container
+			)
+			do {
+				try await actor.triggerFetch()
+			}
+			catch {
+				Logger.background.error(
+					"Failed to trigger fetch \(error.localizedDescription)"
+				)
+			}
+		}
+	}
 	var body: some View {
 		NavigationStack(path: $path) {
 			TabView {
@@ -34,7 +49,7 @@ struct ContentView: View {
 					.tabItem {
 						Label("Add", systemImage: "plus.circle")
 					}
-				SettingView().tabItem {
+				SettingView(onSettingsUpdated: triggerBackgroundFetch).tabItem {
 					Label("Settings", systemImage: "gear")
 				}
 			}
@@ -50,19 +65,7 @@ struct ContentView: View {
 				}
 			}
 		}.onAppear {
-			Task {
-				let actor = BackgroundModelActor(
-					modelContainer: self.context.container
-				)
-				do {
-					try await actor.triggerFetch()
-				}
-				catch {
-					Logger.background.error(
-						"Failed to trigger fetch \(error.localizedDescription)"
-					)
-				}
-			}
+			triggerBackgroundFetch()
 		}
 	}
 }
