@@ -4,6 +4,7 @@
 //
 //  Created by Eli Ribble on 3/19/25.
 //
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -13,13 +14,23 @@ struct SettingView: View {
 	@State private var alertMessage = ""
 	@State private var isShowingAlert = false
 	@State private var password: String = ""
-	@Query private var settings: [Settings]
 	@State private var showPassword: Bool = false
 	@State private var url: String = "https://sync.nidus.cloud"
 	@State private var username: String = ""
 
-	private var currentSettings: Settings? {
-		settings.first
+	private var currentSettings: Settings {
+		if let result = try! modelContext.fetch(FetchDescriptor<Settings>()).first {
+			return result
+		}
+		else {
+			let instance = Settings(
+				password: "foo",
+				URL: "https://sync.nidus.cloud",
+				username: "bar"
+			)
+			modelContext.insert(instance)
+			return instance
+		}
 	}
 
 	private var isFormValid: Bool {
@@ -28,30 +39,27 @@ struct SettingView: View {
 	}
 
 	private func loadCurrentSettings() {
-		if let currentSettings = currentSettings {
-			username = currentSettings.username
-			password = currentSettings.password
-		}
+		let settings = currentSettings
+		password = settings.password
+		username = settings.username
+		url = settings.URL
+		Logger.foreground.info("Loaded settings \(username)")
 	}
 
 	private func save() {
 		let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
 
-		if let existingSettings = currentSettings {
-			// Update existing settings
-			existingSettings.username = trimmedUsername
-			existingSettings.password = password
-		}
-		else {
-			// Create new settings
-			let newSettings = Settings(
-				password: password,
-				URL: url,
-				username: trimmedUsername
-			)
-			modelContext.insert(newSettings)
-		}
+		let settings = currentSettings
+		// Update existing settings
+		settings.URL = url
+		settings.username = trimmedUsername
+		settings.password = password
+		Logger.foreground.info("Updated settings")
 
+		let s = currentSettings
+		if s == nil {
+			Logger.foreground.info("I lied")
+		}
 		do {
 			try modelContext.save()
 			alertMessage = "Settings saved successfully!"

@@ -4,7 +4,7 @@
 //
 //  Created by Eli Ribble on 3/6/25.
 //
-
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -47,6 +47,20 @@ struct ContentView: View {
 				}
 				else {
 					Text("NOAAAAA")
+				}
+			}
+		}.onAppear {
+			Task {
+				let actor = BackgroundModelActor(
+					modelContainer: self.context.container
+				)
+				do {
+					try await actor.triggerFetch()
+				}
+				catch {
+					Logger.background.error(
+						"Failed to trigger fetch \(error.localizedDescription)"
+					)
 				}
 			}
 		}
