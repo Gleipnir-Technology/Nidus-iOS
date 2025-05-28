@@ -34,34 +34,72 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 	init(with container: ModelContainer) {
 		modelContext = ModelContext(container)
 	}
+
 	func setManager(_ manager: BackgroundNetworkManager) {
 		self.manager = manager
 	}
-	private func saveNotes(_ noteResponses: [NoteResponse]) async {
-		Logger.background.info("Saving notes")
+
+	private func noteById(_ id: UUID) -> Note? {
+		let fetchDescriptor = FetchDescriptor<Note>(predicate: #Predicate { $0.id == id })
+		do {
+			return try modelContext.fetch(fetchDescriptor).first
+		}
+		catch {
+			return nil
+		}
+	}
+
+	private func saveNotes(_ noteResponses: [NoteResponse]) {
+		MainActor.preconditionIsolated()
+		Logger.background.info("Saving \(noteResponses.count) notes")
 		for noteResponse in noteResponses {
-			let note = Note(
-				category: NoteCategory.byNameOrDefault(
-					noteResponse.categoryName
-				),
-				content: noteResponse.content,
-				location: noteResponse.location.asNoteLocation()
-			)
-			Logger.background.info("Note \(note.content)")
-			Task { @MainActor in
-				modelContext.insert(note)
+			if let uuid = UUID(uuidString: noteResponse.id) {
+				if let note = noteById(uuid) {
+					Logger.background.info(
+						"Note \(noteResponse.id) already exists, updating"
+					)
+					note.categoryName = noteResponse.categoryName
+					note.content = noteResponse.content
+					note.location = noteResponse.location.asNoteLocation()
+					if let timestamp = ISO8601DateFormatter().date(
+						from: noteResponse.timestamp
+					) {
+						note.timestamp = timestamp
+					}
+					else {
+						Logger.background.warning(
+							"Cannot parse timestamp \(note.timestamp)"
+						)
+					}
+				}
+				else {
+					Logger.background.info(
+						"Note \(noteResponse.id) does not exist, creating"
+					)
+					let newNote = Note(
+						category: NoteCategory.byNameOrDefault(
+							noteResponse.categoryName
+						),
+						content: noteResponse.content,
+						location: noteResponse.location.asNoteLocation()
+					)
+					modelContext.insert(newNote)
+				}
+			}
+			else {
+				Logger.background.warning(
+					"Skipping note with invalid ID: \(noteResponse.id)"
+				)
+				continue
 			}
 		}
-
-		Task {
-			do {
-				try modelContext.save()
-			}
-			catch {
-				Logger.background.error(
-					"Database save failed: \(error.localizedDescription)"
-				)
-			}
+		do {
+			try modelContext.save()
+		}
+		catch {
+			Logger.background.error(
+				"Database save failed: \(error.localizedDescription)"
+			)
 		}
 	}
 
@@ -92,8 +130,8 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 					from: data
 				)
 
-				Task {
-					await saveNotes(noteResponses)
+				Task { @MainActor in
+					saveNotes(noteResponses)
 				}
 
 			}
