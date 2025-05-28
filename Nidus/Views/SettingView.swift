@@ -38,6 +38,15 @@ struct SettingView: View {
 			&& !password.isEmpty
 	}
 
+	private func deleteNotes() {
+		do {
+			try modelContext.delete(model: Note.self)
+		}
+		catch {
+			Logger.foreground.error("Failed to delet notes: \(error)")
+		}
+	}
+
 	private func loadCurrentSettings() {
 		let settings = currentSettings
 		password = settings.password
@@ -143,6 +152,18 @@ struct SettingView: View {
 
 				} header: {
 					Text("Security")
+				}
+				Section {
+					HStack {
+						Image(
+							systemName: "trash"
+						).foregroundColor(.red)
+						Button(action: { deleteNotes() }) {
+							Text("Delete all notes").foregroundColor(
+								.red
+							)
+						}
+					}
 				}
 			}.navigationTitle("Settings")
 				.navigationBarTitleDisplayMode(.inline)
