@@ -18,12 +18,36 @@ struct LocationResponse: Codable {
 	}
 }
 
-struct NoteResponse: Codable {
-	let categoryName: String
-	let content: String
-	let id: String
-	let location: LocationResponse
-	let timestamp: String
+final class APIResponse: Codable {
+	enum CodingKeys: CodingKey {
+		case requests
+		case sources
+		case traps
+	}
+
+	let requests: [ServiceRequest]
+	let sources: [MosquitoSource]
+	let traps: [TrapData]
+
+	init(requests: [ServiceRequest], sources: [MosquitoSource], traps: [TrapData]) {
+		self.requests = requests
+		self.sources = sources
+		self.traps = traps
+	}
+
+	required init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		self.requests = try container.decode([ServiceRequest].self, forKey: .requests)
+		self.sources = try container.decode([MosquitoSource].self, forKey: .sources)
+		self.traps = try container.decode([TrapData].self, forKey: .traps)
+	}
+
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(requests, forKey: .requests)
+		try container.encode(sources, forKey: .sources)
+		try container.encode(traps, forKey: .traps)
+	}
 }
 
 class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
@@ -39,8 +63,10 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 		self.manager = manager
 	}
 
-	private func noteById(_ id: UUID) -> Note? {
-		let fetchDescriptor = FetchDescriptor<Note>(predicate: #Predicate { $0.id == id })
+	private func requestById(_ id: UUID) -> ServiceRequest? {
+		let fetchDescriptor = FetchDescriptor<ServiceRequest>(
+			predicate: #Predicate { $0.id == id }
+		)
 		do {
 			return try modelContext.fetch(fetchDescriptor).first
 		}
@@ -49,11 +75,79 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 		}
 	}
 
-	private func saveNotes(_ noteResponses: [NoteResponse]) {
+	private func sourceById(_ id: UUID) -> MosquitoSource? {
+		let fetchDescriptor = FetchDescriptor<MosquitoSource>(
+			predicate: #Predicate { $0.id == id }
+		)
+		do {
+			return try modelContext.fetch(fetchDescriptor).first
+		}
+		catch {
+			return nil
+		}
+	}
+
+	private func trapById(_ id: UUID) -> TrapData? {
+		let fetchDescriptor = FetchDescriptor<TrapData>(
+			predicate: #Predicate { $0.id == id }
+		)
+		do {
+			return try modelContext.fetch(fetchDescriptor).first
+		}
+		catch {
+			return nil
+		}
+	}
+
+	private func saveResponse(_ response: APIResponse) {
 		MainActor.preconditionIsolated()
-		Logger.background.info("Saving \(noteResponses.count) notes")
-		for noteResponse in noteResponses {
-			if let uuid = UUID(uuidString: noteResponse.id) {
+		Logger.background.info("Saving API response")
+		Logger.background.info("Sources \(response.sources.count)")
+		Logger.background.info("Requests \(response.requests.count)")
+		Logger.background.info("Traps \(response.traps.count)")
+		for s in response.sources {
+			if let source = sourceById(s.id) {
+				source.access = s.access
+				source.comments = s.comments
+				source.description_ = s.description_
+				source.location = s.location
+				source.habitat = s.habitat
+				source.inspections = s.inspections
+				source.name = s.name
+				source.treatments = s.treatments
+				source.useType = s.useType
+				source.waterOrigin = s.waterOrigin
+			}
+			else {
+				modelContext.insert(s)
+			}
+		}
+		for r in response.requests {
+			if let request = requestById(r.id) {
+				request.address = r.address
+				request.city = r.city
+				request.location = r.location
+				request.priority = r.priority
+				request.source = r.source
+				request.status = r.status
+				request.target = r.target
+				request.zip = r.zip
+			}
+			else {
+				modelContext.insert(r)
+			}
+		}
+		for t in response.traps {
+			if let trap = trapById(t.id) {
+				trap.description_ = t.description_
+				trap.location = t.location
+				trap.name = t.name
+			}
+			else {
+				modelContext.insert(t)
+			}
+		}
+		/*
 				if let note = noteById(uuid) {
 					Logger.background.info(
 						"Note \(noteResponse.id) already exists, updating"
@@ -86,14 +180,7 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 					newNote.id = uuid
 					modelContext.insert(newNote)
 				}
-			}
-			else {
-				Logger.background.warning(
-					"Skipping note with invalid ID: \(noteResponse.id)"
-				)
-				continue
-			}
-		}
+         */
 		do {
 			try modelContext.save()
 		}
@@ -126,13 +213,13 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 			do {
 				let data = try Data(contentsOf: location)
 				let decoder = JSONDecoder()
-				let noteResponses = try decoder.decode(
-					[NoteResponse].self,
+				let apiResponse = try decoder.decode(
+					APIResponse.self,
 					from: data
 				)
 
 				Task { @MainActor in
-					saveNotes(noteResponses)
+					saveResponse(apiResponse)
 				}
 
 			}
