@@ -87,7 +87,7 @@ struct MapOverview: View {
 			Map(position: $position) {
 				ForEach(notes, id: \.id) { note in
 					Marker(
-						note.category.name,
+						"",
 						systemImage: note.category.icon,
 						coordinate: note.coordinate
 					).tint(
