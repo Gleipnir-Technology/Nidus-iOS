@@ -15,7 +15,6 @@ let appContainer: ModelContainer = {
 			MosquitoSource.self,
 			NoteLocation.self,
 			ServiceRequest.self,
-			Settings.self,
 			TrapData.self,
 		])
 		let container = try ModelContainer(for: schema)
@@ -30,13 +29,14 @@ let appContainer: ModelContainer = {
 @main
 @MainActor
 struct NidusApp: App {
+	@State private var db = Database()
 	@State private var modelData = ModelData()
 	@State private var locationDataManager = LocationDataManager()
 	@UIApplicationDelegateAdaptor private var appDelegate: NidusAppDelegate
 
 	var body: some Scene {
 		WindowGroup {
-			ContentView().environment(locationDataManager)
+			ContentView(db: db).environment(locationDataManager)
 		}
 		.modelContainer(appContainer)
 	}

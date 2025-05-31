@@ -182,8 +182,8 @@ final class ServiceRequest: Codable, Identifiable, Note {
 		case zip
 	}
 	var address: String
-	var created: Date
 	var city: String
+	var created: Date
 	var id: UUID
 	var location: Location
 	var priority: String
@@ -201,8 +201,8 @@ final class ServiceRequest: Codable, Identifiable, Note {
 	// end Note protocol
 	init(
 		address: String,
-		created: Date,
 		city: String,
+		created: Date,
 		id: UUID,
 		location: Location,
 		priority: String,

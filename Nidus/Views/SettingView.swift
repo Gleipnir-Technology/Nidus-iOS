@@ -5,12 +5,10 @@
 //  Created by Eli Ribble on 3/19/25.
 //
 import OSLog
-import SwiftData
 import SwiftUI
 
 struct SettingView: View {
 	@Environment(\.dismiss) private var dismiss
-	@Environment(\.modelContext) private var modelContext
 	@State private var alertMessage = ""
 	@State private var isShowingAlert = false
 	@State private var password: String = ""
@@ -19,67 +17,32 @@ struct SettingView: View {
 	@State private var username: String = ""
 	var onSettingsUpdated: (() -> Void)
 
-	private var currentSettings: Settings {
-		if let result = try! modelContext.fetch(FetchDescriptor<Settings>()).first {
-			return result
-		}
-		else {
-			let instance = Settings(
-				password: "foo",
-				URL: "https://sync.nidus.cloud",
-				username: "bar"
-			)
-			modelContext.insert(instance)
-			return instance
-		}
-	}
-
 	private var isFormValid: Bool {
 		!username.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 			&& !password.isEmpty
 	}
 
 	private func deleteNotes() {
-		/*
-		do {
-			try modelContext.delete(model: Note.self)
-		}
-		catch {
-			Logger.foreground.error("Failed to delete notes: \(error)")
-		}
-         */
+		Logger.foreground.error("Delete is not operational")
 	}
 
 	private func loadCurrentSettings() {
-		let settings = currentSettings
-		password = settings.password
-		username = settings.username
-		url = settings.URL
-		Logger.foreground.info("Loaded settings \(username)")
+		password = UserDefaults.standard.string(forKey: "password") ?? ""
+		url = UserDefaults.standard.string(forKey: "sync-url") ?? "https://sync.nidus.cloud"
+		username = UserDefaults.standard.string(forKey: "username") ?? ""
 	}
 
 	private func save() {
 		let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
 
-		let settings = currentSettings
-		// Update existing settings
-		settings.URL = url
-		settings.username = trimmedUsername
-		settings.password = password
-		Logger.foreground.info("Updated settings")
+		UserDefaults.standard.set(password, forKey: "password")
+		UserDefaults.standard.set(url, forKey: "sync-url")
+		UserDefaults.standard.set(trimmedUsername, forKey: "username")
+		alertMessage = "Settings saved successfully!"
+		isShowingAlert = true
 
-		do {
-			try modelContext.save()
-			alertMessage = "Settings saved successfully!"
-			isShowingAlert = true
-
-			DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-				dismiss()
-			}
-		}
-		catch {
-			alertMessage = "Failed to save settings: \(error.localizedDescription)"
-			isShowingAlert = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+			dismiss()
 		}
 		onSettingsUpdated()
 	}

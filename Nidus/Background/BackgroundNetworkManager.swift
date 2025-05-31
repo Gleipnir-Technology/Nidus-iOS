@@ -6,7 +6,7 @@
 //
 import Foundation
 import OSLog
-import SwiftData
+import SQLite
 import UIKit
 
 struct LocationResponse: Codable {
@@ -52,51 +52,24 @@ final class APIResponse: Codable {
 
 class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 	@Published var errorMessage: String?
-	private var modelContext: ModelContext
 	private var manager: BackgroundNetworkManager!
+	var db: Database?
 
-	init(with container: ModelContainer) {
-		modelContext = ModelContext(container)
-	}
-
-	func setManager(_ manager: BackgroundNetworkManager) {
+	func setManager(_ manager: BackgroundNetworkManager, _ db: Database) {
+		self.db = db
 		self.manager = manager
 	}
 
 	private func requestById(_ id: UUID) -> ServiceRequest? {
-		let fetchDescriptor = FetchDescriptor<ServiceRequest>(
-			predicate: #Predicate { $0.id == id }
-		)
-		do {
-			return try modelContext.fetch(fetchDescriptor).first
-		}
-		catch {
-			return nil
-		}
+		return nil
 	}
 
 	private func sourceById(_ id: UUID) -> MosquitoSource? {
-		let fetchDescriptor = FetchDescriptor<MosquitoSource>(
-			predicate: #Predicate { $0.id == id }
-		)
-		do {
-			return try modelContext.fetch(fetchDescriptor).first
-		}
-		catch {
-			return nil
-		}
+		return nil
 	}
 
 	private func trapById(_ id: UUID) -> TrapData? {
-		let fetchDescriptor = FetchDescriptor<TrapData>(
-			predicate: #Predicate { $0.id == id }
-		)
-		do {
-			return try modelContext.fetch(fetchDescriptor).first
-		}
-		catch {
-			return nil
-		}
+		return nil
 	}
 
 	private func saveResponse(_ response: APIResponse) {
@@ -105,115 +78,27 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 		Logger.background.info("Sources \(response.sources.count)")
 		Logger.background.info("Requests \(response.requests.count)")
 		Logger.background.info("Traps \(response.traps.count)")
-		var updates = 0
-		var inserts = 0
-		var i = 0
-		for s in response.sources {
-			i += 1
-			if let source = sourceById(s.id) {
-				source.access = s.access
-				source.comments = s.comments
-				source.created = s.created
-				source.description_ = s.description_
-				source.location = s.location
-				source.habitat = s.habitat
-				source.inspections = s.inspections
-				source.name = s.name
-				source.treatments = s.treatments
-				source.useType = s.useType
-				source.waterOrigin = s.waterOrigin
-				updates += 1
-			}
-			else {
-				modelContext.insert(s)
-				inserts += 1
-			}
-			if i % 100 == 0 {
-				Logger.background.info("Source \(i)")
-			}
-		}
-		Logger.background.info("Sources \(updates) updates \(inserts) inserts")
-		updates = 0
-		inserts = 0
-		for r in response.requests {
-			if let request = requestById(r.id) {
-				request.address = r.address
-				request.city = r.city
-				request.created = r.created
-				request.location = r.location
-				request.priority = r.priority
-				request.source = r.source
-				request.status = r.status
-				request.target = r.target
-				request.zip = r.zip
-				updates += 1
-			}
-			else {
-				modelContext.insert(r)
-				inserts += 1
-			}
-		}
-		Logger.background.info("Requests \(updates) updates \(inserts) inserts")
-		updates = 0
-		inserts = 0
-		for t in response.traps {
-			if let trap = trapById(t.id) {
-				trap.created = t.created
-				trap.description_ = t.description_
-				trap.location = t.location
-				trap.name = t.name
-				updates += 1
-			}
-			else {
-				modelContext.insert(t)
-				inserts += 1
-			}
-		}
-		Logger.background.info("Traps \(updates) updates \(inserts) inserts")
-		updates = 0
-		inserts = 0
-		/*
-				if let note = noteById(uuid) {
-					Logger.background.info(
-						"Note \(noteResponse.id) already exists, updating"
-					)
-					note.categoryName = noteResponse.categoryName
-					note.content = noteResponse.content
-					note.location = noteResponse.location.asNoteLocation()
-					if let timestamp = ISO8601DateFormatter().date(
-						from: noteResponse.timestamp
-					) {
-						note.timestamp = timestamp
-					}
-					else {
-						Logger.background.warning(
-							"Cannot parse timestamp \(note.timestamp)"
-						)
-					}
-				}
-				else {
-					Logger.background.info(
-						"Note \(noteResponse.id) does not exist, creating"
-					)
-					let newNote = Note(
-						category: NoteCategory.byNameOrDefault(
-							noteResponse.categoryName
-						),
-						content: noteResponse.content,
-						location: noteResponse.location.asNoteLocation()
-					)
-					newNote.id = uuid
-					modelContext.insert(newNote)
-				}
-         */
 		do {
-			try modelContext.save()
+			var updates = 0
+			var inserts = 0
+			var i = 0
+			Logger.background.info("Requests \(updates) updates \(inserts) inserts")
+			updates = 0
+			inserts = 0
+			for r in response.requests {
+				try db?.upsertServiceRequest(r)
+				i += 1
+				inserts += 1
+				if i % 100 == 0 {
+					Logger.background.info("Source \(i)")
+				}
+			}
 		}
 		catch {
-			Logger.background.error(
-				"Database save failed: \(error.localizedDescription)"
-			)
+			Logger.background.error("Failed to do DB stuff \(error)")
 		}
+		db?.triggerUpdateComplete()
+		Logger.background.info("Done saving response")
 	}
 
 	func urlSession(
@@ -289,18 +174,14 @@ actor BackgroundNetworkManager: ObservableObject {
 	private var backgroundSession: URLSession!
 	private let cookieStorage: HTTPCookieStorage
 	private var downloadDelegate: DownloadDelegate
-	private var modelContext: ModelContext
+	private var db: Database
 
 	@Published var isLoggedIn = false
 
-	// From @ModelActor
-	nonisolated let modelExecutor: any SwiftData.ModelExecutor
-	nonisolated let modelContainer: SwiftData.ModelContainer
-
-	init(with container: SwiftData.ModelContainer) {
+	init(_ db: Database) {
 		cookieStorage = HTTPCookieStorage.shared
-		downloadDelegate = DownloadDelegate(with: container)
-		modelContext = ModelContext(container)
+		self.db = db
+		downloadDelegate = DownloadDelegate()
 
 		let config = URLSessionConfiguration.background(
 			withIdentifier: "technology.gleipnir.nidus-notes.download-session"
@@ -317,24 +198,16 @@ actor BackgroundNetworkManager: ObservableObject {
 			delegateQueue: nil
 		)
 
-		// From @ModelActor
-		self.modelExecutor = DefaultSerialModelExecutor(modelContext: modelContext)
-		self.modelContainer = container
-
-		downloadDelegate.setManager(self)
+		downloadDelegate.setManager(self, db)
 	}
 
-	private var currentSettings: Settings? {
-		let fetchDescriptor = FetchDescriptor<Settings>()
-		do {
-			return try modelContext.fetch(fetchDescriptor).first
-		}
-		catch {
-			Logger.background.error(
-				"Failed to fetch settings: \(error.localizedDescription)"
-			)
-			return nil
-		}
+	private var currentSettings: Settings {
+		let password = UserDefaults.standard.string(forKey: "password") ?? ""
+		let url =
+			UserDefaults.standard.string(forKey: "sync-url")
+			?? "https://sync.nidus.cloud"
+		let username = UserDefaults.standard.string(forKey: "username") ?? ""
+		return Settings(password: password, URL: url, username: username)
 	}
 
 	func fetchNotes() async {
@@ -349,17 +222,17 @@ actor BackgroundNetworkManager: ObservableObject {
 	}
 
 	nonisolated func startBackgroundDownload() async throws {
-		if let settings = await currentSettings {
-			await login(password: settings.password, username: settings.username)
-			// await fetchNotes(
+		let settings = await currentSettings
+		if settings.username != "" && settings.password != "" {
+			await login(settings)
 		}
 		else {
-			Logger.background.error("Failed to get settings")
+			Logger.background.info("Refusing to do download, no username and password")
 		}
 	}
 
-	func login(password: String, username: String) async {
-		guard let loginURL = URL(string: "https://sync.nidus.cloud/login") else {
+	func login(_ settings: Settings) async {
+		guard let loginURL = URL(string: settings.URL + "/login") else {
 			Logger.background.error("Invalid login URL")
 			return
 		}
@@ -374,7 +247,7 @@ actor BackgroundNetworkManager: ObservableObject {
 
 		// Create form data
 		let formData =
-			"username=\(username.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")&password=\(password.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")"
+			"username=\(settings.username.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")&password=\(settings.password.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")"
 		request.httpBody = formData.data(using: .utf8)
 		let downloadTask = backgroundSession.downloadTask(with: request)
 		downloadTask.resume()

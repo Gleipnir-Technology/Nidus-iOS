@@ -12,8 +12,8 @@ import SwiftUI
  */
 
 @ModelActor public actor BackgroundModelActor {
-	func triggerFetch() async throws {
-		let backgroundNetworkManager = BackgroundNetworkManager(with: modelContainer)
+	func triggerFetch(_ db: Database) async throws {
+		let backgroundNetworkManager = BackgroundNetworkManager(db)
 		try await backgroundNetworkManager.startBackgroundDownload()
 	}
 }

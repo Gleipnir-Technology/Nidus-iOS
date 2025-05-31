@@ -5,9 +5,6 @@
 //  Created by Eli Ribble on 5/27/25.
 //
 
-import SwiftData
-
-@Model
 final class Settings {
 	var password: String = ""
 	var URL: String = ""

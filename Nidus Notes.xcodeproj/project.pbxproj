@@ -15,6 +15,11 @@
 		532F3AD52DE66F42006E0E40 /* ModelActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD42DE66F3E006E0E40 /* ModelActor.swift */; };
 		532F3ADA2DE7A41F006E0E40 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD92DE7A41C006E0E40 /* Toast.swift */; };
 		532F3AE02DEA0BCD006E0E40 /* FieldSeeker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */; };
+		532F3AE22DEB64B4006E0E40 /* Importer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AE12DEB64B0006E0E40 /* Importer.swift */; };
+		532F3AE52DEB66C5006E0E40 /* Automerge in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AE42DEB66C5006E0E40 /* Automerge */; };
+		532F3AE82DEB6765006E0E40 /* AutomergeRepo in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AE72DEB6765006E0E40 /* AutomergeRepo */; };
+		532F3AEB2DEB68C7006E0E40 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AEA2DEB68C7006E0E40 /* SQLite */; };
+		532F3AED2DEB74D8006E0E40 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AEC2DEB74D3006E0E40 /* Database.swift */; };
 		537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5375609F2D820A5A00D8528B /* Preview Assets.xcassets */; };
 		537560B22D820A5A00D8528B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 537560A12D820A5A00D8528B /* Assets.xcassets */; };
 		537560B42D820A5A00D8528B /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A82D820A5A00D8528B /* ModelData.swift */; };
@@ -59,6 +64,8 @@
 		532F3AD82DE76EF8006E0E40 /* Nidus-Notes-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Nidus-Notes-Info.plist"; sourceTree = "<group>"; };
 		532F3AD92DE7A41C006E0E40 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldSeeker.swift; sourceTree = "<group>"; };
+		532F3AE12DEB64B0006E0E40 /* Importer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Importer.swift; sourceTree = "<group>"; };
+		532F3AEC2DEB74D3006E0E40 /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		5375609F2D820A5A00D8528B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		537560A12D820A5A00D8528B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		537560A42D820A5A00D8528B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -85,6 +92,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				532F3AEB2DEB68C7006E0E40 /* SQLite in Frameworks */,
+				532F3AE82DEB6765006E0E40 /* AutomergeRepo in Frameworks */,
+				532F3AE52DEB66C5006E0E40 /* Automerge in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,6 +118,7 @@
 		532F3ACD2DE61BF7006E0E40 /* Background */ = {
 			isa = PBXGroup;
 			children = (
+				532F3AE12DEB64B0006E0E40 /* Importer.swift */,
 				532F3AD42DE66F3E006E0E40 /* ModelActor.swift */,
 				532F3AD02DE61CE1006E0E40 /* BackgroundNetworkManager.swift */,
 			);
@@ -143,6 +154,7 @@
 		537560C12D820FFE00D8528B /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				532F3AEC2DEB74D3006E0E40 /* Database.swift */,
 				532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */,
 				532F3ACB2DE5FC62006E0E40 /* Settings.swift */,
 				537560A92D820A5A00D8528B /* Note.swift */,
@@ -220,6 +232,9 @@
 			);
 			name = "Nidus Notes";
 			packageProductDependencies = (
+				532F3AE42DEB66C5006E0E40 /* Automerge */,
+				532F3AE72DEB6765006E0E40 /* AutomergeRepo */,
+				532F3AEA2DEB68C7006E0E40 /* SQLite */,
 			);
 			productName = Nidus;
 			productReference = 53D57B4A2D79E2A20094740D /* Nidus Notes.app */;
@@ -297,6 +312,11 @@
 			);
 			mainGroup = 53D57B412D79E2A20094740D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				532F3AE32DEB66C5006E0E40 /* XCRemoteSwiftPackageReference "automerge-swift" */,
+				532F3AE62DEB6765006E0E40 /* XCRemoteSwiftPackageReference "automerge-repo-swift" */,
+				532F3AE92DEB68C7006E0E40 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 53D57B4B2D79E2A20094740D /* Products */;
 			projectDirPath = "";
@@ -345,6 +365,7 @@
 				537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */,
 				531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */,
 				537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */,
+				532F3AE22DEB64B4006E0E40 /* Importer.swift in Sources */,
 				537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */,
 				532F3AD32DE66D40006E0E40 /* Logger.swift in Sources */,
 				538784432D8B474500B3552E /* SettingView.swift in Sources */,
@@ -361,6 +382,7 @@
 				537E02672DC03DC5000F254F /* MapOverview.swift in Sources */,
 				531B36B72D8CEAEF00CE8BA0 /* SampleLocations.swift in Sources */,
 				537560BC2D820A5A00D8528B /* ContentView.swift in Sources */,
+				532F3AED2DEB74D8006E0E40 /* Database.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -716,6 +738,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		532F3AE32DEB66C5006E0E40 /* XCRemoteSwiftPackageReference "automerge-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/automerge/automerge-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.1;
+			};
+		};
+		532F3AE62DEB6765006E0E40 /* XCRemoteSwiftPackageReference "automerge-repo-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/automerge/automerge-repo-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.2;
+			};
+		};
+		532F3AE92DEB68C7006E0E40 /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		532F3AE42DEB66C5006E0E40 /* Automerge */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 532F3AE32DEB66C5006E0E40 /* XCRemoteSwiftPackageReference "automerge-swift" */;
+			productName = Automerge;
+		};
+		532F3AE72DEB6765006E0E40 /* AutomergeRepo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 532F3AE62DEB6765006E0E40 /* XCRemoteSwiftPackageReference "automerge-repo-swift" */;
+			productName = AutomergeRepo;
+		};
+		532F3AEA2DEB68C7006E0E40 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 532F3AE92DEB68C7006E0E40 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 53D57B422D79E2A20094740D /* Project object */;
 }

@@ -14,38 +14,7 @@ struct ContentView: View {
 	@State var currentValue: Float = 0.0
 	@State private var path = NavigationPath()
 	@State private var selection: Int = 0
-	var allNotes: [AnyNote] {
-		var fetchDescriptor = FetchDescriptor<ServiceRequest>()
-		fetchDescriptor.fetchLimit = 20
-		do {
-			let serviceRequests = try context.fetch(fetchDescriptor)
-			var notes: [AnyNote] = []
-			for s in serviceRequests {
-				notes.append(AnyNote(s))
-			}
-			/*
-             i = 0
-             for t in traps {
-             notes.append(AnyNote(t))
-             i += 1
-             if i > max { break }
-             }
-             Logger.foreground.info("Have \(traps.count) traps and \(notes.count) notes")
-             i = 0
-             for s in sources {
-             notes.append(AnyNote(s))
-             i += 1
-             if i > max { break }
-             }
-             Logger.foreground.info("Have \(sources.count) sources and \(notes.count) notes")
-             */
-			return notes
-		}
-		catch {
-			Logger.foreground.error("Failed to fetch \(error)")
-			return []
-		}
-	}
+	var db: Database
 
 	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
@@ -59,7 +28,7 @@ struct ContentView: View {
 				modelContainer: self.context.container
 			)
 			do {
-				try await actor.triggerFetch()
+				try await actor.triggerFetch(db)
 			}
 			catch {
 				Logger.background.error(
@@ -73,13 +42,13 @@ struct ContentView: View {
 			TabView(selection: $selection) {
 				Tab("Notes", systemImage: "clock", value: 0) {
 					NoteListView(
-						notes: allNotes,
+						notes: db.notes,
 						userLocation: locationDataManager.location
 					)
 				}
 				Tab("Map", systemImage: "map", value: 1) {
 					MapOverview(
-						notes: allNotes,
+						notes: db.notes,
 						onNoteSelected: onNoteSelected,
 						userLocation: locationDataManager.location
 					)
@@ -89,7 +58,7 @@ struct ContentView: View {
 				}
 			}
 			.navigationDestination(for: UUID.self) { noteId in
-				if let note = allNotes.first(where: { $0.id == noteId }) {
+				if let note = db.notes.first(where: { $0.id == noteId }) {
 					NoteEditor(
 						note: note,
 						userLocation: locationDataManager.location

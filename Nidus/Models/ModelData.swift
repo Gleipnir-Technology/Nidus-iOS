@@ -10,8 +10,6 @@ import Foundation
 @Observable
 class ModelData {
 	var categories: [NoteCategory] = []
-	var serviceRequests: [ServiceRequest] = []
-	var settings: Settings?
 }
 
 func load<T: Decodable>(_ filename: String) -> T {
