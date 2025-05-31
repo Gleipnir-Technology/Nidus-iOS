@@ -41,7 +41,6 @@ class ServiceRequestTable {
 	}
 
 	func asNotes(_ connection: Connection) throws -> [AnyNote] {
-		var i = 0
 		var results: [AnyNote] = []
 		for row in try connection.prepare(table) {
 			let created = row[created]
@@ -62,8 +61,6 @@ class ServiceRequestTable {
 					)
 				)
 			)
-			i += 1
-			if i > 10 { break }
 		}
 		return results
 	}

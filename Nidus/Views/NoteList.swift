@@ -28,8 +28,12 @@ struct NoteList: View {
 	var notes: [AnyNote]
 	var userLocation: CLLocation?
 
+	var notesToShow: [AnyNote].SubSequence {
+		return notes[0...100]
+	}
+
 	var body: some View {
-		List(notes) { note in
+		List(notesToShow) { note in
 			NavigationLink {
 				NoteEditor(note: note, userLocation: userLocation)
 			} label: {
