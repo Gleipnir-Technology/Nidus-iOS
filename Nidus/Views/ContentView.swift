@@ -14,36 +14,37 @@ struct ContentView: View {
 	@State var currentValue: Float = 0.0
 	@State private var path = NavigationPath()
 	@State private var selection: Int = 0
-	@Query private var sources: [MosquitoSource]
-	@Query private var serviceRequests: [ServiceRequest]
-	@Query private var traps: [TrapData]
 	var allNotes: [AnyNote] {
-		var notes: [AnyNote] = []
-		var i = 0
-		let max = 3
-		for s in serviceRequests {
-			notes.append(AnyNote(s))
-			i += 1
-			if i > max { break }
+		var fetchDescriptor = FetchDescriptor<ServiceRequest>()
+		fetchDescriptor.fetchLimit = 20
+		do {
+			let serviceRequests = try context.fetch(fetchDescriptor)
+			var notes: [AnyNote] = []
+			for s in serviceRequests {
+				notes.append(AnyNote(s))
+			}
+			/*
+             i = 0
+             for t in traps {
+             notes.append(AnyNote(t))
+             i += 1
+             if i > max { break }
+             }
+             Logger.foreground.info("Have \(traps.count) traps and \(notes.count) notes")
+             i = 0
+             for s in sources {
+             notes.append(AnyNote(s))
+             i += 1
+             if i > max { break }
+             }
+             Logger.foreground.info("Have \(sources.count) sources and \(notes.count) notes")
+             */
+			return notes
 		}
-		Logger.foreground.info(
-			"Have \(serviceRequests.count) service requests and \(notes.count) notes"
-		)
-		i = 0
-		for t in traps {
-			notes.append(AnyNote(t))
-			i += 1
-			if i > max { break }
+		catch {
+			Logger.foreground.error("Failed to fetch \(error)")
+			return []
 		}
-		Logger.foreground.info("Have \(traps.count) traps and \(notes.count) notes")
-		i = 0
-		for s in sources {
-			notes.append(AnyNote(s))
-			i += 1
-			if i > max { break }
-		}
-		Logger.foreground.info("Have \(sources.count) sources and \(notes.count) notes")
-		return notes
 	}
 
 	func onNoteSelected(_ note: any Note) {
