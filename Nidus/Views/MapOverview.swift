@@ -1,20 +1,29 @@
+import CoreLocation
+import MapKit
 //
 //  MapOverview.swift
 //  Nidus
 //
 //  Created by Eli Ribble on 4/28/25.
 //
-import CoreLocation
-import MapKit
+import OSLog
 import SwiftData
 import SwiftUI
 
+extension CLLocationCoordinate2D {
+	static let visalia: Self = .init(
+		latitude: 36.326,
+		longitude: -119.313191
+	)
+}
+
 struct MapOverview: View {
-	@Environment(\.modelContext) private var modelContext
 	@State private var geometrySize: CGSize = .zero
 	var notes: [any Note]
 
 	var onNoteSelected: ((any Note) -> Void)
+	@Binding var position: MapCameraPosition
+	var onPositionChange: ((MKCoordinateRegion) -> Void)
 	var userLocation: CLLocation?
 
 	// Convert tap location to map coordinate
@@ -33,7 +42,7 @@ struct MapOverview: View {
 		return coordinate
 	}
 	private func findMapView(in geometry: GeometryProxy) -> MKMapView? {
-		let view = geometry.frame(in: .global)
+		//let view = geometry.frame(in: .global)
 
 		func findMapView(in view: UIView) -> MKMapView? {
 			if let mapView = view as? MKMapView {
@@ -75,7 +84,7 @@ struct MapOverview: View {
 	}
 	var body: some View {
 		GeometryReader { geometry in
-			Map {
+			Map(position: $position) {
 				ForEach(notes, id: \.id) { note in
 					Marker(
 						note.category.name,
@@ -107,7 +116,15 @@ struct MapOverview: View {
 						onNoteSelected(closestNote)
 					}
 				}
-			}
+			}.onMapCameraChange(
+				frequency: .onEnd,
+				{ (context: MapCameraUpdateContext) -> Void in
+					Logger.foreground.info(
+						"Camera rect minX \(context.rect.minX), maxX \(context.rect.maxX)"
+					)
+					onPositionChange(MKCoordinateRegion(context.rect))
+				}
+			)
 		}
 	}
 }

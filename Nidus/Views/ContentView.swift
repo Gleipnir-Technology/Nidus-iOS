@@ -4,6 +4,8 @@
 //
 //  Created by Eli Ribble on 3/6/25.
 //
+import Combine
+import MapKit
 import OSLog
 import SwiftData
 import SwiftUI
@@ -13,10 +15,21 @@ struct ContentView: View {
 	@State var currentValue: Float = 0.0
 	@State private var path = NavigationPath()
 	@State private var selection: Int = 0
+	@State private var position: MapCameraPosition = .camera(
+		.init(centerCoordinate: .visalia, distance: 1_000)
+	)
+
 	var db: Database
 
 	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
+	}
+	func onMapPositionChange(_ region: MKCoordinateRegion) {
+		let minX = region.center.longitude - region.span.longitudeDelta / 2
+		let minY = region.center.latitude - region.span.latitudeDelta / 2
+		let maxX = region.center.longitude + region.span.longitudeDelta / 2
+		let maxY = region.center.latitude + region.span.latitudeDelta / 2
+		db.setPosition(minX, minY, maxX, maxY)
 	}
 	func setTabNotes() {
 		selection = 0
@@ -47,8 +60,12 @@ struct ContentView: View {
 					MapOverview(
 						notes: db.notesToShow,
 						onNoteSelected: onNoteSelected,
+						position: $position,
+						onPositionChange: onMapPositionChange,
 						userLocation: locationDataManager.location
-					)
+					).onReceive(Just(position)) { position in
+						//db.setPosition(position.rect?.minX, position.rect?.minY, position.rect?.maxX, position.rect?.maxY)
+					}
 				}
 				Tab("Settings", systemImage: "gear", value: 3) {
 					SettingView(onSettingsUpdated: triggerBackgroundFetch)

@@ -95,6 +95,10 @@ class Database: ObservableObject {
 	private var connection: SQLite.Connection?
 	private var serviceRequestTable: ServiceRequestTable
 	var notes: [AnyNote] = []
+	var minx: Double?
+	var miny: Double?
+	var maxx: Double?
+	var maxy: Double?
 
 	init() {
 		serviceRequestTable = ServiceRequestTable()
@@ -116,15 +120,37 @@ class Database: ObservableObject {
 	}
 
 	var notesToShow: [AnyNote] {
-		return Array(notes[0..<100])
+		var toShow: [AnyNote] = []
+		if minx == nil || miny == nil || maxx == nil || maxy == nil {
+			return Array(notes[0..<10])
+		}
+		for note in notes {
+			if note.coordinate.latitude > miny! && note.coordinate.longitude > minx!
+				&& note.coordinate.latitude < maxy!
+				&& note.coordinate.longitude < maxx!
+			{
+				toShow.append(note)
+			}
+		}
+		return toShow
 	}
 
+	func setPosition(_ minX: Double?, _ minY: Double?, _ maxX: Double?, _ maxY: Double?) {
+		self.minx = minX
+		self.miny = minY
+		self.maxx = maxX
+		self.maxy = maxY
+		Logger.foreground.info(
+			"Set DB limits to \(String(describing: minX)), \(String(describing: minY)), \(String(describing: maxX)), \(String(describing: maxY))"
+		)
+	}
 	func upsertServiceRequest(_ serviceRequest: ServiceRequest) throws {
 		try self.serviceRequestTable.upsert(connection: self.connection!, serviceRequest)
 	}
 	func triggerUpdateComplete() {
 		do {
-			notes = try serviceRequestTable.asNotes(connection!)
+			notes = []
+			notes += try serviceRequestTable.asNotes(connection!)
 		}
 		catch {
 			Logger.background.error("Failed to get notes: \(error)")
