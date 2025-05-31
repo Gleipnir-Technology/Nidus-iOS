@@ -35,10 +35,31 @@ struct NoteRow: View {
 	}
 	var body: some View {
 		HStack {
-			Label(note.category.name, systemImage: note.category.icon)
-			Text(distanceString())
+			VStack {
+				Label("", systemImage: note.category.icon)
+				Text(distanceString())
+			}
+			Text(note.content)
 			Spacer()
 		}
 		.padding()
 	}
+}
+
+#Preview {
+	NoteRow(
+		note: ServiceRequest(
+			address: "somewhere",
+			city: "over there",
+			created: Date.now,
+			id: UUID(uuidString: "1846d421-f8ab-4e37-850a-b61bb8422453")!,
+			location: Location(latitude: 30, longitude: -111),
+			priority: "low",
+			source: "everywhere",
+			status: "bad",
+			target: "here",
+			zip: "12345"
+		),
+		userLocation: nil
+	)
 }
