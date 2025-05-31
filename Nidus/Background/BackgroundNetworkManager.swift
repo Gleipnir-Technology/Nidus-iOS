@@ -105,10 +105,15 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 		Logger.background.info("Sources \(response.sources.count)")
 		Logger.background.info("Requests \(response.requests.count)")
 		Logger.background.info("Traps \(response.traps.count)")
+		var updates = 0
+		var inserts = 0
+		var i = 0
 		for s in response.sources {
+			i += 1
 			if let source = sourceById(s.id) {
 				source.access = s.access
 				source.comments = s.comments
+				source.created = s.created
 				source.description_ = s.description_
 				source.location = s.location
 				source.habitat = s.habitat
@@ -117,36 +122,56 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 				source.treatments = s.treatments
 				source.useType = s.useType
 				source.waterOrigin = s.waterOrigin
+				updates += 1
 			}
 			else {
 				modelContext.insert(s)
+				inserts += 1
+			}
+			if i % 100 == 0 {
+				Logger.background.info("Source \(i)")
 			}
 		}
+		Logger.background.info("Sources \(updates) updates \(inserts) inserts")
+		updates = 0
+		inserts = 0
 		for r in response.requests {
 			if let request = requestById(r.id) {
 				request.address = r.address
 				request.city = r.city
+				request.created = r.created
 				request.location = r.location
 				request.priority = r.priority
 				request.source = r.source
 				request.status = r.status
 				request.target = r.target
 				request.zip = r.zip
+				updates += 1
 			}
 			else {
 				modelContext.insert(r)
+				inserts += 1
 			}
 		}
+		Logger.background.info("Requests \(updates) updates \(inserts) inserts")
+		updates = 0
+		inserts = 0
 		for t in response.traps {
 			if let trap = trapById(t.id) {
+				trap.created = t.created
 				trap.description_ = t.description_
 				trap.location = t.location
 				trap.name = t.name
+				updates += 1
 			}
 			else {
 				modelContext.insert(t)
+				inserts += 1
 			}
 		}
+		Logger.background.info("Traps \(updates) updates \(inserts) inserts")
+		updates = 0
+		inserts = 0
 		/*
 				if let note = noteById(uuid) {
 					Logger.background.info(
@@ -213,6 +238,8 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 			do {
 				let data = try Data(contentsOf: location)
 				let decoder = JSONDecoder()
+				decoder.dateDecodingStrategy = .iso8601withOptionalFractionalSeconds
+				decoder.keyDecodingStrategy = .convertFromSnakeCase
 				let apiResponse = try decoder.decode(
 					APIResponse.self,
 					from: data
@@ -225,7 +252,7 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 			}
 			catch {
 				Logger.background.error(
-					"Failed to process download: \(error.localizedDescription)"
+					"Failed to process download: \(error)"
 				)
 			}
 
@@ -392,4 +419,20 @@ actor BackgroundNetworkManager: ObservableObject {
         */
 	}
 
+}
+
+extension ParseStrategy where Self == Date.ISO8601FormatStyle {
+	static var iso8601withFractionalSeconds: Self { .init(includingFractionalSeconds: true) }
+}
+
+extension JSONDecoder.DateDecodingStrategy {
+	static let iso8601withOptionalFractionalSeconds = custom {
+		let string = try $0.singleValueContainer().decode(String.self)
+		do {
+			return try .init(string, strategy: .iso8601withFractionalSeconds)
+		}
+		catch {
+			return try .init(string, strategy: .iso8601)
+		}
+	}
 }

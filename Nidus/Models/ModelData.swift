@@ -10,7 +10,7 @@ import Foundation
 @Observable
 class ModelData {
 	var categories: [NoteCategory] = []
-	var notes: [Note] = []
+	var serviceRequests: [ServiceRequest] = []
 	var settings: Settings?
 }
 

@@ -14,7 +14,6 @@
 		532F3AD32DE66D40006E0E40 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD22DE66D3D006E0E40 /* Logger.swift */; };
 		532F3AD52DE66F42006E0E40 /* ModelActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD42DE66F3E006E0E40 /* ModelActor.swift */; };
 		532F3ADA2DE7A41F006E0E40 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD92DE7A41C006E0E40 /* Toast.swift */; };
-		532F3ADC2DE7A9C2006E0E40 /* NoteAdd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3ADB2DE7A9BF006E0E40 /* NoteAdd.swift */; };
 		532F3AE02DEA0BCD006E0E40 /* FieldSeeker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */; };
 		537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5375609F2D820A5A00D8528B /* Preview Assets.xcassets */; };
 		537560B22D820A5A00D8528B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 537560A12D820A5A00D8528B /* Assets.xcassets */; };
@@ -27,10 +26,7 @@
 		537560CC2D82127100D8528B /* NoteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C92D82127100D8528B /* NoteRow.swift */; };
 		537560CE2D82127100D8528B /* NoteList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C82D82127100D8528B /* NoteList.swift */; };
 		537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560CF2D821BD500D8528B /* NoteEditor.swift */; };
-		537560D82D8224AB00D8528B /* SampleData+Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560D72D8224A000D8528B /* SampleData+Note.swift */; };
 		537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560DB2D83306C00D8528B /* LocationDataManager.swift */; };
-		537560E12D88D69D00D8528B /* ModelContainerPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560E02D88D69800D8528B /* ModelContainerPreview.swift */; };
-		537560E32D88EC0B00D8528B /* Preview+ModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560E22D88EC0300D8528B /* Preview+ModelContainer.swift */; };
 		537E02672DC03DC5000F254F /* MapOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E02662DC03DC1000F254F /* MapOverview.swift */; };
 		538784432D8B474500B3552E /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538784422D8B474300B3552E /* SettingView.swift */; };
 		53E308182D8B39ED00534AB0 /* NoteCategoryAdd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E308172D8B39E800534AB0 /* NoteCategoryAdd.swift */; };
@@ -62,7 +58,6 @@
 		532F3AD42DE66F3E006E0E40 /* ModelActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelActor.swift; sourceTree = "<group>"; };
 		532F3AD82DE76EF8006E0E40 /* Nidus-Notes-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Nidus-Notes-Info.plist"; sourceTree = "<group>"; };
 		532F3AD92DE7A41C006E0E40 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
-		532F3ADB2DE7A9BF006E0E40 /* NoteAdd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteAdd.swift; sourceTree = "<group>"; };
 		532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldSeeker.swift; sourceTree = "<group>"; };
 		5375609F2D820A5A00D8528B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		537560A12D820A5A00D8528B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -76,10 +71,7 @@
 		537560C82D82127100D8528B /* NoteList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteList.swift; sourceTree = "<group>"; };
 		537560C92D82127100D8528B /* NoteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteRow.swift; sourceTree = "<group>"; };
 		537560CF2D821BD500D8528B /* NoteEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditor.swift; sourceTree = "<group>"; };
-		537560D72D8224A000D8528B /* SampleData+Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SampleData+Note.swift"; sourceTree = "<group>"; };
 		537560DB2D83306C00D8528B /* LocationDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDataManager.swift; sourceTree = "<group>"; };
-		537560E02D88D69800D8528B /* ModelContainerPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContainerPreview.swift; sourceTree = "<group>"; };
-		537560E22D88EC0300D8528B /* Preview+ModelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preview+ModelContainer.swift"; sourceTree = "<group>"; };
 		537E02662DC03DC1000F254F /* MapOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapOverview.swift; sourceTree = "<group>"; };
 		538784422D8B474300B3552E /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		53D57B4A2D79E2A20094740D /* Nidus Notes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Nidus Notes.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -166,7 +158,6 @@
 				537560A42D820A5A00D8528B /* ContentView.swift */,
 				537E02662DC03DC1000F254F /* MapOverview.swift */,
 				537560A72D820A5A00D8528B /* MapView.swift */,
-				532F3ADB2DE7A9BF006E0E40 /* NoteAdd.swift */,
 				53E308172D8B39E800534AB0 /* NoteCategoryAdd.swift */,
 				537560CF2D821BD500D8528B /* NoteEditor.swift */,
 				537560C82D82127100D8528B /* NoteList.swift */,
@@ -181,8 +172,6 @@
 		537560D12D8223E800D8528B /* PreviewHelper */ = {
 			isa = PBXGroup;
 			children = (
-				537560E22D88EC0300D8528B /* Preview+ModelContainer.swift */,
-				537560E02D88D69800D8528B /* ModelContainerPreview.swift */,
 			);
 			path = PreviewHelper;
 			sourceTree = "<group>";
@@ -191,7 +180,6 @@
 			isa = PBXGroup;
 			children = (
 				531B36B62D8CEAE800CE8BA0 /* SampleLocations.swift */,
-				537560D72D8224A000D8528B /* SampleData+Note.swift */,
 			);
 			path = SampleData;
 			sourceTree = "<group>";
@@ -357,10 +345,7 @@
 				537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */,
 				531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */,
 				537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */,
-				537560E12D88D69D00D8528B /* ModelContainerPreview.swift in Sources */,
 				537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */,
-				537560E32D88EC0B00D8528B /* Preview+ModelContainer.swift in Sources */,
-				537560D82D8224AB00D8528B /* SampleData+Note.swift in Sources */,
 				532F3AD32DE66D40006E0E40 /* Logger.swift in Sources */,
 				538784432D8B474500B3552E /* SettingView.swift in Sources */,
 				537560CC2D82127100D8528B /* NoteRow.swift in Sources */,
@@ -371,7 +356,6 @@
 				532F3ACC2DE5FC67006E0E40 /* Settings.swift in Sources */,
 				53E308182D8B39ED00534AB0 /* NoteCategoryAdd.swift in Sources */,
 				532F3AE02DEA0BCD006E0E40 /* FieldSeeker.swift in Sources */,
-				532F3ADC2DE7A9C2006E0E40 /* NoteAdd.swift in Sources */,
 				537560BA2D820A5A00D8528B /* MapView.swift in Sources */,
 				532F3AD12DE61CE7006E0E40 /* BackgroundNetworkManager.swift in Sources */,
 				537E02672DC03DC5000F254F /* MapOverview.swift in Sources */,

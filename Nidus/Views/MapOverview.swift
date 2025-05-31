@@ -11,10 +11,10 @@ import SwiftUI
 
 struct MapOverview: View {
 	@Environment(\.modelContext) private var modelContext
-	@Query(sort: \Note.content) private var notes: [Note]
 	@State private var geometrySize: CGSize = .zero
+	var notes: [any Note]
 
-	var onNoteSelected: ((Note) -> Void)
+	var onNoteSelected: ((any Note) -> Void)
 	var userLocation: CLLocation?
 
 	// Convert tap location to map coordinate
@@ -60,11 +60,11 @@ struct MapOverview: View {
 		}
 		return findMapView(in: rootView)
 	}
-	private func findClosestNote(to coordinate: CLLocationCoordinate2D) -> Note? {
+	private func findClosestNote(to coordinate: CLLocationCoordinate2D) -> (any Note)? {
 		notes.min { note, _ in
 			let noteLocation = CLLocation(
-				latitude: note.location.latitude,
-				longitude: note.location.longitude
+				latitude: note.coordinate.latitude,
+				longitude: note.coordinate.longitude
 			)
 			let tappedLocation = CLLocation(
 				latitude: coordinate.latitude,
@@ -80,9 +80,7 @@ struct MapOverview: View {
 					Marker(
 						note.category.name,
 						systemImage: note.category.icon,
-						coordinate:
-							note.location
-							.asCLLocationCoordinate2D()
+						coordinate: note.coordinate
 					).tint(
 						.orange
 					)

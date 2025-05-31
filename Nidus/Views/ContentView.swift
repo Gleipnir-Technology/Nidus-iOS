@@ -14,9 +14,39 @@ struct ContentView: View {
 	@State var currentValue: Float = 0.0
 	@State private var path = NavigationPath()
 	@State private var selection: Int = 0
-	@Query private var notes: [Note]
+	@Query private var sources: [MosquitoSource]
+	@Query private var serviceRequests: [ServiceRequest]
+	@Query private var traps: [TrapData]
+	var allNotes: [AnyNote] {
+		var notes: [AnyNote] = []
+		var i = 0
+		let max = 3
+		for s in serviceRequests {
+			notes.append(AnyNote(s))
+			i += 1
+			if i > max { break }
+		}
+		Logger.foreground.info(
+			"Have \(serviceRequests.count) service requests and \(notes.count) notes"
+		)
+		i = 0
+		for t in traps {
+			notes.append(AnyNote(t))
+			i += 1
+			if i > max { break }
+		}
+		Logger.foreground.info("Have \(traps.count) traps and \(notes.count) notes")
+		i = 0
+		for s in sources {
+			notes.append(AnyNote(s))
+			i += 1
+			if i > max { break }
+		}
+		Logger.foreground.info("Have \(sources.count) sources and \(notes.count) notes")
+		return notes
+	}
 
-	func onNoteSelected(_ note: Note) {
+	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
 	}
 	func setTabNotes() {
@@ -41,17 +71,15 @@ struct ContentView: View {
 		NavigationStack(path: $path) {
 			TabView(selection: $selection) {
 				Tab("Notes", systemImage: "clock", value: 0) {
-					NoteListView(userLocation: locationDataManager.location)
-				}
-				Tab("Map", systemImage: "map", value: 1) {
-					MapOverview(
-						onNoteSelected: onNoteSelected,
+					NoteListView(
+						notes: allNotes,
 						userLocation: locationDataManager.location
 					)
 				}
-				Tab("Add", systemImage: "plus.circle", value: 2) {
-					NoteAdd(
-						onSave: setTabNotes,
+				Tab("Map", systemImage: "map", value: 1) {
+					MapOverview(
+						notes: allNotes,
+						onNoteSelected: onNoteSelected,
 						userLocation: locationDataManager.location
 					)
 				}
@@ -60,7 +88,7 @@ struct ContentView: View {
 				}
 			}
 			.navigationDestination(for: UUID.self) { noteId in
-				if let note = notes.first(where: { $0.id == noteId }) {
+				if let note = allNotes.first(where: { $0.id == noteId }) {
 					NoteEditor(
 						note: note,
 						userLocation: locationDataManager.location
@@ -74,8 +102,4 @@ struct ContentView: View {
 			triggerBackgroundFetch()
 		}
 	}
-}
-
-#Preview("Loading") {
-	ContentView().modelContainer(try! ModelContainer.sample())
 }

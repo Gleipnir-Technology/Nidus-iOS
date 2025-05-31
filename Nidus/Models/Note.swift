@@ -81,42 +81,52 @@ struct NoteCategory: Codable, Hashable, Identifiable {
 	}
 	static func byNameOrDefault(_ name: String?) -> NoteCategory {
 		if name == nil {
-			return NoteCategory.info
+			return NoteCategory.mosquitoSource
 		}
 		else {
 			let result = NoteCategory.byName(name!)
 			if result == nil {
-				return NoteCategory.info
+				return NoteCategory.mosquitoSource
 			}
 			return result!
 		}
 	}
 
-	static let entry = NoteCategory(color: .green, icon: "lock.circle", name: "entry")
-	static let info = NoteCategory(color: .blue, icon: "info.circle", name: "info")
-	static let todo = NoteCategory(color: .red, icon: "checkmark.circle", name: "todo")
+	static let mosquitoSource = NoteCategory(
+		color: .red,
+		icon: "ant.circle",
+		name: "Mosquito Source"
+	)
+	static let serviceRequest = NoteCategory(
+		color: .green,
+		icon: "clipboard",
+		name: "Service Request"
+	)
+	static let trapData = NoteCategory(color: .blue, icon: "hazardsign", name: "Trap Data")
 
-	static let all = [entry, info, todo]
+	static let all = [mosquitoSource, serviceRequest, trapData]
 }
 
-@Model
-final class Note: Identifiable {
-	var categoryName: String
-	var content: String
-	var id: UUID = UUID()
-	var location: NoteLocation
-	var timestamp: Date = Date()
+protocol Note: Identifiable<UUID> {
+	var category: NoteCategory { get }
+	var categoryName: String { get }
+	var content: String { get }
+	var coordinate: CLLocationCoordinate2D { get }
+	var id: UUID { get }
+	var timestamp: Date { get }
+}
+struct AnyNote: Note {
+	var innerNote: any Note
 
-	init(category: NoteCategory, content: String, location: NoteLocation) {
-		self.categoryName = category.name
-		self.content = content
-		self.location = location
+	init(_ note: any Note) {
+		innerNote = note
 	}
-
-	var category: NoteCategory {
-		return NoteCategory.byNameOrDefault(categoryName)
+	var category: NoteCategory { innerNote.category }
+	var categoryName: String { innerNote.categoryName }
+	var content: String { innerNote.content }
+	var id: UUID {
+		innerNote.id
 	}
-	func coordinate() -> CLLocationCoordinate2D? {
-		return location.asCLLocationCoordinate2D()
-	}
+	var coordinate: CLLocationCoordinate2D { innerNote.coordinate }
+	var timestamp: Date { innerNote.timestamp }
 }

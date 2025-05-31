@@ -23,7 +23,7 @@ struct PointOfInterest: Identifiable {
 */
 
 struct NoteMapView: View {
-	@Query() private var notes: [Note]
+	private var notes: [any Note]
 
 	var body: some View {
 		ZStack(alignment: .trailing) {
@@ -32,8 +32,7 @@ struct NoteMapView: View {
 					Marker(
 						note.category.name,
 						systemImage: note.category.icon,
-						coordinate:
-							note.location.asCLLocationCoordinate2D()
+						coordinate: note.coordinate
 					).tint(
 						.orange
 					)
@@ -49,8 +48,4 @@ struct NoteMapView: View {
 			)
 		}
 	}
-}
-
-#Preview("sample", traits: .modifier(MockDataPreviewModifier())) {
-	NoteMapView()
 }

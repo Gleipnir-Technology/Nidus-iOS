@@ -21,9 +21,3 @@ struct NoteCategoryAdd: View {
 		}
 	}
 }
-
-#Preview {
-	ModelContainerPreview(ModelContainer.sample) {
-		NoteCategoryAdd()
-	}
-}

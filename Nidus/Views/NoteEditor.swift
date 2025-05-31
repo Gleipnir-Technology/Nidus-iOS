@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct NoteEditor: View {
-	let note: Note
+	let note: any Note
 
 	@State private var content: String
 	@State private var category: NoteCategory
@@ -21,18 +21,19 @@ struct NoteEditor: View {
 	@Environment(\.dismiss) private var dismiss
 	@Environment(\.modelContext) private var modelContext
 
-	init(note: Note, userLocation: CLLocation?) {
+	init(note: any Note, userLocation: CLLocation?) {
 		self.note = note
 		self.content = note.content
 		self.category = NoteCategory.byNameOrDefault(note.categoryName)
-		self.location =
-			note.location.asCLLocationCoordinate2D()
+		self.location = note.coordinate
 	}
 
 	private func save() {
-		note.categoryName = category.name
+		/*
+         note.categoryName = category.name
 		note.content = content
 		note.location = NoteLocation(location: location)
+         */
 		showSavedToast = true
 	}
 	var body: some View {
@@ -63,8 +64,4 @@ struct NoteEditor: View {
 			}
 		}.toast(message: "Saved", isShowing: $showSavedToast, duration: Toast.short)
 	}
-}
-
-#Preview("new gps", traits: .modifier(MockDataPreviewModifier())) {
-	NoteEditor(note: Note.dog, userLocation: SampleLocations.park)
 }

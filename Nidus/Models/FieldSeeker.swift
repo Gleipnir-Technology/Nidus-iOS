@@ -5,6 +5,7 @@
 //  Created by Eli Ribble on 5/30/25.
 //
 import Foundation
+import MapKit
 import SwiftData
 
 @Model
@@ -58,6 +59,10 @@ final class Location: Codable, Identifiable {
 		longitude = try container.decode(Double.self, forKey: .longitude)
 	}
 
+	func coordinate() -> CLLocationCoordinate2D {
+		return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+	}
+
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(latitude, forKey: .latitude)
@@ -66,10 +71,11 @@ final class Location: Codable, Identifiable {
 }
 
 @Model
-final class MosquitoSource: Codable, Identifiable {
+final class MosquitoSource: Codable, Identifiable, Note {
 	enum CodingKeys: CodingKey {
 		case access
 		case comments
+		case created
 		case description
 		case id
 		case location
@@ -82,6 +88,7 @@ final class MosquitoSource: Codable, Identifiable {
 	}
 	var access: String
 	var comments: String
+	var created: Date
 	var description_: String
 	var id: UUID
 	var location: Location
@@ -92,9 +99,18 @@ final class MosquitoSource: Codable, Identifiable {
 	var useType: String
 	var waterOrigin: String
 
+	// Note protocol
+	var category: NoteCategory { NoteCategory.byNameOrDefault(categoryName) }
+	var categoryName: String { "Mosquito Source" }
+	var content: String { name }
+	var coordinate: CLLocationCoordinate2D { location.coordinate() }
+	var timestamp: Date { created }
+	// end Note protocol
+
 	init(
 		access: String,
 		comments: String,
+		created: Date,
 		description: String,
 		id: UUID,
 		location: Location,
@@ -107,6 +123,7 @@ final class MosquitoSource: Codable, Identifiable {
 	) {
 		self.access = access
 		self.comments = comments
+		self.created = created
 		self.description_ = description
 		self.id = id
 		self.location = location
@@ -122,6 +139,7 @@ final class MosquitoSource: Codable, Identifiable {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		access = try container.decode(String.self, forKey: .access)
 		comments = try container.decode(String.self, forKey: .comments)
+		created = try container.decode(Date.self, forKey: .created)
 		description_ = try container.decode(String.self, forKey: .description)
 		id = try container.decode(UUID.self, forKey: .id)
 		location = try container.decode(Location.self, forKey: .location)
@@ -137,6 +155,7 @@ final class MosquitoSource: Codable, Identifiable {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(access, forKey: .access)
 		try container.encode(comments, forKey: .comments)
+		try container.encode(created, forKey: .created)
 		try container.encode(description_, forKey: .description)
 		try container.encode(id, forKey: .id)
 		try container.encode(location, forKey: .location)
@@ -149,10 +168,11 @@ final class MosquitoSource: Codable, Identifiable {
 }
 
 @Model
-final class ServiceRequest: Codable, Identifiable {
+final class ServiceRequest: Codable, Identifiable, Note {
 	enum CodingKeys: CodingKey {
 		case address
 		case city
+		case created
 		case id
 		case location
 		case priority
@@ -162,6 +182,7 @@ final class ServiceRequest: Codable, Identifiable {
 		case zip
 	}
 	var address: String
+	var created: Date
 	var city: String
 	var id: UUID
 	var location: Location
@@ -171,8 +192,16 @@ final class ServiceRequest: Codable, Identifiable {
 	var target: String
 	var zip: String
 
+	// Note protocol
+	var category: NoteCategory { NoteCategory.byNameOrDefault(categoryName) }
+	var categoryName: String { "Service Request" }
+	var content: String { address }
+	var coordinate: CLLocationCoordinate2D { location.coordinate() }
+	var timestamp: Date { created }
+	// end Note protocol
 	init(
 		address: String,
+		created: Date,
 		city: String,
 		id: UUID,
 		location: Location,
@@ -184,6 +213,7 @@ final class ServiceRequest: Codable, Identifiable {
 	) {
 		self.address = address
 		self.city = city
+		self.created = created
 		self.id = id
 		self.location = location
 		self.priority = priority
@@ -197,6 +227,7 @@ final class ServiceRequest: Codable, Identifiable {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		address = try container.decode(String.self, forKey: .address)
 		city = try container.decode(String.self, forKey: .city)
+		created = try container.decode(Date.self, forKey: .created)
 		id = try container.decode(UUID.self, forKey: .id)
 		location = try container.decode(Location.self, forKey: .location)
 		priority = try container.decode(String.self, forKey: .priority)
@@ -210,6 +241,7 @@ final class ServiceRequest: Codable, Identifiable {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(address, forKey: .address)
 		try container.encode(city, forKey: .city)
+		try container.encode(created, forKey: .created)
 		try container.encode(id, forKey: .id)
 		try container.encode(location, forKey: .location)
 		try container.encode(priority, forKey: .priority)
@@ -221,19 +253,30 @@ final class ServiceRequest: Codable, Identifiable {
 }
 
 @Model
-final class TrapData: Codable, Identifiable {
+final class TrapData: Codable, Identifiable, Note {
 	enum CodingKeys: CodingKey {
+		case created
 		case description
 		case id
 		case location
 		case name
 	}
+	var created: Date
 	var description_: String
 	var id: UUID
 	var location: Location
 	var name: String
 
-	init(description: String, id: UUID, location: Location, name: String) {
+	// Note protocol
+	var category: NoteCategory { NoteCategory.byNameOrDefault(categoryName) }
+	var categoryName: String { "Trap Data" }
+	var content: String { name }
+	var coordinate: CLLocationCoordinate2D { location.coordinate() }
+	var timestamp: Date { created }
+	// end Note protocol
+
+	init(created: Date, description: String, id: UUID, location: Location, name: String) {
+		self.created = created
 		self.description_ = description
 		self.id = id
 		self.location = location
@@ -242,6 +285,7 @@ final class TrapData: Codable, Identifiable {
 
 	required init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
+		created = try container.decode(Date.self, forKey: .created)
 		description_ = try container.decode(String.self, forKey: .description)
 		id = try container.decode(UUID.self, forKey: .id)
 		location = try container.decode(Location.self, forKey: .location)
@@ -250,6 +294,7 @@ final class TrapData: Codable, Identifiable {
 
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(created, forKey: .created)
 		try container.encode(description_, forKey: .description)
 		try container.encode(id, forKey: .id)
 		try container.encode(location, forKey: .location)

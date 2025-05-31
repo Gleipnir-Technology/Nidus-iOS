@@ -10,8 +10,7 @@ import SwiftUI
 
 struct NoteListView: View {
 	@Environment(\.modelContext) private var modelContext
-	@Query(sort: \Note.content) private var notes: [Note]
-	@State private var selectedNote: Note?
+	var notes: [AnyNote]
 	var userLocation: CLLocation?
 
 	var body: some View {
@@ -19,40 +18,23 @@ struct NoteListView: View {
 			Text("No notes yet")
 		}
 		else {
-			NoteList(userLocation: userLocation)
+			NoteList(notes: notes, userLocation: userLocation)
 		}
 	}
 }
 
 struct NoteList: View {
 	@Environment(\.modelContext) private var modelContext
-	@Query(sort: \Note.content) private var notes: [Note]
-	@State private var selectedNote: Note?
+	var notes: [AnyNote]
 	var userLocation: CLLocation?
 
 	var body: some View {
-		List(notes, selection: $selectedNote) { note in
+		List(notes) { note in
 			NavigationLink {
 				NoteEditor(note: note, userLocation: userLocation)
 			} label: {
 				NoteRow(note: note, userLocation: userLocation)
 			}
 		}
-	}
-}
-
-#Preview("Empty") {
-	ModelContainerPreview(ModelContainer.empty) {
-		NoteListView()
-	}
-}
-#Preview("No location") {
-	ModelContainerPreview(ModelContainer.sample) {
-		NoteListView()
-	}
-}
-#Preview("Sample") {
-	ModelContainerPreview(ModelContainer.sample) {
-		NoteListView(userLocation: .init(latitude: 33.302, longitude: -111.7328))
 	}
 }

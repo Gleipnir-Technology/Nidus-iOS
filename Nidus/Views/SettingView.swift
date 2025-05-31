@@ -40,12 +40,14 @@ struct SettingView: View {
 	}
 
 	private func deleteNotes() {
+		/*
 		do {
 			try modelContext.delete(model: Note.self)
 		}
 		catch {
-			Logger.foreground.error("Failed to delet notes: \(error)")
+			Logger.foreground.error("Failed to delete notes: \(error)")
 		}
+         */
 	}
 
 	private func loadCurrentSettings() {

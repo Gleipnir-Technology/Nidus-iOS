@@ -11,7 +11,13 @@ import UIKit
 @MainActor
 let appContainer: ModelContainer = {
 	do {
-		let schema = Schema([Note.self, NoteLocation.self, Settings.self])
+		let schema = Schema([
+			MosquitoSource.self,
+			NoteLocation.self,
+			ServiceRequest.self,
+			Settings.self,
+			TrapData.self,
+		])
 		let container = try ModelContainer(for: schema)
 
 		return container
