@@ -9,7 +9,6 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-	@Environment(\.modelContext) private var context
 	@State var locationDataManager: LocationDataManager = LocationDataManager()
 	@State var currentValue: Float = 0.0
 	@State private var path = NavigationPath()
@@ -24,9 +23,7 @@ struct ContentView: View {
 	}
 	func triggerBackgroundFetch() {
 		Task {
-			let actor = BackgroundModelActor(
-				modelContainer: self.context.container
-			)
+			let actor = BackgroundModelActor()
 			do {
 				try await actor.triggerFetch(db)
 			}
