@@ -70,7 +70,6 @@ final class Location: Codable, Identifiable {
 	}
 }
 
-@Model
 final class MosquitoSource: Codable, Identifiable, Note {
 	enum CodingKeys: CodingKey {
 		case access
@@ -89,7 +88,7 @@ final class MosquitoSource: Codable, Identifiable, Note {
 	var access: String
 	var comments: String
 	var created: Date
-	var description_: String
+	var description: String
 	var id: UUID
 	var location: Location
 	var habitat: String
@@ -124,7 +123,7 @@ final class MosquitoSource: Codable, Identifiable, Note {
 		self.access = access
 		self.comments = comments
 		self.created = created
-		self.description_ = description
+		self.description = description
 		self.id = id
 		self.location = location
 		self.habitat = habitat
@@ -140,7 +139,7 @@ final class MosquitoSource: Codable, Identifiable, Note {
 		access = try container.decode(String.self, forKey: .access)
 		comments = try container.decode(String.self, forKey: .comments)
 		created = try container.decode(Date.self, forKey: .created)
-		description_ = try container.decode(String.self, forKey: .description)
+		description = try container.decode(String.self, forKey: .description)
 		id = try container.decode(UUID.self, forKey: .id)
 		location = try container.decode(Location.self, forKey: .location)
 		habitat = try container.decode(String.self, forKey: .habitat)
@@ -156,7 +155,7 @@ final class MosquitoSource: Codable, Identifiable, Note {
 		try container.encode(access, forKey: .access)
 		try container.encode(comments, forKey: .comments)
 		try container.encode(created, forKey: .created)
-		try container.encode(description_, forKey: .description)
+		try container.encode(description, forKey: .description)
 		try container.encode(id, forKey: .id)
 		try container.encode(location, forKey: .location)
 		try container.encode(inspections, forKey: .inspections)
@@ -252,7 +251,6 @@ final class ServiceRequest: Codable, Identifiable, Note {
 	}
 }
 
-@Model
 final class TrapData: Codable, Identifiable, Note {
 	enum CodingKeys: CodingKey {
 		case created
@@ -262,7 +260,7 @@ final class TrapData: Codable, Identifiable, Note {
 		case name
 	}
 	var created: Date
-	var description_: String
+	var description: String
 	var id: UUID
 	var location: Location
 	var name: String
@@ -277,7 +275,7 @@ final class TrapData: Codable, Identifiable, Note {
 
 	init(created: Date, description: String, id: UUID, location: Location, name: String) {
 		self.created = created
-		self.description_ = description
+		self.description = description
 		self.id = id
 		self.location = location
 		self.name = name
@@ -286,7 +284,7 @@ final class TrapData: Codable, Identifiable, Note {
 	required init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		created = try container.decode(Date.self, forKey: .created)
-		description_ = try container.decode(String.self, forKey: .description)
+		description = try container.decode(String.self, forKey: .description)
 		id = try container.decode(UUID.self, forKey: .id)
 		location = try container.decode(Location.self, forKey: .location)
 		name = try container.decode(String.self, forKey: .name)
@@ -295,7 +293,7 @@ final class TrapData: Codable, Identifiable, Note {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(created, forKey: .created)
-		try container.encode(description_, forKey: .description)
+		try container.encode(description, forKey: .description)
 		try container.encode(id, forKey: .id)
 		try container.encode(location, forKey: .location)
 		try container.encode(name, forKey: .name)

@@ -12,10 +12,7 @@ import UIKit
 let appContainer: ModelContainer = {
 	do {
 		let schema = Schema([
-			MosquitoSource.self,
-			NoteLocation.self,
-			ServiceRequest.self,
-			TrapData.self,
+			NoteLocation.self
 		])
 		let container = try ModelContainer(for: schema)
 

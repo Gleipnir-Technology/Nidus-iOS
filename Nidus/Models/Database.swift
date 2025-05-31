@@ -8,8 +8,90 @@ import OSLog
 import SQLite
 import SwiftUI
 
+class MosquitoSourceTable {
+	let table = Table("mosquito_source")
+
+	let access = SQLite.Expression<String>("access")
+	let comments = SQLite.Expression<String>("comments")
+	let created = SQLite.Expression<Date>("created")
+	let description = SQLite.Expression<String>("description")
+	let id = SQLite.Expression<UUID>("id")
+	let habitat = SQLite.Expression<String>("habitat")
+	let name = SQLite.Expression<String>("name")
+	let useType = SQLite.Expression<String>("use_type")
+	let waterOrigin = SQLite.Expression<String>("water_origin")
+	let latitude = SQLite.Expression<Double>("latitude")
+	let longitude = SQLite.Expression<Double>("longitude")
+
+	func createTable(_ connection: SQLite.Connection) throws {
+		try connection.run(
+			table.create(ifNotExists: true) { t in
+				t.column(id, primaryKey: true)
+				t.column(access)
+				t.column(comments)
+				t.column(created)
+				t.column(description)
+				t.column(habitat)
+				t.column(name)
+				t.column(useType)
+				t.column(waterOrigin)
+				t.column(latitude)
+				t.column(longitude)
+			}
+		)
+	}
+	func asNotes(_ connection: Connection) throws -> [AnyNote] {
+		var results: [AnyNote] = []
+		for row in try connection.prepare(table) {
+			let location = Location(latitude: row[latitude], longitude: row[longitude])
+			results.append(
+				AnyNote(
+					MosquitoSource(
+						access: row[access],
+						comments: row[comments],
+						created: row[created],
+						description: row[description],
+						id: row[id],
+						location: location,
+						habitat: row[habitat],
+						inspections: [],
+						name: row[name],
+						treatments: [],
+						useType: row[useType],
+						waterOrigin: row[waterOrigin]
+					)
+				)
+			)
+		}
+		return results
+	}
+	func upsert(connection: SQLite.Connection, _ source: MosquitoSource) throws {
+		let upsert = table.upsert(
+			access <- SQLite.Expression<String>(source.access),
+			comments <- SQLite.Expression<String>(source.comments),
+			created <- SQLite.Expression<Date>(value: source.created),
+			description <- SQLite.Expression<String>(source.description),
+			id <- SQLite.Expression<UUID>(value: source.id),
+			habitat <- SQLite.Expression<String>(source.habitat),
+			name <- SQLite.Expression<String>(source.name),
+			useType <- SQLite.Expression<String>(source.useType),
+			waterOrigin <- SQLite.Expression<String>(source.waterOrigin),
+			latitude
+				<- SQLite.Expression<Double>(
+					value: source.location.latitude
+				),
+			longitude
+				<- SQLite.Expression<Double>(
+					value: source.location.longitude
+				),
+			onConflictOf: id
+		)
+		try connection.run(upsert)
+	}
+}
 class ServiceRequestTable {
 	let table = Table("service_request")
+
 	let address = SQLite.Expression<String>("address")
 	let city = SQLite.Expression<String>("city")
 	let created = SQLite.Expression<Date>("created")
@@ -93,7 +175,8 @@ class ServiceRequestTable {
 class Database: ObservableObject {
 	var fileURL: URL?
 	private var connection: SQLite.Connection?
-	private var serviceRequestTable: ServiceRequestTable
+	private var mosquitoSourceTable: MosquitoSourceTable = MosquitoSourceTable()
+	private var serviceRequestTable: ServiceRequestTable = ServiceRequestTable()
 	var notes: [AnyNote] = []
 	var minx: Double?
 	var miny: Double?
@@ -101,7 +184,6 @@ class Database: ObservableObject {
 	var maxy: Double?
 
 	init() {
-		serviceRequestTable = ServiceRequestTable()
 		do {
 			fileURL = try FileManager.default.url(
 				for: .applicationSupportDirectory,
@@ -110,6 +192,7 @@ class Database: ObservableObject {
 				create: true
 			).appendingPathComponent("fieldseeker.sqlite3")
 			connection = try Connection(fileURL!.path)
+			try mosquitoSourceTable.createTable(connection!)
 			try serviceRequestTable.createTable(connection!)
 			triggerUpdateComplete()
 		}
@@ -147,9 +230,13 @@ class Database: ObservableObject {
 	func upsertServiceRequest(_ serviceRequest: ServiceRequest) throws {
 		try self.serviceRequestTable.upsert(connection: self.connection!, serviceRequest)
 	}
+	func upsertSource(_ source: MosquitoSource) throws {
+		try self.mosquitoSourceTable.upsert(connection: self.connection!, source)
+	}
 	func triggerUpdateComplete() {
 		do {
 			notes = []
+			notes += try mosquitoSourceTable.asNotes(connection!)
 			notes += try serviceRequestTable.asNotes(connection!)
 		}
 		catch {

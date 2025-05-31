@@ -79,17 +79,19 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 		Logger.background.info("Requests \(response.requests.count)")
 		Logger.background.info("Traps \(response.traps.count)")
 		do {
-			var updates = 0
-			var inserts = 0
 			var i = 0
-			Logger.background.info("Requests \(updates) updates \(inserts) inserts")
-			updates = 0
-			inserts = 0
 			for r in response.requests {
 				try db?.upsertServiceRequest(r)
 				i += 1
-				inserts += 1
-				if i % 100 == 0 {
+				if i % 1000 == 0 {
+					Logger.background.info("Request \(i)")
+				}
+			}
+			i = 0
+			for s in response.sources {
+				try db?.upsertSource(s)
+				i += 1
+				if i % 1000 == 0 {
 					Logger.background.info("Source \(i)")
 				}
 			}
