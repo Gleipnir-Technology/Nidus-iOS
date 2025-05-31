@@ -39,13 +39,13 @@ struct ContentView: View {
 			TabView(selection: $selection) {
 				Tab("Notes", systemImage: "clock", value: 0) {
 					NoteListView(
-						notes: db.notes,
+						notes: db.notesToShow,
 						userLocation: locationDataManager.location
 					)
 				}
 				Tab("Map", systemImage: "map", value: 1) {
 					MapOverview(
-						notes: db.notes,
+						notes: db.notesToShow,
 						onNoteSelected: onNoteSelected,
 						userLocation: locationDataManager.location
 					)
@@ -55,7 +55,7 @@ struct ContentView: View {
 				}
 			}
 			.navigationDestination(for: UUID.self) { noteId in
-				if let note = db.notes.first(where: { $0.id == noteId }) {
+				if let note = db.notesToShow.first(where: { $0.id == noteId }) {
 					NoteEditor(
 						note: note,
 						userLocation: locationDataManager.location

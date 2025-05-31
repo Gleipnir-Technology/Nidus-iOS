@@ -115,6 +115,10 @@ class Database: ObservableObject {
 		}
 	}
 
+	var notesToShow: [AnyNote] {
+		return Array(notes[0..<100])
+	}
+
 	func upsertServiceRequest(_ serviceRequest: ServiceRequest) throws {
 		try self.serviceRequestTable.upsert(connection: self.connection!, serviceRequest)
 	}
