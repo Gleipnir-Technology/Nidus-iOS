@@ -205,6 +205,9 @@ class Database: ObservableObject {
 	var notesToShow: [AnyNote] {
 		var toShow: [AnyNote] = []
 		if minx == nil || miny == nil || maxx == nil || maxy == nil {
+			if notes.isEmpty {
+				return []
+			}
 			return Array(notes[0..<10])
 		}
 		for note in notes {
