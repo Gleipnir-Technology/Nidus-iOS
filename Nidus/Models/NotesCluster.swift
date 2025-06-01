@@ -29,7 +29,11 @@ final class NotesCluster: ObservableObject {
         await clusterManager.add(notes)
         await reloadAnnotations()*/
 		let newAnnotations = notes.map {
-			ExampleAnnotation(coordinate: $0.coordinate, systemImage: $0.category.icon)
+			ExampleAnnotation(
+				color: $0.color,
+				coordinate: $0.coordinate,
+				systemImage: $0.category.icon
+			)
 		}
 		await clusterManager.removeAll()
 		await clusterManager.add(newAnnotations)
@@ -42,7 +46,7 @@ final class NotesCluster: ObservableObject {
 			within: currentRegion
 		)
 		let newAnnotations = points.map {
-			ExampleAnnotation(coordinate: $0, systemImage: "mappin")
+			ExampleAnnotation(color: .red, coordinate: $0, systemImage: "mappin")
 		}
 		await clusterManager.add(newAnnotations)
 		await reloadAnnotations()

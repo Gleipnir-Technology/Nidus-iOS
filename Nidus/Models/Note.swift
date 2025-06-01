@@ -124,6 +124,7 @@ struct AnyNote: Note {
 	}
 	var category: NoteCategory { innerNote.category }
 	var categoryName: String { innerNote.categoryName }
+	var color: Color { .blue }
 	var content: String { innerNote.content }
 	var id: UUID {
 		innerNote.id
