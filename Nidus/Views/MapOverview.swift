@@ -17,7 +17,6 @@ struct MapOverview: View {
 	var dataSource: NotesCluster
 
 	var onNoteSelected: ((any Note) -> Void)
-	@Binding var position: MapCameraPosition
 	var onPositionChange: ((MKCoordinateRegion) -> Void)
 	var userLocation: CLLocation?
 
@@ -81,7 +80,7 @@ struct MapOverview: View {
 	}
 
 	var body: some View {
-		ModernMap(dataSource: dataSource)
+		ModernMap(dataSource: dataSource, onPositionChange: onPositionChange)
 		//ModernMap()
 	}
 }

@@ -232,6 +232,7 @@ final class DataSource: ObservableObject {
 @available(iOS 17.0, *)
 struct ModernMap: View {
 	@State var dataSource: NotesCluster
+	var onPositionChange: ((MKCoordinateRegion) -> Void)
 
 	func asMarker(_ item: ExampleAnnotation) -> some MapContent {
 		return Marker(
@@ -267,6 +268,7 @@ struct ModernMap: View {
 		}
 		.onMapCameraChange(frequency: .onEnd) { context in
 			Task.detached { await dataSource.reloadAnnotations() }
+			Task.detached { onPositionChange(context.region) }
 		}
 		.overlay(
 			alignment: .bottom,

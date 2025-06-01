@@ -60,7 +60,6 @@ struct ContentView: View {
 					MapOverview(
 						dataSource: db.cluster,
 						onNoteSelected: onNoteSelected,
-						position: $position,
 						onPositionChange: onMapPositionChange,
 						userLocation: locationDataManager.location
 					).onReceive(Just(position)) { position in
