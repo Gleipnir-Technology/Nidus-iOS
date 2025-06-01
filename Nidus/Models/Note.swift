@@ -108,9 +108,6 @@ struct AnyNote: Note {
 	var categoryName: String { innerNote.categoryName }
 	var color: Color { innerNote.color }
 	var content: String { innerNote.content }
-	var id: UUID {
-		innerNote.id
-	}
 	var coordinate: CLLocationCoordinate2D {
 		get {
 			innerNote.coordinate
@@ -118,6 +115,9 @@ struct AnyNote: Note {
 		set {
 			innerNote.coordinate = newValue
 		}
+	}
+	var id: UUID {
+		innerNote.id
 	}
 	var timestamp: Date { innerNote.timestamp }
 	static func == (lhs: AnyNote, rhs: AnyNote) -> Bool {

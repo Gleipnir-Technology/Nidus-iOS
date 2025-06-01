@@ -174,7 +174,10 @@ class ServiceRequestTable {
 
 @Observable
 class Database: ObservableObject {
-	var center: CLLocation?
+	var center: CLLocation = CLLocation(
+		latitude: MKCoordinateRegion.visalia.center.latitude,
+		longitude: MKCoordinateRegion.visalia.center.longitude
+	)
 	var fileURL: URL?
 	private var connection: SQLite.Connection?
 	private var mosquitoSourceTable: MosquitoSourceTable = MosquitoSourceTable()

@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct NoteListView: View {
-	var currentLocation: CLLocation?
+	var currentLocation: CLLocation
 	var notes: [AnyNote]
 
 	var body: some View {
@@ -23,9 +23,27 @@ struct NoteListView: View {
 }
 
 struct NoteList: View {
-	var currentLocation: CLLocation?
+	var currentLocation: CLLocation
 	var notes: [AnyNote]
 
+	var notesByDistance: [AnyNote] {
+		var byDistance: [AnyNote] = notes
+		byDistance.sort(by: { (an1: AnyNote, an2: AnyNote) -> Bool in
+			return currentLocation.distance(
+				from: CLLocation(
+					latitude: an1.coordinate.latitude,
+					longitude: an1.coordinate.longitude
+				)
+			)
+				> currentLocation.distance(
+					from: CLLocation(
+						latitude: an2.coordinate.latitude,
+						longitude: an2.coordinate.longitude
+					)
+				)
+		})
+		return byDistance
+	}
 	var body: some View {
 		List(notes) { note in
 			NavigationLink {
