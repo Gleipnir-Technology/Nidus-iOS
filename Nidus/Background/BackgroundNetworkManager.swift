@@ -73,7 +73,6 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 	}
 
 	private func saveResponse(_ response: APIResponse) {
-		MainActor.preconditionIsolated()
 		Logger.background.info("Saving API response")
 		Logger.background.info("Sources \(response.sources.count)")
 		Logger.background.info("Requests \(response.requests.count)")
@@ -132,9 +131,7 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 					from: data
 				)
 
-				Task { @MainActor in
-					saveResponse(apiResponse)
-				}
+				saveResponse(apiResponse)
 
 			}
 			catch {
