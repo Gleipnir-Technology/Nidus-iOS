@@ -45,7 +45,7 @@ struct NoteList: View {
 		return byDistance
 	}
 	var body: some View {
-		List(notes) { note in
+		List(notesByDistance) { note in
 			NavigationLink {
 				switch note.category {
 				case .mosquitoSource:
