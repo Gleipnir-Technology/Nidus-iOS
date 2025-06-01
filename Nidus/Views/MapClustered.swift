@@ -260,6 +260,9 @@ struct ModernMap: View {
 				).tint(.yellow)
 			}
 		}
+		.mapControls {
+			MapUserLocationButton()
+		}
 		.readSize(onChange: { newValue in
 			dataSource.mapSize = newValue
 		})
@@ -270,19 +273,6 @@ struct ModernMap: View {
 			Task.detached { await dataSource.reloadAnnotations() }
 			Task.detached { await onPositionChange(context.region) }
 		}
-		.overlay(
-			alignment: .bottom,
-			content: {
-				HStack {
-					Spacer()
-					AsyncButton("Remove annotations") {
-						await dataSource.removeAnnotations()
-					}
-				}
-				.padding()
-				.buttonStyle(RoundedButton(fillColor: .accentColor, padding: 8))
-			}
-		)
 	}
 }
 
