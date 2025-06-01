@@ -120,6 +120,10 @@ struct AnyNote: Note {
 		innerNote.id
 	}
 	var timestamp: Date { innerNote.timestamp }
+
+	func asMosquitoSource() -> MosquitoSource? {
+		return innerNote as? MosquitoSource
+	}
 	static func == (lhs: AnyNote, rhs: AnyNote) -> Bool {
 		return lhs.category == rhs.category && lhs.content == rhs.content
 			&& lhs.id == rhs.id && lhs.timestamp == rhs.timestamp

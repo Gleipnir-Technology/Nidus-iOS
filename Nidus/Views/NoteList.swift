@@ -47,7 +47,12 @@ struct NoteList: View {
 	var body: some View {
 		List(notes) { note in
 			NavigationLink {
-				NoteEditor(currentLocation: currentLocation, note: note)
+				switch note.category {
+				case .mosquitoSource:
+					MosquitoSourceDetail(source: note.asMosquitoSource()!)
+				default:
+					NoteEditor(currentLocation: currentLocation, note: note)
+				}
 			} label: {
 				NoteRow(currentLocation: currentLocation, note: note)
 			}
