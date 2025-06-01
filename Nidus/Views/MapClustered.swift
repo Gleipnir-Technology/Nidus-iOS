@@ -263,9 +263,6 @@ struct ModernMap: View {
 			alignment: .bottom,
 			content: {
 				HStack {
-					AsyncButton("Add annotations") {
-						await dataSource.addAnnotations()
-					}
 					Spacer()
 					AsyncButton("Remove annotations") {
 						await dataSource.removeAnnotations()

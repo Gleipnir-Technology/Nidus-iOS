@@ -28,6 +28,10 @@ final class NotesCluster: ObservableObject {
 		/*annotations = notes
         await clusterManager.add(notes)
         await reloadAnnotations()*/
+		let newAnnotations = notes.map { ExampleAnnotation(coordinate: $0.coordinate) }
+		await clusterManager.removeAll()
+		await clusterManager.add(newAnnotations)
+		await reloadAnnotations()
 	}
 
 	func addAnnotations() async {
