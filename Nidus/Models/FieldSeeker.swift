@@ -4,6 +4,7 @@
 //
 //  Created by Eli Ribble on 5/30/25.
 //
+import CoreData
 import Foundation
 import MapKit
 import SwiftData

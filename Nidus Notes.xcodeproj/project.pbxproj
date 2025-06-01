@@ -20,6 +20,9 @@
 		532F3AE82DEB6765006E0E40 /* AutomergeRepo in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AE72DEB6765006E0E40 /* AutomergeRepo */; };
 		532F3AEB2DEB68C7006E0E40 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AEA2DEB68C7006E0E40 /* SQLite */; };
 		532F3AED2DEB74D8006E0E40 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AEC2DEB74D3006E0E40 /* Database.swift */; };
+		532F3AF52DECAE26006E0E40 /* ClusterMap in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AF42DECAE26006E0E40 /* ClusterMap */; };
+		532F3AF72DECAE26006E0E40 /* ClusterMapSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */; };
+		532F3AF92DECB02C006E0E40 /* MapClustered.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AF82DECB027006E0E40 /* MapClustered.swift */; };
 		537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5375609F2D820A5A00D8528B /* Preview Assets.xcassets */; };
 		537560B22D820A5A00D8528B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 537560A12D820A5A00D8528B /* Assets.xcassets */; };
 		537560B42D820A5A00D8528B /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A82D820A5A00D8528B /* ModelData.swift */; };
@@ -66,6 +69,7 @@
 		532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldSeeker.swift; sourceTree = "<group>"; };
 		532F3AE12DEB64B0006E0E40 /* Importer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Importer.swift; sourceTree = "<group>"; };
 		532F3AEC2DEB74D3006E0E40 /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
+		532F3AF82DECB027006E0E40 /* MapClustered.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapClustered.swift; sourceTree = "<group>"; };
 		5375609F2D820A5A00D8528B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		537560A12D820A5A00D8528B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		537560A42D820A5A00D8528B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -93,7 +97,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				532F3AEB2DEB68C7006E0E40 /* SQLite in Frameworks */,
+				532F3AF72DECAE26006E0E40 /* ClusterMapSwiftUI in Frameworks */,
 				532F3AE82DEB6765006E0E40 /* AutomergeRepo in Frameworks */,
+				532F3AF52DECAE26006E0E40 /* ClusterMap in Frameworks */,
 				532F3AE52DEB66C5006E0E40 /* Automerge in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -166,6 +172,7 @@
 		537560C42D82125200D8528B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				532F3AF82DECB027006E0E40 /* MapClustered.swift */,
 				537560C52D82127100D8528B /* ButtonAddNote.swift */,
 				537560A42D820A5A00D8528B /* ContentView.swift */,
 				537E02662DC03DC1000F254F /* MapOverview.swift */,
@@ -235,6 +242,8 @@
 				532F3AE42DEB66C5006E0E40 /* Automerge */,
 				532F3AE72DEB6765006E0E40 /* AutomergeRepo */,
 				532F3AEA2DEB68C7006E0E40 /* SQLite */,
+				532F3AF42DECAE26006E0E40 /* ClusterMap */,
+				532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */,
 			);
 			productName = Nidus;
 			productReference = 53D57B4A2D79E2A20094740D /* Nidus Notes.app */;
@@ -316,6 +325,7 @@
 				532F3AE32DEB66C5006E0E40 /* XCRemoteSwiftPackageReference "automerge-swift" */,
 				532F3AE62DEB6765006E0E40 /* XCRemoteSwiftPackageReference "automerge-repo-swift" */,
 				532F3AE92DEB68C7006E0E40 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
+				532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 53D57B4B2D79E2A20094740D /* Products */;
@@ -382,6 +392,7 @@
 				537E02672DC03DC5000F254F /* MapOverview.swift in Sources */,
 				531B36B72D8CEAEF00CE8BA0 /* SampleLocations.swift in Sources */,
 				537560BC2D820A5A00D8528B /* ContentView.swift in Sources */,
+				532F3AF92DECB02C006E0E40 /* MapClustered.swift in Sources */,
 				532F3AED2DEB74D8006E0E40 /* Database.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -764,6 +775,14 @@
 				minimumVersion = 0.15.3;
 			};
 		};
+		532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/vospennikov/ClusterMap";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -781,6 +800,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 532F3AE92DEB68C7006E0E40 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
 			productName = SQLite;
+		};
+		532F3AF42DECAE26006E0E40 /* ClusterMap */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */;
+			productName = ClusterMap;
+		};
+		532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */;
+			productName = ClusterMapSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
