@@ -62,9 +62,7 @@ struct ContentView: View {
 						onNoteSelected: onNoteSelected,
 						onPositionChange: onMapPositionChange,
 						userLocation: locationDataManager.location
-					).onReceive(Just(position)) { position in
-						//db.setPosition(position.rect?.minX, position.rect?.minY, position.rect?.maxX, position.rect?.maxY)
-					}
+					)
 				}
 				Tab("Settings", systemImage: "gear", value: 3) {
 					SettingView(onSettingsUpdated: triggerBackgroundFetch)
