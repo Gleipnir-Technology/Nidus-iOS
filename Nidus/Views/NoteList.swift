@@ -35,7 +35,7 @@ struct NoteList: View {
 					longitude: an1.coordinate.longitude
 				)
 			)
-				> currentLocation.distance(
+				< currentLocation.distance(
 					from: CLLocation(
 						latitude: an2.coordinate.latitude,
 						longitude: an2.coordinate.longitude
