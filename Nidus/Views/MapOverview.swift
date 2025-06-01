@@ -1,3 +1,5 @@
+import ClusterMap
+import ClusterMapSwiftUI
 import CoreLocation
 import MapKit
 //
@@ -10,16 +12,9 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-extension CLLocationCoordinate2D {
-	static let visalia: Self = .init(
-		latitude: 36.326,
-		longitude: -119.313191
-	)
-}
-
 struct MapOverview: View {
 	@State private var geometrySize: CGSize = .zero
-	var notes: [any Note]
+	var dataSource: NotesCluster
 
 	var onNoteSelected: ((any Note) -> Void)
 	@Binding var position: MapCameraPosition
@@ -70,6 +65,7 @@ struct MapOverview: View {
 		return findMapView(in: rootView)
 	}
 	private func findClosestNote(to coordinate: CLLocationCoordinate2D) -> (any Note)? {
+		/*
 		notes.min { note, _ in
 			let noteLocation = CLLocation(
 				latitude: note.coordinate.latitude,
@@ -80,52 +76,13 @@ struct MapOverview: View {
 				longitude: coordinate.longitude
 			)
 			return noteLocation.distance(from: tappedLocation) < 100  // Within 100 meters
-		}
+		}*/
+		return nil
 	}
-	var body: some View {
-		GeometryReader { geometry in
-			Map(position: $position) {
-				ForEach(notes, id: \.id) { note in
-					Marker(
-						"",
-						systemImage: note.category.icon,
-						coordinate: note.coordinate
-					).tint(
-						.orange
-					)
-				}
-			}.mapControls {
-				MapCompass()
-				MapScaleView()
-				MapUserLocationButton()
-			}.mapStyle(
-				MapStyle.standard(
-					pointsOfInterest: PointOfInterestCategories
-						.excludingAll
-				)
-			).onTapGesture(coordinateSpace: .local) { tapLocation in
-				geometrySize = geometry.size
 
-				if let tappedCoordinate = convertTapToCoordinate(
-					tapLocation: tapLocation,
-					in: geometry
-				) {
-					if let closestNote = findClosestNote(
-						to: tappedCoordinate
-					) {
-						onNoteSelected(closestNote)
-					}
-				}
-			}.onMapCameraChange(
-				frequency: .onEnd,
-				{ (context: MapCameraUpdateContext) -> Void in
-					Logger.foreground.info(
-						"Camera rect minX \(context.rect.minX), maxX \(context.rect.maxX)"
-					)
-					onPositionChange(MKCoordinateRegion(context.rect))
-				}
-			)
-		}
+	var body: some View {
+		ModernMap(dataSource: dataSource)
+		//ModernMap()
 	}
 }
 

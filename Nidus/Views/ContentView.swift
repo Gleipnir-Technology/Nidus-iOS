@@ -16,7 +16,7 @@ struct ContentView: View {
 	@State private var path = NavigationPath()
 	@State private var selection: Int = 0
 	@State private var position: MapCameraPosition = .camera(
-		.init(centerCoordinate: .visalia, distance: 1_000)
+		.init(centerCoordinate: MKCoordinateRegion.visalia.center, distance: 1_000)
 	)
 
 	var db: Database
@@ -58,7 +58,7 @@ struct ContentView: View {
 				}
 				Tab("Map", systemImage: "map", value: 1) {
 					MapOverview(
-						notes: db.notesToShow,
+						dataSource: db.cluster,
 						onNoteSelected: onNoteSelected,
 						position: $position,
 						onPositionChange: onMapPositionChange,

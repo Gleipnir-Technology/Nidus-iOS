@@ -42,6 +42,7 @@ struct NoteEditor: View {
 				coordinate: $location
 			).frame(height: 300)
 			Text("Location \(location.latitude), \(location.longitude)")
+			Text("Category: \(category.name)")
 			Picker(selection: $category) {
 				ForEach(NoteCategory.all) { c in
 					Label(

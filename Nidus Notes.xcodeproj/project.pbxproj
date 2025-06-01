@@ -23,6 +23,7 @@
 		532F3AF52DECAE26006E0E40 /* ClusterMap in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AF42DECAE26006E0E40 /* ClusterMap */; };
 		532F3AF72DECAE26006E0E40 /* ClusterMapSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */; };
 		532F3AF92DECB02C006E0E40 /* MapClustered.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AF82DECB027006E0E40 /* MapClustered.swift */; };
+		532F3AFB2DECBFF5006E0E40 /* NotesCluster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AFA2DECBFE9006E0E40 /* NotesCluster.swift */; };
 		537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5375609F2D820A5A00D8528B /* Preview Assets.xcassets */; };
 		537560B22D820A5A00D8528B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 537560A12D820A5A00D8528B /* Assets.xcassets */; };
 		537560B42D820A5A00D8528B /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A82D820A5A00D8528B /* ModelData.swift */; };
@@ -70,6 +71,7 @@
 		532F3AE12DEB64B0006E0E40 /* Importer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Importer.swift; sourceTree = "<group>"; };
 		532F3AEC2DEB74D3006E0E40 /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		532F3AF82DECB027006E0E40 /* MapClustered.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapClustered.swift; sourceTree = "<group>"; };
+		532F3AFA2DECBFE9006E0E40 /* NotesCluster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesCluster.swift; sourceTree = "<group>"; };
 		5375609F2D820A5A00D8528B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		537560A12D820A5A00D8528B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		537560A42D820A5A00D8528B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 		537560C12D820FFE00D8528B /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				532F3AFA2DECBFE9006E0E40 /* NotesCluster.swift */,
 				532F3AEC2DEB74D3006E0E40 /* Database.swift */,
 				532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */,
 				532F3ACB2DE5FC62006E0E40 /* Settings.swift */,
@@ -375,6 +378,7 @@
 				537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */,
 				531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */,
 				537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */,
+				532F3AFB2DECBFF5006E0E40 /* NotesCluster.swift in Sources */,
 				532F3AE22DEB64B4006E0E40 /* Importer.swift in Sources */,
 				537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */,
 				532F3AD32DE66D40006E0E40 /* Logger.swift in Sources */,

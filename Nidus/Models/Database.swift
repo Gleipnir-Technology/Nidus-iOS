@@ -182,6 +182,7 @@ class Database: ObservableObject {
 	var miny: Double?
 	var maxx: Double?
 	var maxy: Double?
+	var cluster: NotesCluster = NotesCluster()
 
 	init() {
 		do {
@@ -241,6 +242,9 @@ class Database: ObservableObject {
 			notes = []
 			notes += try mosquitoSourceTable.asNotes(connection!)
 			notes += try serviceRequestTable.asNotes(connection!)
+			Task {
+				await cluster.addNotes(notes)
+			}
 		}
 		catch {
 			Logger.background.error("Failed to get notes: \(error)")

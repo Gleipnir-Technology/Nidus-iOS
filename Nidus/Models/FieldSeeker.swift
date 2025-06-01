@@ -103,7 +103,15 @@ final class MosquitoSource: Codable, Identifiable, Note {
 	var category: NoteCategory { NoteCategory.byNameOrDefault(categoryName) }
 	var categoryName: String { "Mosquito Source" }
 	var content: String { name }
-	var coordinate: CLLocationCoordinate2D { location.coordinate() }
+	var coordinate: CLLocationCoordinate2D {
+		get {
+			location.coordinate()
+		}
+		set {
+			location.latitude = newValue.latitude
+			location.longitude = newValue.longitude
+		}
+	}
 	var timestamp: Date { created }
 	// end Note protocol
 
@@ -165,6 +173,27 @@ final class MosquitoSource: Codable, Identifiable, Note {
 		try container.encode(useType, forKey: .useType)
 		try container.encode(waterOrigin, forKey: .waterOrigin)
 	}
+	static func == (lhs: MosquitoSource, rhs: MosquitoSource) -> Bool {
+		return lhs.access == rhs.access && lhs.comments == rhs.comments
+			&& lhs.created == rhs.created && lhs.description == rhs.description
+			&& lhs.location == rhs.location && lhs.habitat == rhs.habitat
+			&& lhs.inspections == rhs.inspections && lhs.name == rhs.name
+			&& lhs.treatments == rhs.treatments && lhs.useType == rhs.useType
+			&& lhs.waterOrigin == rhs.waterOrigin
+	}
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(access)
+		hasher.combine(comments)
+		hasher.combine(created)
+		hasher.combine(description)
+		hasher.combine(location)
+		hasher.combine(habitat)
+		hasher.combine(inspections)
+		hasher.combine(name)
+		hasher.combine(treatments)
+		hasher.combine(useType)
+		hasher.combine(waterOrigin)
+	}
 }
 
 @Model
@@ -196,7 +225,13 @@ final class ServiceRequest: Codable, Identifiable, Note {
 	var category: NoteCategory { NoteCategory.byNameOrDefault(categoryName) }
 	var categoryName: String { "Service Request" }
 	var content: String { address }
-	var coordinate: CLLocationCoordinate2D { location.coordinate() }
+	var coordinate: CLLocationCoordinate2D {
+		get { location.coordinate() }
+		set {
+			location.latitude = newValue.latitude
+			location.longitude = newValue.longitude
+		}
+	}
 	var timestamp: Date { created }
 	// end Note protocol
 	init(
@@ -250,6 +285,13 @@ final class ServiceRequest: Codable, Identifiable, Note {
 		try container.encode(target, forKey: .target)
 		try container.encode(zip, forKey: .zip)
 	}
+	static func == (lhs: ServiceRequest, rhs: ServiceRequest) -> Bool {
+		return lhs.address == rhs.address && lhs.city == rhs.city
+			&& lhs.created == rhs.created && lhs.location == rhs.location
+			&& lhs.priority == rhs.priority && lhs.source == rhs.source
+			&& lhs.status == rhs.status && lhs.target == rhs.target
+			&& lhs.zip == rhs.zip
+	}
 }
 
 final class TrapData: Codable, Identifiable, Note {
@@ -270,7 +312,15 @@ final class TrapData: Codable, Identifiable, Note {
 	var category: NoteCategory { NoteCategory.byNameOrDefault(categoryName) }
 	var categoryName: String { "Trap Data" }
 	var content: String { name }
-	var coordinate: CLLocationCoordinate2D { location.coordinate() }
+	var coordinate: CLLocationCoordinate2D {
+		get {
+			location.coordinate()
+		}
+		set {
+			location.latitude = newValue.latitude
+			location.longitude = newValue.longitude
+		}
+	}
 	var timestamp: Date { created }
 	// end Note protocol
 
@@ -298,6 +348,16 @@ final class TrapData: Codable, Identifiable, Note {
 		try container.encode(id, forKey: .id)
 		try container.encode(location, forKey: .location)
 		try container.encode(name, forKey: .name)
+	}
+	static func == (lhs: TrapData, rhs: TrapData) -> Bool {
+		return lhs.created == rhs.created && lhs.description == rhs.description
+			&& lhs.location == rhs.location && lhs.name == rhs.name
+	}
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(created)
+		hasher.combine(description)
+		hasher.combine(location)
+		hasher.combine(name)
 	}
 }
 @Model

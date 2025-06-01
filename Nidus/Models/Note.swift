@@ -1,3 +1,4 @@
+import ClusterMap
 //
 //  Task.swift
 //  Nidus
@@ -107,11 +108,11 @@ struct NoteCategory: Codable, Hashable, Identifiable {
 	static let all = [mosquitoSource, serviceRequest, trapData]
 }
 
-protocol Note: Identifiable<UUID> {
+protocol Note: Identifiable<UUID>, CoordinateIdentifiable, Hashable {
 	var category: NoteCategory { get }
 	var categoryName: String { get }
 	var content: String { get }
-	var coordinate: CLLocationCoordinate2D { get }
+	var coordinate: CLLocationCoordinate2D { get set }
 	var id: UUID { get }
 	var timestamp: Date { get }
 }
@@ -127,6 +128,20 @@ struct AnyNote: Note {
 	var id: UUID {
 		innerNote.id
 	}
-	var coordinate: CLLocationCoordinate2D { innerNote.coordinate }
+	var coordinate: CLLocationCoordinate2D {
+		get {
+			innerNote.coordinate
+		}
+		set {
+			innerNote.coordinate = newValue
+		}
+	}
 	var timestamp: Date { innerNote.timestamp }
+	static func == (lhs: AnyNote, rhs: AnyNote) -> Bool {
+		return lhs.category == rhs.category && lhs.content == rhs.content
+			&& lhs.id == rhs.id && lhs.timestamp == rhs.timestamp
+	}
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(innerNote)
+	}
 }
