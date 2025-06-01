@@ -154,6 +154,7 @@ class ExampleAnnotation: MKPointAnnotation, CoordinateIdentifiable, Identifiable
 struct ExampleAnnotation: Identifiable, CoordinateIdentifiable, Hashable {
 	var id = UUID()
 	var coordinate: CLLocationCoordinate2D
+	var systemImage: String
 }
 
 struct ExampleClusterAnnotation: Identifiable {
@@ -178,7 +179,9 @@ final class DataSource: ObservableObject {
 			count: 10000,
 			within: currentRegion
 		)
-		let newAnnotations = points.map { ExampleAnnotation(coordinate: $0) }
+		let newAnnotations = points.map {
+			ExampleAnnotation(coordinate: $0, systemImage: "mappin")
+		}
 		await clusterManager.add(newAnnotations)
 		await reloadAnnotations()
 	}
@@ -237,7 +240,7 @@ struct ModernMap: View {
 			ForEach(dataSource.annotations) { item in
 				Marker(
 					"\(item.coordinate.latitude) \(item.coordinate.longitude)",
-					systemImage: "mappin",
+					systemImage: item.systemImage,
 					coordinate: item.coordinate
 				)
 				.annotationTitles(.hidden)

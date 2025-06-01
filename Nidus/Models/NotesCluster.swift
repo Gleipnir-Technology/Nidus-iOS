@@ -28,7 +28,9 @@ final class NotesCluster: ObservableObject {
 		/*annotations = notes
         await clusterManager.add(notes)
         await reloadAnnotations()*/
-		let newAnnotations = notes.map { ExampleAnnotation(coordinate: $0.coordinate) }
+		let newAnnotations = notes.map {
+			ExampleAnnotation(coordinate: $0.coordinate, systemImage: $0.category.icon)
+		}
 		await clusterManager.removeAll()
 		await clusterManager.add(newAnnotations)
 		await reloadAnnotations()
@@ -39,7 +41,9 @@ final class NotesCluster: ObservableObject {
 			count: 10000,
 			within: currentRegion
 		)
-		let newAnnotations = points.map { ExampleAnnotation(coordinate: $0) }
+		let newAnnotations = points.map {
+			ExampleAnnotation(coordinate: $0, systemImage: "mappin")
+		}
 		await clusterManager.add(newAnnotations)
 		await reloadAnnotations()
 	}
@@ -61,8 +65,6 @@ final class NotesCluster: ObservableObject {
 	private func applyChanges(
 		_ difference: ClusterManager<ExampleAnnotation>.Difference
 	) {
-		Logger.foreground.info("Applying cluster changes")
-		Logger.foreground.info("Removals: \(difference.removals.count)")
 		for removal in difference.removals {
 			switch removal {
 			case .annotation(let annotation):
@@ -71,7 +73,6 @@ final class NotesCluster: ObservableObject {
 				clusters.removeAll { $0.id == clusterAnnotation.id }
 			}
 		}
-		Logger.foreground.info("Insertions: \(difference.insertions.count)")
 		for insertion in difference.insertions {
 			switch insertion {
 			case .annotation(let newItem):
