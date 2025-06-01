@@ -8,6 +8,7 @@ import CoreData
 import Foundation
 import MapKit
 import SwiftData
+import SwiftUI
 
 @Model
 final class Inspection: Codable, Identifiable {
@@ -102,6 +103,7 @@ final class MosquitoSource: Codable, Identifiable, Note {
 	// Note protocol
 	var category: NoteCategory { NoteCategory.byNameOrDefault(categoryName) }
 	var categoryName: String { "Mosquito Source" }
+	var color: Color { category.color }
 	var content: String { name }
 	var coordinate: CLLocationCoordinate2D {
 		get {
@@ -224,6 +226,7 @@ final class ServiceRequest: Codable, Identifiable, Note {
 	// Note protocol
 	var category: NoteCategory { NoteCategory.byNameOrDefault(categoryName) }
 	var categoryName: String { "Service Request" }
+	var color: Color { category.color }
 	var content: String { address }
 	var coordinate: CLLocationCoordinate2D {
 		get { location.coordinate() }
@@ -311,6 +314,7 @@ final class TrapData: Codable, Identifiable, Note {
 	// Note protocol
 	var category: NoteCategory { NoteCategory.byNameOrDefault(categoryName) }
 	var categoryName: String { "Trap Data" }
+	var color: Color { category.color }
 	var content: String { name }
 	var coordinate: CLLocationCoordinate2D {
 		get {

@@ -256,7 +256,7 @@ struct ModernMap: View {
 					"\(item.count)",
 					systemImage: "square.3.layers.3d",
 					coordinate: item.coordinate
-				)
+				).tint(.yellow)
 			}
 		}
 		.readSize(onChange: { newValue in

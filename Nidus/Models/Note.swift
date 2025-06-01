@@ -39,34 +39,15 @@ final class NoteLocation {
 	}
 }
 
-struct ColorComponents: Codable, Hashable {
-	let red: Float
-	let green: Float
-	let blue: Float
-
-	var color: Color {
-		Color(red: Double(red), green: Double(green), blue: Double(blue))
-	}
-
-	static func fromColor(_ color: Color) -> ColorComponents {
-		let resolved = color.resolve(in: EnvironmentValues())
-		return ColorComponents(
-			red: resolved.red,
-			green: resolved.green,
-			blue: resolved.blue
-		)
-	}
-}
-
-struct NoteCategory: Codable, Hashable, Identifiable {
+struct NoteCategory: Hashable, Identifiable {
 	var id: String
 
-	var color: ColorComponents
+	var color: Color
 	var icon: String
 	var name: String
 
 	init(color: Color, icon: String, name: String) {
-		self.color = ColorComponents.fromColor(color)
+		self.color = color
 		self.icon = icon
 		self.name = name
 		self.id = name
@@ -111,6 +92,7 @@ struct NoteCategory: Codable, Hashable, Identifiable {
 protocol Note: Identifiable<UUID>, CoordinateIdentifiable, Hashable {
 	var category: NoteCategory { get }
 	var categoryName: String { get }
+	var color: Color { get }
 	var content: String { get }
 	var coordinate: CLLocationCoordinate2D { get set }
 	var id: UUID { get }
@@ -124,7 +106,7 @@ struct AnyNote: Note {
 	}
 	var category: NoteCategory { innerNote.category }
 	var categoryName: String { innerNote.categoryName }
-	var color: Color { .blue }
+	var color: Color { innerNote.color }
 	var content: String { innerNote.content }
 	var id: UUID {
 		innerNote.id
