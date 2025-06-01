@@ -9,6 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct NoteEditor: View {
+	var currentLocation: CLLocation?
 	let note: any Note
 
 	@State private var content: String
@@ -16,12 +17,10 @@ struct NoteEditor: View {
 	@State private var location: CLLocationCoordinate2D
 	@State private var showSavedToast = false
 
-	var userLocation: CLLocation?
-
 	@Environment(\.dismiss) private var dismiss
 	@Environment(\.modelContext) private var modelContext
 
-	init(note: any Note, userLocation: CLLocation?) {
+	init(currentLocation: CLLocation?, note: any Note) {
 		self.note = note
 		self.content = note.content
 		self.category = NoteCategory.byNameOrDefault(note.categoryName)
@@ -69,6 +68,7 @@ struct NoteEditor: View {
 
 #Preview {
 	NoteEditor(
+		currentLocation: nil,
 		note: ServiceRequest(
 			address: "somewhere",
 			city: "over there",
@@ -80,7 +80,6 @@ struct NoteEditor: View {
 			status: "bad",
 			target: "here",
 			zip: "12345"
-		),
-		userLocation: nil
+		)
 	)
 }

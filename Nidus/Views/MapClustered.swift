@@ -268,7 +268,7 @@ struct ModernMap: View {
 		}
 		.onMapCameraChange(frequency: .onEnd) { context in
 			Task.detached { await dataSource.reloadAnnotations() }
-			Task.detached { onPositionChange(context.region) }
+			Task.detached { await onPositionChange(context.region) }
 		}
 		.overlay(
 			alignment: .bottom,

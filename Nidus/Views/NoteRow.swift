@@ -10,11 +10,11 @@ import SwiftUI
 struct NoteRow: View {
 	@Environment(\.locale) var locale
 
+	var currentLocation: CLLocation?
 	var note: any Note
-	var userLocation: CLLocation?
 
 	func distanceString() -> String {
-		if let ul = userLocation {
+		if let ul = currentLocation {
 			let noteLocation = CLLocation(
 				latitude: note.coordinate.latitude,
 				longitude: note.coordinate.longitude
@@ -48,6 +48,7 @@ struct NoteRow: View {
 
 #Preview {
 	NoteRow(
+		currentLocation: nil,
 		note: ServiceRequest(
 			address: "somewhere",
 			city: "over there",
@@ -59,7 +60,6 @@ struct NoteRow: View {
 			status: "bad",
 			target: "here",
 			zip: "12345"
-		),
-		userLocation: nil
+		)
 	)
 }

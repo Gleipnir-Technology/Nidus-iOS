@@ -9,31 +9,29 @@ import SwiftData
 import SwiftUI
 
 struct NoteListView: View {
-	@Environment(\.modelContext) private var modelContext
+	var currentLocation: CLLocation?
 	var notes: [AnyNote]
-	var userLocation: CLLocation?
 
 	var body: some View {
 		if notes.count == 0 {
 			Text("No notes yet. Try going to settings to set up sync.")
 		}
 		else {
-			NoteList(notes: notes, userLocation: userLocation)
+			NoteList(currentLocation: currentLocation, notes: notes)
 		}
 	}
 }
 
 struct NoteList: View {
-	@Environment(\.modelContext) private var modelContext
+	var currentLocation: CLLocation?
 	var notes: [AnyNote]
-	var userLocation: CLLocation?
 
 	var body: some View {
 		List(notes) { note in
 			NavigationLink {
-				NoteEditor(note: note, userLocation: userLocation)
+				NoteEditor(currentLocation: currentLocation, note: note)
 			} label: {
-				NoteRow(note: note, userLocation: userLocation)
+				NoteRow(currentLocation: currentLocation, note: note)
 			}
 		}
 	}
