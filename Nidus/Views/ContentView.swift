@@ -29,7 +29,8 @@ struct ContentView: View {
 		let minY = region.center.latitude - region.span.latitudeDelta / 2
 		let maxX = region.center.longitude + region.span.longitudeDelta / 2
 		let maxY = region.center.latitude + region.span.latitudeDelta / 2
-		db.setPosition(minX, minY, maxX, maxY)
+		db.setPosition(region.center, minX, minY, maxX, maxY)
+
 	}
 	func setTabNotes() {
 		selection = 0
@@ -52,7 +53,7 @@ struct ContentView: View {
 			TabView(selection: $selection) {
 				Tab("Notes", systemImage: "clock", value: 0) {
 					NoteListView(
-						currentLocation: nil,
+						currentLocation: db.center,
 						notes: db.notesToShow
 					)
 				}

@@ -4,6 +4,7 @@
 //
 //  Created by Eli Ribble on 5/31/25.
 //
+import MapKit
 import OSLog
 import SQLite
 import SwiftUI
@@ -173,6 +174,7 @@ class ServiceRequestTable {
 
 @Observable
 class Database: ObservableObject {
+	var center: CLLocation?
 	var fileURL: URL?
 	private var connection: SQLite.Connection?
 	private var mosquitoSourceTable: MosquitoSourceTable = MosquitoSourceTable()
@@ -222,7 +224,14 @@ class Database: ObservableObject {
 		return toShow
 	}
 
-	func setPosition(_ minX: Double?, _ minY: Double?, _ maxX: Double?, _ maxY: Double?) {
+	func setPosition(
+		_ center: CLLocationCoordinate2D,
+		_ minX: Double?,
+		_ minY: Double?,
+		_ maxX: Double?,
+		_ maxY: Double?
+	) {
+		self.center = CLLocation(latitude: center.latitude, longitude: center.longitude)
 		self.minx = minX
 		self.miny = minY
 		self.maxx = maxX
