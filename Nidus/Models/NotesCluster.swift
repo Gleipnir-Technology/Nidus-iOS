@@ -22,7 +22,7 @@ final class NotesCluster: ObservableObject {
 	var clusters: [ExampleClusterAnnotation] = []
 
 	var mapSize: CGSize = .zero
-	var currentRegion: MKCoordinateRegion = .sanFrancisco
+	var currentRegion: MKCoordinateRegion = .visalia
 
 	func addNotes(_ notes: [AnyNote]) async {
 		/*annotations = notes
