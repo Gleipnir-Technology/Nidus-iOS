@@ -9,6 +9,40 @@ import OSLog
 import SQLite
 import SwiftUI
 
+class InspectionTable {
+	let table = Table("inspection")
+
+	let comments = SQLite.Expression<String>("comments")
+	let condition = SQLite.Expression<String>("condition")
+	let created = SQLite.Expression<Date>("created")
+	let id = SQLite.Expression<UUID>("id")
+	let sourceID = SQLite.Expression<UUID>("source_id")
+
+	func createTable(_ connection: SQLite.Connection) throws {
+		try connection.run(
+			table.create(ifNotExists: true) { t in
+				t.column(id, primaryKey: true)
+				t.column(comments)
+				t.column(condition)
+				t.column(created)
+				t.column(sourceID)
+			}
+		)
+	}
+
+	func upsert(_ connection: SQLite.Connection, _ sID: UUID, _ inspection: Inspection) throws {
+		let upsert = table.upsert(
+			comments <- SQLite.Expression<String>(inspection.comments ?? ""),
+			condition <- SQLite.Expression<String>(inspection.condition ?? ""),
+			created <- SQLite.Expression<Date>(value: inspection.created),
+			id <- SQLite.Expression<UUID>(value: inspection.id),
+			sourceID <- SQLite.Expression<UUID>(value: sID),
+			onConflictOf: id
+		)
+		try connection.run(upsert)
+	}
+}
+
 class MosquitoSourceTable {
 	let table = Table("mosquito_source")
 
@@ -41,8 +75,40 @@ class MosquitoSourceTable {
 			}
 		)
 	}
-	func asNotes(_ connection: Connection) throws -> [AnyNote] {
+	func asNotes(
+		_ connection: Connection,
+		_ inspectionTable: InspectionTable,
+		_ treatmentTable: TreatmentTable
+	) throws -> [AnyNote] {
 		var results: [AnyNote] = []
+		var inspections_by_id: [UUID: [Inspection]] = [:]
+		for row in try connection.prepare(inspectionTable.table) {
+			inspections_by_id[row[inspectionTable.sourceID], default: []].append(
+				Inspection(
+					comments: row[inspectionTable.comments],
+					condition: row[inspectionTable.condition],
+					created: row[inspectionTable.created],
+					id: row[inspectionTable.id]
+				)
+			)
+		}
+		var treatments_by_id: [UUID: [Treatment]] = [:]
+		for row in try connection.prepare(treatmentTable.table) {
+			treatments_by_id[row[treatmentTable.sourceID], default: []].append(
+				Treatment(
+					comments: row[treatmentTable.comments],
+					created: row[treatmentTable.created],
+					habitat: row[treatmentTable.habitat],
+					id: row[treatmentTable.id],
+					product: row[treatmentTable.product],
+					quantity: row[treatmentTable.quantity],
+					quantityUnit: row[treatmentTable.quantityUnit],
+					siteCondition: row[treatmentTable.siteCondition],
+					treatAcres: row[treatmentTable.treatAcres],
+					treatHectares: row[treatmentTable.treatHectares]
+				)
+			)
+		}
 		for row in try connection.prepare(table) {
 			let location = Location(latitude: row[latitude], longitude: row[longitude])
 			results.append(
@@ -55,9 +121,9 @@ class MosquitoSourceTable {
 						id: row[id],
 						location: location,
 						habitat: row[habitat],
-						inspections: [],
+						inspections: inspections_by_id[row[id]] ?? [],
 						name: row[name],
-						treatments: [],
+						treatments: treatments_by_id[row[id]] ?? [],
 						useType: row[useType],
 						waterOrigin: row[waterOrigin]
 					)
@@ -172,6 +238,58 @@ class ServiceRequestTable {
 	}
 }
 
+class TreatmentTable {
+	let table = Table("treatment")
+
+	let comments = SQLite.Expression<String>("comments")
+	let created = SQLite.Expression<Date>("created")
+	let id = SQLite.Expression<UUID>("id")
+	let habitat = SQLite.Expression<String>("habitat")
+	let product = SQLite.Expression<String>("product")
+	let quantity = SQLite.Expression<Double>("quantity")
+	let quantityUnit = SQLite.Expression<String>("quantity_unit")
+	let siteCondition = SQLite.Expression<String>("site_condition")
+	let sourceID = SQLite.Expression<UUID>("source_id")
+	let treatAcres = SQLite.Expression<Double>("treat_acres")
+	let treatHectares = SQLite.Expression<Double>("treat_hectares")
+
+	func createTable(_ connection: SQLite.Connection) throws {
+		try connection.run(
+			table.create(ifNotExists: true) { t in
+				t.column(id, primaryKey: true)
+				t.column(comments)
+				t.column(created)
+				t.column(habitat)
+				t.column(product)
+				t.column(quantity)
+				t.column(quantityUnit)
+				t.column(siteCondition)
+				t.column(sourceID)
+				t.column(treatAcres)
+				t.column(treatHectares)
+			}
+		)
+	}
+
+	func upsert(_ connection: SQLite.Connection, _ sID: UUID, _ treatment: Treatment) throws {
+		let upsert = table.upsert(
+			comments <- SQLite.Expression<String>(treatment.comments),
+			created <- SQLite.Expression<Date>(value: treatment.created),
+			id <- SQLite.Expression<UUID>(value: treatment.id),
+			habitat <- SQLite.Expression<String>(treatment.habitat),
+			product <- SQLite.Expression<String>(treatment.product),
+			quantity <- SQLite.Expression<Double>(value: treatment.quantity),
+			quantityUnit <- SQLite.Expression<String>(treatment.quantityUnit),
+			siteCondition <- SQLite.Expression<String>(treatment.siteCondition),
+			sourceID <- SQLite.Expression<UUID>(value: sID),
+			treatAcres <- SQLite.Expression<Double>(value: treatment.treatAcres),
+			treatHectares <- SQLite.Expression<Double>(value: treatment.treatHectares),
+			onConflictOf: id
+		)
+		try connection.run(upsert)
+	}
+}
+
 @Observable
 class Database: ObservableObject {
 	var center: CLLocation = CLLocation(
@@ -180,8 +298,10 @@ class Database: ObservableObject {
 	)
 	var fileURL: URL?
 	private var connection: SQLite.Connection?
+	private var inspectionTable: InspectionTable = InspectionTable()
 	private var mosquitoSourceTable: MosquitoSourceTable = MosquitoSourceTable()
 	private var serviceRequestTable: ServiceRequestTable = ServiceRequestTable()
+	private var treatmentTable: TreatmentTable = TreatmentTable()
 	var notes: [AnyNote] = []
 	var minx: Double?
 	var miny: Double?
@@ -198,8 +318,10 @@ class Database: ObservableObject {
 				create: true
 			).appendingPathComponent("fieldseeker.sqlite3")
 			connection = try Connection(fileURL!.path)
+			try inspectionTable.createTable(connection!)
 			try mosquitoSourceTable.createTable(connection!)
 			try serviceRequestTable.createTable(connection!)
+			try treatmentTable.createTable(connection!)
 			triggerUpdateComplete()
 		}
 		catch {
@@ -248,11 +370,21 @@ class Database: ObservableObject {
 	}
 	func upsertSource(_ source: MosquitoSource) throws {
 		try self.mosquitoSourceTable.upsert(connection: self.connection!, source)
+		for inspection in source.inspections {
+			try inspectionTable.upsert(self.connection!, source.id, inspection)
+		}
+		for treatment in source.treatments {
+			try treatmentTable.upsert(self.connection!, source.id, treatment)
+		}
 	}
 	func triggerUpdateComplete() {
 		do {
 			notes = []
-			notes += try mosquitoSourceTable.asNotes(connection!)
+			notes += try mosquitoSourceTable.asNotes(
+				connection!,
+				inspectionTable,
+				treatmentTable
+			)
 			notes += try serviceRequestTable.asNotes(connection!)
 			Task {
 				await cluster.addNotes(notes)

@@ -7,24 +7,25 @@
 import CoreData
 import Foundation
 import MapKit
-import SwiftData
 import SwiftUI
 
-@Model
-final class Inspection: Codable, Identifiable {
+final class Inspection: Codable, Equatable, Hashable, Identifiable {
 	enum CodingKeys: CodingKey {
 		case comments
 		case condition
 		case created
+		case id
 	}
 	var comments: String?
 	var condition: String?
 	var created: Date
+	var id: UUID
 
-	init(comments: String? = nil, condition: String? = nil, created: Date) {
+	init(comments: String? = nil, condition: String? = nil, created: Date, id: UUID) {
 		self.comments = comments
 		self.condition = condition
 		self.created = created
+		self.id = id
 	}
 
 	required init(from decoder: Decoder) throws {
@@ -32,6 +33,7 @@ final class Inspection: Codable, Identifiable {
 		comments = try container.decodeIfPresent(String.self, forKey: .comments)
 		condition = try container.decodeIfPresent(String.self, forKey: .condition)
 		created = try container.decode(Date.self, forKey: .created)
+		id = try container.decode(UUID.self, forKey: .id)
 	}
 
 	func encode(to encoder: Encoder) throws {
@@ -39,11 +41,20 @@ final class Inspection: Codable, Identifiable {
 		try container.encode(comments, forKey: .comments)
 		try container.encode(condition, forKey: .condition)
 		try container.encode(created, forKey: .created)
+		try container.encode(id, forKey: .id)
+	}
+	static func == (lhs: Inspection, rhs: Inspection) -> Bool {
+		return lhs.comments == rhs.comments && lhs.created == rhs.created
+			&& lhs.condition == rhs.condition
+	}
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(comments)
+		hasher.combine(condition)
+		hasher.combine(created)
 	}
 }
 
-@Model
-final class Location: Codable, Identifiable {
+final class Location: Codable, Equatable, Hashable, Identifiable {
 	enum CodingKeys: CodingKey {
 		case latitude
 		case longitude
@@ -69,6 +80,13 @@ final class Location: Codable, Identifiable {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(latitude, forKey: .latitude)
 		try container.encode(longitude, forKey: .longitude)
+	}
+	static func == (lhs: Location, rhs: Location) -> Bool {
+		return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
+	}
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(latitude)
+		hasher.combine(longitude)
 	}
 }
 
@@ -198,7 +216,6 @@ final class MosquitoSource: Codable, Identifiable, Note {
 	}
 }
 
-@Model
 final class ServiceRequest: Codable, Identifiable, Note {
 	enum CodingKeys: CodingKey {
 		case address
@@ -295,6 +312,17 @@ final class ServiceRequest: Codable, Identifiable, Note {
 			&& lhs.status == rhs.status && lhs.target == rhs.target
 			&& lhs.zip == rhs.zip
 	}
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(address)
+		hasher.combine(city)
+		hasher.combine(created)
+		hasher.combine(location)
+		hasher.combine(priority)
+		hasher.combine(source)
+		hasher.combine(status)
+		hasher.combine(target)
+		hasher.combine(zip)
+	}
 }
 
 final class TrapData: Codable, Identifiable, Note {
@@ -364,12 +392,12 @@ final class TrapData: Codable, Identifiable, Note {
 		hasher.combine(name)
 	}
 }
-@Model
-final class Treatment: Codable, Identifiable {
+final class Treatment: Codable, Equatable, Hashable, Identifiable {
 	enum CodingKeys: CodingKey {
 		case comments
 		case created
 		case habitat
+		case id
 		case product
 		case quantity
 		case quantityUnit
@@ -381,6 +409,7 @@ final class Treatment: Codable, Identifiable {
 	var comments: String
 	var created: Date
 	var habitat: String
+	var id: UUID
 	var product: String
 	var quantity: Double
 	var quantityUnit: String
@@ -392,6 +421,7 @@ final class Treatment: Codable, Identifiable {
 		comments: String,
 		created: Date,
 		habitat: String,
+		id: UUID,
 		product: String,
 		quantity: Double,
 		quantityUnit: String,
@@ -402,6 +432,7 @@ final class Treatment: Codable, Identifiable {
 		self.comments = comments
 		self.created = created
 		self.habitat = habitat
+		self.id = id
 		self.product = product
 		self.quantity = quantity
 		self.quantityUnit = quantityUnit
@@ -415,6 +446,7 @@ final class Treatment: Codable, Identifiable {
 		comments = try container.decode(String.self, forKey: .comments)
 		created = try container.decode(Date.self, forKey: .created)
 		habitat = try container.decode(String.self, forKey: .habitat)
+		id = try container.decode(UUID.self, forKey: .id)
 		product = try container.decode(String.self, forKey: .product)
 		quantity = try container.decode(Double.self, forKey: .quantity)
 		quantityUnit = try container.decode(String.self, forKey: .quantityUnit)
@@ -434,5 +466,24 @@ final class Treatment: Codable, Identifiable {
 		try container.encode(siteCondition, forKey: .siteCondition)
 		try container.encode(treatAcres, forKey: .treatAcres)
 		try container.encode(treatHectares, forKey: .treatHectares)
+	}
+	static func == (lhs: Treatment, rhs: Treatment) -> Bool {
+		return lhs.comments == rhs.comments && lhs.created == rhs.created
+			&& lhs.habitat == rhs.habitat && lhs.product == rhs.product
+			&& lhs.quantity == rhs.quantity && lhs.quantityUnit == rhs.quantityUnit
+			&& lhs.siteCondition == rhs.siteCondition
+			&& lhs.treatAcres == rhs.treatAcres
+			&& lhs.treatHectares == rhs.treatHectares
+	}
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(comments)
+		hasher.combine(created)
+		hasher.combine(habitat)
+		hasher.combine(product)
+		hasher.combine(quantity)
+		hasher.combine(quantityUnit)
+		hasher.combine(siteCondition)
+		hasher.combine(treatAcres)
+		hasher.combine(treatHectares)
 	}
 }

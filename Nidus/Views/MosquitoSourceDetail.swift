@@ -41,6 +41,26 @@ struct MosquitoSourceDetail: View {
 			Text(
 				"Location \(source.coordinate.latitude), \(source.coordinate.longitude)"
 			)
+			if source.inspections.isEmpty {
+				Text("No inspections recorded")
+			}
+			else {
+				NavigationLink {
+					InspectionList(inspections: source.inspections)
+				} label: {
+					Label("Inspections", systemImage: "magnifyingglass")
+				}
+			}
+			if source.treatments.isEmpty {
+				Text("No treatments recorded")
+			}
+			else {
+				NavigationLink {
+					TreatmentList(treatments: source.treatments)
+				} label: {
+					Label("Treatments", systemImage: "hazardsign")
+				}
+			}
 			Text("Access: \(source.access)")
 			Text("Comments: \(source.comments)")
 			Text("Created: \(createdFormatted(source.created))")
@@ -63,7 +83,20 @@ struct MosquitoSourceDetail: View {
 			id: UUID(uuidString: "1846d421-f8ab-4e37-850a-b61bb8422453")!,
 			location: Location(latitude: 33.3, longitude: -111.1),
 			habitat: "everywhere",
-			inspections: [],
+			inspections: [
+				Inspection(
+					comments: "it was gross",
+					condition: "bad",
+					created: Date.now.addingTimeInterval(-5000),
+					id: UUID()
+				),
+				Inspection(
+					comments: "it was not too bad",
+					condition: "acceptable",
+					created: Date.now.addingTimeInterval(-3000),
+					id: UUID()
+				),
+			],
 			name: "drain pipe",
 			treatments: [],
 			useType: "not used",

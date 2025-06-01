@@ -25,6 +25,10 @@
 		532F3AF92DECB02C006E0E40 /* MapClustered.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AF82DECB027006E0E40 /* MapClustered.swift */; };
 		532F3AFB2DECBFF5006E0E40 /* NotesCluster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AFA2DECBFE9006E0E40 /* NotesCluster.swift */; };
 		532F3AFD2DECE4EA006E0E40 /* MosquitoSourceDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AFC2DECE4E1006E0E40 /* MosquitoSourceDetail.swift */; };
+		532F3AFF2DECEDC4006E0E40 /* InspectionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AFE2DECEDC1006E0E40 /* InspectionList.swift */; };
+		532F3B012DECEE5D006E0E40 /* InspectionDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3B002DECEE5A006E0E40 /* InspectionDetail.swift */; };
+		532F3B032DECF0F2006E0E40 /* TreatmentList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3B022DECF0EE006E0E40 /* TreatmentList.swift */; };
+		532F3B052DECF12D006E0E40 /* TreatmentDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3B042DECF12B006E0E40 /* TreatmentDetail.swift */; };
 		537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5375609F2D820A5A00D8528B /* Preview Assets.xcassets */; };
 		537560B22D820A5A00D8528B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 537560A12D820A5A00D8528B /* Assets.xcassets */; };
 		537560B42D820A5A00D8528B /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A82D820A5A00D8528B /* ModelData.swift */; };
@@ -74,6 +78,10 @@
 		532F3AF82DECB027006E0E40 /* MapClustered.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapClustered.swift; sourceTree = "<group>"; };
 		532F3AFA2DECBFE9006E0E40 /* NotesCluster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesCluster.swift; sourceTree = "<group>"; };
 		532F3AFC2DECE4E1006E0E40 /* MosquitoSourceDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MosquitoSourceDetail.swift; sourceTree = "<group>"; };
+		532F3AFE2DECEDC1006E0E40 /* InspectionList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectionList.swift; sourceTree = "<group>"; };
+		532F3B002DECEE5A006E0E40 /* InspectionDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectionDetail.swift; sourceTree = "<group>"; };
+		532F3B022DECF0EE006E0E40 /* TreatmentList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentList.swift; sourceTree = "<group>"; };
+		532F3B042DECF12B006E0E40 /* TreatmentDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentDetail.swift; sourceTree = "<group>"; };
 		5375609F2D820A5A00D8528B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		537560A12D820A5A00D8528B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		537560A42D820A5A00D8528B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -177,6 +185,10 @@
 		537560C42D82125200D8528B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				532F3B042DECF12B006E0E40 /* TreatmentDetail.swift */,
+				532F3B022DECF0EE006E0E40 /* TreatmentList.swift */,
+				532F3B002DECEE5A006E0E40 /* InspectionDetail.swift */,
+				532F3AFE2DECEDC1006E0E40 /* InspectionList.swift */,
 				532F3AFC2DECE4E1006E0E40 /* MosquitoSourceDetail.swift */,
 				532F3AF82DECB027006E0E40 /* MapClustered.swift */,
 				537560C52D82127100D8528B /* ButtonAddNote.swift */,
@@ -380,12 +392,15 @@
 				532F3ADA2DE7A41F006E0E40 /* Toast.swift in Sources */,
 				537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */,
 				531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */,
+				532F3B012DECEE5D006E0E40 /* InspectionDetail.swift in Sources */,
 				537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */,
 				532F3AFB2DECBFF5006E0E40 /* NotesCluster.swift in Sources */,
 				532F3AE22DEB64B4006E0E40 /* Importer.swift in Sources */,
 				537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */,
+				532F3B052DECF12D006E0E40 /* TreatmentDetail.swift in Sources */,
 				532F3AD32DE66D40006E0E40 /* Logger.swift in Sources */,
 				538784432D8B474500B3552E /* SettingView.swift in Sources */,
+				532F3AFF2DECEDC4006E0E40 /* InspectionList.swift in Sources */,
 				537560CC2D82127100D8528B /* NoteRow.swift in Sources */,
 				537560CE2D82127100D8528B /* NoteList.swift in Sources */,
 				532F3AD52DE66F42006E0E40 /* ModelActor.swift in Sources */,
@@ -394,6 +409,7 @@
 				537560B92D820A5A00D8528B /* Note.swift in Sources */,
 				532F3ACC2DE5FC67006E0E40 /* Settings.swift in Sources */,
 				53E308182D8B39ED00534AB0 /* NoteCategoryAdd.swift in Sources */,
+				532F3B032DECF0F2006E0E40 /* TreatmentList.swift in Sources */,
 				532F3AE02DEA0BCD006E0E40 /* FieldSeeker.swift in Sources */,
 				537560BA2D820A5A00D8528B /* MapView.swift in Sources */,
 				532F3AD12DE61CE7006E0E40 /* BackgroundNetworkManager.swift in Sources */,
