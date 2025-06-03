@@ -27,7 +27,6 @@ let appContainer: ModelContainer = {
 @MainActor
 struct NidusApp: App {
 	@State private var db = Database()
-	@State private var modelData = ModelData()
 	@State private var locationDataManager = LocationDataManager()
 	@UIApplicationDelegateAdaptor private var appDelegate: NidusAppDelegate
 

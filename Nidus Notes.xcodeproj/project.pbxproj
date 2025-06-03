@@ -31,7 +31,6 @@
 		532F3B052DECF12D006E0E40 /* TreatmentDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3B042DECF12B006E0E40 /* TreatmentDetail.swift */; };
 		537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5375609F2D820A5A00D8528B /* Preview Assets.xcassets */; };
 		537560B22D820A5A00D8528B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 537560A12D820A5A00D8528B /* Assets.xcassets */; };
-		537560B42D820A5A00D8528B /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A82D820A5A00D8528B /* ModelData.swift */; };
 		537560B92D820A5A00D8528B /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A92D820A5A00D8528B /* Note.swift */; };
 		537560BA2D820A5A00D8528B /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A72D820A5A00D8528B /* MapView.swift */; };
 		537560BC2D820A5A00D8528B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A42D820A5A00D8528B /* ContentView.swift */; };
@@ -86,7 +85,6 @@
 		537560A12D820A5A00D8528B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		537560A42D820A5A00D8528B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		537560A72D820A5A00D8528B /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
-		537560A82D820A5A00D8528B /* ModelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelData.swift; sourceTree = "<group>"; };
 		537560A92D820A5A00D8528B /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		537560BE2D820F0A00D8528B /* Nidus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Nidus.entitlements; sourceTree = "<group>"; };
 		537560BF2D820F3D00D8528B /* NidusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NidusApp.swift; sourceTree = "<group>"; };
@@ -177,7 +175,6 @@
 				532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */,
 				532F3ACB2DE5FC62006E0E40 /* Settings.swift */,
 				537560A92D820A5A00D8528B /* Note.swift */,
-				537560A82D820A5A00D8528B /* ModelData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -388,7 +385,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				537560B42D820A5A00D8528B /* ModelData.swift in Sources */,
 				532F3ADA2DE7A41F006E0E40 /* Toast.swift in Sources */,
 				537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */,
 				531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */,
