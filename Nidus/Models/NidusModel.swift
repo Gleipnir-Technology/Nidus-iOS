@@ -11,8 +11,9 @@ import OSLog
 class NidusModel {
 	var currentRegion: MKCoordinateRegion = MKCoordinateRegion.visalia
 	var cluster: NotesCluster = NotesCluster()
-	var errorMessage: String?
 	var database: Database = Database()
+	var errorMessage: String?
+	var isDownloading = false
 	var notes: [UUID: AnyNote] = [:]
 
 	init() {
@@ -55,6 +56,7 @@ class NidusModel {
 		Task {
 			let actor = BackgroundModelActor()
 			do {
+				isDownloading = true
 				try await actor.triggerFetch(self)
 			}
 			catch {
@@ -64,6 +66,7 @@ class NidusModel {
 			}
 		}
 	}
+
 	func upsertServiceRequest(_ sr: ServiceRequest) {
 		do {
 			try database.upsertServiceRequest(sr)

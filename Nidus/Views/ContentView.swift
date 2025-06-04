@@ -27,43 +27,73 @@ struct ContentView: View {
 	}
 	var body: some View {
 		NavigationStack(path: $path) {
-			TabView(selection: $selection) {
-				Tab("Notes", systemImage: "clock", value: 0) {
-					NoteListView(
-						currentLocation: CLLocation(
-							latitude: model.currentRegion.center
-								.latitude,
-							longitude: model.currentRegion.center
-								.longitude
-						),
-						notes: model.notesToShow
-					)
+			VStack {
+				TabView(selection: $selection) {
+					Tab("Notes", systemImage: "clock", value: 0) {
+						NoteListView(
+							currentLocation: CLLocation(
+								latitude: model.currentRegion.center
+									.latitude,
+								longitude: model.currentRegion
+									.center
+									.longitude
+							),
+							notes: model.notesToShow
+						)
+					}
+					Tab("Map", systemImage: "map", value: 1) {
+						MapOverview(
+							dataSource: model.cluster,
+							onNoteSelected: onNoteSelected,
+							onPositionChange: onMapPositionChange,
+							userLocation: locationDataManager.location
+						)
+					}
+					Tab("Settings", systemImage: "gear", value: 3) {
+						SettingView(
+							onSettingsUpdated: model
+								.triggerBackgroundFetch
+						)
+					}
 				}
-				Tab("Map", systemImage: "map", value: 1) {
-					MapOverview(
-						dataSource: model.cluster,
-						onNoteSelected: onNoteSelected,
-						onPositionChange: onMapPositionChange,
-						userLocation: locationDataManager.location
-					)
+				.navigationDestination(for: UUID.self) { noteId in
+					if let note = model.notesToShow.first(where: {
+						$0.id == noteId
+					}) {
+						NoteEditor(
+							currentLocation: locationDataManager
+								.location,
+							note: note
+						)
+					}
+					else {
+						Text("NOAAAAA")
+					}
 				}
-				Tab("Settings", systemImage: "gear", value: 3) {
-					SettingView(onSettingsUpdated: model.triggerBackgroundFetch)
-				}
-			}
-			.navigationDestination(for: UUID.self) { noteId in
-				if let note = model.notesToShow.first(where: { $0.id == noteId }) {
-					NoteEditor(
-						currentLocation: locationDataManager.location,
-						note: note
-					)
-				}
-				else {
-					Text("NOAAAAA")
+				if model.isDownloading {
+					Text("Downloading notes...")
 				}
 			}
 		}.onAppear {
 			onAppear()
 		}
 	}
+}
+
+#Preview("No notes") {
+	ContentView(
+		model: NidusModelPreview(),
+		onAppear: {},
+		onMapPositionChange: { (MKCoordinateRegion) -> Void in
+		}
+	)
+}
+
+#Preview("Downloading") {
+	ContentView(
+		model: NidusModelPreview(isDownloading: true),
+		onAppear: {},
+		onMapPositionChange: { (MKCoordinateRegion) -> Void in
+		}
+	)
 }
