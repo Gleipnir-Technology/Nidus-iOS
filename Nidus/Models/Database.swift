@@ -290,7 +290,6 @@ class TreatmentTable {
 	}
 }
 
-@Observable
 class Database: ObservableObject {
 	var center: CLLocation = CLLocation(
 		latitude: MKCoordinateRegion.visalia.center.latitude,
@@ -302,12 +301,6 @@ class Database: ObservableObject {
 	private var mosquitoSourceTable: MosquitoSourceTable = MosquitoSourceTable()
 	private var serviceRequestTable: ServiceRequestTable = ServiceRequestTable()
 	private var treatmentTable: TreatmentTable = TreatmentTable()
-	var notes: [AnyNote] = []
-	var minx: Double?
-	var miny: Double?
-	var maxx: Double?
-	var maxy: Double?
-	var cluster: NotesCluster = NotesCluster()
 
 	init() {
 		do {
@@ -322,7 +315,6 @@ class Database: ObservableObject {
 			try mosquitoSourceTable.createTable(connection!)
 			try serviceRequestTable.createTable(connection!)
 			try treatmentTable.createTable(connection!)
-			triggerUpdateComplete()
 		}
 		catch {
 			fileURL = nil
@@ -330,40 +322,34 @@ class Database: ObservableObject {
 		}
 	}
 
-	var notesToShow: [AnyNote] {
-		var toShow: [AnyNote] = []
-		if minx == nil || miny == nil || maxx == nil || maxy == nil {
-			if notes.isEmpty {
-				return []
-			}
-			return Array(notes[0..<10])
-		}
-		for note in notes {
-			if note.coordinate.latitude > miny! && note.coordinate.longitude > minx!
-				&& note.coordinate.latitude < maxy!
-				&& note.coordinate.longitude < maxx!
-			{
-				toShow.append(note)
+	func notes() throws -> [UUID: AnyNote] {
+		var results: [UUID: AnyNote] = [:]
+		do {
+			let sources = try mosquitoSourceTable.asNotes(
+				connection!,
+				inspectionTable,
+				treatmentTable
+			)
+			for source in sources {
+				results[source.id] = source
 			}
 		}
-		return toShow
-	}
+		catch {
+			Logger.background.error("Failed to get source notes: \(error)")
+			throw error
+		}
+		do {
+			let requests = try serviceRequestTable.asNotes(connection!)
+			for request in requests {
+				results[request.id] = request
+			}
+		}
+		catch {
+			Logger.background.error("Failed to get request notes: \(error)")
+			throw error
 
-	func setPosition(
-		_ center: CLLocationCoordinate2D,
-		_ minX: Double?,
-		_ minY: Double?,
-		_ maxX: Double?,
-		_ maxY: Double?
-	) {
-		self.center = CLLocation(latitude: center.latitude, longitude: center.longitude)
-		self.minx = minX
-		self.miny = minY
-		self.maxx = maxX
-		self.maxy = maxY
-		Logger.foreground.info(
-			"Set DB limits to \(String(describing: minX)), \(String(describing: minY)), \(String(describing: maxX)), \(String(describing: maxY))"
-		)
+		}
+		return results
 	}
 	func upsertServiceRequest(_ serviceRequest: ServiceRequest) throws {
 		try self.serviceRequestTable.upsert(connection: self.connection!, serviceRequest)
@@ -375,23 +361,6 @@ class Database: ObservableObject {
 		}
 		for treatment in source.treatments {
 			try treatmentTable.upsert(self.connection!, source.id, treatment)
-		}
-	}
-	func triggerUpdateComplete() {
-		do {
-			notes = []
-			notes += try mosquitoSourceTable.asNotes(
-				connection!,
-				inspectionTable,
-				treatmentTable
-			)
-			notes += try serviceRequestTable.asNotes(connection!)
-			Task {
-				await cluster.addNotes(notes)
-			}
-		}
-		catch {
-			Logger.background.error("Failed to get notes: \(error)")
 		}
 	}
 }

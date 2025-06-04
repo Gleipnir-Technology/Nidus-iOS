@@ -24,7 +24,7 @@ final class NotesCluster: ObservableObject {
 	var mapSize: CGSize = .zero
 	var currentRegion: MKCoordinateRegion = .visalia
 
-	func addNotes(_ notes: [AnyNote]) async {
+	func setNotes(_ notes: [AnyNote]) async {
 		/*annotations = notes
         await clusterManager.add(notes)
         await reloadAnnotations()*/

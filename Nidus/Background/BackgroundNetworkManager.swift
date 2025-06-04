@@ -53,10 +53,10 @@ final class APIResponse: Codable {
 class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 	@Published var errorMessage: String?
 	private var manager: BackgroundNetworkManager!
-	var db: Database?
+	var model: NidusModel?
 
-	func setManager(_ manager: BackgroundNetworkManager, _ db: Database) {
-		self.db = db
+	func setManager(_ manager: BackgroundNetworkManager, _ model: NidusModel) {
+		self.model = model
 		self.manager = manager
 	}
 
@@ -77,28 +77,23 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
 		Logger.background.info("Sources \(response.sources.count)")
 		Logger.background.info("Requests \(response.requests.count)")
 		Logger.background.info("Traps \(response.traps.count)")
-		do {
-			var i = 0
-			for r in response.requests {
-				try db?.upsertServiceRequest(r)
-				i += 1
-				if i % 1000 == 0 {
-					Logger.background.info("Request \(i)")
-				}
-			}
-			i = 0
-			for s in response.sources {
-				try db?.upsertSource(s)
-				i += 1
-				if i % 1000 == 0 {
-					Logger.background.info("Source \(i)")
-				}
+		var i = 0
+		for r in response.requests {
+			model?.upsertServiceRequest(r)
+			i += 1
+			if i % 1000 == 0 {
+				Logger.background.info("Request \(i)")
 			}
 		}
-		catch {
-			Logger.background.error("Failed to do DB stuff \(error)")
+		i = 0
+		for s in response.sources {
+			model?.upsertSource(s)
+			i += 1
+			if i % 1000 == 0 {
+				Logger.background.info("Source \(i)")
+			}
 		}
-		db?.triggerUpdateComplete()
+		model?.triggerUpdateComplete()
 		Logger.background.info("Done saving response")
 	}
 
@@ -173,13 +168,13 @@ actor BackgroundNetworkManager: ObservableObject {
 	private var backgroundSession: URLSession!
 	private let cookieStorage: HTTPCookieStorage
 	private var downloadDelegate: DownloadDelegate
-	private var db: Database
+	private var model: NidusModel
 
 	@Published var isLoggedIn = false
 
-	init(_ db: Database) {
+	init(_ model: NidusModel) {
 		cookieStorage = HTTPCookieStorage.shared
-		self.db = db
+		self.model = model
 		downloadDelegate = DownloadDelegate()
 
 		let config = URLSessionConfiguration.background(
@@ -197,7 +192,7 @@ actor BackgroundNetworkManager: ObservableObject {
 			delegateQueue: nil
 		)
 
-		downloadDelegate.setManager(self, db)
+		downloadDelegate.setManager(self, model)
 	}
 
 	private var currentSettings: Settings {

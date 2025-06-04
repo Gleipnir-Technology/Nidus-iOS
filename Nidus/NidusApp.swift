@@ -26,13 +26,17 @@ let appContainer: ModelContainer = {
 @main
 @MainActor
 struct NidusApp: App {
-	@State private var db = Database()
 	@State private var locationDataManager = LocationDataManager()
+	@State private var model = NidusModel()
 	@UIApplicationDelegateAdaptor private var appDelegate: NidusAppDelegate
 
 	var body: some Scene {
 		WindowGroup {
-			ContentView(db: db).environment(locationDataManager)
+			ContentView(
+				model: model,
+				onAppear: model.triggerBackgroundFetch,
+				onMapPositionChange: model.setPosition
+			).environment(locationDataManager)
 		}
 		.modelContainer(appContainer)
 	}
