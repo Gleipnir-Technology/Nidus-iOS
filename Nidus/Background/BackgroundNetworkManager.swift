@@ -204,45 +204,6 @@ actor BackgroundNetworkManager: ObservableObject {
 		request.httpBody = formData.data(using: .utf8)
 		let downloadTask = backgroundSession.downloadTask(with: request)
 		downloadTask.resume()
-		/*
-		do {
-			let (data, response) = try await backgroundSession.data(for: request)
-
-			guard let httpResponse = response as? HTTPURLResponse else {
-                Logger.background.error("Invalid response")
-				return
-			}
-
-			if httpResponse.statusCode == 200 {
-				// Check if we received cookies
-				let cookies = HTTPCookie.cookies(
-					withResponseHeaderFields: httpResponse.allHeaderFields
-						as! [String: String],
-					for: loginURL
-				)
-				// Store cookies
-				for cookie in cookies {
-					cookieStorage.setCookie(cookie)
-				}
-
-				// Parse login response if needed
-				if let responseString = String(data: data, encoding: .utf8) {
-					print("Login response: \(responseString)")
-				}
-
-				self.isLoggedIn = true
-			}
-			else {
-                Logger.background.error(
-					"Login failed with status: \(httpResponse.statusCode)"
-				)
-			}
-
-		}
-		catch {
-            Logger.background.error("Login error: \(error.localizedDescription)")
-		}
-        */
 	}
 
 }
