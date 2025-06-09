@@ -9,11 +9,12 @@ import OSLog
 
 @Observable
 class NidusModel {
+	var backgroundNetworkManager: BackgroundNetworkManager?
+	var backgroundNetworkState: BackgroundNetworkState = .idle
 	var currentRegion: MKCoordinateRegion = MKCoordinateRegion.visalia
 	var cluster: NotesCluster = NotesCluster()
 	var database: Database = Database()
 	var errorMessage: String?
-	var isDownloading = false
 	var notes: [UUID: AnyNote] = [:]
 
 	init() {
@@ -34,6 +35,40 @@ class NidusModel {
 		return toShow
 	}
 
+	func onAPIResponse(_ response: APIResponse) {
+		do {
+			Logger.background.info("Saving API response")
+			Logger.background.info("Sources \(response.sources.count)")
+			Logger.background.info("Requests \(response.requests.count)")
+			Logger.background.info("Traps \(response.traps.count)")
+			var i = 0
+			for r in response.requests {
+				try database.upsertServiceRequest(r)
+				i += 1
+				if i % 1000 == 0 {
+					Logger.background.info("Request \(i)")
+				}
+			}
+			i = 0
+			for s in response.sources {
+				try database.upsertSource(s)
+				i += 1
+				if i % 1000 == 0 {
+					Logger.background.info("Source \(i)")
+				}
+			}
+			triggerUpdateComplete()
+			Logger.background.info("Done saving response")
+		}
+		catch {
+			Logger.background.error("Failed to handle API response: \(error)")
+		}
+	}
+
+	func onNetworkStateChange(_ state: BackgroundNetworkState) {
+		self.backgroundNetworkState = state
+	}
+
 	func setPosition(region: MKCoordinateRegion) {
 		currentRegion = region
 		Logger.foreground.info(
@@ -52,35 +87,21 @@ class NidusModel {
 			errorMessage = "Error loading notes: \(error)"
 		}
 	}
+
 	func triggerBackgroundFetch() {
+		self.backgroundNetworkManager = BackgroundNetworkManager(
+			onAPIResponse: onAPIResponse,
+			onStateChange: onNetworkStateChange
+		)
 		Task {
-			let actor = BackgroundModelActor()
 			do {
-				isDownloading = true
-				try await actor.triggerFetch(self)
+				try await backgroundNetworkManager!.startBackgroundDownload()
 			}
 			catch {
 				Logger.background.error(
-					"Failed to trigger fetch \(error.localizedDescription)"
+					"Failed to trigger fetch \(error)"
 				)
 			}
-		}
-	}
-
-	func upsertServiceRequest(_ sr: ServiceRequest) {
-		do {
-			try database.upsertServiceRequest(sr)
-		}
-		catch {
-			Logger.background.error("Failed to upsert service request: \(error)")
-		}
-	}
-	func upsertSource(_ source: MosquitoSource) {
-		do {
-			try database.upsertSource(source)
-		}
-		catch {
-			Logger.background.error("Failed to upsert source: \(error)")
 		}
 	}
 }

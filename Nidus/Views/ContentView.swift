@@ -70,8 +70,19 @@ struct ContentView: View {
 						Text("NOAAAAA")
 					}
 				}
-				if model.isDownloading {
-					Text("Downloading notes...")
+				switch model.backgroundNetworkState {
+				case .downloading:
+					Text("Downloading data...")
+				case .error:
+					Text("Error downloading data")
+				case .idle:
+					EmptyView()
+				case .loggingIn:
+					Text("Logging in...")
+				case .notConfigured:
+					Text("Configure sync in settings")
+				case .savingData:
+					Text("Saving data...")
 				}
 			}
 		}.onAppear {
@@ -91,7 +102,7 @@ struct ContentView: View {
 
 #Preview("Downloading") {
 	ContentView(
-		model: NidusModelPreview(isDownloading: true),
+		model: NidusModelPreview(backgroundNetworkState: .downloading),
 		onAppear: {},
 		onMapPositionChange: { (MKCoordinateRegion) -> Void in
 		}

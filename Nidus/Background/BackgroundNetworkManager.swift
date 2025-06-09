@@ -41,13 +41,44 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 			task.resume()
 		}
 	}
+
+	private func permanentURL(for originalURL: URL) -> URL {
+		let documentsPath = FileManager.default.urls(
+			for: .documentDirectory,
+			in: .userDomainMask
+		)[0]
+		let filename = originalURL.lastPathComponent
+		return documentsPath.appendingPathComponent(filename)
+	}
+
 	func urlSession(
 		_ session: URLSession,
 		downloadTask: URLSessionDownloadTask,
 		didFinishDownloadingTo location: URL
 	) {
-		if let continuation = continuations.removeValue(forKey: downloadTask) {
-			continuation.resume(returning: location)
+		guard let continuation = continuations.removeValue(forKey: downloadTask) else {
+			return
+		}
+
+		do {
+			// Create permanent URL
+			let originalURL =
+				downloadTask.originalRequest?.url ?? URL(string: "downloaded_file")!
+			let permanentURL = permanentURL(for: originalURL)
+
+			// Remove existing file if it exists
+			if FileManager.default.fileExists(atPath: permanentURL.path) {
+				try FileManager.default.removeItem(at: permanentURL)
+			}
+
+			// Move the temporary file to permanent location
+			try FileManager.default.moveItem(at: location, to: permanentURL)
+
+			// Resume continuation with permanent URL
+			continuation.resume(returning: permanentURL)
+		}
+		catch {
+			continuation.resume(throwing: error)
 		}
 	}
 
@@ -62,16 +93,30 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 	}
 }
 
-actor BackgroundNetworkManager: ObservableObject {
+enum BackgroundNetworkState {
+	case downloading
+	case error
+	case idle
+	case loggingIn
+	case notConfigured
+	case savingData
+}
+
+actor BackgroundNetworkManager {
 	private var continuations: [URLSessionTask: CheckedContinuation<(), Error>] = [:]
 	private var downloadWrapper: BackgroundDownloadWrapper!
-	private var model: NidusModel
+	nonisolated let onAPIResponse: ((APIResponse) -> Void)
+	nonisolated let onStateChange: ((BackgroundNetworkState) -> Void)
 
 	@Published var isLoggedIn = false
 
-	init(_ model: NidusModel) {
-		self.model = model
+	init(
+		onAPIResponse: @escaping ((APIResponse) -> Void),
+		onStateChange: @escaping ((BackgroundNetworkState) -> Void)
+	) {
 		self.downloadWrapper = BackgroundDownloadWrapper()
+		self.onAPIResponse = onAPIResponse
+		self.onStateChange = onStateChange
 	}
 
 	private var currentSettings: Settings {
@@ -84,6 +129,7 @@ actor BackgroundNetworkManager: ObservableObject {
 	}
 
 	private func fetchNotes() async throws -> APIResponse {
+		updateState(.downloading)
 		let url = URL(string: "https://sync.nidus.cloud/api/client/ios")!
 		let request = URLRequest(url: url)
 		let tempURL = try await downloadWrapper.handle(request)
@@ -92,17 +138,22 @@ actor BackgroundNetworkManager: ObservableObject {
 	}
 
 	nonisolated func startBackgroundDownload() async throws {
+		await updateState(.idle)
 		let settings = await currentSettings
 		if settings.username == "" || settings.password == "" {
 			Logger.background.info("Refusing to do download, no username and password")
+			await updateState(.notConfigured)
 			return
 		}
 		try await login(settings)
 		let apiResponse = try await fetchNotes()
-		await saveResponse(apiResponse)
+		await updateState(.savingData)
+		onAPIResponse(apiResponse)
+		await updateState(.idle)
 	}
 
 	private func login(_ settings: Settings) async throws {
+		updateState(.loggingIn)
 		let loginURL: URL = URL(string: settings.URL + "/login")!
 
 		// Create form-encoded POST request
@@ -129,31 +180,9 @@ actor BackgroundNetworkManager: ObservableObject {
 		return response
 	}
 
-	private func saveResponse(_ response: APIResponse) {
-		Logger.background.info("Saving API response")
-		Logger.background.info("Sources \(response.sources.count)")
-		Logger.background.info("Requests \(response.requests.count)")
-		Logger.background.info("Traps \(response.traps.count)")
-		var i = 0
-		for r in response.requests {
-			model.upsertServiceRequest(r)
-			i += 1
-			if i % 1000 == 0 {
-				Logger.background.info("Request \(i)")
-			}
-		}
-		i = 0
-		for s in response.sources {
-			model.upsertSource(s)
-			i += 1
-			if i % 1000 == 0 {
-				Logger.background.info("Source \(i)")
-			}
-		}
-		model.triggerUpdateComplete()
-		Logger.background.info("Done saving response")
+	private func updateState(_ newState: BackgroundNetworkState) {
+		onStateChange(newState)
 	}
-
 }
 
 extension ParseStrategy where Self == Date.ISO8601FormatStyle {

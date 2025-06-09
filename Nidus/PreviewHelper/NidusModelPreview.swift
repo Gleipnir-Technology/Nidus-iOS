@@ -8,8 +8,8 @@ import SwiftUI
 
 @Observable
 class NidusModelPreview: NidusModel {
-	init(isDownloading: Bool = false) {
+	init(backgroundNetworkState: BackgroundNetworkState = .idle) {
 		super.init()
-		self.isDownloading = isDownloading
+		self.backgroundNetworkState = backgroundNetworkState
 	}
 }

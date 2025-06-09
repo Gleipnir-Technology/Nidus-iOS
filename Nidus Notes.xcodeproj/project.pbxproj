@@ -12,7 +12,6 @@
 		532F3ACC2DE5FC67006E0E40 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3ACB2DE5FC62006E0E40 /* Settings.swift */; };
 		532F3AD12DE61CE7006E0E40 /* BackgroundNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD02DE61CE1006E0E40 /* BackgroundNetworkManager.swift */; };
 		532F3AD32DE66D40006E0E40 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD22DE66D3D006E0E40 /* Logger.swift */; };
-		532F3AD52DE66F42006E0E40 /* ModelActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD42DE66F3E006E0E40 /* ModelActor.swift */; };
 		532F3ADA2DE7A41F006E0E40 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD92DE7A41C006E0E40 /* Toast.swift */; };
 		532F3AE02DEA0BCD006E0E40 /* FieldSeeker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */; };
 		532F3AE22DEB64B4006E0E40 /* Importer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AE12DEB64B0006E0E40 /* Importer.swift */; };
@@ -71,7 +70,6 @@
 		532F3ACB2DE5FC62006E0E40 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		532F3AD02DE61CE1006E0E40 /* BackgroundNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundNetworkManager.swift; sourceTree = "<group>"; };
 		532F3AD22DE66D3D006E0E40 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
-		532F3AD42DE66F3E006E0E40 /* ModelActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelActor.swift; sourceTree = "<group>"; };
 		532F3AD82DE76EF8006E0E40 /* Nidus-Notes-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Nidus-Notes-Info.plist"; sourceTree = "<group>"; };
 		532F3AD92DE7A41C006E0E40 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldSeeker.swift; sourceTree = "<group>"; };
@@ -141,7 +139,6 @@
 			isa = PBXGroup;
 			children = (
 				532F3AE12DEB64B0006E0E40 /* Importer.swift */,
-				532F3AD42DE66F3E006E0E40 /* ModelActor.swift */,
 				532F3AD02DE61CE1006E0E40 /* BackgroundNetworkManager.swift */,
 			);
 			path = Background;
@@ -409,7 +406,6 @@
 				532F3AFF2DECEDC4006E0E40 /* InspectionList.swift in Sources */,
 				537560CC2D82127100D8528B /* NoteRow.swift in Sources */,
 				537560CE2D82127100D8528B /* NoteList.swift in Sources */,
-				532F3AD52DE66F42006E0E40 /* ModelActor.swift in Sources */,
 				537560C02D820F3D00D8528B /* NidusApp.swift in Sources */,
 				532F3AFD2DECE4EA006E0E40 /* MosquitoSourceDetail.swift in Sources */,
 				537560B92D820A5A00D8528B /* Note.swift in Sources */,
