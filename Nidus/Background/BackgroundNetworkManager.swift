@@ -9,9 +9,17 @@ import OSLog
 import SQLite
 import UIKit
 
+struct DownloadProgress {
+	let bytesWritten: Int64
+	let totalBytesExpected: Int64
+	let progress: Double
+}
+
 class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadDelegate {
 	private var backgroundSession: URLSession!
 	private var continuations: [URLSessionTask: CheckedContinuation<URL, Error>] = [:]
+	private var progressHandlers: [URLSessionTask: (DownloadProgress) -> Void] = [:]
+
 	private let cookieStorage: HTTPCookieStorage
 
 	override init() {
@@ -33,11 +41,15 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		)
 	}
 
-	func handle(_ request: URLRequest) async throws -> URL {
+	func handle(
+		with request: URLRequest,
+		progressHandler: @escaping (DownloadProgress) -> Void = { _ in }
+	) async throws -> URL {
 		return try await withCheckedThrowingContinuation {
 			(continuation: CheckedContinuation<URL, Error>) in
 			let task = backgroundSession.downloadTask(with: request)
 			continuations[task] = continuation
+			progressHandlers[task] = progressHandler
 			task.resume()
 		}
 	}
@@ -56,6 +68,8 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		downloadTask: URLSessionDownloadTask,
 		didFinishDownloadingTo location: URL
 	) {
+		progressHandlers.removeValue(forKey: downloadTask)
+
 		guard let continuation = continuations.removeValue(forKey: downloadTask) else {
 			return
 		}
@@ -80,6 +94,24 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		catch {
 			continuation.resume(throwing: error)
 		}
+	}
+
+	func urlSession(
+		_ session: URLSession,
+		downloadTask: URLSessionDownloadTask,
+		didWriteData bytesWritten: Int64,
+		totalBytesWritten: Int64,
+		totalBytesExpectedToWrite: Int64
+	) {
+
+		let progress = DownloadProgress(
+			bytesWritten: totalBytesWritten,
+			totalBytesExpected: totalBytesExpectedToWrite,
+			progress: totalBytesExpectedToWrite > 0
+				? Double(totalBytesWritten) / Double(totalBytesExpectedToWrite) : 0
+		)
+
+		progressHandlers[downloadTask]?(progress)
 	}
 
 	func urlSession(
@@ -132,7 +164,9 @@ actor BackgroundNetworkManager {
 		updateState(.downloading)
 		let url = URL(string: "https://sync.nidus.cloud/api/client/ios")!
 		let request = URLRequest(url: url)
-		let tempURL = try await downloadWrapper.handle(request)
+		let tempURL = try await downloadWrapper.handle(with: request) { progress in
+			print("Download progress: \(progress)")
+		}
 		let notes: APIResponse = try parseJSON(tempURL)
 		return notes
 	}
@@ -168,7 +202,7 @@ actor BackgroundNetworkManager {
 		let formData =
 			"username=\(settings.username.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")&password=\(settings.password.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")"
 		request.httpBody = formData.data(using: .utf8)
-		_ = try await downloadWrapper.handle(request)
+		_ = try await downloadWrapper.handle(with: request)
 	}
 
 	private func parseJSON<T: Decodable>(_ tempURL: URL) throws -> T {
