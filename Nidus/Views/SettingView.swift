@@ -22,10 +22,6 @@ struct SettingView: View {
 			&& !password.isEmpty
 	}
 
-	private func deleteNotes() {
-		Logger.foreground.error("Delete is not operational")
-	}
-
 	private func loadCurrentSettings() {
 		password = UserDefaults.standard.string(forKey: "password") ?? ""
 		url = UserDefaults.standard.string(forKey: "sync-url") ?? "https://sync.nidus.cloud"
@@ -116,18 +112,6 @@ struct SettingView: View {
 				} header: {
 					Text("Security")
 				}
-				Section {
-					HStack {
-						Image(
-							systemName: "trash"
-						).foregroundColor(.red)
-						Button(action: { deleteNotes() }) {
-							Text("Delete all notes").foregroundColor(
-								.red
-							)
-						}
-					}
-				}
 			}.navigationTitle("Settings")
 				.navigationBarTitleDisplayMode(.inline)
 				.toolbar {
@@ -149,8 +133,6 @@ struct SettingView: View {
 	}
 }
 
-/*
- #Preview {
- SettingView().modelContainer(for: Settings.self, inMemory: true)
- }
-*/
+#Preview {
+	SettingView(onSettingsUpdated: {})
+}
