@@ -138,16 +138,19 @@ actor BackgroundNetworkManager {
 	private var continuations: [URLSessionTask: CheckedContinuation<(), Error>] = [:]
 	private var downloadWrapper: BackgroundDownloadWrapper!
 	nonisolated let onAPIResponse: ((APIResponse) -> Void)
+	nonisolated let onProgress: ((Double) -> Void)
 	nonisolated let onStateChange: ((BackgroundNetworkState) -> Void)
 
 	@Published var isLoggedIn = false
 
 	init(
 		onAPIResponse: @escaping ((APIResponse) -> Void),
+		onProgress: @escaping ((Double) -> Void),
 		onStateChange: @escaping ((BackgroundNetworkState) -> Void)
 	) {
 		self.downloadWrapper = BackgroundDownloadWrapper()
 		self.onAPIResponse = onAPIResponse
+		self.onProgress = onProgress
 		self.onStateChange = onStateChange
 	}
 
@@ -165,7 +168,7 @@ actor BackgroundNetworkManager {
 		let url = URL(string: "https://sync.nidus.cloud/api/client/ios")!
 		let request = URLRequest(url: url)
 		let tempURL = try await downloadWrapper.handle(with: request) { progress in
-			print("Download progress: \(progress)")
+			self.onProgress(progress.progress)
 		}
 		let notes: APIResponse = try parseJSON(tempURL)
 		return notes

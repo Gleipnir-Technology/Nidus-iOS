@@ -72,7 +72,10 @@ struct ContentView: View {
 				}
 				switch model.backgroundNetworkState {
 				case .downloading:
-					Text("Downloading data...")
+					ProgressView(
+						"Downloading data",
+						value: model.backgroundNetworkProgress
+					).frame(maxWidth: 300)
 				case .error:
 					Text("Error downloading data")
 				case .idle:
@@ -82,7 +85,10 @@ struct ContentView: View {
 				case .notConfigured:
 					Text("Configure sync in settings")
 				case .savingData:
-					Text("Saving data...")
+					ProgressView(
+						"Saving data",
+						value: model.backgroundNetworkProgress
+					).frame(maxWidth: 300)
 				}
 			}
 		}.onAppear {
@@ -102,7 +108,22 @@ struct ContentView: View {
 
 #Preview("Downloading") {
 	ContentView(
-		model: NidusModelPreview(backgroundNetworkState: .downloading),
+		model: NidusModelPreview(
+			backgroundNetworkProgress: 0.5,
+			backgroundNetworkState: .downloading
+		),
+		onAppear: {},
+		onMapPositionChange: { (MKCoordinateRegion) -> Void in
+		}
+	)
+}
+
+#Preview("Saving") {
+	ContentView(
+		model: NidusModelPreview(
+			backgroundNetworkProgress: 0.3,
+			backgroundNetworkState: .savingData
+		),
 		onAppear: {},
 		onMapPositionChange: { (MKCoordinateRegion) -> Void in
 		}

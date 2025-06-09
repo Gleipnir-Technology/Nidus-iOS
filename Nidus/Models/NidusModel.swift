@@ -10,6 +10,7 @@ import OSLog
 @Observable
 class NidusModel {
 	var backgroundNetworkManager: BackgroundNetworkManager?
+	var backgroundNetworkProgress: Double = 0.0
 	var backgroundNetworkState: BackgroundNetworkState = .idle
 	var currentRegion: MKCoordinateRegion = MKCoordinateRegion.visalia
 	var cluster: NotesCluster = NotesCluster()
@@ -65,6 +66,10 @@ class NidusModel {
 		}
 	}
 
+	func onNetworkProgress(_ progress: Double) {
+		self.backgroundNetworkProgress = progress
+	}
+
 	func onNetworkStateChange(_ state: BackgroundNetworkState) {
 		self.backgroundNetworkState = state
 	}
@@ -91,6 +96,7 @@ class NidusModel {
 	func triggerBackgroundFetch() {
 		self.backgroundNetworkManager = BackgroundNetworkManager(
 			onAPIResponse: onAPIResponse,
+			onProgress: onNetworkProgress,
 			onStateChange: onNetworkStateChange
 		)
 		Task {
