@@ -260,6 +260,7 @@ struct ModernMap: View {
 				).tint(.yellow)
 			}
 		}
+		.mapStyle(.hybrid)
 		.mapControls {
 			MapUserLocationButton()
 		}
