@@ -9,133 +9,14 @@ import OSLog
 import SQLite
 import UIKit
 
-class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
-	@Published var errorMessage: String?
-	private var manager: BackgroundNetworkManager!
-	var model: NidusModel?
-
-	func setManager(_ manager: BackgroundNetworkManager, _ model: NidusModel) {
-		self.model = model
-		self.manager = manager
-	}
-
-	private func requestById(_ id: UUID) -> ServiceRequest? {
-		return nil
-	}
-
-	private func sourceById(_ id: UUID) -> MosquitoSource? {
-		return nil
-	}
-
-	private func trapById(_ id: UUID) -> TrapData? {
-		return nil
-	}
-
-	private func saveResponse(_ response: APIResponse) {
-		Logger.background.info("Saving API response")
-		Logger.background.info("Sources \(response.sources.count)")
-		Logger.background.info("Requests \(response.requests.count)")
-		Logger.background.info("Traps \(response.traps.count)")
-		var i = 0
-		for r in response.requests {
-			model?.upsertServiceRequest(r)
-			i += 1
-			if i % 1000 == 0 {
-				Logger.background.info("Request \(i)")
-			}
-		}
-		i = 0
-		for s in response.sources {
-			model?.upsertSource(s)
-			i += 1
-			if i % 1000 == 0 {
-				Logger.background.info("Source \(i)")
-			}
-		}
-		model?.triggerUpdateComplete()
-		Logger.background.info("Done saving response")
-	}
-
-	func urlSession(
-		_ session: URLSession,
-		downloadTask: URLSessionDownloadTask,
-		didFinishDownloadingTo location: URL
-	) {
-		Logger.background.info("urlSession did finish downloading")
-		let msg: String = downloadTask.originalRequest?.url?.absoluteString ?? "no url"
-		Logger.background.info("\(String(describing: msg))")
-		if downloadTask.originalRequest?.url?.absoluteString
-			== "https://sync.nidus.cloud/login"
-		{
-			// Try the next request, assuming that we have proper cookies
-			Task {
-				await manager.fetchNotes()
-			}
-		}
-		else if downloadTask.originalRequest?.url?.absoluteString
-			== "https://sync.nidus.cloud/api/client/ios"
-		{
-			do {
-				let data = try Data(contentsOf: location)
-				let decoder = JSONDecoder()
-				decoder.dateDecodingStrategy = .iso8601withOptionalFractionalSeconds
-				decoder.keyDecodingStrategy = .convertFromSnakeCase
-				let apiResponse = try decoder.decode(
-					APIResponse.self,
-					from: data
-				)
-
-				saveResponse(apiResponse)
-
-			}
-			catch {
-				Logger.background.error(
-					"Failed to process download: \(error)"
-				)
-			}
-
-		}
-		else {
-			Logger.background.info("not sure what to do next")
-		}
-	}
-
-	func urlSession(
-		_ session: URLSession,
-		task: URLSessionTask,
-		didCompleteWithError error: Error?
-	) {
-		if let error = error {
-			self.errorMessage = "Download failed: \(error.localizedDescription)"
-		}
-	}
-
-	func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
-		Logger.background.info("urlSessionDidFinishEvents")
-		DispatchQueue.main.async {
-			guard let appDelegate = UIApplication.shared.delegate as? NidusAppDelegate,
-				let backgroundCompletionHandler = appDelegate
-					.backgroundCompletionHandler
-			else {
-				return
-			}
-			backgroundCompletionHandler()
-		}
-	}
-}
-actor BackgroundNetworkManager: ObservableObject {
+class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadDelegate {
 	private var backgroundSession: URLSession!
+	private var continuations: [URLSessionTask: CheckedContinuation<URL, Error>] = [:]
 	private let cookieStorage: HTTPCookieStorage
-	private var downloadDelegate: DownloadDelegate
-	private var model: NidusModel
 
-	@Published var isLoggedIn = false
-
-	init(_ model: NidusModel) {
-		cookieStorage = HTTPCookieStorage.shared
-		self.model = model
-		downloadDelegate = DownloadDelegate()
-
+	override init() {
+		self.cookieStorage = HTTPCookieStorage.shared
+		super.init()
 		let config = URLSessionConfiguration.background(
 			withIdentifier: "technology.gleipnir.nidus-notes.download-session"
 		)
@@ -147,11 +28,50 @@ actor BackgroundNetworkManager: ObservableObject {
 
 		backgroundSession = URLSession(
 			configuration: config,
-			delegate: downloadDelegate,
+			delegate: self,
 			delegateQueue: nil
 		)
+	}
 
-		downloadDelegate.setManager(self, model)
+	func handle(_ request: URLRequest) async throws -> URL {
+		return try await withCheckedThrowingContinuation {
+			(continuation: CheckedContinuation<URL, Error>) in
+			let task = backgroundSession.downloadTask(with: request)
+			continuations[task] = continuation
+			task.resume()
+		}
+	}
+	func urlSession(
+		_ session: URLSession,
+		downloadTask: URLSessionDownloadTask,
+		didFinishDownloadingTo location: URL
+	) {
+		if let continuation = continuations.removeValue(forKey: downloadTask) {
+			continuation.resume(returning: location)
+		}
+	}
+
+	func urlSession(
+		_ session: URLSession,
+		task: URLSessionTask,
+		didCompleteWithError error: Error?
+	) {
+		if let error = error, let continuation = continuations.removeValue(forKey: task) {
+			continuation.resume(throwing: error)
+		}
+	}
+}
+
+actor BackgroundNetworkManager: ObservableObject {
+	private var continuations: [URLSessionTask: CheckedContinuation<(), Error>] = [:]
+	private var downloadWrapper: BackgroundDownloadWrapper!
+	private var model: NidusModel
+
+	@Published var isLoggedIn = false
+
+	init(_ model: NidusModel) {
+		self.model = model
+		self.downloadWrapper = BackgroundDownloadWrapper()
 	}
 
 	private var currentSettings: Settings {
@@ -163,32 +83,27 @@ actor BackgroundNetworkManager: ObservableObject {
 		return Settings(password: password, URL: url, username: username)
 	}
 
-	func fetchNotes() async {
-		Logger.background.info("Fetching notes")
-		guard let url = URL(string: "https://sync.nidus.cloud/api/client/ios") else {
-			return
-		}
-
-		let downloadTask = backgroundSession.downloadTask(with: url)
-		downloadTask.resume()
-
+	private func fetchNotes() async throws -> APIResponse {
+		let url = URL(string: "https://sync.nidus.cloud/api/client/ios")!
+		let request = URLRequest(url: url)
+		let tempURL = try await downloadWrapper.handle(request)
+		let notes: APIResponse = try parseJSON(tempURL)
+		return notes
 	}
 
 	nonisolated func startBackgroundDownload() async throws {
 		let settings = await currentSettings
-		if settings.username != "" && settings.password != "" {
-			await login(settings)
-		}
-		else {
+		if settings.username == "" || settings.password == "" {
 			Logger.background.info("Refusing to do download, no username and password")
-		}
-	}
-
-	func login(_ settings: Settings) async {
-		guard let loginURL = URL(string: settings.URL + "/login") else {
-			Logger.background.error("Invalid login URL")
 			return
 		}
+		try await login(settings)
+		let apiResponse = try await fetchNotes()
+		await saveResponse(apiResponse)
+	}
+
+	private func login(_ settings: Settings) async throws {
+		let loginURL: URL = URL(string: settings.URL + "/login")!
 
 		// Create form-encoded POST request
 		var request = URLRequest(url: loginURL)
@@ -202,8 +117,41 @@ actor BackgroundNetworkManager: ObservableObject {
 		let formData =
 			"username=\(settings.username.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")&password=\(settings.password.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")"
 		request.httpBody = formData.data(using: .utf8)
-		let downloadTask = backgroundSession.downloadTask(with: request)
-		downloadTask.resume()
+		_ = try await downloadWrapper.handle(request)
+	}
+
+	private func parseJSON<T: Decodable>(_ tempURL: URL) throws -> T {
+		let data = try Data(contentsOf: tempURL)
+		let decoder = JSONDecoder()
+		decoder.dateDecodingStrategy = .iso8601withOptionalFractionalSeconds
+		decoder.keyDecodingStrategy = .convertFromSnakeCase
+		let response = try decoder.decode(T.self, from: data)
+		return response
+	}
+
+	private func saveResponse(_ response: APIResponse) {
+		Logger.background.info("Saving API response")
+		Logger.background.info("Sources \(response.sources.count)")
+		Logger.background.info("Requests \(response.requests.count)")
+		Logger.background.info("Traps \(response.traps.count)")
+		var i = 0
+		for r in response.requests {
+			model.upsertServiceRequest(r)
+			i += 1
+			if i % 1000 == 0 {
+				Logger.background.info("Request \(i)")
+			}
+		}
+		i = 0
+		for s in response.sources {
+			model.upsertSource(s)
+			i += 1
+			if i % 1000 == 0 {
+				Logger.background.info("Source \(i)")
+			}
+		}
+		model.triggerUpdateComplete()
+		Logger.background.info("Done saving response")
 	}
 
 }
