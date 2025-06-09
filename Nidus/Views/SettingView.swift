@@ -42,6 +42,56 @@ struct SettingView: View {
 		}
 		onSettingsUpdated()
 	}
+
+	private func testLogin() {
+		let loginURL = url + "/login"
+		guard let url = URL(string: loginURL) else {
+			alertMessage = "The sync server URL isn't valid"
+			isShowingAlert = true
+			return
+		}
+		var request = URLRequest(url: url)
+		request.httpMethod = "POST"
+		request.setValue(
+			"application/x-www-form-urlencoded",
+			forHTTPHeaderField: "Content-Type"
+		)
+		let formData =
+			"username=\(username.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")&password=\(password.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")"
+		Logger.foreground.debug("Form data for login test: \(formData)")
+		request.httpBody = formData.data(using: .utf8)
+		URLSession.shared.dataTask(with: request) { data, response, error in
+			if let error = error {
+				DispatchQueue.main.async {
+					self.alertMessage = "Failed to login: \(error)"
+					self.isShowingAlert = true
+				}
+				return
+			}
+			guard let httpResponse = response as? HTTPURLResponse else {
+				self.alertMessage = "Failed to parse server response"
+				self.isShowingAlert = true
+				return
+			}
+			Logger.foreground.info("Login test status: \(httpResponse.statusCode)")
+			if (200..<400) ~= httpResponse.statusCode {
+				let success = [
+					"Login looks good.",
+					"Login works.",
+					"Server says you're good to go.",
+					"You're in!",
+					"Works.",
+				]
+				self.alertMessage = success.randomElement()!
+				self.isShowingAlert = true
+			}
+			else {
+				self.alertMessage = "Login failed"
+				self.isShowingAlert = true
+				return
+			}
+		}.resume()
+	}
 	var body: some View {
 		NavigationView {
 			Form {
@@ -74,10 +124,6 @@ struct SettingView: View {
 							.autocapitalization(.none)
 							.disableAutocorrection(true)
 					}
-				} header: {
-					Text("Account Information")
-				}
-				Section {
 					HStack {
 						Image(systemName: "lock.fill")
 							.foregroundColor(.blue)
@@ -108,9 +154,17 @@ struct SettingView: View {
 							.foregroundColor(.secondary)
 						}
 					}
-
+					HStack {
+						Button(action: { testLogin() }) {
+							Label(
+								"Test Login",
+								systemImage:
+									"person.fill.questionmark"
+							)
+						}
+					}
 				} header: {
-					Text("Security")
+					Text("Account Information")
 				}
 			}.navigationTitle("Settings")
 				.navigationBarTitleDisplayMode(.inline)
