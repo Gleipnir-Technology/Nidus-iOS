@@ -38,24 +38,25 @@ class NidusModel {
 
 	func onAPIResponse(_ response: APIResponse) {
 		do {
-			Logger.background.info("Saving API response")
-			Logger.background.info("Sources \(response.sources.count)")
-			Logger.background.info("Requests \(response.requests.count)")
-			Logger.background.info("Traps \(response.traps.count)")
+			self.backgroundNetworkProgress = 0.0
+			let totalRecords =
+				response.requests.count + response.sources.count
+				+ response.traps.count
 			var i = 0
 			for r in response.requests {
 				try database.upsertServiceRequest(r)
 				i += 1
-				if i % 1000 == 0 {
-					Logger.background.info("Request \(i)")
+				if i % 100 == 0 {
+					self.backgroundNetworkProgress =
+						Double(i) / Double(totalRecords)
 				}
 			}
-			i = 0
 			for s in response.sources {
 				try database.upsertSource(s)
 				i += 1
-				if i % 1000 == 0 {
-					Logger.background.info("Source \(i)")
+				if i % 100 == 0 {
+					self.backgroundNetworkProgress =
+						Double(i) / Double(totalRecords)
 				}
 			}
 			triggerUpdateComplete()
