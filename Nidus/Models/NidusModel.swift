@@ -48,11 +48,7 @@ class NidusModel {
 	var notesToShow: [AnyNote] {
 		var toShow: [AnyNote] = []
 		for (_, note) in notes {
-			if note.coordinate.latitude > currentRegion.minLatitude
-				&& note.coordinate.longitude > currentRegion.minLongitude
-				&& note.coordinate.latitude < currentRegion.maxLatitude
-				&& note.coordinate.longitude < currentRegion.maxLongitude
-			{
+			if shouldShow(note) {
 				toShow.append(note)
 			}
 		}
@@ -109,6 +105,27 @@ class NidusModel {
 		Logger.foreground.info(
 			"Set current location limits to \(String(describing: region))"
 		)
+	}
+
+	private func shouldShow(_ note: any Note) -> Bool {
+		for filter in filters {
+			switch filter.type {
+			case .type:
+				if note.categoryName != filter.stringValue {
+					return false
+				}
+			default:
+				continue
+			}
+		}
+		if note.coordinate.latitude < currentRegion.minLatitude
+			|| note.coordinate.longitude < currentRegion.minLongitude
+			|| note.coordinate.latitude > currentRegion.maxLatitude
+			|| note.coordinate.longitude > currentRegion.maxLongitude
+		{
+			return false
+		}
+		return true
 	}
 
 	func triggerUpdateComplete() {
