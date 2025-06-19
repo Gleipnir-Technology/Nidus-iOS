@@ -65,4 +65,28 @@ struct Filter: Identifiable, Equatable, Hashable {
 	var displayValue: String {
 		type.isBooleanFilter ? (_boolValue ? "Yes" : "No") : _stringValue
 	}
+
+	var stringValue: String {
+		if type.isBooleanFilter {
+			return String(_boolValue)
+		}
+		else {
+			return _stringValue
+		}
+	}
+
+	static func fromString(_ input: String) -> Filter? {
+		let components = input.split(separator: "=")
+		guard components.count == 2 else { return nil }
+		let filterTypeString = components[0]
+		guard let filterType = FilterType(rawValue: String(filterTypeString)) else {
+			return nil
+		}
+		let val = components[1]
+		return Filter(type: filterType, value: String(val))
+	}
+
+	func toString() -> String {
+		return "\(type.rawValue)=\(stringValue)"
+	}
 }
