@@ -66,10 +66,12 @@ struct FilterView: View {
 		let filters = Set(activeFilters)
 		onFilterChange(filters)
 	}
+
 	func onFilterRemove() {
 		let filters = Set(activeFilters)
 		onFilterChange(filters)
 	}
+
 	var body: some View {
 		NavigationView {
 			VStack(spacing: 0) {
@@ -113,6 +115,7 @@ struct FilterView: View {
 				if !activeFilters.isEmpty {
 					Button("Clear All") {
 						activeFilters.removeAll()
+						onFilterRemove()
 					}
 					.font(.subheadline)
 					.foregroundColor(.red)
@@ -251,18 +254,18 @@ struct FilterRowView: View {
 
 	private func iconForFilterType(_ type: FilterType) -> String {
 		switch type {
-		case .type:
-			return "ant.circle"
 		case .age:
 			return "calendar"
 		case .description:
 			return "text.alignleft"
-		case .name:
-			return "person"
 		case .hasComments:
 			return "bubble.left"
 		case .hasRatings:
 			return "star"
+		case .name:
+			return "person"
+		case .type:
+			return "ant.circle"
 		}
 	}
 }
@@ -274,7 +277,7 @@ struct AddFilterSheet: View {
 	@State private var selectedFilterType: FilterType = .age
 	@State private var stringValue: String = ""
 	@State private var boolValue: Bool = false
-	var onFilterAdd: (Filter) -> Void = { _ in }
+	var onFilterAdd: (Filter) -> Void
 
 	private var availableFilterTypes: [FilterType] {
 		FilterType.allCases.filter { filterType in
@@ -346,6 +349,25 @@ struct AddFilterSheet: View {
 					}
 					.disabled(!canAddFilter)
 				}
+			}
+			.onAppear {
+				// Set the selected filter type to the first available option
+				if let firstAvailable = availableFilterTypes.first {
+					selectedFilterType = firstAvailable
+					// Reset values when filter type changes
+					stringValue =
+						selectedFilterType.isSelectionFilter
+						? (selectedFilterType.selectionOptions.first ?? "")
+						: ""
+					boolValue = false
+				}
+			}
+			.onChange(of: selectedFilterType) { _, newValue in
+				// Reset values when filter type changes
+				stringValue =
+					newValue.isSelectionFilter
+					? (newValue.selectionOptions.first ?? "") : ""
+				boolValue = false
 			}
 		}
 	}
