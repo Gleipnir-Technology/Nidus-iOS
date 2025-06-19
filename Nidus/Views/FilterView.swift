@@ -1,0 +1,344 @@
+//
+//  FilterView.swift
+//  Nidus Notes
+//
+//  Created by Eli Ribble on 6/19/25.
+//
+
+import OSLog
+import SwiftUI
+
+// MARK: - Filter Models
+enum FilterType: String, CaseIterable {
+	case age = "Age"
+	case description = "Description"
+	case name = "Name"
+	case hasComments = "Has Comments"
+	case hasRatings = "Has Ratings"
+
+	var isBooleanFilter: Bool {
+		switch self {
+		case .hasComments, .hasRatings:
+			return true
+		case .age, .description, .name:
+			return false
+		}
+	}
+}
+
+struct Filter: Identifiable, Equatable {
+	let id = UUID()
+	let type: FilterType
+	var stringValue: String = ""
+	var boolValue: Bool = false
+
+	var displayValue: String {
+		type.isBooleanFilter ? (boolValue ? "Yes" : "No") : stringValue
+	}
+}
+
+// MARK: - Main Filter View
+struct FilterView: View {
+	@State private var activeFilters: [Filter] = []
+	@State private var showingAddFilter = false
+
+	var body: some View {
+		NavigationView {
+			VStack(spacing: 0) {
+				// Header
+				headerView
+
+				// Active Filters List
+				if activeFilters.isEmpty {
+					emptyStateView
+				}
+				else {
+					activeFiltersView
+				}
+
+				Spacer()
+
+				// Add Filter Button
+				addFilterButton
+			}
+			.navigationTitle("Filters")
+			.navigationBarTitleDisplayMode(.large)
+			.sheet(isPresented: $showingAddFilter) {
+				AddFilterSheet(activeFilters: $activeFilters)
+			}
+		}
+	}
+
+	// MARK: - Header View
+	private var headerView: some View {
+		VStack(alignment: .leading, spacing: 8) {
+			HStack {
+				Text("Active Filters")
+					.font(.headline)
+					.foregroundColor(.primary)
+
+				Spacer()
+
+				if !activeFilters.isEmpty {
+					Button("Clear All") {
+						activeFilters.removeAll()
+					}
+					.font(.subheadline)
+					.foregroundColor(.red)
+				}
+			}
+
+			Text(
+				"\(activeFilters.count) filter\(activeFilters.count == 1 ? "" : "s") applied"
+			)
+			.font(.caption)
+			.foregroundColor(.secondary)
+		}
+		.padding(.horizontal)
+		.padding(.top, 8)
+		.padding(.bottom, 16)
+		.background(Color(.systemBackground))
+	}
+
+	// MARK: - Empty State
+	private var emptyStateView: some View {
+		VStack(spacing: 16) {
+			Image(systemName: "line.3.horizontal.decrease.circle")
+				.font(.system(size: 60))
+				.foregroundColor(.secondary)
+
+			Text("No Filters Applied")
+				.font(.title2)
+				.fontWeight(.medium)
+				.foregroundColor(.primary)
+
+			Text("Add filters to refine your data")
+				.font(.body)
+				.foregroundColor(.secondary)
+				.multilineTextAlignment(.center)
+		}
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+	}
+
+	// MARK: - Active Filters List
+	private var activeFiltersView: some View {
+		ScrollView {
+			LazyVStack(spacing: 12) {
+				ForEach(activeFilters) { filter in
+					FilterRowView(filter: filter) {
+						removeFilter(filter)
+					}
+				}
+			}
+			.padding(.horizontal)
+		}
+	}
+
+	// MARK: - Add Filter Button
+	private var addFilterButton: some View {
+		Button(action: {
+			showingAddFilter = true
+		}) {
+			HStack {
+				Image(systemName: "plus.circle.fill")
+					.font(.title2)
+				Text("Add Filter")
+					.font(.headline)
+			}
+			.foregroundColor(.white)
+			.frame(maxWidth: .infinity)
+			.padding()
+			.background(Color.blue)
+			.cornerRadius(12)
+		}
+		.padding(.horizontal)
+		.padding(.bottom, 34)  // Safe area padding
+	}
+
+	// MARK: - Helper Methods
+	private func removeFilter(_ filter: Filter) {
+		withAnimation(.easeInOut(duration: 0.3)) {
+			activeFilters.removeAll { $0.id == filter.id }
+		}
+	}
+}
+
+// MARK: - Filter Row View
+struct FilterRowView: View {
+	let filter: Filter
+	let onRemove: () -> Void
+
+	var body: some View {
+		HStack(spacing: 12) {
+			// Filter Icon
+			Circle()
+				.fill(Color.blue.opacity(0.1))
+				.frame(width: 40, height: 40)
+				.overlay(
+					Image(systemName: iconForFilterType(filter.type))
+						.foregroundColor(.blue)
+						.font(.system(size: 18))
+				)
+
+			// Filter Details
+			VStack(alignment: .leading, spacing: 4) {
+				Text(filter.type.rawValue)
+					.font(.headline)
+					.foregroundColor(.primary)
+
+				HStack {
+					Text("Value:")
+						.font(.caption)
+						.foregroundColor(.secondary)
+
+					Text(filter.displayValue)
+						.font(.subheadline)
+						.fontWeight(.medium)
+						.foregroundColor(.primary)
+						.padding(.horizontal, 8)
+						.padding(.vertical, 2)
+						.background(Color(.systemGray6))
+						.cornerRadius(6)
+				}
+			}
+
+			Spacer()
+
+			// Remove Button
+			Button(action: onRemove) {
+				Image(systemName: "xmark.circle.fill")
+					.foregroundColor(.red)
+					.font(.title2)
+			}
+		}
+		.padding()
+		.background(Color(.systemBackground))
+		.cornerRadius(12)
+		.shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+	}
+
+	private func iconForFilterType(_ type: FilterType) -> String {
+		switch type {
+		case .age:
+			return "calendar"
+		case .description:
+			return "text.alignleft"
+		case .name:
+			return "person"
+		case .hasComments:
+			return "bubble.left"
+		case .hasRatings:
+			return "star"
+		}
+	}
+}
+
+// MARK: - Add Filter Sheet
+struct AddFilterSheet: View {
+	@Binding var activeFilters: [Filter]
+	@Environment(\.dismiss) private var dismiss
+	@State private var selectedFilterType: FilterType = .age
+	@State private var stringValue: String = ""
+	@State private var boolValue: Bool = false
+
+	private var availableFilterTypes: [FilterType] {
+		FilterType.allCases.filter { filterType in
+			!activeFilters.contains { $0.type == filterType }
+		}
+	}
+
+	var body: some View {
+		NavigationView {
+			Form {
+				Section("Filter Type") {
+					Picker("Select Filter", selection: $selectedFilterType) {
+						ForEach(availableFilterTypes, id: \.self) {
+							filterType in
+							Text(filterType.rawValue)
+								.tag(filterType)
+						}
+					}
+					.pickerStyle(.menu)
+				}
+
+				Section("Filter Value") {
+					if selectedFilterType.isBooleanFilter {
+						Toggle(isOn: $boolValue) {
+							Text(selectedFilterType.rawValue)
+						}
+					}
+					else {
+						TextField(
+							"Enter \(selectedFilterType.rawValue.lowercased())",
+							text: $stringValue
+						)
+						.textFieldStyle(.roundedBorder)
+					}
+				}
+
+				if availableFilterTypes.isEmpty {
+					Section {
+						Text("All available filters have been added")
+							.foregroundColor(.secondary)
+							.font(.body)
+					}
+				}
+			}
+			.navigationTitle("Add Filter")
+			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .navigationBarLeading) {
+					Button("Cancel") {
+						dismiss()
+					}
+				}
+
+				ToolbarItem(placement: .navigationBarTrailing) {
+					Button("Add") {
+						addFilter()
+					}
+					.disabled(!canAddFilter)
+				}
+			}
+		}
+	}
+
+	private var canAddFilter: Bool {
+		if availableFilterTypes.isEmpty {
+			return false
+		}
+
+		if selectedFilterType.isBooleanFilter {
+			return true
+		}
+		else {
+			return !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+		}
+	}
+
+	private func addFilter() {
+		var newFilter = Filter(type: selectedFilterType)
+
+		if selectedFilterType.isBooleanFilter {
+			newFilter.boolValue = boolValue
+		}
+		else {
+			newFilter.stringValue = stringValue.trimmingCharacters(
+				in: .whitespacesAndNewlines
+			)
+		}
+
+		withAnimation(.easeInOut(duration: 0.3)) {
+			activeFilters.append(newFilter)
+		}
+
+		dismiss()
+	}
+}
+
+// MARK: - Preview
+struct FilterView_Previews: PreviewProvider {
+	static var previews: some View {
+		FilterView()
+	}
+}

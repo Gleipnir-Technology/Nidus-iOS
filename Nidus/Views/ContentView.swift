@@ -27,6 +27,12 @@ struct ContentView: View {
 	}
 	var body: some View {
 		NavigationStack(path: $path) {
+			NavigationLink(
+				"Settings",
+				destination: SettingView(
+					onSettingsUpdated: model.triggerBackgroundFetch
+				)
+			)
 			VStack {
 				TabView(selection: $selection) {
 					Tab("Notes", systemImage: "clock", value: 0) {
@@ -49,11 +55,12 @@ struct ContentView: View {
 							userLocation: locationDataManager.location
 						)
 					}
-					Tab("Settings", systemImage: "gear", value: 3) {
-						SettingView(
-							onSettingsUpdated: model
-								.triggerBackgroundFetch
-						)
+					Tab(
+						"Filters",
+						systemImage: "line.3.horizontal.decrease",
+						value: 3
+					) {
+						FilterView()
 					}
 				}
 				.navigationDestination(for: UUID.self) { noteId in
@@ -97,7 +104,7 @@ struct ContentView: View {
 	}
 }
 
-#Preview("No notes") {
+#Preview("No notes, no settings") {
 	ContentView(
 		model: NidusModelPreview(),
 		onAppear: {},
