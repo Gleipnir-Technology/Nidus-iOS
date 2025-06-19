@@ -110,7 +110,7 @@ class NidusModel {
 	private func shouldShow(_ note: any Note) -> Bool {
 		for filter in filters {
 			switch filter.type {
-			case .type:
+			case .category:
 				if note.categoryName != filter.stringValue {
 					return false
 				}

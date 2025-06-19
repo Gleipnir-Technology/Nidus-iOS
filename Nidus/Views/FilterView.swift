@@ -212,6 +212,8 @@ struct FilterRowView: View {
 		switch type {
 		case .age:
 			return "calendar"
+		case .category:
+			return "ant.circle"
 		case .description:
 			return "text.alignleft"
 		case .hasComments:
@@ -220,8 +222,6 @@ struct FilterRowView: View {
 			return "star"
 		case .name:
 			return "person"
-		case .type:
-			return "ant.circle"
 		}
 	}
 }

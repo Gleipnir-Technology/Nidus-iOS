@@ -8,9 +8,9 @@ import SwiftUI
 
 enum FilterType: String, CaseIterable {
 	case age = "Age"
+	case category = "Category"
 	case description = "Description"
 	case name = "Name"
-	case type = "Type"
 	case hasComments = "Has Comments"
 	case hasRatings = "Has Ratings"
 
@@ -18,14 +18,14 @@ enum FilterType: String, CaseIterable {
 		switch self {
 		case .hasComments, .hasRatings:
 			return true
-		case .age, .description, .name, .type:
+		case .age, .category, .description, .name:
 			return false
 		}
 	}
 
 	var isSelectionFilter: Bool {
 		switch self {
-		case .type:
+		case .category:
 			return true
 		case .age, .description, .name, .hasComments, .hasRatings:
 			return false
@@ -34,7 +34,7 @@ enum FilterType: String, CaseIterable {
 
 	var selectionOptions: [String] {
 		switch self {
-		case .type:
+		case .category:
 			return NoteCategory.all.map(\.name)
 		default:
 			return []
@@ -54,7 +54,7 @@ struct Filter: Identifiable, Equatable, Hashable {
 		case .age, .description, .name:
 			_boolValue = false
 			_stringValue = value
-		case .type:
+		case .category:
 			_boolValue = false
 			_stringValue = value
 		case .hasComments, .hasRatings:
