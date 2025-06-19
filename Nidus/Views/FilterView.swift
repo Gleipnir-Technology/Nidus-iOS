@@ -45,7 +45,7 @@ enum FilterType: String, CaseIterable {
 	}
 }
 
-struct Filter: Identifiable, Equatable {
+struct Filter: Identifiable, Equatable, Hashable {
 	let id = UUID()
 	let type: FilterType
 	var stringValue: String = ""
@@ -60,7 +60,16 @@ struct Filter: Identifiable, Equatable {
 struct FilterView: View {
 	@State private var activeFilters: [Filter] = []
 	@State private var showingAddFilter = false
+	var onFilterChange: ((Set<Filter>) -> Void)
 
+	func onFilterAdd(_ filter: Filter) {
+		let filters = Set(activeFilters)
+		onFilterChange(filters)
+	}
+	func onFilterRemove() {
+		let filters = Set(activeFilters)
+		onFilterChange(filters)
+	}
 	var body: some View {
 		NavigationView {
 			VStack(spacing: 0) {
@@ -83,7 +92,10 @@ struct FilterView: View {
 			.navigationTitle("Filters")
 			.navigationBarTitleDisplayMode(.large)
 			.sheet(isPresented: $showingAddFilter) {
-				AddFilterSheet(activeFilters: $activeFilters)
+				AddFilterSheet(
+					activeFilters: $activeFilters,
+					onFilterAdd: onFilterAdd
+				)
 			}
 		}
 	}
@@ -178,6 +190,7 @@ struct FilterView: View {
 	private func removeFilter(_ filter: Filter) {
 		withAnimation(.easeInOut(duration: 0.3)) {
 			activeFilters.removeAll { $0.id == filter.id }
+			onFilterRemove()
 		}
 	}
 }
@@ -261,6 +274,7 @@ struct AddFilterSheet: View {
 	@State private var selectedFilterType: FilterType = .age
 	@State private var stringValue: String = ""
 	@State private var boolValue: Bool = false
+	var onFilterAdd: (Filter) -> Void = { _ in }
 
 	private var availableFilterTypes: [FilterType] {
 		FilterType.allCases.filter { filterType in
@@ -369,6 +383,7 @@ struct AddFilterSheet: View {
 
 		withAnimation(.easeInOut(duration: 0.3)) {
 			activeFilters.append(newFilter)
+			onFilterAdd(newFilter)
 		}
 
 		dismiss()
@@ -378,6 +393,6 @@ struct AddFilterSheet: View {
 // MARK: - Preview
 struct FilterView_Previews: PreviewProvider {
 	static var previews: some View {
-		FilterView()
+		FilterView(onFilterChange: ({ _ in }))
 	}
 }

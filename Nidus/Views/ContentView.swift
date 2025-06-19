@@ -19,6 +19,9 @@ struct ContentView: View {
 	var onAppear: () -> Void
 	var onMapPositionChange: (MKCoordinateRegion) -> Void
 
+	func onFilterChange(_ filters: Set<Filter>) {
+		Logger.foreground.info("filters changed")
+	}
 	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
 	}
@@ -60,7 +63,7 @@ struct ContentView: View {
 						systemImage: "line.3.horizontal.decrease",
 						value: 3
 					) {
-						FilterView()
+						FilterView(onFilterChange: onFilterChange)
 					}
 				}
 				.navigationDestination(for: UUID.self) { noteId in
