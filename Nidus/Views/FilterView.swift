@@ -341,19 +341,19 @@ struct AddFilterSheet: View {
 	}
 
 	private func addFilter() {
-		var newFilter = Filter(type: selectedFilterType)
-
+		var value: String
 		if selectedFilterType.isBooleanFilter {
-			newFilter.boolValue = boolValue
+			value = String(boolValue)
 		}
 		else if selectedFilterType.isSelectionFilter {
-			newFilter.stringValue = stringValue
+			value = stringValue
 		}
 		else {
-			newFilter.stringValue = stringValue.trimmingCharacters(
+			value = stringValue.trimmingCharacters(
 				in: .whitespacesAndNewlines
 			)
 		}
+		let newFilter = Filter(type: selectedFilterType, value: value)
 
 		withAnimation(.easeInOut(duration: 0.3)) {
 			activeFilters.append(newFilter)
