@@ -26,7 +26,7 @@ class NidusModel {
 		var toShow: [AnyNote] = []
 		for (_, note) in notes {
 			if note.coordinate.latitude > currentRegion.minLatitude
-				&& note.coordinate.longitude > currentRegion.minLatitude
+				&& note.coordinate.longitude > currentRegion.minLongitude
 				&& note.coordinate.latitude < currentRegion.maxLatitude
 				&& note.coordinate.longitude < currentRegion.maxLongitude
 			{
