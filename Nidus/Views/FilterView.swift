@@ -13,6 +13,7 @@ enum FilterType: String, CaseIterable {
 	case age = "Age"
 	case description = "Description"
 	case name = "Name"
+	case type = "Type"
 	case hasComments = "Has Comments"
 	case hasRatings = "Has Ratings"
 
@@ -20,8 +21,26 @@ enum FilterType: String, CaseIterable {
 		switch self {
 		case .hasComments, .hasRatings:
 			return true
-		case .age, .description, .name:
+		case .age, .description, .name, .type:
 			return false
+		}
+	}
+
+	var isSelectionFilter: Bool {
+		switch self {
+		case .type:
+			return true
+		case .age, .description, .name, .hasComments, .hasRatings:
+			return false
+		}
+	}
+
+	var selectionOptions: [String] {
+		switch self {
+		case .type:
+			return ["Mosquito Source", "Mosquito Trap", "Service Request"]
+		default:
+			return []
 		}
 	}
 }
@@ -219,6 +238,8 @@ struct FilterRowView: View {
 
 	private func iconForFilterType(_ type: FilterType) -> String {
 		switch type {
+		case .type:
+			return "ant.circle"
 		case .age:
 			return "calendar"
 		case .description:
@@ -267,6 +288,18 @@ struct AddFilterSheet: View {
 							Text(selectedFilterType.rawValue)
 						}
 					}
+					else if selectedFilterType.isSelectionFilter {
+						Picker("Select Value", selection: $stringValue) {
+							ForEach(
+								selectedFilterType.selectionOptions,
+								id: \.self
+							) { option in
+								Text(option)
+									.tag(option)
+							}
+						}
+						.pickerStyle(.menu)
+					}
 					else {
 						TextField(
 							"Enter \(selectedFilterType.rawValue.lowercased())",
@@ -311,6 +344,9 @@ struct AddFilterSheet: View {
 		if selectedFilterType.isBooleanFilter {
 			return true
 		}
+		else if selectedFilterType.isSelectionFilter {
+			return !stringValue.isEmpty
+		}
 		else {
 			return !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 		}
@@ -321,6 +357,9 @@ struct AddFilterSheet: View {
 
 		if selectedFilterType.isBooleanFilter {
 			newFilter.boolValue = boolValue
+		}
+		else if selectedFilterType.isSelectionFilter {
+			newFilter.stringValue = stringValue
 		}
 		else {
 			newFilter.stringValue = stringValue.trimmingCharacters(
