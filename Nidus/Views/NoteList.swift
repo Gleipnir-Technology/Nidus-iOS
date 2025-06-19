@@ -14,7 +14,7 @@ struct NoteListView: View {
 
 	var body: some View {
 		if notes.count == 0 {
-			Text("No notes yet. Try going to settings to set up sync.")
+			Text("No notes")
 		}
 		else {
 			NoteList(currentLocation: currentLocation, notes: notes)
