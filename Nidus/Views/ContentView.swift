@@ -15,12 +15,12 @@ struct ContentView: View {
 	@State var currentValue: Float = 0.0
 	@State private var path = NavigationPath()
 	@State private var selection: Int = 0
-	var model: NidusModel
+	@Bindable var model: NidusModel
 	var onAppear: () -> Void
 	var onMapPositionChange: (MKCoordinateRegion) -> Void
 
 	func onFilterChange(_ filters: Set<Filter>) {
-		Logger.foreground.info("filters changed")
+		model.setFilters(filters)
 	}
 	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
@@ -63,7 +63,10 @@ struct ContentView: View {
 						systemImage: "line.3.horizontal.decrease",
 						value: 3
 					) {
-						FilterView(onFilterChange: onFilterChange)
+						FilterView(
+							filters: $model.filters,
+							onFilterChange: onFilterChange
+						)
 					}
 				}
 				.navigationDestination(for: UUID.self) { noteId in

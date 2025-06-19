@@ -10,17 +10,17 @@ import SwiftUI
 
 // MARK: - Main Filter View
 struct FilterView: View {
-	@State private var activeFilters: [Filter] = []
+	@Binding var filters: Set<Filter>
 	@State private var showingAddFilter = false
 	var onFilterChange: ((Set<Filter>) -> Void)
 
 	func onFilterAdd(_ filter: Filter) {
-		let filters = Set(activeFilters)
+		let filters = Set(filters)
 		onFilterChange(filters)
 	}
 
 	func onFilterRemove() {
-		let filters = Set(activeFilters)
+		let filters = Set(filters)
 		onFilterChange(filters)
 	}
 
@@ -31,7 +31,7 @@ struct FilterView: View {
 				headerView
 
 				// Active Filters List
-				if activeFilters.isEmpty {
+				if filters.isEmpty {
 					emptyStateView
 				}
 				else {
@@ -47,13 +47,17 @@ struct FilterView: View {
 			.navigationBarTitleDisplayMode(.large)
 			.sheet(isPresented: $showingAddFilter) {
 				AddFilterSheet(
-					activeFilters: $activeFilters,
+					filters: $filters,
 					onFilterAdd: onFilterAdd
 				)
 			}
 		}
 	}
 
+	private func filtersByName() -> [Filter] {
+		let sortedArray = filters.sorted { $0.type.rawValue < $1.type.rawValue }
+		return sortedArray
+	}
 	// MARK: - Header View
 	private var headerView: some View {
 		VStack(alignment: .leading, spacing: 8) {
@@ -64,9 +68,9 @@ struct FilterView: View {
 
 				Spacer()
 
-				if !activeFilters.isEmpty {
+				if !filters.isEmpty {
 					Button("Clear All") {
-						activeFilters.removeAll()
+						filters.removeAll()
 						onFilterRemove()
 					}
 					.font(.subheadline)
@@ -75,7 +79,7 @@ struct FilterView: View {
 			}
 
 			Text(
-				"\(activeFilters.count) filter\(activeFilters.count == 1 ? "" : "s") applied"
+				"\(filters.count) filter\(filters.count == 1 ? "" : "s") applied"
 			)
 			.font(.caption)
 			.foregroundColor(.secondary)
@@ -110,7 +114,7 @@ struct FilterView: View {
 	private var activeFiltersView: some View {
 		ScrollView {
 			LazyVStack(spacing: 12) {
-				ForEach(activeFilters) { filter in
+				ForEach(filtersByName()) { filter in
 					FilterRowView(filter: filter) {
 						removeFilter(filter)
 					}
@@ -144,7 +148,7 @@ struct FilterView: View {
 	// MARK: - Helper Methods
 	private func removeFilter(_ filter: Filter) {
 		withAnimation(.easeInOut(duration: 0.3)) {
-			activeFilters.removeAll { $0.id == filter.id }
+			filters.remove(at: filters.firstIndex(of: filter)!)
 			onFilterRemove()
 		}
 	}
@@ -224,7 +228,7 @@ struct FilterRowView: View {
 
 // MARK: - Add Filter Sheet
 struct AddFilterSheet: View {
-	@Binding var activeFilters: [Filter]
+	@Binding var filters: Set<Filter>
 	@Environment(\.dismiss) private var dismiss
 	@State private var selectedFilterType: FilterType = .age
 	@State private var stringValue: String = ""
@@ -233,7 +237,7 @@ struct AddFilterSheet: View {
 
 	private var availableFilterTypes: [FilterType] {
 		FilterType.allCases.filter { filterType in
-			!activeFilters.contains { $0.type == filterType }
+			!filters.contains { $0.type == filterType }
 		}
 	}
 
@@ -356,7 +360,7 @@ struct AddFilterSheet: View {
 		let newFilter = Filter(type: selectedFilterType, value: value)
 
 		withAnimation(.easeInOut(duration: 0.3)) {
-			activeFilters.append(newFilter)
+			filters.insert(newFilter)
 			onFilterAdd(newFilter)
 		}
 
@@ -366,7 +370,8 @@ struct AddFilterSheet: View {
 
 // MARK: - Preview
 struct FilterView_Previews: PreviewProvider {
+	@State static var filters: Set<Filter> = []
 	static var previews: some View {
-		FilterView(onFilterChange: ({ _ in }))
+		FilterView(filters: $filters, onFilterChange: ({ _ in }))
 	}
 }

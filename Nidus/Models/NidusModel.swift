@@ -6,6 +6,7 @@
 //
 import MapKit
 import OSLog
+import SwiftUI
 
 @Observable
 class NidusModel {
@@ -15,10 +16,13 @@ class NidusModel {
 	var currentRegion: MKCoordinateRegion = MKCoordinateRegion.visalia
 	var cluster: NotesCluster = NotesCluster()
 	var database: Database = Database()
+	var filters: Set<Filter>
 	var errorMessage: String?
 	var notes: [UUID: AnyNote] = [:]
 
 	init() {
+		self.filters = []
+		loadFilters()
 		triggerUpdateComplete()
 	}
 
@@ -31,6 +35,16 @@ class NidusModel {
 		return Settings(password: password, URL: url, username: username)
 	}
 
+	private func loadFilters() {
+		let fs = UserDefaults.standard.stringArray(forKey: "filters") ?? []
+		for f in fs {
+			guard let filter: Filter = Filter.fromString(f) else {
+				Logger.background.error("Failed to parse filter string: \(f)")
+				continue
+			}
+			self.filters.insert(filter)
+		}
+	}
 	var notesToShow: [AnyNote] {
 		var toShow: [AnyNote] = []
 		for (_, note) in notes {
@@ -82,6 +96,12 @@ class NidusModel {
 
 	func onNetworkStateChange(_ state: BackgroundNetworkState) {
 		self.backgroundNetworkState = state
+	}
+
+	func setFilters(_ filters: Set<Filter>) {
+		let asStrings: [String] = filters.map { $0.toString() }
+		UserDefaults.standard.set(asStrings, forKey: "filters")
+		Logger.foreground.info("Saved filters \(asStrings)")
 	}
 
 	func setPosition(region: MKCoordinateRegion) {
