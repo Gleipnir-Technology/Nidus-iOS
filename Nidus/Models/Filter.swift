@@ -35,7 +35,7 @@ enum FilterType: String, CaseIterable {
 	var selectionOptions: [String] {
 		switch self {
 		case .type:
-			return ["Mosquito Source", "Mosquito Trap", "Service Request"]
+			return NoteCategory.all.map(\.name)
 		default:
 			return []
 		}
