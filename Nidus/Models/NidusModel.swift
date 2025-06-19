@@ -22,6 +22,15 @@ class NidusModel {
 		triggerUpdateComplete()
 	}
 
+	private var currentSettings: Settings {
+		let password = UserDefaults.standard.string(forKey: "password") ?? ""
+		let url =
+			UserDefaults.standard.string(forKey: "sync-url")
+			?? "https://sync.nidus.cloud"
+		let username = UserDefaults.standard.string(forKey: "username") ?? ""
+		return Settings(password: password, URL: url, username: username)
+	}
+
 	var notesToShow: [AnyNote] {
 		var toShow: [AnyNote] = []
 		for (_, note) in notes {
@@ -102,7 +111,9 @@ class NidusModel {
 		)
 		Task {
 			do {
-				try await backgroundNetworkManager!.startBackgroundDownload()
+				try await backgroundNetworkManager!.startBackgroundDownload(
+					currentSettings
+				)
 			}
 			catch {
 				Logger.background.error(

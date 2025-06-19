@@ -154,15 +154,6 @@ actor BackgroundNetworkManager {
 		self.onStateChange = onStateChange
 	}
 
-	private var currentSettings: Settings {
-		let password = UserDefaults.standard.string(forKey: "password") ?? ""
-		let url =
-			UserDefaults.standard.string(forKey: "sync-url")
-			?? "https://sync.nidus.cloud"
-		let username = UserDefaults.standard.string(forKey: "username") ?? ""
-		return Settings(password: password, URL: url, username: username)
-	}
-
 	private func fetchNotes() async throws -> APIResponse {
 		updateState(.downloading)
 		let url = URL(string: "https://sync.nidus.cloud/api/client/ios")!
@@ -174,9 +165,8 @@ actor BackgroundNetworkManager {
 		return notes
 	}
 
-	nonisolated func startBackgroundDownload() async throws {
+	nonisolated func startBackgroundDownload(_ settings: Settings) async throws {
 		await updateState(.idle)
-		let settings = await currentSettings
 		if settings.username == "" || settings.password == "" {
 			Logger.background.info("Refusing to do download, no username and password")
 			await updateState(.notConfigured)
