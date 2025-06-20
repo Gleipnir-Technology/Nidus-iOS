@@ -36,6 +36,7 @@ struct TreatmentDetail: View {
 		treatment: Treatment(
 			comments: "No comment",
 			created: Date.now.addingTimeInterval(-45000),
+			fieldTechnician: "Captain Jane",
 			habitat: "somewhere here",
 			id: UUID(uuidString: "0aaf268c-5497-4bdf-86ce-044c53fa4db7")!,
 			product: "cyanide",

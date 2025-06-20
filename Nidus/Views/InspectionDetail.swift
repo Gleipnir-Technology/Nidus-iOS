@@ -31,6 +31,7 @@ struct InspectionDetail: View {
 			comments: "it was gross",
 			condition: "bad",
 			created: Date.now.addingTimeInterval(-5000),
+			fieldTechnician: "Some Guy",
 			id: UUID()
 		)
 	)

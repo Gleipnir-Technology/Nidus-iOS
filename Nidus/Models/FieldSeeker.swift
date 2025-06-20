@@ -11,46 +11,82 @@ import SwiftUI
 
 final class Inspection: Codable, Equatable, Hashable, Identifiable {
 	enum CodingKeys: CodingKey {
+		case actionTaken
 		case comments
 		case condition
 		case created
+		case fieldTechnician
 		case id
+		case locationName
+		case siteCondition
 	}
+	var actionTaken: String?
 	var comments: String?
 	var condition: String?
 	var created: Date
+	var fieldTechnician: String
 	var id: UUID
+	var locationName: String?
+	var siteCondition: String?
 
-	init(comments: String? = nil, condition: String? = nil, created: Date, id: UUID) {
+	init(
+		actionTaken: String? = nil,
+		comments: String? = nil,
+		condition: String? = nil,
+		created: Date,
+		fieldTechnician: String = "",
+		id: UUID,
+		locationName: String? = nil,
+		siteCondition: String? = nil
+	) {
+		self.actionTaken = actionTaken
 		self.comments = comments
 		self.condition = condition
 		self.created = created
+		self.fieldTechnician = fieldTechnician
 		self.id = id
+		self.locationName = locationName
+		self.siteCondition = siteCondition
 	}
 
 	required init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
+		actionTaken = try container.decodeIfPresent(String.self, forKey: .actionTaken)
 		comments = try container.decodeIfPresent(String.self, forKey: .comments)
 		condition = try container.decodeIfPresent(String.self, forKey: .condition)
 		created = try container.decode(Date.self, forKey: .created)
+		fieldTechnician = try container.decode(String.self, forKey: .fieldTechnician)
 		id = try container.decode(UUID.self, forKey: .id)
+		locationName = try container.decode(String.self, forKey: .locationName)
+		siteCondition = try container.decode(String.self, forKey: .siteCondition)
 	}
 
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(actionTaken, forKey: .actionTaken)
 		try container.encode(comments, forKey: .comments)
 		try container.encode(condition, forKey: .condition)
 		try container.encode(created, forKey: .created)
+		try container.encode(fieldTechnician, forKey: .fieldTechnician)
 		try container.encode(id, forKey: .id)
+		try container.encode(locationName, forKey: .locationName)
+		try container.encode(siteCondition, forKey: .siteCondition)
 	}
 	static func == (lhs: Inspection, rhs: Inspection) -> Bool {
-		return lhs.comments == rhs.comments && lhs.created == rhs.created
-			&& lhs.condition == rhs.condition
+		return lhs.actionTaken == rhs.actionTaken && lhs.comments == rhs.comments
+			&& lhs.condition == rhs.condition && lhs.created == rhs.created
+			&& lhs.fieldTechnician == rhs.fieldTechnician
+			&& lhs.locationName == rhs.locationName
+			&& lhs.siteCondition == rhs.siteCondition
 	}
 	func hash(into hasher: inout Hasher) {
+		hasher.combine(actionTaken)
 		hasher.combine(comments)
 		hasher.combine(condition)
 		hasher.combine(created)
+		hasher.combine(fieldTechnician)
+		hasher.combine(locationName)
+		hasher.combine(siteCondition)
 	}
 }
 
@@ -93,30 +129,38 @@ final class Location: Codable, Equatable, Hashable, Identifiable {
 final class MosquitoSource: Codable, Identifiable, Note {
 	enum CodingKeys: CodingKey {
 		case access
+		case active
 		case comments
 		case created
 		case description
-		case id
-		case location
 		case habitat
+		case id
 		case inspections
+		case lastInspectionDate
+		case location
 		case name
+		case nextActionDateScheduled
 		case treatments
 		case useType
 		case waterOrigin
+		case zone
 	}
 	var access: String
+	var active: Bool?
 	var comments: String
 	var created: Date
 	var description: String
-	var id: UUID
-	var location: Location
 	var habitat: String
+	var id: UUID
 	var inspections: [Inspection]
+	var lastInspectionDate: Date
+	var location: Location
 	var name: String
+	var nextActionDateScheduled: Date
 	var treatments: [Treatment]
 	var useType: String
 	var waterOrigin: String
+	var zone: String
 
 	// Note protocol
 	var category: NoteCategory { NoteCategory.byNameOrDefault(categoryName) }
@@ -137,90 +181,127 @@ final class MosquitoSource: Codable, Identifiable, Note {
 
 	init(
 		access: String,
+		active: Bool?,
 		comments: String,
 		created: Date,
 		description: String,
-		id: UUID,
-		location: Location,
 		habitat: String,
+		id: UUID,
 		inspections: [Inspection],
+		lastInspectionDate: Date,
+		location: Location,
 		name: String,
+		nextActionDateScheduled: Date,
 		treatments: [Treatment],
 		useType: String,
-		waterOrigin: String
+		waterOrigin: String,
+		zone: String
 	) {
 		self.access = access
+		self.active = active
 		self.comments = comments
 		self.created = created
 		self.description = description
-		self.id = id
-		self.location = location
 		self.habitat = habitat
+		self.id = id
 		self.inspections = inspections
+		self.lastInspectionDate = lastInspectionDate
+		self.location = location
 		self.name = name
+		self.nextActionDateScheduled = nextActionDateScheduled
 		self.treatments = treatments
 		self.useType = useType
 		self.waterOrigin = waterOrigin
+		self.zone = zone
 	}
 
 	required init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		access = try container.decode(String.self, forKey: .access)
+		active = try container.decode(Bool.self, forKey: .active)
 		comments = try container.decode(String.self, forKey: .comments)
 		created = try container.decode(Date.self, forKey: .created)
 		description = try container.decode(String.self, forKey: .description)
-		id = try container.decode(UUID.self, forKey: .id)
-		location = try container.decode(Location.self, forKey: .location)
 		habitat = try container.decode(String.self, forKey: .habitat)
+		id = try container.decode(UUID.self, forKey: .id)
 		inspections = try container.decode([Inspection].self, forKey: .inspections)
+		lastInspectionDate = try container.decode(Date.self, forKey: .lastInspectionDate)
+		location = try container.decode(Location.self, forKey: .location)
 		name = try container.decode(String.self, forKey: .name)
+		nextActionDateScheduled = try container.decode(
+			Date.self,
+			forKey: .nextActionDateScheduled
+		)
 		treatments = try container.decode([Treatment].self, forKey: .treatments)
 		useType = try container.decode(String.self, forKey: .useType)
 		waterOrigin = try container.decode(String.self, forKey: .waterOrigin)
+		zone = try container.decode(String.self, forKey: .zone)
 	}
 
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(access, forKey: .access)
+		try container.encode(active, forKey: .active)
 		try container.encode(comments, forKey: .comments)
 		try container.encode(created, forKey: .created)
 		try container.encode(description, forKey: .description)
+		try container.encode(habitat, forKey: .habitat)
 		try container.encode(id, forKey: .id)
-		try container.encode(location, forKey: .location)
 		try container.encode(inspections, forKey: .inspections)
+		try container.encode(lastInspectionDate, forKey: .lastInspectionDate)
+		try container.encode(location, forKey: .location)
 		try container.encode(name, forKey: .name)
+		try container.encode(nextActionDateScheduled, forKey: .nextActionDateScheduled)
 		try container.encode(treatments, forKey: .treatments)
 		try container.encode(useType, forKey: .useType)
 		try container.encode(waterOrigin, forKey: .waterOrigin)
+		try container.encode(zone, forKey: .zone)
 	}
 	static func == (lhs: MosquitoSource, rhs: MosquitoSource) -> Bool {
-		return lhs.access == rhs.access && lhs.comments == rhs.comments
-			&& lhs.created == rhs.created && lhs.description == rhs.description
-			&& lhs.location == rhs.location && lhs.habitat == rhs.habitat
-			&& lhs.inspections == rhs.inspections && lhs.name == rhs.name
-			&& lhs.treatments == rhs.treatments && lhs.useType == rhs.useType
+		return
+			(lhs.access == rhs.access
+			&& lhs.active == rhs.active
+			&& lhs.comments == rhs.comments
+			&& lhs.created == rhs.created
+			&& lhs.description == rhs.description
+			&& lhs.habitat == rhs.habitat
+			&& lhs.inspections == rhs.inspections
+			&& lhs.lastInspectionDate == rhs.lastInspectionDate
+			&& lhs.location == rhs.location
+			&& lhs.name == rhs.name
+			&& lhs.nextActionDateScheduled == rhs.nextActionDateScheduled
+			&& lhs.treatments == rhs.treatments
+			&& lhs.useType == rhs.useType
 			&& lhs.waterOrigin == rhs.waterOrigin
+			&& lhs.zone == rhs.zone)
 	}
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(access)
+		hasher.combine(active)
 		hasher.combine(comments)
 		hasher.combine(created)
 		hasher.combine(description)
-		hasher.combine(location)
 		hasher.combine(habitat)
 		hasher.combine(inspections)
+		hasher.combine(lastInspectionDate)
+		hasher.combine(location)
 		hasher.combine(name)
+		hasher.combine(nextActionDateScheduled)
 		hasher.combine(treatments)
 		hasher.combine(useType)
 		hasher.combine(waterOrigin)
+		hasher.combine(zone)
 	}
 }
 
 final class ServiceRequest: Codable, Identifiable, Note {
 	enum CodingKeys: CodingKey {
 		case address
+		case assignedTechnician
 		case city
 		case created
+		case hasDog
+		case hasSpanishSpeaker
 		case id
 		case location
 		case priority
@@ -230,8 +311,11 @@ final class ServiceRequest: Codable, Identifiable, Note {
 		case zip
 	}
 	var address: String
+	var assignedTechnician: String
 	var city: String
 	var created: Date
+	var hasDog: Bool?
+	var hasSpanishSpeaker: Bool?
 	var id: UUID
 	var location: Location
 	var priority: String
@@ -256,8 +340,11 @@ final class ServiceRequest: Codable, Identifiable, Note {
 	// end Note protocol
 	init(
 		address: String,
+		assignedTechnician: String,
 		city: String,
 		created: Date,
+		hasDog: Bool?,
+		hasSpanishSpeaker: Bool?,
 		id: UUID,
 		location: Location,
 		priority: String,
@@ -267,8 +354,11 @@ final class ServiceRequest: Codable, Identifiable, Note {
 		zip: String
 	) {
 		self.address = address
+		self.assignedTechnician = assignedTechnician
 		self.city = city
 		self.created = created
+		self.hasDog = hasDog
+		self.hasSpanishSpeaker = hasSpanishSpeaker
 		self.id = id
 		self.location = location
 		self.priority = priority
@@ -281,8 +371,11 @@ final class ServiceRequest: Codable, Identifiable, Note {
 	required init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		address = try container.decode(String.self, forKey: .address)
+		assignedTechnician = try container.decode(String.self, forKey: .assignedTechnician)
 		city = try container.decode(String.self, forKey: .city)
 		created = try container.decode(Date.self, forKey: .created)
+		hasDog = try container.decode(Bool?.self, forKey: .hasDog)
+		hasSpanishSpeaker = try container.decode(Bool?.self, forKey: .hasSpanishSpeaker)
 		id = try container.decode(UUID.self, forKey: .id)
 		location = try container.decode(Location.self, forKey: .location)
 		priority = try container.decode(String.self, forKey: .priority)
@@ -295,8 +388,11 @@ final class ServiceRequest: Codable, Identifiable, Note {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(address, forKey: .address)
+		try container.encode(assignedTechnician, forKey: .assignedTechnician)
 		try container.encode(city, forKey: .city)
 		try container.encode(created, forKey: .created)
+		try container.encode(hasDog, forKey: .hasDog)
+		try container.encode(hasSpanishSpeaker, forKey: .hasSpanishSpeaker)
 		try container.encode(id, forKey: .id)
 		try container.encode(location, forKey: .location)
 		try container.encode(priority, forKey: .priority)
@@ -306,16 +402,27 @@ final class ServiceRequest: Codable, Identifiable, Note {
 		try container.encode(zip, forKey: .zip)
 	}
 	static func == (lhs: ServiceRequest, rhs: ServiceRequest) -> Bool {
-		return lhs.address == rhs.address && lhs.city == rhs.city
-			&& lhs.created == rhs.created && lhs.location == rhs.location
-			&& lhs.priority == rhs.priority && lhs.source == rhs.source
-			&& lhs.status == rhs.status && lhs.target == rhs.target
-			&& lhs.zip == rhs.zip
+		return
+			(lhs.address == rhs.address
+			&& lhs.assignedTechnician == rhs.assignedTechnician
+			&& lhs.city == rhs.city
+			&& lhs.created == rhs.created
+			&& lhs.hasDog == rhs.hasDog
+			&& lhs.hasSpanishSpeaker == rhs.hasSpanishSpeaker
+			&& lhs.location == rhs.location
+			&& lhs.priority == rhs.priority
+			&& lhs.source == rhs.source
+			&& lhs.status == rhs.status
+			&& lhs.target == rhs.target
+			&& lhs.zip == rhs.zip)
 	}
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(address)
+		hasher.combine(assignedTechnician)
 		hasher.combine(city)
 		hasher.combine(created)
+		hasher.combine(hasDog)
+		hasher.combine(hasSpanishSpeaker)
 		hasher.combine(location)
 		hasher.combine(priority)
 		hasher.combine(source)
@@ -356,7 +463,15 @@ final class TrapData: Codable, Identifiable, Note {
 	var timestamp: Date { created }
 	// end Note protocol
 
-	init(created: Date, description: String, id: UUID, location: Location, name: String) {
+	init(
+		created: Date,
+		description: String,
+		fieldTechnician: String,
+		id: UUID,
+		location: Location,
+		name: String,
+		product: String
+	) {
 		self.created = created
 		self.description = description
 		self.id = id
@@ -382,8 +497,11 @@ final class TrapData: Codable, Identifiable, Note {
 		try container.encode(name, forKey: .name)
 	}
 	static func == (lhs: TrapData, rhs: TrapData) -> Bool {
-		return lhs.created == rhs.created && lhs.description == rhs.description
-			&& lhs.location == rhs.location && lhs.name == rhs.name
+		return
+			(lhs.created == rhs.created
+			&& lhs.description == rhs.description
+			&& lhs.location == rhs.location
+			&& lhs.name == rhs.name)
 	}
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(created)
@@ -396,6 +514,7 @@ final class Treatment: Codable, Equatable, Hashable, Identifiable {
 	enum CodingKeys: CodingKey {
 		case comments
 		case created
+		case fieldTechnician
 		case habitat
 		case id
 		case product
@@ -408,6 +527,7 @@ final class Treatment: Codable, Equatable, Hashable, Identifiable {
 
 	var comments: String
 	var created: Date
+	var fieldTechnician: String
 	var habitat: String
 	var id: UUID
 	var product: String
@@ -420,6 +540,7 @@ final class Treatment: Codable, Equatable, Hashable, Identifiable {
 	init(
 		comments: String,
 		created: Date,
+		fieldTechnician: String,
 		habitat: String,
 		id: UUID,
 		product: String,
@@ -431,6 +552,7 @@ final class Treatment: Codable, Equatable, Hashable, Identifiable {
 	) {
 		self.comments = comments
 		self.created = created
+		self.fieldTechnician = fieldTechnician
 		self.habitat = habitat
 		self.id = id
 		self.product = product
@@ -445,6 +567,7 @@ final class Treatment: Codable, Equatable, Hashable, Identifiable {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		comments = try container.decode(String.self, forKey: .comments)
 		created = try container.decode(Date.self, forKey: .created)
+		fieldTechnician = try container.decode(String.self, forKey: .fieldTechnician)
 		habitat = try container.decode(String.self, forKey: .habitat)
 		id = try container.decode(UUID.self, forKey: .id)
 		product = try container.decode(String.self, forKey: .product)
@@ -459,6 +582,7 @@ final class Treatment: Codable, Equatable, Hashable, Identifiable {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(comments, forKey: .comments)
 		try container.encode(created, forKey: .created)
+		try container.encode(fieldTechnician, forKey: .fieldTechnician)
 		try container.encode(habitat, forKey: .habitat)
 		try container.encode(product, forKey: .product)
 		try container.encode(quantity, forKey: .quantity)
@@ -468,16 +592,22 @@ final class Treatment: Codable, Equatable, Hashable, Identifiable {
 		try container.encode(treatHectares, forKey: .treatHectares)
 	}
 	static func == (lhs: Treatment, rhs: Treatment) -> Bool {
-		return lhs.comments == rhs.comments && lhs.created == rhs.created
-			&& lhs.habitat == rhs.habitat && lhs.product == rhs.product
-			&& lhs.quantity == rhs.quantity && lhs.quantityUnit == rhs.quantityUnit
+		return
+			(lhs.comments == rhs.comments
+			&& lhs.created == rhs.created
+			&& lhs.fieldTechnician == rhs.fieldTechnician
+			&& lhs.habitat == rhs.habitat
+			&& lhs.product == rhs.product
+			&& lhs.quantity == rhs.quantity
+			&& lhs.quantityUnit == rhs.quantityUnit
 			&& lhs.siteCondition == rhs.siteCondition
 			&& lhs.treatAcres == rhs.treatAcres
-			&& lhs.treatHectares == rhs.treatHectares
+			&& lhs.treatHectares == rhs.treatHectares)
 	}
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(comments)
 		hasher.combine(created)
+		hasher.combine(fieldTechnician)
 		hasher.combine(habitat)
 		hasher.combine(product)
 		hasher.combine(quantity)

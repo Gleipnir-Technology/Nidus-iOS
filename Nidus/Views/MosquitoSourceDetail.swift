@@ -93,31 +93,36 @@ struct MosquitoSourceDetail_Previews: PreviewProvider {
 			onFilterAdded: { _ in },
 			source: MosquitoSource(
 				access: "somewhere",
+				active: true,
 				comments: "over there",
 				created: Date.now.addingTimeInterval(-15000),
 				description: "dank",
-				id: UUID(uuidString: "1846d421-f8ab-4e37-850a-b61bb8422453")!,
-				location: Location(latitude: 33.3, longitude: -111.1),
 				habitat: "everywhere",
+				id: UUID(uuidString: "1846d421-f8ab-4e37-850a-b61bb8422453")!,
 				inspections: [
 					Inspection(
 						comments: "it was gross",
 						condition: "bad",
 						created: Date.now.addingTimeInterval(-5000),
+						fieldTechnician: "John Doe",
 						id: UUID()
 					),
 					Inspection(
 						comments: "it was not too bad",
 						condition: "acceptable",
 						created: Date.now.addingTimeInterval(-3000),
+						fieldTechnician: "Adam Smith",
 						id: UUID()
 					),
 				],
+				lastInspectionDate: Date.now.addingTimeInterval(-2000),
+				location: Location(latitude: 33.3, longitude: -111.1),
 				name: "drain pipe",
-
+				nextActionDateScheduled: Date.now.addingTimeInterval(4000),
 				treatments: [],
 				useType: "not used",
-				waterOrigin: "humans"
+				waterOrigin: "humans",
+				zone: "1"
 			)
 		)
 	}

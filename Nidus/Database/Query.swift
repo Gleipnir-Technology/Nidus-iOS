@@ -14,6 +14,8 @@ func InspectionUpsert(_ connection: SQLite.Connection, _ sID: UUID, _ inspection
 		schema.inspection.condition
 			<- SQLite.Expression<String>(inspection.condition ?? ""),
 		schema.inspection.created <- SQLite.Expression<Date>(value: inspection.created),
+		schema.inspection.fieldTechnician
+			<- SQLite.Expression<String>(value: inspection.fieldTechnician),
 		schema.inspection.id <- SQLite.Expression<UUID>(value: inspection.id),
 		schema.inspection.sourceID <- SQLite.Expression<UUID>(value: sID),
 		onConflictOf: schema.inspection.id
@@ -32,7 +34,7 @@ func MosquitoSourceAsNotes(
 				comments: row[schema.inspection.comments],
 				condition: row[schema.inspection.condition],
 				created: row[schema.inspection.created],
-				//fieldTechnician: row[schema.inspection.fieldTechnician],
+				fieldTechnician: row[schema.inspection.fieldTechnician],
 				id: row[schema.inspection.id]
 			)
 		)
@@ -43,6 +45,7 @@ func MosquitoSourceAsNotes(
 			Treatment(
 				comments: row[schema.treatment.comments],
 				created: row[schema.treatment.created],
+				fieldTechnician: row[schema.treatment.fieldTechnician],
 				habitat: row[schema.treatment.habitat],
 				id: row[schema.treatment.id],
 				product: row[schema.treatment.product],
@@ -63,20 +66,28 @@ func MosquitoSourceAsNotes(
 			AnyNote(
 				MosquitoSource(
 					access: row[schema.mosquitoSource.access],
+					active: row[schema.mosquitoSource.active],
 					comments: row[schema.mosquitoSource.comments],
 					created: row[schema.mosquitoSource.created],
 					description: row[schema.mosquitoSource.description],
-					id: row[schema.mosquitoSource.id],
-					location: location,
 					habitat: row[schema.mosquitoSource.habitat],
+					id: row[schema.mosquitoSource.id],
 					inspections: inspections_by_id[
 						row[schema.mosquitoSource.id]
 					] ?? [],
+					lastInspectionDate: row[
+						schema.mosquitoSource.lastInspectionDate
+					],
+					location: location,
 					name: row[schema.mosquitoSource.name],
+					nextActionDateScheduled: row[
+						schema.mosquitoSource.nextActionDateScheduled
+					],
 					treatments: treatments_by_id[row[schema.mosquitoSource.id]]
 						?? [],
 					useType: row[schema.mosquitoSource.useType],
-					waterOrigin: row[schema.mosquitoSource.waterOrigin]
+					waterOrigin: row[schema.mosquitoSource.waterOrigin],
+					zone: row[schema.mosquitoSource.zone]
 				)
 			)
 		)
@@ -87,14 +98,20 @@ func MosquitoSourceAsNotes(
 func MosquitoSourceUpsert(connection: SQLite.Connection, _ source: MosquitoSource) throws {
 	let upsert = schema.mosquitoSource.table.upsert(
 		schema.mosquitoSource.access <- SQLite.Expression<String>(source.access),
+		schema.mosquitoSource.active <- SQLite.Expression<Bool?>(value: source.active),
 		schema.mosquitoSource.comments <- SQLite.Expression<String>(source.comments),
 		schema.mosquitoSource.created <- SQLite.Expression<Date>(value: source.created),
 		schema.mosquitoSource.description <- SQLite.Expression<String>(source.description),
-		schema.mosquitoSource.id <- SQLite.Expression<UUID>(value: source.id),
 		schema.mosquitoSource.habitat <- SQLite.Expression<String>(source.habitat),
+		schema.mosquitoSource.id <- SQLite.Expression<UUID>(value: source.id),
+		schema.mosquitoSource.lastInspectionDate
+			<- SQLite.Expression<Date>(value: source.lastInspectionDate),
 		schema.mosquitoSource.name <- SQLite.Expression<String>(source.name),
+		schema.mosquitoSource.nextActionDateScheduled
+			<- SQLite.Expression<Date>(value: source.nextActionDateScheduled),
 		schema.mosquitoSource.useType <- SQLite.Expression<String>(source.useType),
 		schema.mosquitoSource.waterOrigin <- SQLite.Expression<String>(source.waterOrigin),
+		schema.mosquitoSource.zone <- SQLite.Expression<String>(source.zone),
 		schema.mosquitoSource.latitude
 			<- SQLite.Expression<Double>(
 				value: source.location.latitude
@@ -120,8 +137,15 @@ func ServiceRequestAsNotes(_ connection: Connection) throws -> [AnyNote] {
 			AnyNote(
 				ServiceRequest(
 					address: row[schema.serviceRequest.address],
+					assignedTechnician: row[
+						schema.serviceRequest.assignedTechnician
+					],
 					city: row[schema.serviceRequest.city],
 					created: created,
+					hasDog: row[schema.serviceRequest.hasDog],
+					hasSpanishSpeaker: row[
+						schema.serviceRequest.hasSpanishSpeaker
+					],
 					id: row[schema.serviceRequest.id],
 					location: location,
 					priority: row[schema.serviceRequest.priority],
@@ -139,9 +163,15 @@ func ServiceRequestAsNotes(_ connection: Connection) throws -> [AnyNote] {
 func ServiceRequestUpsert(connection: SQLite.Connection, _ serviceRequest: ServiceRequest) throws {
 	let upsert = schema.serviceRequest.table.upsert(
 		schema.serviceRequest.address <- SQLite.Expression<String>(serviceRequest.address),
+		schema.serviceRequest.assignedTechnician
+			<- SQLite.Expression<String>(serviceRequest.assignedTechnician),
 		schema.serviceRequest.city <- SQLite.Expression<String>(serviceRequest.city),
 		schema.serviceRequest.created
 			<- SQLite.Expression<Date>(value: serviceRequest.created),
+		schema.serviceRequest.hasDog
+			<- SQLite.Expression<Bool?>(value: serviceRequest.hasDog),
+		schema.serviceRequest.hasSpanishSpeaker
+			<- SQLite.Expression<Bool?>(value: serviceRequest.hasSpanishSpeaker),
 		schema.serviceRequest.id <- SQLite.Expression<UUID>(value: serviceRequest.id),
 		schema.serviceRequest.priority
 			<- SQLite.Expression<String>(serviceRequest.priority),
@@ -166,8 +196,10 @@ func TreatmentUpsert(_ connection: SQLite.Connection, _ sID: UUID, _ treatment: 
 	let upsert = schema.treatment.table.upsert(
 		schema.treatment.comments <- SQLite.Expression<String>(treatment.comments),
 		schema.treatment.created <- SQLite.Expression<Date>(value: treatment.created),
-		schema.treatment.id <- SQLite.Expression<UUID>(value: treatment.id),
+		schema.treatment.fieldTechnician
+			<- SQLite.Expression<String>(value: treatment.fieldTechnician),
 		schema.treatment.habitat <- SQLite.Expression<String>(treatment.habitat),
+		schema.treatment.id <- SQLite.Expression<UUID>(value: treatment.id),
 		schema.treatment.product <- SQLite.Expression<String>(treatment.product),
 		schema.treatment.quantity <- SQLite.Expression<Double>(value: treatment.quantity),
 		schema.treatment.quantityUnit <- SQLite.Expression<String>(treatment.quantityUnit),

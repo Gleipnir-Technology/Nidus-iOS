@@ -51,8 +51,11 @@ struct NoteRow: View {
 		currentLocation: nil,
 		note: ServiceRequest(
 			address: "somewhere",
+			assignedTechnician: "John Doe",
 			city: "over there",
 			created: Date.now,
+			hasDog: false,
+			hasSpanishSpeaker: false,
 			id: UUID(uuidString: "1846d421-f8ab-4e37-850a-b61bb8422453")!,
 			location: Location(latitude: 30, longitude: -111),
 			priority: "low",

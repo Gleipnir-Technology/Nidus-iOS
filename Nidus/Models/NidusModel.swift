@@ -23,6 +23,12 @@ class NidusModel {
 	init() {
 		self.filters = []
 		self.database = Database()!
+		do {
+			try self.database.migrateIfNeeded()
+		}
+		catch {
+			fatalError("Failed to run database migrations: \(error)")
+		}
 		loadFilters()
 		triggerUpdateComplete()
 	}
