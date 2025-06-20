@@ -1,5 +1,5 @@
 {
-  "originHash" : "aeffd2177417c7b3cb5b7568eb42b7e0260801c21bb959738dc4eb112f9550d9",
+  "originHash" : "53f7b849c4d2dd9e0e6d76678dac920949a1ab7bd9e2c6229a8403438e7ac42b",
   "pins" : [
     {
       "identity" : "automerge-repo-swift",
@@ -80,6 +80,15 @@
       "state" : {
         "revision" : "a95fc6df17d108bd99210db5e8a9bac90fe984b8",
         "version" : "0.15.3"
+      }
+    },
+    {
+      "identity" : "sqlitemigrationmanager.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/garriguv/SQLiteMigrationManager.swift.git",
+      "state" : {
+        "revision" : "42281bf1111a4bba144c5ba138724514383ff3ab",
+        "version" : "0.8.3"
       }
     },
     {

@@ -46,6 +46,7 @@
 		538784432D8B474500B3552E /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538784422D8B474300B3552E /* SettingView.swift */; };
 		53E1F2EA2E04B7A900A6D888 /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E1F2E92E04B7A600A6D888 /* FilterView.swift */; };
 		53E1F2EE2E04CC0400A6D888 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E1F2ED2E04CC0200A6D888 /* Filter.swift */; };
+		53E1F2FF2E05E3FA00A6D888 /* SQLiteMigrationManager in Frameworks */ = {isa = PBXBuildFile; productRef = 53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */; };
 		53E308182D8B39ED00534AB0 /* NoteCategoryAdd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E308172D8B39E800534AB0 /* NoteCategoryAdd.swift */; };
 /* End PBXBuildFile section */
 
@@ -125,6 +126,7 @@
 				532F3AEB2DEB68C7006E0E40 /* SQLite in Frameworks */,
 				532F3AF72DECAE26006E0E40 /* ClusterMapSwiftUI in Frameworks */,
 				532F3AE82DEB6765006E0E40 /* AutomergeRepo in Frameworks */,
+				53E1F2FF2E05E3FA00A6D888 /* SQLiteMigrationManager in Frameworks */,
 				532F3AF52DECAE26006E0E40 /* ClusterMap in Frameworks */,
 				532F3AE52DEB66C5006E0E40 /* Automerge in Frameworks */,
 			);
@@ -283,6 +285,7 @@
 				532F3AEA2DEB68C7006E0E40 /* SQLite */,
 				532F3AF42DECAE26006E0E40 /* ClusterMap */,
 				532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */,
+				53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */,
 			);
 			productName = Nidus;
 			productReference = 53D57B4A2D79E2A20094740D /* Nidus Notes.app */;
@@ -365,6 +368,7 @@
 				532F3AE62DEB6765006E0E40 /* XCRemoteSwiftPackageReference "automerge-repo-swift" */,
 				532F3AE92DEB68C7006E0E40 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
 				532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */,
+				53E1F2FD2E05E3FA00A6D888 /* XCRemoteSwiftPackageReference "SQLiteMigrationManager.swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 53D57B4B2D79E2A20094740D /* Products */;
@@ -839,6 +843,14 @@
 				minimumVersion = 2.1.1;
 			};
 		};
+		53E1F2FD2E05E3FA00A6D888 /* XCRemoteSwiftPackageReference "SQLiteMigrationManager.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/garriguv/SQLiteMigrationManager.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.8.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -866,6 +878,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */;
 			productName = ClusterMapSwiftUI;
+		};
+		53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 53E1F2FD2E05E3FA00A6D888 /* XCRemoteSwiftPackageReference "SQLiteMigrationManager.swift" */;
+			productName = SQLiteMigrationManager;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

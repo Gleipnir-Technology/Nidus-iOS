@@ -15,13 +15,14 @@ class NidusModel {
 	var backgroundNetworkState: BackgroundNetworkState = .idle
 	var currentRegion: MKCoordinateRegion = MKCoordinateRegion.visalia
 	var cluster: NotesCluster = NotesCluster()
-	var database: Database = Database()
+	var database: Database
 	var filters: Set<Filter>
 	var errorMessage: String?
 	var notes: [UUID: AnyNote] = [:]
 
 	init() {
 		self.filters = []
+		self.database = Database()!
 		loadFilters()
 		triggerUpdateComplete()
 	}
