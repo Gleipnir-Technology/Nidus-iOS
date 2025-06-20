@@ -10,6 +10,7 @@ enum FilterType: String, CaseIterable {
 	case age = "Age"
 	case category = "Category"
 	case description = "Description"
+	case habitat = "Habitat"
 	case name = "Name"
 	case hasComments = "Has Comments"
 	case hasRatings = "Has Ratings"
@@ -18,7 +19,7 @@ enum FilterType: String, CaseIterable {
 		switch self {
 		case .hasComments, .hasRatings:
 			return true
-		case .age, .category, .description, .name:
+		case .age, .category, .description, .habitat, .name:
 			return false
 		}
 	}
@@ -27,7 +28,7 @@ enum FilterType: String, CaseIterable {
 		switch self {
 		case .category:
 			return true
-		case .age, .description, .name, .hasComments, .hasRatings:
+		case .age, .description, .habitat, .name, .hasComments, .hasRatings:
 			return false
 		}
 	}
@@ -51,7 +52,7 @@ struct Filter: Identifiable, Equatable, Hashable {
 	init(type: FilterType, value: String) {
 		self.type = type
 		switch type {
-		case .age, .description, .name:
+		case .age, .description, .habitat, .name:
 			_boolValue = false
 			_stringValue = value
 		case .category:

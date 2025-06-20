@@ -15,12 +15,10 @@ struct FilterView: View {
 	var onFilterChange: ((Set<Filter>) -> Void)
 
 	func onFilterAdd(_ filter: Filter) {
-		let filters = Set(filters)
 		onFilterChange(filters)
 	}
 
 	func onFilterRemove() {
-		let filters = Set(filters)
 		onFilterChange(filters)
 	}
 
@@ -216,6 +214,8 @@ struct FilterRowView: View {
 			return "ant.circle"
 		case .description:
 			return "text.alignleft"
+		case .habitat:
+			return "ant.circle"
 		case .hasComments:
 			return "bubble.left"
 		case .hasRatings:

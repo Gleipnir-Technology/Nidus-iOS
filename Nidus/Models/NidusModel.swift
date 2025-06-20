@@ -45,6 +45,24 @@ class NidusModel {
 			self.filters.insert(filter)
 		}
 	}
+	func maybeAddFilter(_ filter: Filter) {
+		var toRemove: Filter? = nil
+		for f in filters {
+			if f.type == filter.type {
+				toRemove = f
+			}
+		}
+		if toRemove != nil {
+			filters.remove(toRemove!)
+		}
+		// Some filters require others. Add both
+		if filter.type == .habitat {
+			maybeAddFilter(
+				Filter(type: .category, value: NoteCategory.mosquitoSource.name)
+			)
+		}
+		filters.insert(filter)
+	}
 	var notesToShow: [AnyNote] {
 		var toShow: [AnyNote] = []
 		for (_, note) in notes {
@@ -107,11 +125,18 @@ class NidusModel {
 		)
 	}
 
-	private func shouldShow(_ note: any Note) -> Bool {
+	private func shouldShow(_ note: AnyNote) -> Bool {
 		for filter in filters {
 			switch filter.type {
 			case .category:
 				if note.categoryName != filter.stringValue {
+					return false
+				}
+			case .habitat:
+				guard let asSource: MosquitoSource = note.asMosquitoSource() else {
+					return false
+				}
+				if asSource.habitat != filter.stringValue {
 					return false
 				}
 			default:

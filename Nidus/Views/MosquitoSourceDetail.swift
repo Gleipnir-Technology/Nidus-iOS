@@ -10,7 +10,14 @@ import SwiftData
 import SwiftUI
 
 struct MosquitoSourceDetail: View {
+	let onFilterAdded: (Filter) -> Void
+	@State private var showFilterToast = false
 	let source: MosquitoSource
+
+	private func addFilter(_ type: FilterType, _ value: String) {
+		showFilterToast = true
+		onFilterAdded(Filter(type: type, value: value))
+	}
 
 	func createdFormatted(_ created: Date) -> String {
 		let formatter = RelativeDateTimeFormatter()
@@ -65,42 +72,53 @@ struct MosquitoSourceDetail: View {
 			Text("Comments: \(source.comments)")
 			Text("Created: \(createdFormatted(source.created))")
 			Text("Description: \(source.description)")
-			Text("Habitat: \(source.habitat)")
+			HStack {
+				Button("Add Filter", systemImage: "line.3.horizontal.decrease") {
+					addFilter(.habitat, source.habitat)
+				}.labelStyle(.iconOnly)
+				Text("Habitat: \(source.habitat)")
+				Spacer()
+			}
+
 			Text("Name: \(source.name)")
 			Text("Use Type: \(source.useType)")
 			Text("Water Origin: \(source.waterOrigin)")
-		}
+		}.toast(message: "Filter saved", isShowing: $showFilterToast, duration: Toast.short)
 	}
 }
 
-#Preview {
-	MosquitoSourceDetail(
-		source: MosquitoSource(
-			access: "somewhere",
-			comments: "over there",
-			created: Date.now.addingTimeInterval(-15000),
-			description: "dank",
-			id: UUID(uuidString: "1846d421-f8ab-4e37-850a-b61bb8422453")!,
-			location: Location(latitude: 33.3, longitude: -111.1),
-			habitat: "everywhere",
-			inspections: [
-				Inspection(
-					comments: "it was gross",
-					condition: "bad",
-					created: Date.now.addingTimeInterval(-5000),
-					id: UUID()
-				),
-				Inspection(
-					comments: "it was not too bad",
-					condition: "acceptable",
-					created: Date.now.addingTimeInterval(-3000),
-					id: UUID()
-				),
-			],
-			name: "drain pipe",
-			treatments: [],
-			useType: "not used",
-			waterOrigin: "humans"
+struct MosquitoSourceDetail_Previews: PreviewProvider {
+	static var previews: some View {
+		MosquitoSourceDetail(
+			onFilterAdded: { _ in },
+			source: MosquitoSource(
+				access: "somewhere",
+				comments: "over there",
+				created: Date.now.addingTimeInterval(-15000),
+				description: "dank",
+				id: UUID(uuidString: "1846d421-f8ab-4e37-850a-b61bb8422453")!,
+				location: Location(latitude: 33.3, longitude: -111.1),
+				habitat: "everywhere",
+				inspections: [
+					Inspection(
+						comments: "it was gross",
+						condition: "bad",
+						created: Date.now.addingTimeInterval(-5000),
+						id: UUID()
+					),
+					Inspection(
+						comments: "it was not too bad",
+						condition: "acceptable",
+						created: Date.now.addingTimeInterval(-3000),
+						id: UUID()
+					),
+				],
+				name: "drain pipe",
+
+				treatments: [],
+				useType: "not used",
+				waterOrigin: "humans"
+			)
 		)
-	)
+	}
 }

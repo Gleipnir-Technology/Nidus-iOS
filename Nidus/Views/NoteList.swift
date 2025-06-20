@@ -11,13 +11,18 @@ import SwiftUI
 struct NoteListView: View {
 	var currentLocation: CLLocation
 	var notes: [AnyNote]
+	let onFilterAdded: (Filter) -> Void
 
 	var body: some View {
 		if notes.count == 0 {
 			Text("No notes")
 		}
 		else {
-			NoteList(currentLocation: currentLocation, notes: notes)
+			NoteList(
+				currentLocation: currentLocation,
+				notes: notes,
+				onFilterAdded: onFilterAdded
+			)
 		}
 	}
 }
@@ -25,6 +30,7 @@ struct NoteListView: View {
 struct NoteList: View {
 	var currentLocation: CLLocation
 	var notes: [AnyNote]
+	let onFilterAdded: (Filter) -> Void
 
 	var notesByDistance: [AnyNote] {
 		var byDistance: [AnyNote] = notes
@@ -49,7 +55,10 @@ struct NoteList: View {
 			NavigationLink {
 				switch note.category {
 				case .mosquitoSource:
-					MosquitoSourceDetail(source: note.asMosquitoSource()!)
+					MosquitoSourceDetail(
+						onFilterAdded: onFilterAdded,
+						source: note.asMosquitoSource()!
+					)
 				default:
 					NoteEditor(currentLocation: currentLocation, note: note)
 				}
