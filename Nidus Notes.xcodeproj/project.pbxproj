@@ -109,6 +109,14 @@
 		53E308172D8B39E800534AB0 /* NoteCategoryAdd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCategoryAdd.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		53E1F2EF2E05CF6B00A6D888 /* Database */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Database;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		53D57B472D79E2A20094740D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -159,6 +167,7 @@
 		537560AF2D820A5A00D8528B /* Nidus */ = {
 			isa = PBXGroup;
 			children = (
+				53E1F2EF2E05CF6B00A6D888 /* Database */,
 				537560A12D820A5A00D8528B /* Assets.xcassets */,
 				532F3ACD2DE61BF7006E0E40 /* Background */,
 				537560DB2D83306C00D8528B /* LocationDataManager.swift */,
@@ -263,6 +272,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				53E1F2EF2E05CF6B00A6D888 /* Database */,
 			);
 			name = "Nidus Notes";
 			packageProductDependencies = (
