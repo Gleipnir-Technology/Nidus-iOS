@@ -101,6 +101,9 @@ class NidusModel {
 			Logger.background.error("Failed to handle API response: \(error)")
 		}
 	}
+	func onError(_ error: Error) {
+		errorMessage = "\(error)"
+	}
 	func onFilterAdded(_ instance: FilterInstance) {
 		filterInstances[instance.Name()] = instance
 		onFilterChange()
@@ -157,20 +160,14 @@ class NidusModel {
 	func triggerBackgroundFetch() {
 		self.backgroundNetworkManager = BackgroundNetworkManager(
 			onAPIResponse: onAPIResponse,
+			onError: onError,
 			onProgress: onNetworkProgress,
 			onStateChange: onNetworkStateChange
 		)
 		Task {
-			do {
-				try await backgroundNetworkManager!.startBackgroundDownload(
-					currentSettings
-				)
-			}
-			catch {
-				Logger.background.error(
-					"Failed to trigger fetch \(error)"
-				)
-			}
+			await backgroundNetworkManager!.startBackgroundDownload(
+				currentSettings
+			)
 		}
 	}
 }

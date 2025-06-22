@@ -91,7 +91,7 @@ struct ContentView: View {
 						value: model.backgroundNetworkProgress
 					).frame(maxWidth: 300)
 				case .error:
-					Text("Error downloading data")
+					Text("Error downloading data: \(model.errorMessage ?? "")")
 				case .idle:
 					EmptyView()
 				case .loggingIn:
@@ -125,6 +125,19 @@ struct ContentView: View {
 		model: NidusModelPreview(
 			backgroundNetworkProgress: 0.5,
 			backgroundNetworkState: .downloading
+		),
+		onAppear: {},
+		onMapPositionChange: { (MKCoordinateRegion) -> Void in
+		}
+	)
+}
+
+#Preview("Error") {
+	ContentView(
+		model: NidusModelPreview(
+			backgroundNetworkProgress: 0.0,
+			backgroundNetworkState: .error,
+			errorMessage: "something bad"
 		),
 		onAppear: {},
 		onMapPositionChange: { (MKCoordinateRegion) -> Void in

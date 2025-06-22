@@ -10,10 +10,12 @@ import SwiftUI
 class NidusModelPreview: NidusModel {
 	init(
 		backgroundNetworkProgress: Double = 0.0,
-		backgroundNetworkState: BackgroundNetworkState = .idle
+		backgroundNetworkState: BackgroundNetworkState = .idle,
+		errorMessage: String? = nil
 	) {
 		super.init()
 		self.backgroundNetworkProgress = backgroundNetworkProgress
 		self.backgroundNetworkState = backgroundNetworkState
+		self.errorMessage = errorMessage
 	}
 }

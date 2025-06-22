@@ -138,6 +138,7 @@ actor BackgroundNetworkManager {
 	private var continuations: [URLSessionTask: CheckedContinuation<(), Error>] = [:]
 	private var downloadWrapper: BackgroundDownloadWrapper!
 	nonisolated let onAPIResponse: ((APIResponse) -> Void)
+	nonisolated let onError: ((any Error) -> Void)
 	nonisolated let onProgress: ((Double) -> Void)
 	nonisolated let onStateChange: ((BackgroundNetworkState) -> Void)
 
@@ -145,11 +146,13 @@ actor BackgroundNetworkManager {
 
 	init(
 		onAPIResponse: @escaping ((APIResponse) -> Void),
+		onError: @escaping ((any Error) -> Void),
 		onProgress: @escaping ((Double) -> Void),
 		onStateChange: @escaping ((BackgroundNetworkState) -> Void)
 	) {
 		self.downloadWrapper = BackgroundDownloadWrapper()
 		self.onAPIResponse = onAPIResponse
+		self.onError = onError
 		self.onProgress = onProgress
 		self.onStateChange = onStateChange
 	}
@@ -163,20 +166,6 @@ actor BackgroundNetworkManager {
 		}
 		let notes: APIResponse = try parseJSON(tempURL)
 		return notes
-	}
-
-	nonisolated func startBackgroundDownload(_ settings: Settings) async throws {
-		await updateState(.idle)
-		if settings.username == "" || settings.password == "" {
-			Logger.background.info("Refusing to do download, no username and password")
-			await updateState(.notConfigured)
-			return
-		}
-		try await login(settings)
-		let apiResponse = try await fetchNotes()
-		await updateState(.savingData)
-		onAPIResponse(apiResponse)
-		await updateState(.idle)
 	}
 
 	private func login(_ settings: Settings) async throws {
@@ -205,6 +194,32 @@ actor BackgroundNetworkManager {
 		decoder.keyDecodingStrategy = .convertFromSnakeCase
 		let response = try decoder.decode(T.self, from: data)
 		return response
+	}
+
+	private func setError(_ error: Error) async {
+		onError(error)
+		updateState(.error)
+	}
+
+	nonisolated func startBackgroundDownload(_ settings: Settings) async {
+		do {
+			await updateState(.idle)
+			if settings.username == "" || settings.password == "" {
+				Logger.background.info(
+					"Refusing to do download, no username and password"
+				)
+				await updateState(.notConfigured)
+				return
+			}
+			try await login(settings)
+			let apiResponse = try await fetchNotes()
+			await updateState(.savingData)
+			onAPIResponse(apiResponse)
+			await updateState(.idle)
+		}
+		catch {
+			await setError(error)
+		}
 	}
 
 	private func updateState(_ newState: BackgroundNetworkState) {
