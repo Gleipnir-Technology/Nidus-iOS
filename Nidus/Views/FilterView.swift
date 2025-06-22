@@ -10,16 +10,16 @@ import SwiftUI
 
 // MARK: - Main Filter View
 struct FilterView: View {
-	@Binding var filters: Set<Filter>
+	@Binding var filterInstances: [String: FilterInstance]
 	@State private var showingAddFilter = false
-	var onFilterChange: ((Set<Filter>) -> Void)
+	var onFilterChange: (() -> Void)
 
-	func onFilterAdd(_ filter: Filter) {
-		onFilterChange(filters)
+	func onFilterAdd(_ filter: FilterInstance) {
+		onFilterChange()
 	}
 
 	func onFilterRemove() {
-		onFilterChange(filters)
+		onFilterChange()
 	}
 
 	var body: some View {
@@ -29,7 +29,7 @@ struct FilterView: View {
 				headerView
 
 				// Active Filters List
-				if filters.isEmpty {
+				if filterInstances.isEmpty {
 					emptyStateView
 				}
 				else {
@@ -45,15 +45,15 @@ struct FilterView: View {
 			.navigationBarTitleDisplayMode(.large)
 			.sheet(isPresented: $showingAddFilter) {
 				AddFilterSheet(
-					filters: $filters,
+					filterInstances: $filterInstances,
 					onFilterAdd: onFilterAdd
 				)
 			}
 		}
 	}
 
-	private func filtersByName() -> [Filter] {
-		let sortedArray = filters.sorted { $0.type.rawValue < $1.type.rawValue }
+	private func filtersByName() -> [FilterInstance] {
+		let sortedArray = filterInstances.sorted(by: { $0.key < $1.key }).map { $0.value }
 		return sortedArray
 	}
 	// MARK: - Header View
@@ -66,9 +66,9 @@ struct FilterView: View {
 
 				Spacer()
 
-				if !filters.isEmpty {
+				if !filterInstances.isEmpty {
 					Button("Clear All") {
-						filters.removeAll()
+						filterInstances.removeAll()
 						onFilterRemove()
 					}
 					.font(.subheadline)
@@ -77,7 +77,7 @@ struct FilterView: View {
 			}
 
 			Text(
-				"\(filters.count) filter\(filters.count == 1 ? "" : "s") applied"
+				"\(filterInstances.count) filter\(filterInstances.count == 1 ? "" : "s") applied"
 			)
 			.font(.caption)
 			.foregroundColor(.secondary)
@@ -112,9 +112,9 @@ struct FilterView: View {
 	private var activeFiltersView: some View {
 		ScrollView {
 			LazyVStack(spacing: 12) {
-				ForEach(filtersByName()) { filter in
-					FilterRowView(filter: filter) {
-						removeFilter(filter)
+				ForEach(filtersByName()) { filterInstance in
+					FilterRowView(filter: filterInstance) {
+						removeFilter(filterInstance)
 					}
 				}
 			}
@@ -144,9 +144,9 @@ struct FilterView: View {
 	}
 
 	// MARK: - Helper Methods
-	private func removeFilter(_ filter: Filter) {
+	private func removeFilter(_ filter: FilterInstance) {
 		withAnimation(.easeInOut(duration: 0.3)) {
-			filters.remove(at: filters.firstIndex(of: filter)!)
+			self.filterInstances.removeValue(forKey: filter.Name())
 			onFilterRemove()
 		}
 	}
@@ -154,7 +154,7 @@ struct FilterView: View {
 
 // MARK: - Filter Row View
 struct FilterRowView: View {
-	let filter: Filter
+	let filter: FilterInstance
 	let onRemove: () -> Void
 
 	var body: some View {
@@ -164,14 +164,14 @@ struct FilterRowView: View {
 				.fill(Color.blue.opacity(0.1))
 				.frame(width: 40, height: 40)
 				.overlay(
-					Image(systemName: iconForFilterType(filter.type))
+					Image(systemName: filter.filter.IconName())
 						.foregroundColor(.blue)
 						.font(.system(size: 18))
 				)
 
 			// Filter Details
 			VStack(alignment: .leading, spacing: 4) {
-				Text(filter.type.rawValue)
+				Text(filter.Name())
 					.font(.headline)
 					.foregroundColor(.primary)
 
@@ -180,7 +180,7 @@ struct FilterRowView: View {
 						.font(.caption)
 						.foregroundColor(.secondary)
 
-					Text(filter.displayValue)
+					Text(filter.value)
 						.font(.subheadline)
 						.fontWeight(.medium)
 						.foregroundColor(.primary)
@@ -205,90 +205,91 @@ struct FilterRowView: View {
 		.cornerRadius(12)
 		.shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
 	}
-
-	private func iconForFilterType(_ type: FilterType) -> String {
-		switch type {
-		case .age:
-			return "calendar"
-		case .category:
-			return "ant.circle"
-		case .description:
-			return "text.alignleft"
-		case .habitat:
-			return "ant.circle"
-		case .hasComments:
-			return "bubble.left"
-		case .hasRatings:
-			return "star"
-		case .name:
-			return "person"
-		}
-	}
 }
 
 // MARK: - Add Filter Sheet
 struct AddFilterSheet: View {
-	@Binding var filters: Set<Filter>
+	@Binding var filterInstances: [String: FilterInstance]
 	@Environment(\.dismiss) private var dismiss
-	@State private var selectedFilterType: FilterType = .age
+	@State private var selectedFilterName: String = filters.category.Name()
 	@State private var stringValue: String = ""
 	@State private var boolValue: Bool = false
-	var onFilterAdd: (Filter) -> Void
+	var onFilterAdd: (FilterInstance) -> Void
 
-	private var availableFilterTypes: [FilterType] {
-		FilterType.allCases.filter { filterType in
-			!filters.contains { $0.type == filterType }
+	private var availableFilterNames: [String] {
+		filters.all.filter { filter in
+			!filterInstances.contains { $0.value.filter.Name() == filter.Name() }
+		}.map { $0.Name() }
+	}
+	private var filterExhaustedSection: some View {
+		Section {
+			if availableFilterNames.isEmpty {
+				Text("All available filters have been added")
+					.foregroundColor(.secondary)
+					.font(.body)
+			}
+			else {
+				EmptyView()
+			}
 		}
+	}
+	private var filterTypeSection: some View {
+		Section("Filter Type") {
+			Picker("Select Filter", selection: $selectedFilterName) {
+				ForEach(availableFilterNames, id: \.self) {
+					filterName in
+					Text(filterName)
+						.tag(filterName)
+				}
+			}
+			.pickerStyle(.menu)
+		}
+
+	}
+	private var filterValueSection: some View {
+		Section("Filter Value") {
+			if selectedFilter as? FilterBool != nil {
+				Toggle(isOn: $boolValue) {
+					Text(selectedFilterName)
+				}
+			}
+			else if selectedFilter as? FilterChoice != nil {
+				Picker("Select Value", selection: $stringValue) {
+					ForEach(
+						(selectedFilter as? FilterChoice)!.choices,
+						id: \.self
+					) { option in
+						Text(option)
+							.tag(option)
+					}
+				}
+				.pickerStyle(.menu)
+			}
+			else {
+				TextField(
+					"Enter \(selectedFilterName)",
+					text: $stringValue
+				)
+				.textFieldStyle(.roundedBorder)
+			}
+		}
+	}
+
+	private var selectedFilter: any Filter {
+		for filter in filters.all {
+			if filter.Name() == selectedFilterName {
+				return filter
+			}
+		}
+		fatalError("No filter named \(selectedFilterName)")
 	}
 
 	var body: some View {
 		NavigationView {
 			Form {
-				Section("Filter Type") {
-					Picker("Select Filter", selection: $selectedFilterType) {
-						ForEach(availableFilterTypes, id: \.self) {
-							filterType in
-							Text(filterType.rawValue)
-								.tag(filterType)
-						}
-					}
-					.pickerStyle(.menu)
-				}
-
-				Section("Filter Value") {
-					if selectedFilterType.isBooleanFilter {
-						Toggle(isOn: $boolValue) {
-							Text(selectedFilterType.rawValue)
-						}
-					}
-					else if selectedFilterType.isSelectionFilter {
-						Picker("Select Value", selection: $stringValue) {
-							ForEach(
-								selectedFilterType.selectionOptions,
-								id: \.self
-							) { option in
-								Text(option)
-									.tag(option)
-							}
-						}
-						.pickerStyle(.menu)
-					}
-					else {
-						TextField(
-							"Enter \(selectedFilterType.rawValue.lowercased())",
-							text: $stringValue
-						)
-						.textFieldStyle(.roundedBorder)
-					}
-				}
-
-				if availableFilterTypes.isEmpty {
-					Section {
-						Text("All available filters have been added")
-							.foregroundColor(.secondary)
-							.font(.body)
-					}
-				}
+				filterTypeSection
+				filterValueSection
+				filterExhaustedSection
 			}
 			.navigationTitle("Add Filter")
 			.navigationBarTitleDisplayMode(.inline)
@@ -308,35 +309,37 @@ struct AddFilterSheet: View {
 			}
 			.onAppear {
 				// Set the selected filter type to the first available option
-				if let firstAvailable = availableFilterTypes.first {
-					selectedFilterType = firstAvailable
+				if let firstAvailable = availableFilterNames.first {
+					selectedFilterName = firstAvailable
 					// Reset values when filter type changes
 					stringValue =
-						selectedFilterType.isSelectionFilter
-						? (selectedFilterType.selectionOptions.first ?? "")
+						(selectedFilter as? FilterChoice != nil)
+						? ((selectedFilter as? FilterChoice)!.choices.first
+							?? "")
 						: ""
 					boolValue = false
 				}
 			}
-			.onChange(of: selectedFilterType) { _, newValue in
+			.onChange(of: selectedFilterName) { _, newValue in
 				// Reset values when filter type changes
 				stringValue =
-					newValue.isSelectionFilter
-					? (newValue.selectionOptions.first ?? "") : ""
+					(selectedFilter as? FilterChoice != nil)
+					? ((selectedFilter as? FilterChoice)!.choices.first ?? "")
+					: ""
 				boolValue = false
 			}
 		}
 	}
 
 	private var canAddFilter: Bool {
-		if availableFilterTypes.isEmpty {
+		if availableFilterNames.isEmpty {
 			return false
 		}
 
-		if selectedFilterType.isBooleanFilter {
+		if selectedFilter as? FilterBool != nil {
 			return true
 		}
-		else if selectedFilterType.isSelectionFilter {
+		else if selectedFilter as? FilterChoice != nil {
 			return !stringValue.isEmpty
 		}
 		else {
@@ -346,10 +349,10 @@ struct AddFilterSheet: View {
 
 	private func addFilter() {
 		var value: String
-		if selectedFilterType.isBooleanFilter {
+		if selectedFilter as? FilterBool != nil {
 			value = String(boolValue)
 		}
-		else if selectedFilterType.isSelectionFilter {
+		else if selectedFilter as? FilterChoice != nil {
 			value = stringValue
 		}
 		else {
@@ -357,10 +360,10 @@ struct AddFilterSheet: View {
 				in: .whitespacesAndNewlines
 			)
 		}
-		let newFilter = Filter(type: selectedFilterType, value: value)
+		let newFilter = FilterInstance(selectedFilter, value)
 
 		withAnimation(.easeInOut(duration: 0.3)) {
-			filters.insert(newFilter)
+			filterInstances[selectedFilterName] = newFilter
 			onFilterAdd(newFilter)
 		}
 
@@ -370,8 +373,8 @@ struct AddFilterSheet: View {
 
 // MARK: - Preview
 struct FilterView_Previews: PreviewProvider {
-	@State static var filters: Set<Filter> = []
+	@State static var filterInstances: [String: FilterInstance] = [:]
 	static var previews: some View {
-		FilterView(filters: $filters, onFilterChange: ({ _ in }))
+		FilterView(filterInstances: $filterInstances) {}
 	}
 }

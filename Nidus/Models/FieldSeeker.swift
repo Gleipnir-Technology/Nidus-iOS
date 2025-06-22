@@ -466,11 +466,9 @@ final class TrapData: Codable, Identifiable, Note {
 	init(
 		created: Date,
 		description: String,
-		fieldTechnician: String,
 		id: UUID,
 		location: Location,
-		name: String,
-		product: String
+		name: String
 	) {
 		self.created = created
 		self.description = description

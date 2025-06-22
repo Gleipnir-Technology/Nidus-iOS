@@ -124,6 +124,12 @@ struct AnyNote: Note {
 	func asMosquitoSource() -> MosquitoSource? {
 		return innerNote as? MosquitoSource
 	}
+	func asServiceRequest() -> ServiceRequest? {
+		return innerNote as? ServiceRequest
+	}
+	func asTrapData() -> TrapData? {
+		return innerNote as? TrapData
+	}
 	static func == (lhs: AnyNote, rhs: AnyNote) -> Bool {
 		return lhs.category == rhs.category && lhs.content == rhs.content
 			&& lhs.id == rhs.id && lhs.timestamp == rhs.timestamp

@@ -16,12 +16,12 @@ class NidusModel {
 	var currentRegion: MKCoordinateRegion = MKCoordinateRegion.visalia
 	var cluster: NotesCluster = NotesCluster()
 	var database: Database
-	var filters: Set<Filter>
+	var filterInstances: [String: FilterInstance]
 	var errorMessage: String?
 	var notes: [UUID: AnyNote] = [:]
 
 	init() {
-		self.filters = []
+		self.filterInstances = [:]
 		self.database = Database()!
 		do {
 			try self.database.migrateIfNeeded()
@@ -45,30 +45,21 @@ class NidusModel {
 	private func loadFilters() {
 		let fs = UserDefaults.standard.stringArray(forKey: "filters") ?? []
 		for f in fs {
-			guard let filter: Filter = Filter.fromString(f) else {
+			guard let filter: FilterInstance = FilterInstance.fromString(f) else {
 				Logger.background.error("Failed to parse filter string: \(f)")
 				continue
 			}
-			self.filters.insert(filter)
+			self.filterInstances[filter.Name()] = filter
 		}
 	}
-	func maybeAddFilter(_ filter: Filter) {
-		var toRemove: Filter? = nil
-		for f in filters {
-			if f.type == filter.type {
-				toRemove = f
-			}
-		}
-		if toRemove != nil {
-			filters.remove(toRemove!)
-		}
+	func maybeAddFilter(_ instance: FilterInstance) {
 		// Some filters require others. Add both
-		if filter.type == .habitat {
+		if instance.Name() == filters.habitat.Name() {
 			maybeAddFilter(
-				Filter(type: .category, value: NoteCategory.mosquitoSource.name)
+				FilterInstance(filters.category, NoteCategory.mosquitoSource.name)
 			)
 		}
-		filters.insert(filter)
+		self.filterInstances[instance.Name()] = instance
 	}
 	var notesToShow: [AnyNote] {
 		var toShow: [AnyNote] = []
@@ -110,6 +101,15 @@ class NidusModel {
 			Logger.background.error("Failed to handle API response: \(error)")
 		}
 	}
+	func onFilterAdded(_ instance: FilterInstance) {
+		filterInstances[instance.Name()] = instance
+		onFilterChange()
+	}
+	func onFilterChange() {
+		let asStrings: [String] = filterInstances.map { $1.toString() }
+		UserDefaults.standard.set(asStrings, forKey: "filters")
+		Logger.foreground.info("Saved filters \(asStrings)")
+	}
 
 	func onNetworkProgress(_ progress: Double) {
 		self.backgroundNetworkProgress = progress
@@ -117,12 +117,6 @@ class NidusModel {
 
 	func onNetworkStateChange(_ state: BackgroundNetworkState) {
 		self.backgroundNetworkState = state
-	}
-
-	func setFilters(_ filters: Set<Filter>) {
-		let asStrings: [String] = filters.map { $0.toString() }
-		UserDefaults.standard.set(asStrings, forKey: "filters")
-		Logger.foreground.info("Saved filters \(asStrings)")
 	}
 
 	func setPosition(region: MKCoordinateRegion) {
@@ -133,21 +127,9 @@ class NidusModel {
 	}
 
 	private func shouldShow(_ note: AnyNote) -> Bool {
-		for filter in filters {
-			switch filter.type {
-			case .category:
-				if note.categoryName != filter.stringValue {
-					return false
-				}
-			case .habitat:
-				guard let asSource: MosquitoSource = note.asMosquitoSource() else {
-					return false
-				}
-				if asSource.habitat != filter.stringValue {
-					return false
-				}
-			default:
-				continue
+		for filter in filterInstances.values {
+			if !filter.AllowsNote(note) {
+				return false
 			}
 		}
 		if note.coordinate.latitude < currentRegion.minLatitude

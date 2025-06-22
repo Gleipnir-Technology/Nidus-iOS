@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TreatmentList: View {
 	var treatments: [Treatment]
+	let addFilter: (any Filter, String) -> Void
 
 	func createdFormatted(_ created: Date) -> String {
 		let formatter = RelativeDateTimeFormatter()
@@ -24,7 +25,7 @@ struct TreatmentList: View {
 		else {
 			List(treatments) { treatment in
 				NavigationLink {
-					TreatmentDetail(treatment: treatment)
+					TreatmentDetail(treatment: treatment, addFilter: addFilter)
 				} label: {
 					Text("\(createdFormatted(treatment.created))")
 				}

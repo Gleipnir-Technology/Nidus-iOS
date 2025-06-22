@@ -10,13 +10,13 @@ import SwiftData
 import SwiftUI
 
 struct MosquitoSourceDetail: View {
-	let onFilterAdded: (Filter) -> Void
+	let onFilterAdded: (FilterInstance) -> Void
 	@State private var showFilterToast = false
 	let source: MosquitoSource
 
-	private func addFilter(_ type: FilterType, _ value: String) {
+	private func addFilter(_ type: any Filter, _ value: String) {
 		showFilterToast = true
-		onFilterAdded(Filter(type: type, value: value))
+		onFilterAdded(FilterInstance(type, value))
 	}
 
 	func createdFormatted(_ created: Date) -> String {
@@ -53,7 +53,10 @@ struct MosquitoSourceDetail: View {
 			}
 			else {
 				NavigationLink {
-					InspectionList(inspections: source.inspections)
+					InspectionList(
+						inspections: source.inspections,
+						addFilter: addFilter
+					)
 				} label: {
 					Label("Inspections", systemImage: "magnifyingglass")
 				}
@@ -63,67 +66,98 @@ struct MosquitoSourceDetail: View {
 			}
 			else {
 				NavigationLink {
-					TreatmentList(treatments: source.treatments)
+					TreatmentList(
+						treatments: source.treatments,
+						addFilter: addFilter
+					)
 				} label: {
 					Label("Treatments", systemImage: "hazardsign")
 				}
 			}
+			FilterableField(
+				filter: filters.isActive,
+				label: "Active?",
+				value: source.active?.description ?? "Unknown",
+				addFilter: addFilter
+			)
 			Text("Access: \(source.access)")
 			Text("Comments: \(source.comments)")
 			Text("Created: \(createdFormatted(source.created))")
 			Text("Description: \(source.description)")
 			HStack {
 				Button("Add Filter", systemImage: "line.3.horizontal.decrease") {
-					addFilter(.habitat, source.habitat)
+					addFilter(filters.habitat, source.habitat)
 				}.labelStyle(.iconOnly)
 				Text("Habitat: \(source.habitat)")
 				Spacer()
 			}
 
 			Text("Name: \(source.name)")
-			Text("Use Type: \(source.useType)")
-			Text("Water Origin: \(source.waterOrigin)")
+			FilterableField(
+				filter: filters.useType,
+				label: "Use Type",
+				value: source.useType,
+				addFilter: addFilter
+			)
+			FilterableField(
+				filter: filters.waterOrigin,
+				label: "Water Origin",
+				value: source.waterOrigin,
+				addFilter: addFilter
+			)
+			FilterableField(
+				filter: filters.zone,
+				label: "Zone",
+				value: source.zone,
+				addFilter: addFilter
+			)
 		}.toast(message: "Filter saved", isShowing: $showFilterToast, duration: Toast.short)
 	}
 }
 
 struct MosquitoSourceDetail_Previews: PreviewProvider {
 	static var previews: some View {
-		MosquitoSourceDetail(
-			onFilterAdded: { _ in },
-			source: MosquitoSource(
-				access: "somewhere",
-				active: true,
-				comments: "over there",
-				created: Date.now.addingTimeInterval(-15000),
-				description: "dank",
-				habitat: "everywhere",
-				id: UUID(uuidString: "1846d421-f8ab-4e37-850a-b61bb8422453")!,
-				inspections: [
-					Inspection(
-						comments: "it was gross",
-						condition: "bad",
-						created: Date.now.addingTimeInterval(-5000),
-						fieldTechnician: "John Doe",
-						id: UUID()
-					),
-					Inspection(
-						comments: "it was not too bad",
-						condition: "acceptable",
-						created: Date.now.addingTimeInterval(-3000),
-						fieldTechnician: "Adam Smith",
-						id: UUID()
-					),
-				],
-				lastInspectionDate: Date.now.addingTimeInterval(-2000),
-				location: Location(latitude: 33.3, longitude: -111.1),
-				name: "drain pipe",
-				nextActionDateScheduled: Date.now.addingTimeInterval(4000),
-				treatments: [],
-				useType: "not used",
-				waterOrigin: "humans",
-				zone: "1"
+		NavigationStack {
+			MosquitoSourceDetail(
+				onFilterAdded: { _ in },
+				source: MosquitoSource(
+					access: "somewhere",
+					active: true,
+					comments: "over there",
+					created: Date.now.addingTimeInterval(-15000),
+					description: "dank",
+					habitat: "everywhere",
+					id: UUID(
+						uuidString: "1846d421-f8ab-4e37-850a-b61bb8422453"
+					)!,
+					inspections: [
+						Inspection(
+							comments: "it was gross",
+							condition: "bad",
+							created: Date.now.addingTimeInterval(-5000),
+							fieldTechnician: "John Doe",
+							id: UUID(),
+							locationName: "somewhere"
+						),
+						Inspection(
+							comments: "it was not too bad",
+							condition: "acceptable",
+							created: Date.now.addingTimeInterval(-3000),
+							fieldTechnician: "Adam Smith",
+							id: UUID(),
+							locationName: "somewhere else"
+						),
+					],
+					lastInspectionDate: Date.now.addingTimeInterval(-2000),
+					location: Location(latitude: 33.3, longitude: -111.1),
+					name: "drain pipe",
+					nextActionDateScheduled: Date.now.addingTimeInterval(4000),
+					treatments: [],
+					useType: "not used",
+					waterOrigin: "humans",
+					zone: "1"
+				)
 			)
-		)
+		}
 	}
 }

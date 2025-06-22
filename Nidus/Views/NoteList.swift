@@ -11,7 +11,7 @@ import SwiftUI
 struct NoteListView: View {
 	var currentLocation: CLLocation
 	var notes: [AnyNote]
-	let onFilterAdded: (Filter) -> Void
+	let onFilterAdded: (FilterInstance) -> Void
 
 	var body: some View {
 		if notes.count == 0 {
@@ -30,7 +30,7 @@ struct NoteListView: View {
 struct NoteList: View {
 	var currentLocation: CLLocation
 	var notes: [AnyNote]
-	let onFilterAdded: (Filter) -> Void
+	let onFilterAdded: (FilterInstance) -> Void
 
 	var notesByDistance: [AnyNote] {
 		var byDistance: [AnyNote] = notes
@@ -58,6 +58,16 @@ struct NoteList: View {
 					MosquitoSourceDetail(
 						onFilterAdded: onFilterAdded,
 						source: note.asMosquitoSource()!
+					)
+				case .serviceRequest:
+					ServiceRequestDetail(
+						onFilterAdded: onFilterAdded,
+						request: note.asServiceRequest()!
+					)
+				case .trapData:
+					TrapDataDetail(
+						onFilterAdded: onFilterAdded,
+						trapData: note.asTrapData()!
 					)
 				default:
 					NoteEditor(currentLocation: currentLocation, note: note)

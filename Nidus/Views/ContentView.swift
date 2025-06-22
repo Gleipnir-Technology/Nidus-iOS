@@ -19,11 +19,8 @@ struct ContentView: View {
 	var onAppear: () -> Void
 	var onMapPositionChange: (MKCoordinateRegion) -> Void
 
-	func onFilterAdded(_ filter: Filter) {
-		model.maybeAddFilter(filter)
-	}
-	func onFilterChange(_ filters: Set<Filter>) {
-		model.setFilters(filters)
+	func onFilterChange() {
+		model.onFilterChange()
 	}
 	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
@@ -51,7 +48,7 @@ struct ContentView: View {
 									.longitude
 							),
 							notes: model.notesToShow,
-							onFilterAdded: onFilterAdded
+							onFilterAdded: model.onFilterAdded
 						)
 					}
 					Tab("Map", systemImage: "map", value: 1) {
@@ -68,7 +65,7 @@ struct ContentView: View {
 						value: 3
 					) {
 						FilterView(
-							filters: $model.filters,
+							filterInstances: $model.filterInstances,
 							onFilterChange: onFilterChange
 						)
 					}
