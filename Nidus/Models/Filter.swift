@@ -23,7 +23,14 @@ struct FilterGlobal {
 		guard let sr = note.asServiceRequest() else { return false }
 		return sr.assignedTechnician == value
 	}
-	let category = FilterChoice("Category", [], "heart.text.clipboard") { note, value in
+	let category = FilterChoice(
+		"Category",
+		[
+			NoteCategory.mosquitoSource.name, NoteCategory.serviceRequest.name,
+			NoteCategory.trapData.name,
+		],
+		"heart.text.clipboard"
+	) { note, value in
 		return note.category.name == value
 	}
 	let fieldTechnician = FilterString("Field Technician", "figure,wave") { note, value in
