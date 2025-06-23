@@ -12,6 +12,9 @@ import SwiftUI
 struct FilterView: View {
 	@Binding var filterInstances: [String: FilterInstance]
 	@State private var showingAddFilter = false
+	let notesCountFiltered: Int
+	let notesCountTotal: Int
+
 	var onFilterChange: (() -> Void)
 
 	func onFilterAdd(_ filter: FilterInstance) {
@@ -20,6 +23,10 @@ struct FilterView: View {
 
 	func onFilterRemove() {
 		onFilterChange()
+	}
+
+	private var notesFilteredPercentageDisplay: String {
+		String(format: "%.1f%%", Double(notesCountFiltered) / Double(notesCountTotal) * 100)
 	}
 
 	var body: some View {
@@ -81,6 +88,17 @@ struct FilterView: View {
 			)
 			.font(.caption)
 			.foregroundColor(.secondary)
+			if notesCountTotal == 0 {
+				Text("No notes yet to be filtered").font(.caption).foregroundColor(
+					.secondary
+				)
+			}
+			else {
+				Text(
+					"\(notesCountFiltered)/\(notesCountTotal) notes filtered (\(notesFilteredPercentageDisplay))"
+				).font(.caption)
+					.foregroundColor(.secondary)
+			}
 		}
 		.padding(.horizontal)
 		.padding(.top, 8)
@@ -375,6 +393,21 @@ struct AddFilterSheet: View {
 struct FilterView_Previews: PreviewProvider {
 	@State static var filterInstances: [String: FilterInstance] = [:]
 	static var previews: some View {
-		FilterView(filterInstances: $filterInstances) {}
+		FilterView(
+			filterInstances: $filterInstances,
+			notesCountFiltered: 123,
+			notesCountTotal: 250
+		) {}
+	}
+}
+
+struct FilterViewNoNotes_Previews: PreviewProvider {
+	@State static var filterInstances: [String: FilterInstance] = [:]
+	static var previews: some View {
+		FilterView(
+			filterInstances: $filterInstances,
+			notesCountFiltered: 0,
+			notesCountTotal: 0
+		) {}
 	}
 }

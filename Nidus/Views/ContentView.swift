@@ -66,6 +66,9 @@ struct ContentView: View {
 					) {
 						FilterView(
 							filterInstances: $model.filterInstances,
+							notesCountFiltered: model.notes.count
+								- model.notesToShow.count,
+							notesCountTotal: model.notes.count,
 							onFilterChange: onFilterChange
 						)
 					}
