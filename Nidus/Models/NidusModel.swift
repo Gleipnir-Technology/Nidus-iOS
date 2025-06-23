@@ -118,6 +118,7 @@ class NidusModel {
 
 	func setPosition(region: MKCoordinateRegion) {
 		currentRegion = region
+		updateCluster()
 		Logger.foreground.info(
 			"Set current location limits to \(String(describing: region))"
 		)
