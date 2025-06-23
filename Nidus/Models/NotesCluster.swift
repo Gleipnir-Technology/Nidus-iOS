@@ -14,7 +14,6 @@ import SwiftUI
 
 @Observable
 final class NotesCluster: ObservableObject {
-	private let coordinateRandomizer = CoordinateRandomizer()
 	private let clusterManager = ClusterManager<ExampleAnnotation>()
 
 	//var annotations: [AnyNote] = []
@@ -37,23 +36,6 @@ final class NotesCluster: ObservableObject {
 		}
 		await clusterManager.removeAll()
 		await clusterManager.add(newAnnotations)
-		await reloadAnnotations()
-	}
-
-	func addAnnotations() async {
-		let points = coordinateRandomizer.generateRandomCoordinates(
-			count: 10000,
-			within: currentRegion
-		)
-		let newAnnotations = points.map {
-			ExampleAnnotation(color: .red, coordinate: $0, systemImage: "mappin")
-		}
-		await clusterManager.add(newAnnotations)
-		await reloadAnnotations()
-	}
-
-	func removeAnnotations() async {
-		await clusterManager.removeAll()
 		await reloadAnnotations()
 	}
 

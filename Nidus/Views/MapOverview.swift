@@ -81,7 +81,6 @@ struct MapOverview: View {
 
 	var body: some View {
 		ModernMap(dataSource: dataSource, onPositionChange: onPositionChange)
-		//ModernMap()
 	}
 }
 
