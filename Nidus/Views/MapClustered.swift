@@ -61,7 +61,9 @@ struct ExampleClusterAnnotation: Identifiable {
 @available(iOS 17.0, *)
 struct MapClustered: View {
 	@State var dataSource: NotesCluster
-	var onPositionChange: ((MKCoordinateRegion) -> Void)
+	let onMapSizeChange: ((CGSize) -> Void)
+	let onPositionChange: ((MKCoordinateRegion) -> Void)
+	let region: MKCoordinateRegion
 
 	func asMarker(_ item: ExampleAnnotation) -> some MapContent {
 		return Marker(
@@ -75,7 +77,7 @@ struct MapClustered: View {
 
 	var body: some View {
 		Map(
-			initialPosition: .region(dataSource.currentRegion),
+			initialPosition: .region(region),
 			interactionModes: .all
 		) {
 			ForEach(dataSource.annotations) { item in
@@ -94,13 +96,9 @@ struct MapClustered: View {
 			MapUserLocationButton()
 		}
 		.readSize(onChange: { newValue in
-			dataSource.mapSize = newValue
+			onMapSizeChange(newValue)
 		})
-		.onMapCameraChange { context in
-			dataSource.currentRegion = context.region
-		}
 		.onMapCameraChange(frequency: .onEnd) { context in
-			Task.detached { await dataSource.reloadAnnotations() }
 			Task.detached { await onPositionChange(context.region) }
 		}
 	}

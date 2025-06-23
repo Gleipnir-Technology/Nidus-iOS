@@ -34,8 +34,7 @@ struct NidusApp: App {
 		WindowGroup {
 			ContentView(
 				model: model,
-				onAppear: model.triggerBackgroundFetch,
-				onMapPositionChange: model.setPosition
+				onAppear: model.triggerBackgroundFetch
 			).environment(locationDataManager)
 		}
 		.modelContainer(appContainer)

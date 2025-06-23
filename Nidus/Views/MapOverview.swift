@@ -14,10 +14,9 @@ import SwiftUI
 
 struct MapOverview: View {
 	@State private var geometrySize: CGSize = .zero
-	var dataSource: NotesCluster
+	var model: NidusModel
 
 	var onNoteSelected: ((any Note) -> Void)
-	var onPositionChange: ((MKCoordinateRegion) -> Void)
 	var userLocation: CLLocation?
 
 	// Convert tap location to map coordinate
@@ -80,7 +79,12 @@ struct MapOverview: View {
 	}
 
 	var body: some View {
-		MapClustered(dataSource: dataSource, onPositionChange: onPositionChange)
+		MapClustered(
+			dataSource: model.cluster,
+			onMapSizeChange: model.onMapSizeChange,
+			onPositionChange: model.onMapPositionChange,
+			region: model.currentRegion
+		)
 	}
 }
 

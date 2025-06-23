@@ -18,6 +18,8 @@ class NidusModel {
 	var database: Database
 	var filterInstances: [String: FilterInstance]
 	var errorMessage: String?
+	var mapSize: CGSize = .zero
+
 	var notes: [UUID: AnyNote] = [:]
 
 	init() {
@@ -109,22 +111,24 @@ class NidusModel {
 		Logger.foreground.info("Saved filters \(asStrings)")
 		updateCluster()
 	}
-
-	func onNetworkProgress(_ progress: Double) {
-		self.backgroundNetworkProgress = progress
-	}
-
-	func onNetworkStateChange(_ state: BackgroundNetworkState) {
-		self.backgroundNetworkState = state
-	}
-
-	func setPosition(region: MKCoordinateRegion) {
+	func onMapPositionChange(region: MKCoordinateRegion) {
 		currentRegion = region
 		updateCluster()
 		saveCurrentRegion()
 		Logger.foreground.info(
 			"Set current location limits to \(String(describing: region))"
 		)
+	}
+
+	func onMapSizeChange(_ size: CGSize) {
+		self.mapSize = size
+	}
+	func onNetworkProgress(_ progress: Double) {
+		self.backgroundNetworkProgress = progress
+	}
+
+	func onNetworkStateChange(_ state: BackgroundNetworkState) {
+		self.backgroundNetworkState = state
 	}
 
 	func triggerBackgroundFetch() {
@@ -171,6 +175,14 @@ class NidusModel {
 				longitudeDelta: longitudeDelta
 			)
 		)
+		let r = String(
+			format: "%f,%f,%f,%f",
+			currentRegion.center.latitude,
+			currentRegion.center.longitude,
+			currentRegion.span.latitudeDelta,
+			currentRegion.span.longitudeDelta
+		)
+		Logger.foreground.info("Loaded location \(r)")
 	}
 	private func loadNotesFromDatabase() {
 		Task {
@@ -210,7 +222,11 @@ class NidusModel {
 
 	private func updateCluster() {
 		Task {
-			await cluster.onNoteChanges(notesToShow)
+			await cluster.onNoteChanges(
+				notes: notesToShow,
+				mapSize: mapSize,
+				region: currentRegion
+			)
 		}
 	}
 

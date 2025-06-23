@@ -17,7 +17,6 @@ struct ContentView: View {
 	@State private var selection: Int = 0
 	@Bindable var model: NidusModel
 	var onAppear: () -> Void
-	var onMapPositionChange: (MKCoordinateRegion) -> Void
 
 	func onFilterChange() {
 		model.onFilterChange()
@@ -53,9 +52,8 @@ struct ContentView: View {
 					}
 					Tab("Map", systemImage: "map", value: 1) {
 						MapOverview(
-							dataSource: model.cluster,
+							model: model,
 							onNoteSelected: onNoteSelected,
-							onPositionChange: onMapPositionChange,
 							userLocation: locationDataManager.location
 						)
 					}
@@ -117,9 +115,7 @@ struct ContentView: View {
 #Preview("No notes, no settings") {
 	ContentView(
 		model: NidusModelPreview(),
-		onAppear: {},
-		onMapPositionChange: { (MKCoordinateRegion) -> Void in
-		}
+		onAppear: {}
 	)
 }
 
@@ -129,9 +125,7 @@ struct ContentView: View {
 			backgroundNetworkProgress: 0.5,
 			backgroundNetworkState: .downloading
 		),
-		onAppear: {},
-		onMapPositionChange: { (MKCoordinateRegion) -> Void in
-		}
+		onAppear: {}
 	)
 }
 
@@ -142,9 +136,7 @@ struct ContentView: View {
 			backgroundNetworkState: .error,
 			errorMessage: "something bad"
 		),
-		onAppear: {},
-		onMapPositionChange: { (MKCoordinateRegion) -> Void in
-		}
+		onAppear: {}
 	)
 }
 
@@ -154,8 +146,6 @@ struct ContentView: View {
 			backgroundNetworkProgress: 0.3,
 			backgroundNetworkState: .savingData
 		),
-		onAppear: {},
-		onMapPositionChange: { (MKCoordinateRegion) -> Void in
-		}
+		onAppear: {}
 	)
 }

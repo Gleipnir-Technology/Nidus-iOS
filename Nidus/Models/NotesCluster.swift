@@ -19,10 +19,7 @@ final class NotesCluster: ObservableObject {
 	var annotations: [ExampleAnnotation] = []
 	var clusters: [ExampleClusterAnnotation] = []
 
-	var mapSize: CGSize = .zero
-	var currentRegion: MKCoordinateRegion = .visalia
-
-	func onNoteChanges(_ notes: [AnyNote]) async {
+	func onNoteChanges(notes: [AnyNote], mapSize: CGSize, region: MKCoordinateRegion) async {
 		Logger.background.info("Detected changes in note cluster: \(notes.count) notes now")
 		let newAnnotations = notes.map {
 			ExampleAnnotation(
@@ -33,13 +30,9 @@ final class NotesCluster: ObservableObject {
 		}
 		await clusterManager.removeAll()
 		await clusterManager.add(newAnnotations)
-		await reloadAnnotations()
-	}
-
-	func reloadAnnotations() async {
 		async let changes = clusterManager.reload(
 			mapViewSize: mapSize,
-			coordinateRegion: currentRegion
+			coordinateRegion: region
 		)
 		await applyChanges(changes)
 	}
