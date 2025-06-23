@@ -80,7 +80,7 @@ struct MapOverview: View {
 	}
 
 	var body: some View {
-		ModernMap(dataSource: dataSource, onPositionChange: onPositionChange)
+		MapClustered(dataSource: dataSource, onPositionChange: onPositionChange)
 	}
 }
 

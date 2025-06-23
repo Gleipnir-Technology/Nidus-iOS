@@ -68,7 +68,7 @@ struct ExampleClusterAnnotation: Identifiable {
 }
 
 @available(iOS 17.0, *)
-struct ModernMap: View {
+struct MapClustered: View {
 	@State var dataSource: NotesCluster
 	var onPositionChange: ((MKCoordinateRegion) -> Void)
 
