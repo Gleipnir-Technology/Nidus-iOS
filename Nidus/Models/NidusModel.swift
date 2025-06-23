@@ -13,7 +13,7 @@ class NidusModel {
 	var backgroundNetworkManager: BackgroundNetworkManager?
 	var backgroundNetworkProgress: Double = 0.0
 	var backgroundNetworkState: BackgroundNetworkState = .idle
-	var currentRegion: MKCoordinateRegion = MKCoordinateRegion.visalia
+	var currentRegion: MKCoordinateRegion
 	var cluster: NotesCluster = NotesCluster()
 	var database: Database
 	var filterInstances: [String: FilterInstance]
@@ -21,6 +21,7 @@ class NidusModel {
 	var notes: [UUID: AnyNote] = [:]
 
 	init() {
+		self.currentRegion = .visalia
 		self.filterInstances = [:]
 		self.database = Database()!
 		do {
@@ -29,6 +30,7 @@ class NidusModel {
 		catch {
 			fatalError("Failed to run database migrations: \(error)")
 		}
+		loadCurrentRegion()
 		loadFilters()
 		loadNotesFromDatabase()
 		updateCluster()
@@ -119,6 +121,7 @@ class NidusModel {
 	func setPosition(region: MKCoordinateRegion) {
 		currentRegion = region
 		updateCluster()
+		saveCurrentRegion()
 		Logger.foreground.info(
 			"Set current location limits to \(String(describing: region))"
 		)
@@ -137,6 +140,38 @@ class NidusModel {
 			)
 		}
 	}
+	private func loadCurrentRegion() {
+		guard let regionString = UserDefaults.standard.string(forKey: "currentRegion")
+		else {
+			return
+		}
+		if regionString == "" {
+			return
+		}
+		let scanner = Scanner(string: regionString)
+		guard let latitude = scanner.scanDouble() else {
+			return
+		}
+		_ = scanner.scanCharacter()  // drop the ","
+		guard let longitude = scanner.scanDouble() else {
+			return
+		}
+		_ = scanner.scanCharacter()  // drop the ","
+		guard let latitudeDelta = scanner.scanDouble() else {
+			return
+		}
+		_ = scanner.scanCharacter()  // drop the ","
+		guard let longitudeDelta = scanner.scanDouble() else {
+			return
+		}
+		self.currentRegion = .init(
+			center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
+			span: MKCoordinateSpan(
+				latitudeDelta: latitudeDelta,
+				longitudeDelta: longitudeDelta
+			)
+		)
+	}
 	private func loadNotesFromDatabase() {
 		Task {
 			do {
@@ -146,6 +181,16 @@ class NidusModel {
 				errorMessage = "Error loading notes: \(error)"
 			}
 		}
+	}
+	private func saveCurrentRegion() {
+		let regionString = String(
+			format: "%f,%f,%f,%f",
+			currentRegion.center.latitude,
+			currentRegion.center.longitude,
+			currentRegion.span.latitudeDelta,
+			currentRegion.span.longitudeDelta
+		)
+		UserDefaults.standard.set(regionString, forKey: "currentRegion")
 	}
 	private func shouldShow(_ note: AnyNote) -> Bool {
 		for filter in filterInstances.values {
