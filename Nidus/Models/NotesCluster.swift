@@ -16,17 +16,14 @@ import SwiftUI
 final class NotesCluster: ObservableObject {
 	private let clusterManager = ClusterManager<ExampleAnnotation>()
 
-	//var annotations: [AnyNote] = []
 	var annotations: [ExampleAnnotation] = []
 	var clusters: [ExampleClusterAnnotation] = []
 
 	var mapSize: CGSize = .zero
 	var currentRegion: MKCoordinateRegion = .visalia
 
-	func setNotes(_ notes: [AnyNote]) async {
-		/*annotations = notes
-        await clusterManager.add(notes)
-        await reloadAnnotations()*/
+	func onNoteChanges(_ notes: [AnyNote]) async {
+		Logger.background.info("Detected changes in note cluster: \(notes.count) notes now")
 		let newAnnotations = notes.map {
 			ExampleAnnotation(
 				color: $0.color,

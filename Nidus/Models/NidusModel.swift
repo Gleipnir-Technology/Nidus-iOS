@@ -52,15 +52,6 @@ class NidusModel {
 			self.filterInstances[filter.Name()] = filter
 		}
 	}
-	func maybeAddFilter(_ instance: FilterInstance) {
-		// Some filters require others. Add both
-		if instance.Name() == filters.habitat.Name() {
-			maybeAddFilter(
-				FilterInstance(filters.category, NoteCategory.mosquitoSource.name)
-			)
-		}
-		self.filterInstances[instance.Name()] = instance
-	}
 	var notesToShow: [AnyNote] {
 		var toShow: [AnyNote] = []
 		for (_, note) in notes {
@@ -112,6 +103,7 @@ class NidusModel {
 		let asStrings: [String] = filterInstances.map { $1.toString() }
 		UserDefaults.standard.set(asStrings, forKey: "filters")
 		Logger.foreground.info("Saved filters \(asStrings)")
+		triggerUpdateComplete()
 	}
 
 	func onNetworkProgress(_ progress: Double) {
@@ -129,6 +121,19 @@ class NidusModel {
 		)
 	}
 
+	func triggerBackgroundFetch() {
+		self.backgroundNetworkManager = BackgroundNetworkManager(
+			onAPIResponse: onAPIResponse,
+			onError: onError,
+			onProgress: onNetworkProgress,
+			onStateChange: onNetworkStateChange
+		)
+		Task {
+			await backgroundNetworkManager!.startBackgroundDownload(
+				currentSettings
+			)
+		}
+	}
 	private func shouldShow(_ note: AnyNote) -> Bool {
 		for filter in filterInstances.values {
 			if !filter.AllowsNote(note) {
@@ -145,11 +150,11 @@ class NidusModel {
 		return true
 	}
 
-	func triggerUpdateComplete() {
+	private func triggerUpdateComplete() {
 		do {
 			notes = try database.notes()
 			Task {
-				await cluster.setNotes(Array(notes.values))
+				await cluster.onNoteChanges(notesToShow)
 			}
 		}
 		catch {
@@ -157,17 +162,4 @@ class NidusModel {
 		}
 	}
 
-	func triggerBackgroundFetch() {
-		self.backgroundNetworkManager = BackgroundNetworkManager(
-			onAPIResponse: onAPIResponse,
-			onError: onError,
-			onProgress: onNetworkProgress,
-			onStateChange: onNetworkStateChange
-		)
-		Task {
-			await backgroundNetworkManager!.startBackgroundDownload(
-				currentSettings
-			)
-		}
-	}
 }
