@@ -30,7 +30,8 @@ class NidusModel {
 			fatalError("Failed to run database migrations: \(error)")
 		}
 		loadFilters()
-		triggerUpdateComplete()
+		loadNotesFromDatabase()
+		updateCluster()
 	}
 
 	private var currentSettings: Settings {
@@ -85,7 +86,8 @@ class NidusModel {
 						Double(i) / Double(totalRecords)
 				}
 			}
-			triggerUpdateComplete()
+			loadNotesFromDatabase()
+			updateCluster()
 			Logger.background.info("Done saving response")
 		}
 		catch {
@@ -103,7 +105,7 @@ class NidusModel {
 		let asStrings: [String] = filterInstances.map { $1.toString() }
 		UserDefaults.standard.set(asStrings, forKey: "filters")
 		Logger.foreground.info("Saved filters \(asStrings)")
-		triggerUpdateComplete()
+		updateCluster()
 	}
 
 	func onNetworkProgress(_ progress: Double) {
@@ -134,6 +136,16 @@ class NidusModel {
 			)
 		}
 	}
+	private func loadNotesFromDatabase() {
+		Task {
+			do {
+				notes = try database.notes()
+			}
+			catch {
+				errorMessage = "Error loading notes: \(error)"
+			}
+		}
+	}
 	private func shouldShow(_ note: AnyNote) -> Bool {
 		for filter in filterInstances.values {
 			if !filter.AllowsNote(note) {
@@ -150,15 +162,9 @@ class NidusModel {
 		return true
 	}
 
-	private func triggerUpdateComplete() {
-		do {
-			notes = try database.notes()
-			Task {
-				await cluster.onNoteChanges(notesToShow)
-			}
-		}
-		catch {
-			errorMessage = "Error loading notes: \(error)"
+	private func updateCluster() {
+		Task {
+			await cluster.onNoteChanges(notesToShow)
 		}
 	}
 
