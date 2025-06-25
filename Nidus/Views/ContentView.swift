@@ -29,12 +29,6 @@ struct ContentView: View {
 	}
 	var body: some View {
 		NavigationStack(path: $path) {
-			NavigationLink(
-				"Settings",
-				destination: SettingView(
-					onSettingsUpdated: model.triggerBackgroundFetch
-				)
-			)
 			VStack {
 				TabView(selection: $selection) {
 					Tab("Create", systemImage: "plus", value: 0) {
@@ -71,6 +65,16 @@ struct ContentView: View {
 								- model.notesToShow.count,
 							notesCountTotal: model.notes.count,
 							onFilterChange: onFilterChange
+						)
+					}
+					Tab(
+						"Sync",
+						systemImage: "gear",
+						value: 5
+					) {
+						SettingView(
+							onSettingsUpdated: model
+								.triggerBackgroundFetch
 						)
 					}
 				}
