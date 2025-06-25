@@ -32,7 +32,8 @@ struct ContentView: View {
 			VStack {
 				TabView(selection: $selection) {
 					Tab("Create", systemImage: "plus", value: 0) {
-						VoiceRecorderView()
+						AddNoteView(//locationDataManager: locationDataManager
+						)
 					}
 					Tab("Notes", systemImage: "clock", value: 1) {
 						NoteListView(

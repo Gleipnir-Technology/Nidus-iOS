@@ -1,17 +1,12 @@
 import AVFoundation
-//
-//  AddNoteView.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 6/25/25.
-//
+import Speech
 import SwiftUI
 
-struct VoiceRecorderView: View {
+struct AddNoteView: View {
 	@StateObject private var audioRecorder = AudioRecorder()
 
 	var body: some View {
-		VStack(spacing: 30) {
+		VStack(spacing: 20) {
 			Text("Voice Memo Recorder")
 				.font(.title)
 				.fontWeight(.bold)
@@ -26,6 +21,18 @@ struct VoiceRecorderView: View {
 				Text("Duration: \(formatTime(audioRecorder.recordingTime))")
 					.font(.subheadline)
 					.foregroundColor(.secondary)
+			}
+
+			// Live transcription
+			if audioRecorder.isRecording && !audioRecorder.transcribedText.isEmpty {
+				ScrollView {
+					Text(audioRecorder.transcribedText)
+						.padding()
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.background(Color.blue.opacity(0.1))
+						.cornerRadius(10)
+				}
+				.frame(maxHeight: 150)
 			}
 
 			// Record button
@@ -44,13 +51,21 @@ struct VoiceRecorderView: View {
 				.font(.system(size: 80))
 				.foregroundColor(audioRecorder.isRecording ? .red : .blue)
 			}
-			.disabled(!audioRecorder.hasPermission)
+			.disabled(!audioRecorder.hasPermissions)
 
 			// Permission status
-			if !audioRecorder.hasPermission {
-				Text("Microphone permission required")
-					.font(.caption)
-					.foregroundColor(.red)
+			if !audioRecorder.hasPermissions {
+				VStack {
+					Text("Permissions required:")
+						.font(.caption)
+						.foregroundColor(.red)
+					Text("• Microphone access")
+						.font(.caption2)
+						.foregroundColor(.red)
+					Text("• Speech recognition")
+						.font(.caption2)
+						.foregroundColor(.red)
+				}
 			}
 
 			// Recordings list
@@ -61,8 +76,30 @@ struct VoiceRecorderView: View {
 
 					ForEach(audioRecorder.recordings, id: \.self) { recording in
 						HStack {
-							Text(recording.lastPathComponent)
-								.font(.caption)
+							VStack(alignment: .leading) {
+								Text(recording.lastPathComponent)
+									.font(.caption)
+								if let transcription =
+									audioRecorder
+									.savedTranscriptions[
+										recording
+											.lastPathComponent
+									]
+								{
+									Text(
+										transcription.prefix(
+											50
+										)
+											+ (transcription
+												.count
+												> 50
+												? "..."
+												: "")
+									)
+									.font(.caption2)
+									.foregroundColor(.secondary)
+								}
+							}
 							Spacer()
 							Button("Play") {
 								audioRecorder.playRecording(
@@ -81,7 +118,7 @@ struct VoiceRecorderView: View {
 		}
 		.padding()
 		.onAppear {
-			audioRecorder.requestPermission()
+			audioRecorder.requestPermissions()
 		}
 	}
 
@@ -94,40 +131,81 @@ struct VoiceRecorderView: View {
 
 class AudioRecorder: NSObject, ObservableObject {
 	@Published var isRecording = false
-	@Published var hasPermission = false
+	@Published var hasPermissions = false
 	@Published var recordings: [URL] = []
 	@Published var recordingTime: TimeInterval = 0
+	@Published var transcribedText = ""
+	@Published var savedTranscriptions: [String: String] = [:]
 
 	private var audioRecorder: AVAudioRecorder?
 	private var audioPlayer: AVAudioPlayer?
 	private var timer: Timer?
+	private var speechRecognizer: SFSpeechRecognizer?
+	private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
+	private var recognitionTask: SFSpeechRecognitionTask?
+	private var audioEngine = AVAudioEngine()
+	private var hasMicrophonePermission = false
+	private var hasSpeechPermission = false
 
 	override init() {
 		super.init()
+		speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
 		loadRecordings()
+		loadTranscriptions()
 	}
 
-	func requestPermission() {
+	func requestPermissions() {
+		// Request microphone permission
 		if #available(iOS 17.0, *) {
 			AVAudioApplication.requestRecordPermission { granted in
 				DispatchQueue.main.async {
-					self.hasPermission = granted
+					self.hasMicrophonePermission = granted
+					self.updatePermissionStatus()
 				}
 			}
 		}
 		else {
-			// Fallback for iOS versions prior to 17.0
 			AVAudioSession.sharedInstance().requestRecordPermission { granted in
 				DispatchQueue.main.async {
-					self.hasPermission = granted
+					self.hasMicrophonePermission = granted
+					self.updatePermissionStatus()
 				}
+			}
+		}
+
+		// Request speech recognition permission
+		SFSpeechRecognizer.requestAuthorization { authStatus in
+			DispatchQueue.main.async {
+				self.hasSpeechPermission = authStatus == .authorized
+				self.updatePermissionStatus()
 			}
 		}
 	}
 
-	func startRecording() {
-		guard hasPermission else { return }
+	private func updatePermissionStatus() {
+		hasPermissions = hasMicrophonePermission && hasSpeechPermission
+	}
 
+	func startRecording() {
+		guard hasPermissions else { return }
+
+		// Start audio recording
+		startAudioRecording()
+
+		// Start speech recognition
+		startSpeechRecognition()
+
+		isRecording = true
+		recordingTime = 0
+		transcribedText = ""
+
+		// Start timer for recording duration
+		timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+			self.recordingTime += 1
+		}
+	}
+
+	private func startAudioRecording() {
 		let audioSession = AVAudioSession.sharedInstance()
 
 		do {
@@ -153,26 +231,99 @@ class AudioRecorder: NSObject, ObservableObject {
 			audioRecorder?.delegate = self
 			audioRecorder?.record()
 
-			isRecording = true
-			recordingTime = 0
+		}
+		catch {
+			print("Failed to start audio recording: \(error)")
+		}
+	}
 
-			// Start timer for recording duration
-			timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-				self.recordingTime += 1
+	private func startSpeechRecognition() {
+		guard let speechRecognizer = speechRecognizer, speechRecognizer.isAvailable else {
+			print("Speech recognizer not available")
+			return
+		}
+
+		// Cancel any previous task
+		recognitionTask?.cancel()
+		recognitionTask = nil
+
+		let audioSession = AVAudioSession.sharedInstance()
+
+		do {
+			try audioSession.setCategory(
+				.record,
+				mode: .measurement,
+				options: .duckOthers
+			)
+			try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+
+			recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
+			guard let recognitionRequest = recognitionRequest else {
+				print("Unable to create recognition request")
+				return
 			}
+
+			recognitionRequest.shouldReportPartialResults = true
+
+			let inputNode = audioEngine.inputNode
+
+			recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest)
+			{ result, error in
+				DispatchQueue.main.async {
+					if let result = result {
+						self.transcribedText =
+							result.bestTranscription.formattedString
+					}
+
+					if error != nil {
+						self.audioEngine.stop()
+						inputNode.removeTap(onBus: 0)
+						self.recognitionRequest = nil
+						self.recognitionTask = nil
+					}
+				}
+			}
+
+			let recordingFormat = inputNode.outputFormat(forBus: 0)
+			inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) {
+				buffer,
+				_ in
+				self.recognitionRequest?.append(buffer)
+			}
+
+			audioEngine.prepare()
+			try audioEngine.start()
 
 		}
 		catch {
-			print("Failed to start recording: \(error)")
+			print("Failed to start speech recognition: \(error)")
 		}
 	}
 
 	func stopRecording() {
+		// Stop audio recording
 		audioRecorder?.stop()
+
+		// Stop speech recognition
+		audioEngine.stop()
+		audioEngine.inputNode.removeTap(onBus: 0)
+		recognitionRequest?.endAudio()
+		recognitionRequest = nil
+		recognitionTask?.cancel()
+		recognitionTask = nil
+
 		timer?.invalidate()
 		timer = nil
 		isRecording = false
 		recordingTime = 0
+
+		// Save transcription
+		if let audioRecorder = audioRecorder, !transcribedText.isEmpty {
+			let filename = audioRecorder.url.lastPathComponent
+			savedTranscriptions[filename] = transcribedText
+			saveTranscriptions()
+		}
+
 		loadRecordings()
 	}
 
@@ -201,6 +352,42 @@ class AudioRecorder: NSObject, ObservableObject {
 		}
 		catch {
 			print("Failed to load recordings: \(error)")
+		}
+	}
+
+	private func saveTranscriptions() {
+		let documentsPath = FileManager.default.urls(
+			for: .documentDirectory,
+			in: .userDomainMask
+		)[0]
+		let transcriptionsURL = documentsPath.appendingPathComponent("transcriptions.json")
+
+		do {
+			let data = try JSONEncoder().encode(savedTranscriptions)
+			try data.write(to: transcriptionsURL)
+		}
+		catch {
+			print("Failed to save transcriptions: \(error)")
+		}
+	}
+
+	private func loadTranscriptions() {
+		let documentsPath = FileManager.default.urls(
+			for: .documentDirectory,
+			in: .userDomainMask
+		)[0]
+		let transcriptionsURL = documentsPath.appendingPathComponent("transcriptions.json")
+
+		do {
+			let data = try Data(contentsOf: transcriptionsURL)
+			savedTranscriptions = try JSONDecoder().decode(
+				[String: String].self,
+				from: data
+			)
+		}
+		catch {
+			// File doesn't exist or couldn't be loaded, start with empty dictionary
+			savedTranscriptions = [:]
 		}
 	}
 }

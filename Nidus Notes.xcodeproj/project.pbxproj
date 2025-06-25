@@ -629,6 +629,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Nidus uses your camera to allow you to attach pictures to notes";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Nidus saves notes with their location so it can show you notes near your current position.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Nidus uses your microphone to record notes via voice";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Nidus can transcribe your voice into notes";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -673,6 +674,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Nidus uses your camera to allow you to attach pictures to notes";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Nidus saves notes with their location so it can show you notes near your current position.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Nidus uses your microphone to record notes via voice";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Nidus can transcribe your voice into notes";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
