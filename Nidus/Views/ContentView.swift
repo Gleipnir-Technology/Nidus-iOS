@@ -37,7 +37,10 @@ struct ContentView: View {
 			)
 			VStack {
 				TabView(selection: $selection) {
-					Tab("Notes", systemImage: "clock", value: 0) {
+					Tab("Create", systemImage: "plus", value: 0) {
+						VoiceRecorderView()
+					}
+					Tab("Notes", systemImage: "clock", value: 1) {
 						NoteListView(
 							currentLocation: CLLocation(
 								latitude: model.currentRegion.center
@@ -50,7 +53,7 @@ struct ContentView: View {
 							onFilterAdded: model.onFilterAdded
 						)
 					}
-					Tab("Map", systemImage: "map", value: 1) {
+					Tab("Map", systemImage: "map", value: 2) {
 						MapOverview(
 							model: model,
 							onNoteSelected: onNoteSelected,
@@ -60,7 +63,7 @@ struct ContentView: View {
 					Tab(
 						"Filters",
 						systemImage: "line.3.horizontal.decrease",
-						value: 3
+						value: 4
 					) {
 						FilterView(
 							filterInstances: $model.filterInstances,
