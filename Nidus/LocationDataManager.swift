@@ -79,3 +79,12 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 		print("error: \(error.localizedDescription)")
 	}
 }
+
+// A location data manager that will never get a fix
+@Observable
+class LocationDataManagerFake: LocationDataManager {
+	init(location: CLLocation?) {
+		super.init(authorizationStatus: .notDetermined)
+		self.location = location
+	}
+}

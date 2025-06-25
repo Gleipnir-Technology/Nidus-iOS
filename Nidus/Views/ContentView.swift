@@ -32,7 +32,12 @@ struct ContentView: View {
 			VStack {
 				TabView(selection: $selection) {
 					Tab("Create", systemImage: "plus", value: 0) {
-						AddNoteView(//locationDataManager: locationDataManager
+						AddNoteView(
+							location: CLLocation(
+								latitude: -39,
+								longitude: -111
+							),
+							locationDataManager: locationDataManager
 						)
 					}
 					Tab("Notes", systemImage: "clock", value: 1) {
