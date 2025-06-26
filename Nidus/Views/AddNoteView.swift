@@ -49,6 +49,8 @@ struct AddNoteView: View {
 					.cornerRadius(10)
 			}
 			.frame(maxHeight: 150)
+			Text("Pictures:")
+
 			Spacer()
 		}
 	}
