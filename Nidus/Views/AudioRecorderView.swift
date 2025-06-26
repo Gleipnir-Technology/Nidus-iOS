@@ -44,15 +44,23 @@ struct AudioStatusView: View {
 
 			// Permission status
 			if hasPermissions {
-				// Recording status
-				Text(
-					isRecording
-						? "Recording..." : "Ready to record"
-				)
-				.font(.headline)
-				.foregroundColor(
-					isRecording ? .red : .primary
-				)
+				VStack(alignment: .leading) {
+					// Recording status
+					Text(
+						isRecording
+							? "Recording..." : "Ready to record"
+					)
+					.font(.headline)
+					.foregroundColor(
+						isRecording ? .red : .primary
+					)
+					// Recording duration
+					if isRecording {
+						Text("Duration: \(formatTime(recordingTime))")
+							.font(.subheadline)
+							.foregroundColor(.secondary)
+					}
+				}
 			}
 			else {
 				VStack {
@@ -67,15 +75,8 @@ struct AudioStatusView: View {
 						.foregroundColor(.red)
 				}
 			}
-
-			// Recording duration
-			if isRecording {
-				Text("Duration: \(formatTime(recordingTime))")
-					.font(.subheadline)
-					.foregroundColor(.secondary)
-			}
+			Spacer()
 		}
-
 	}
 }
 struct AudioRecorderView: View {
