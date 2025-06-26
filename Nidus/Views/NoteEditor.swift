@@ -14,7 +14,7 @@ struct NoteEditor: View {
 
 	@State private var content: String
 	@State private var category: NoteCategory
-	@State private var location: CLLocationCoordinate2D
+	@State private var location: CLLocation?
 	@State private var showSavedToast = false
 
 	@Environment(\.dismiss) private var dismiss
@@ -24,7 +24,10 @@ struct NoteEditor: View {
 		self.note = note
 		self.content = note.content
 		self.category = NoteCategory.byNameOrDefault(note.categoryName)
-		self.location = note.coordinate
+		self.location = CLLocation(
+			latitude: note.coordinate.latitude,
+			longitude: note.coordinate.longitude
+		)
 	}
 
 	private func save() {
@@ -37,10 +40,12 @@ struct NoteEditor: View {
 	}
 	var body: some View {
 		Form {
-			MapView(
-				coordinate: $location
+			LocationView(
+				location: $location
 			).frame(height: 300)
-			Text("Location \(location.latitude), \(location.longitude)")
+			Text(
+				"Location \(location?.coordinate.latitude), \(location?.coordinate.longitude)"
+			)
 			Picker(selection: $category) {
 				ForEach(NoteCategory.all) { c in
 					Label(

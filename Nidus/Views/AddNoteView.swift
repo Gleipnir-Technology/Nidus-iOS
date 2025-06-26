@@ -26,121 +26,138 @@ struct AddNoteView: View {
 		) + " away"
 	}
 	var body: some View {
-		VStack(alignment: .leading, spacing: 8) {
-			Text("Where: \(locationDescription)")
-			Spacer()
-			Text("Voice Memo Recorder")
-				.font(.title)
-				.fontWeight(.bold)
+		Form {
+			VStack(alignment: .leading, spacing: 8) {
+				Text("Where: \(locationDescription)")
+				LocationView(location: $location).frame(height: 300)
+				Spacer()
+				Text("Voice Memo Recorder")
+					.font(.title)
+					.fontWeight(.bold)
 
-			// Recording status
-			Text(audioRecorder.isRecording ? "Recording..." : "Ready to record")
-				.font(.headline)
-				.foregroundColor(audioRecorder.isRecording ? .red : .primary)
+				// Recording status
+				Text(audioRecorder.isRecording ? "Recording..." : "Ready to record")
+					.font(.headline)
+					.foregroundColor(
+						audioRecorder.isRecording ? .red : .primary
+					)
 
-			// Recording duration
-			if audioRecorder.isRecording {
-				Text("Duration: \(formatTime(audioRecorder.recordingTime))")
-					.font(.subheadline)
-					.foregroundColor(.secondary)
-			}
-
-			// Live transcription
-			if audioRecorder.isRecording && !audioRecorder.transcribedText.isEmpty {
-				ScrollView {
-					Text(audioRecorder.transcribedText)
-						.padding()
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.background(Color.blue.opacity(0.1))
-						.cornerRadius(10)
-				}
-				.frame(maxHeight: 150)
-			}
-
-			// Record button
-			Button(action: {
+				// Recording duration
 				if audioRecorder.isRecording {
-					audioRecorder.stopRecording()
+					Text("Duration: \(formatTime(audioRecorder.recordingTime))")
+						.font(.subheadline)
+						.foregroundColor(.secondary)
 				}
-				else {
-					audioRecorder.startRecording()
+
+				// Live transcription
+				if audioRecorder.isRecording
+					&& !audioRecorder.transcribedText.isEmpty
+				{
+					ScrollView {
+						Text(audioRecorder.transcribedText)
+							.padding()
+							.frame(
+								maxWidth: .infinity,
+								alignment: .leading
+							)
+							.background(Color.blue.opacity(0.1))
+							.cornerRadius(10)
+					}
+					.frame(maxHeight: 150)
 				}
-			}) {
-				Image(
-					systemName: audioRecorder.isRecording
-						? "stop.circle.fill" : "mic.circle.fill"
-				)
-				.font(.system(size: 80))
-				.foregroundColor(audioRecorder.isRecording ? .red : .blue)
-			}
-			.disabled(!audioRecorder.hasPermissions)
 
-			// Permission status
-			if !audioRecorder.hasPermissions {
-				VStack {
-					Text("Permissions required:")
-						.font(.caption)
-						.foregroundColor(.red)
-					Text("• Microphone access")
-						.font(.caption2)
-						.foregroundColor(.red)
-					Text("• Speech recognition")
-						.font(.caption2)
-						.foregroundColor(.red)
+				// Record button
+				Button(action: {
+					if audioRecorder.isRecording {
+						audioRecorder.stopRecording()
+					}
+					else {
+						audioRecorder.startRecording()
+					}
+				}) {
+					Image(
+						systemName: audioRecorder.isRecording
+							? "stop.circle.fill" : "mic.circle.fill"
+					)
+					.font(.system(size: 80))
+					.foregroundColor(audioRecorder.isRecording ? .red : .blue)
 				}
-			}
+				.disabled(!audioRecorder.hasPermissions)
 
-			// Recordings list
-			if !audioRecorder.recordings.isEmpty {
-				VStack(alignment: .leading, spacing: 10) {
-					Text("Recordings")
-						.font(.headline)
-
-					ForEach(audioRecorder.recordings, id: \.self) { recording in
-						HStack {
-							VStack(alignment: .leading) {
-								Text(recording.lastPathComponent)
-									.font(.caption)
-								if let transcription =
-									audioRecorder
-									.savedTranscriptions[
-										recording
-											.lastPathComponent
-									]
-								{
-									Text(
-										transcription.prefix(
-											50
-										)
-											+ (transcription
-												.count
-												> 50
-												? "..."
-												: "")
-									)
-									.font(.caption2)
-									.foregroundColor(.secondary)
-								}
-							}
-							Spacer()
-							Button("Play") {
-								audioRecorder.playRecording(
-									url: recording
-								)
-							}
+				// Permission status
+				if !audioRecorder.hasPermissions {
+					VStack {
+						Text("Permissions required:")
 							.font(.caption)
-						}
-						.padding(.horizontal)
+							.foregroundColor(.red)
+						Text("• Microphone access")
+							.font(.caption2)
+							.foregroundColor(.red)
+						Text("• Speech recognition")
+							.font(.caption2)
+							.foregroundColor(.red)
 					}
 				}
-				.padding()
-				.background(Color.gray.opacity(0.1))
-				.cornerRadius(10)
+
+				// Recordings list
+				if !audioRecorder.recordings.isEmpty {
+					VStack(alignment: .leading, spacing: 10) {
+						Text("Recordings")
+							.font(.headline)
+
+						ForEach(audioRecorder.recordings, id: \.self) {
+							recording in
+							HStack {
+								VStack(alignment: .leading) {
+									Text(
+										recording
+											.lastPathComponent
+									)
+									.font(.caption)
+									if let transcription =
+										audioRecorder
+										.savedTranscriptions[
+											recording
+												.lastPathComponent
+										]
+									{
+										Text(
+											transcription
+												.prefix(
+													50
+												)
+												+ (transcription
+													.count
+													> 50
+													? "..."
+													: "")
+										)
+										.font(.caption2)
+										.foregroundColor(
+											.secondary
+										)
+									}
+								}
+								Spacer()
+								Button("Play") {
+									audioRecorder.playRecording(
+										url: recording
+									)
+								}
+								.font(.caption)
+							}
+							.padding(.horizontal)
+						}
+					}
+					.padding()
+					.background(Color.gray.opacity(0.1))
+					.cornerRadius(10)
+				}
 			}
-		}
-		.padding()
-		.onAppear {
-			audioRecorder.requestPermissions()
+			.padding()
+			.onAppear {
+				audioRecorder.requestPermissions()
+			}
 		}
 	}
 
