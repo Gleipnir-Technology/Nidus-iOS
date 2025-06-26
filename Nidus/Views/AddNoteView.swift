@@ -1,5 +1,6 @@
 import AVFoundation
 import CoreLocation
+import OSLog
 import Speech
 import SwiftUI
 
@@ -39,81 +40,98 @@ struct AddNoteView: View {
 		) + " away"
 	}
 
-	var body: some View {
-		Form {
-			Section(header: Text("Location")) {
-				VStack(alignment: .leading, spacing: 8) {
-					if location == nil {
-						ProgressView().progressViewStyle(
-							CircularProgressViewStyle()
-						).frame(height: 300)
-						Text("Getting a fix on your location...")
-					}
-					else {
-						LocationView(location: $location).frame(height: 300)
-						Text("Where: \(locationDescription)")
-					}
-				}
-			}
-
-			Section(header: Text("Voice Notes")) {
-				AudioRecorderView(audioRecorder: audioRecorder)
-				Text("Transcription:")
-				ScrollView {
-					Text(audioRecorder.transcribedText)
-						.padding()
-						.frame(
-							maxWidth: .infinity,
-							alignment: .leading
-						)
-						.background(Color.blue.opacity(0.1))
-						.cornerRadius(10)
-				}
-				.frame(maxHeight: 150)
-			}
-
-			Section(header: Text("Photos")) {
-				PhotoAttachmentView(
-					selectedImageIndex: $selectedImageIndex,
-					showingCamera: $showingCamera,
-					showingImagePicker: $showingImagePicker,
-					showingImageViewer: $showingImageViewer
-				)
-				ThumbnailListView(
-					capturedImages: $capturedImages,
-					selectedImageIndex: $selectedImageIndex,
-					showingImageViewer: $showingImageViewer
-				)
-			}
-			Section(header: Text("Text")) {
-
-			}
-		}
-		.sheet(isPresented: $showingCamera) {
-			CameraView { image in
-				capturedImages.append(image)
-			}
-		}
-		.sheet(isPresented: $showingImagePicker) {
-			PhotoPicker { images in
-				capturedImages.append(contentsOf: images)
-			}
-		}
-		.sheet(isPresented: $showingImageViewer) {
-			ImageViewer(
-				images: capturedImages,
-				onImageRemove: { at in capturedImages.remove(at: at) },
-				selectedIndex: $selectedImageIndex
-			)
-		}.onAppear {
-			locationDataManager.onLocationAcquired({ userLocation in
-				if useLocationManagerWhenAvailable {
-					self.location = userLocation
-				}
-			})
-		}
+	func onSave() {
+		Logger.foreground.info("Saving new note")
 	}
 
+	var body: some View {
+		NavigationView {
+			Form {
+				Section(header: Text("Location")) {
+					VStack(alignment: .leading, spacing: 8) {
+						if location == nil {
+							ProgressView().progressViewStyle(
+								CircularProgressViewStyle()
+							).frame(height: 300)
+							Text("Getting a fix on your location...")
+						}
+						else {
+							LocationView(location: $location).frame(
+								height: 300
+							)
+							Text("Where: \(locationDescription)")
+						}
+					}
+				}
+
+				Section(header: Text("Voice Notes")) {
+					AudioRecorderView(audioRecorder: audioRecorder)
+					Text("Transcription:")
+					ScrollView {
+						Text(audioRecorder.transcribedText)
+							.padding()
+							.frame(
+								maxWidth: .infinity,
+								alignment: .leading
+							)
+							.background(Color.blue.opacity(0.1))
+							.cornerRadius(10)
+					}
+					.frame(maxHeight: 150)
+				}
+
+				Section(header: Text("Photos")) {
+					PhotoAttachmentView(
+						selectedImageIndex: $selectedImageIndex,
+						showingCamera: $showingCamera,
+						showingImagePicker: $showingImagePicker,
+						showingImageViewer: $showingImageViewer
+					)
+					ThumbnailListView(
+						capturedImages: $capturedImages,
+						selectedImageIndex: $selectedImageIndex,
+						showingImageViewer: $showingImageViewer
+					)
+				}
+				Section(header: Text("Text")) {
+
+				}
+			}
+			.sheet(isPresented: $showingCamera) {
+				CameraView { image in
+					capturedImages.append(image)
+				}
+			}
+			.sheet(isPresented: $showingImagePicker) {
+				PhotoPicker { images in
+					capturedImages.append(contentsOf: images)
+				}
+			}
+			.sheet(isPresented: $showingImageViewer) {
+				ImageViewer(
+					images: capturedImages,
+					onImageRemove: { at in capturedImages.remove(at: at) },
+					selectedIndex: $selectedImageIndex
+				)
+			}.onAppear {
+				locationDataManager.onLocationAcquired({ userLocation in
+					if useLocationManagerWhenAvailable {
+						self.location = userLocation
+					}
+				})
+			}
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationTitle("Create note").toolbar {
+				ToolbarItem {
+					Button {
+						onSave()
+					} label: {
+						Text("Save")
+					}
+				}
+			}
+		}
+	}
 }
 
 // MARK: - Preview
