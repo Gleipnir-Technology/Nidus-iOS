@@ -9,10 +9,13 @@ struct AddNoteView: View {
 	@State private var capturedImages: [UIImage] = []
 	@Environment(\.locale) var locale
 	@State var location: CLLocation?
+	var onAddNote: ((NidusNote) -> Void)
 	@State private var selectedImageIndex: Int = 0
 	@State private var showingCamera = false
 	@State private var showingImagePicker = false
 	@State private var showingImageViewer = false
+	@State private var showLocationToast = false
+	@State private var text = ""
 
 	private var useLocationManagerWhenAvailable: Bool
 	var locationDataManager: LocationDataManager
@@ -21,6 +24,7 @@ struct AddNoteView: View {
 		self._audioRecorder = .init(wrappedValue: AudioRecorder())
 		self._location = .init(wrappedValue: location)
 		self.locationDataManager = locationDataManager
+		self.onAddNote = onAddNote
 		self.useLocationManagerWhenAvailable = (location == nil)
 	}
 
@@ -41,9 +45,15 @@ struct AddNoteView: View {
 	}
 
 	func onSave() {
-		Logger.foreground.info("Saving new note")
+		if location == nil {
+			showLocationToast = true
+			return
+		}
+		let note = NidusNote(
+			location: location!
+		)
+		onAddNote(note)
 	}
-
 	var body: some View {
 		NavigationView {
 			Form {
@@ -129,7 +139,11 @@ struct AddNoteView: View {
 						Text("Save")
 					}
 				}
-			}
+			}.toast(
+				message: "Need a location first",
+				isShowing: $showLocationToast,
+				duration: Toast.short
+			)
 		}
 	}
 }

@@ -67,6 +67,9 @@ class NidusModel {
 		return toShow
 	}
 
+	func onAddNote(_ note: NidusNote) {
+		Logger.foreground.info("Adding note")
+	}
 	func onAPIResponse(_ response: APIResponse) {
 		do {
 			Logger.background.info("Begin saving API response")

@@ -34,7 +34,8 @@ struct ContentView: View {
 					Tab("Create", systemImage: "plus", value: 0) {
 						AddNoteView(
 							location: nil,
-							locationDataManager: locationDataManager
+							locationDataManager: locationDataManager,
+							onAddNote: model.onAddNote
 						)
 					}
 					Tab("Notes", systemImage: "clock", value: 1) {

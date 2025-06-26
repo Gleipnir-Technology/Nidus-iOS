@@ -79,6 +79,7 @@ struct NoteCategory: Hashable, Identifiable {
 		icon: "ant.circle",
 		name: "Mosquito Source"
 	)
+	static let nidus = NoteCategory(color: .purple, icon: "mappin", name: "Nidus Native")
 	static let serviceRequest = NoteCategory(
 		color: .green,
 		icon: "clipboard",
@@ -86,7 +87,7 @@ struct NoteCategory: Hashable, Identifiable {
 	)
 	static let trapData = NoteCategory(color: .blue, icon: "hazardsign", name: "Trap Data")
 
-	static let all = [mosquitoSource, serviceRequest, trapData]
+	static let all = [mosquitoSource, nidus, serviceRequest, trapData]
 }
 
 protocol Note: Identifiable<UUID>, CoordinateIdentifiable, Hashable {
