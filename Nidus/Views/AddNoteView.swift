@@ -40,36 +40,23 @@ struct AddNoteView: View {
 }
 
 // MARK: - Preview
-struct AddNoteViewCurrentLocation_Previews: PreviewProvider {
-	@State static var locationDataManager: LocationDataManager = LocationDataManager()
+struct AddNoteView_Previews: PreviewProvider {
 	static var previews: some View {
 		AddNoteView(
 			location: nil,
-			locationDataManager: locationDataManager
+			locationDataManager: LocationDataManager()
 		)
-	}
-}
-
-struct AddNoteViewNoLocation_Previews: PreviewProvider {
-	@State static var locationDataManager: LocationDataManager = LocationDataManagerFake(
-		location: nil
-	)
-	static var previews: some View {
 		AddNoteView(
 			location: CLLocation(latitude: 32.6514, longitude: -161.4333),
-			locationDataManager: locationDataManager
+			locationDataManager: LocationDataManagerFake(
+				location: nil
+			)
 		)
-	}
-}
-
-struct AddNoteViewWithLocation_Previews: PreviewProvider {
-	@State static var locationDataManager: LocationDataManager = LocationDataManagerFake(
-		location: CLLocation(latitude: 33.0, longitude: -161.5)
-	)
-	static var previews: some View {
 		AddNoteView(
 			location: CLLocation(latitude: 32.6514, longitude: -161.4333),
-			locationDataManager: locationDataManager
+			locationDataManager: LocationDataManagerFake(
+				location: CLLocation(latitude: 33.0, longitude: -161.5)
+			)
 		)
 	}
 }
