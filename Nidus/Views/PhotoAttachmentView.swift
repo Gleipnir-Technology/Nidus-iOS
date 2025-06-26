@@ -84,14 +84,14 @@ struct PhotoAttachmentView: View {
 	@Binding var showingImageViewer: Bool
 
 	var body: some View {
-		VStack {
+		HStack {
 			// Add Photo Buttons
 			Button(action: {
 				showingCamera = true
 			}) {
 				Label("Take Photo", systemImage: "camera")
 					.foregroundColor(.blue)
-			}
+			}.buttonStyle(BorderlessButtonStyle())
 
 			Spacer()
 
@@ -103,7 +103,7 @@ struct PhotoAttachmentView: View {
 					systemImage: "photo.on.rectangle"
 				)
 				.foregroundColor(.blue)
-			}
+			}.buttonStyle(BorderlessButtonStyle())
 
 			ThumbnailListView(
 				capturedImages: $capturedImages,
