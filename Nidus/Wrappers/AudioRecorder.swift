@@ -281,10 +281,15 @@ extension AudioRecorder: AVAudioRecorderDelegate {
 
 class AudioRecorderFake: AudioRecorder {
 
-	init(hasPermissions: Bool = true, isRecording: Bool = false) {
+	init(
+		hasPermissions: Bool = true,
+		isRecording: Bool = false,
+		recordingDuration: TimeInterval = TimeInterval(integerLiteral: 123)
+	) {
 		super.init()
 		self.hasPermissions = hasPermissions
 		self.isRecording = isRecording
+		self.recordingTime = recordingDuration
 	}
 
 	override func requestPermissions() {
