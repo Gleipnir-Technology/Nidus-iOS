@@ -30,10 +30,11 @@ struct AddNoteView: View {
 			Text("New note")
 				.font(.title)
 				.fontWeight(.bold)
-			Text("Where: \(locationDescription)")
 			LocationView(location: $location).frame(height: 300)
+			Text("Where: \(locationDescription)")
 
 			AudioRecorderView()
+			Spacer()
 		}
 	}
 
