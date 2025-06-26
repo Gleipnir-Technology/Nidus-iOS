@@ -4,7 +4,7 @@ import Speech
 import SwiftUI
 
 struct AddNoteView: View {
-	@StateObject private var audioRecorder = AudioRecorder()
+	@State private var audioRecorder = AudioRecorder()
 	@Environment(\.locale) var locale
 	@State var location: CLLocation?
 

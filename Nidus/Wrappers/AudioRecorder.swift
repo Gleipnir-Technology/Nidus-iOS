@@ -8,13 +8,14 @@
 import AVFoundation
 import Speech
 
-class AudioRecorder: NSObject, ObservableObject {
-	@Published var isRecording = false
-	@Published var hasPermissions = false
-	@Published var recordings: [URL] = []
-	@Published var recordingTime: TimeInterval = 0
-	@Published var transcribedText = ""
-	@Published var savedTranscriptions: [String: String] = [:]
+@Observable
+class AudioRecorder: NSObject {
+	var isRecording = false
+	var hasPermissions = false
+	var recordings: [URL] = []
+	var recordingTime: TimeInterval = 0
+	var transcribedText = ""
+	var savedTranscriptions: [String: String] = [:]
 
 	private var audioRecorder: AVAudioRecorder?
 	private var audioPlayer: AVAudioPlayer?
