@@ -38,13 +38,21 @@ struct NoteEditor: View {
          */
 		showSavedToast = true
 	}
+
+	var locationDescription: String {
+		guard let location = location else {
+			return "none"
+		}
+		return "\(location.coordinate.latitude), \(location.coordinate.longitude)"
+	}
+
 	var body: some View {
 		Form {
 			LocationView(
 				location: $location
 			).frame(height: 300)
 			Text(
-				"Location \(location?.coordinate.latitude), \(location?.coordinate.longitude)"
+				locationDescription
 			)
 			Picker(selection: $category) {
 				ForEach(NoteCategory.all) { c in
