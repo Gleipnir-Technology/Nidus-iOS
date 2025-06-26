@@ -47,6 +47,7 @@
 		5398545B2E0DB49500D3E2EF /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5398545A2E0DB49300D3E2EF /* CameraView.swift */; };
 		5398545D2E0DB4C500D3E2EF /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */; };
 		5398545F2E0DB7AF00D3E2EF /* ImageViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5398545E2E0DB7AC00D3E2EF /* ImageViewer.swift */; };
+		539854612E0DBCB700D3E2EF /* ThumbnailListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539854602E0DBCB300D3E2EF /* ThumbnailListView.swift */; };
 		53B8F0842E08059A007ABA40 /* FilterableField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B8F0832E080597007ABA40 /* FilterableField.swift */; };
 		53B8F0862E080A99007ABA40 /* ServiceRequestDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B8F0852E080A94007ABA40 /* ServiceRequestDetail.swift */; };
 		53B8F0882E080C62007ABA40 /* TrapDataDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B8F0872E080C5E007ABA40 /* TrapDataDetail.swift */; };
@@ -113,6 +114,7 @@
 		5398545A2E0DB49300D3E2EF /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
 		5398545E2E0DB7AC00D3E2EF /* ImageViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewer.swift; sourceTree = "<group>"; };
+		539854602E0DBCB300D3E2EF /* ThumbnailListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailListView.swift; sourceTree = "<group>"; };
 		53B8F0832E080597007ABA40 /* FilterableField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterableField.swift; sourceTree = "<group>"; };
 		53B8F0852E080A94007ABA40 /* ServiceRequestDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceRequestDetail.swift; sourceTree = "<group>"; };
 		53B8F0872E080C5E007ABA40 /* TrapDataDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrapDataDetail.swift; sourceTree = "<group>"; };
@@ -247,6 +249,7 @@
 				5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */,
 				53B8F0852E080A94007ABA40 /* ServiceRequestDetail.swift */,
 				538784422D8B474300B3552E /* SettingView.swift */,
+				539854602E0DBCB300D3E2EF /* ThumbnailListView.swift */,
 				532F3AD92DE7A41C006E0E40 /* Toast.swift */,
 				53B8F0872E080C5E007ABA40 /* TrapDataDetail.swift */,
 				532F3B042DECF12B006E0E40 /* TreatmentDetail.swift */,
@@ -474,6 +477,7 @@
 				533F88972DF0FB2C00D0DBF2 /* APIResponse.swift in Sources */,
 				532F3B032DECF0F2006E0E40 /* TreatmentList.swift in Sources */,
 				532F3AE02DEA0BCD006E0E40 /* FieldSeeker.swift in Sources */,
+				539854612E0DBCB700D3E2EF /* ThumbnailListView.swift in Sources */,
 				533F88952DF0F1ED00D0DBF2 /* NidusModelPreview.swift in Sources */,
 				537560BA2D820A5A00D8528B /* LocationView.swift in Sources */,
 				532F3AD12DE61CE7006E0E40 /* BackgroundNetworkManager.swift in Sources */,

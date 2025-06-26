@@ -63,10 +63,14 @@ struct AddNoteView: View {
 
 			Section(header: Text("Photos")) {
 				PhotoAttachmentView(
-					capturedImages: $capturedImages,
 					selectedImageIndex: $selectedImageIndex,
 					showingCamera: $showingCamera,
 					showingImagePicker: $showingImagePicker,
+					showingImageViewer: $showingImageViewer
+				)
+				ThumbnailListView(
+					capturedImages: $capturedImages,
+					selectedImageIndex: $selectedImageIndex,
 					showingImageViewer: $showingImageViewer
 				)
 			}

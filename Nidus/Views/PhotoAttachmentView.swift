@@ -8,76 +8,7 @@
 import PhotosUI
 import SwiftUI
 
-struct ThumbnailListView: View {
-	@Binding var capturedImages: [UIImage]
-	@Binding var selectedImageIndex: Int
-	@State private var showingImageViewer = false
-
-	var body: some View {
-		if !capturedImages.isEmpty {
-			LazyVGrid(
-				columns: [
-					GridItem(.flexible()),
-					GridItem(.flexible()),
-					GridItem(.flexible()),
-				],
-				spacing: 10
-			) {
-				ForEach(
-					Array(capturedImages.enumerated()),
-					id: \.offset
-				) { index, image in
-					ZStack(alignment: .topTrailing) {
-						Image(uiImage: image)
-							.resizable()
-							.aspectRatio(
-								contentMode:
-									.fill
-							)
-							.frame(
-								width: 80,
-								height: 80
-							)
-							.clipped()
-							.cornerRadius(8)
-							.onTapGesture {
-								selectedImageIndex =
-									index
-								showingImageViewer =
-									true
-							}
-
-						// Delete button
-						Button(action: {
-							capturedImages
-								.remove(
-									at:
-										index
-								)
-						}) {
-							Image(
-								systemName:
-									"xmark.circle.fill"
-							)
-							.foregroundColor(
-								.red
-							)
-							.background(
-								Color.white
-							)
-							.clipShape(Circle())
-						}
-						.offset(x: 5, y: -5)
-					}
-				}
-			}
-			.padding(.vertical, 8)
-		}
-
-	}
-}
 struct PhotoAttachmentView: View {
-	@Binding var capturedImages: [UIImage]
 	@Binding var selectedImageIndex: Int
 	@Binding var showingCamera: Bool
 	@Binding var showingImagePicker: Bool
@@ -104,23 +35,12 @@ struct PhotoAttachmentView: View {
 				)
 				.foregroundColor(.blue)
 			}.buttonStyle(BorderlessButtonStyle())
-
-			ThumbnailListView(
-				capturedImages: $capturedImages,
-				selectedImageIndex: $selectedImageIndex
-			)
 		}
-	}
-
-	private func saveNote() {
-		// Implement your save logic here
-		print("Number of images: \(capturedImages.count)")
 	}
 }
 
 // MARK: - Preview
 struct CameraNotesView_Previews: PreviewProvider {
-	@State static var capturedImages: [UIImage] = []
 	@State static var selectedImageIndex: Int = 0
 	@State static var showingCamera: Bool = false
 	@State static var showingImagePicker: Bool = false
@@ -128,7 +48,6 @@ struct CameraNotesView_Previews: PreviewProvider {
 
 	static var previews: some View {
 		PhotoAttachmentView(
-			capturedImages: $capturedImages,
 			selectedImageIndex: $selectedImageIndex,
 			showingCamera: $showingCamera,
 			showingImagePicker: $showingImagePicker,
