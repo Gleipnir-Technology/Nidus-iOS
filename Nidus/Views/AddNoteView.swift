@@ -27,9 +27,6 @@ struct AddNoteView: View {
 	}
 	var body: some View {
 		VStack(alignment: .leading, spacing: 8) {
-			Text("New note")
-				.font(.title)
-				.fontWeight(.bold)
 			LocationView(location: $location).frame(height: 300)
 			Text("Where: \(locationDescription)")
 
