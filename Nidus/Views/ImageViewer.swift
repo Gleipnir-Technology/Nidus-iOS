@@ -11,6 +11,7 @@ import SwiftUI
 // MARK: - Image Viewer
 struct ImageViewer: View {
 	let images: [UIImage]
+	var onImageRemove: (Int) -> Void
 	@Binding var selectedIndex: Int
 	@Environment(\.dismiss) private var dismiss
 
@@ -28,6 +29,11 @@ struct ImageViewer: View {
 			.navigationTitle("Photo \(selectedIndex + 1) of \(images.count)")
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
+				ToolbarItem(placement: .navigationBarLeading) {
+					Button("Remove") {
+						onImageRemove(selectedIndex)
+					}
+				}
 				ToolbarItem(placement: .navigationBarTrailing) {
 					Button("Done") {
 						dismiss()

@@ -27,48 +27,25 @@ struct ThumbnailListView: View {
 					Array(capturedImages.enumerated()),
 					id: \.offset
 				) { index, image in
-					ZStack(alignment: .topTrailing) {
-						Image(uiImage: image)
-							.resizable()
-							.aspectRatio(
-								contentMode:
-									.fill
-							)
-							.frame(
-								width: 80,
-								height: 80
-							)
-							.clipped()
-							.cornerRadius(8)
-							.onTapGesture {
-								selectedImageIndex =
-									index
-								showingImageViewer =
-									true
-							}
-
-						// Delete button
-						Button(action: {
-							capturedImages
-								.remove(
-									at:
-										index
-								)
-						}) {
-							Image(
-								systemName:
-									"xmark.circle.fill"
-							)
-							.foregroundColor(
-								.red
-							)
-							.background(
-								Color.white
-							)
-							.clipShape(Circle())
+					Image(uiImage: image)
+						.resizable()
+						.aspectRatio(
+							contentMode:
+								.fill
+						)
+						.frame(
+							width: 80,
+							height: 80
+						)
+						.clipped()
+						.cornerRadius(8)
+						.onTapGesture {
+							selectedImageIndex =
+								index
+							showingImageViewer =
+								true
 						}
-						.offset(x: 5, y: -5)
-					}
+
 				}
 			}
 			.padding(.vertical, 8)
@@ -80,20 +57,25 @@ struct ThumbnailListView: View {
 // MARK: - Preview
 struct ThumbnailListView_Previews: PreviewProvider {
 	@State static var capturedImages: [UIImage] = [
-		UIImage(systemName: "photo")!,
-		UIImage(systemName: "photo")!,
+		UIImage(systemName: "heart.text.clipboard")!,
+		UIImage(systemName: "gear")!,
+		UIImage(systemName: "cart")!,
+		UIImage(systemName: "figure.walk.treadmill")!,
 	]
 	@State static var selectedImageIndex: Int = 0
 	@State static var showingImageViewer: Bool = false
 	static var previews: some View {
-		VStack {
-			ThumbnailListView(
-				capturedImages: $capturedImages,
-				selectedImageIndex: $selectedImageIndex,
-				showingImageViewer: $showingImageViewer
+		ThumbnailListView(
+			capturedImages: $capturedImages,
+			selectedImageIndex: $selectedImageIndex,
+			showingImageViewer: $showingImageViewer
+		)
+		.sheet(isPresented: $showingImageViewer) {
+			ImageViewer(
+				images: capturedImages,
+				onImageRemove: { at in capturedImages.remove(at: at) },
+				selectedIndex: $selectedImageIndex
 			)
-			Text("Selected index: \(selectedImageIndex)")
-			Text("Showing image viewer: \(showingImageViewer)")
 		}
 	}
 }

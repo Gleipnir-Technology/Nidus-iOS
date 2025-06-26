@@ -36,6 +36,7 @@ struct AddNoteView: View {
 			.measurement(width: .abbreviated, usage: .road).locale(locale)
 		) + " away"
 	}
+
 	var body: some View {
 		Form {
 			Section(header: Text("Location")) {
@@ -89,7 +90,11 @@ struct AddNoteView: View {
 			}
 		}
 		.sheet(isPresented: $showingImageViewer) {
-			ImageViewer(images: capturedImages, selectedIndex: $selectedImageIndex)
+			ImageViewer(
+				images: capturedImages,
+				onImageRemove: { at in capturedImages.remove(at: at) },
+				selectedIndex: $selectedImageIndex
+			)
 		}
 	}
 
