@@ -41,7 +41,6 @@
 		537560CC2D82127100D8528B /* NoteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C92D82127100D8528B /* NoteRow.swift */; };
 		537560CE2D82127100D8528B /* NoteList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560C82D82127100D8528B /* NoteList.swift */; };
 		537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560CF2D821BD500D8528B /* NoteEditor.swift */; };
-		537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560DB2D83306C00D8528B /* LocationDataManager.swift */; };
 		537E02672DC03DC5000F254F /* MapOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E02662DC03DC1000F254F /* MapOverview.swift */; };
 		538784432D8B474500B3552E /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538784422D8B474300B3552E /* SettingView.swift */; };
 		53B8F0842E08059A007ABA40 /* FilterableField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B8F0832E080597007ABA40 /* FilterableField.swift */; };
@@ -104,7 +103,6 @@
 		537560C82D82127100D8528B /* NoteList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteList.swift; sourceTree = "<group>"; };
 		537560C92D82127100D8528B /* NoteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteRow.swift; sourceTree = "<group>"; };
 		537560CF2D821BD500D8528B /* NoteEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditor.swift; sourceTree = "<group>"; };
-		537560DB2D83306C00D8528B /* LocationDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDataManager.swift; sourceTree = "<group>"; };
 		537E02662DC03DC1000F254F /* MapOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapOverview.swift; sourceTree = "<group>"; };
 		538784422D8B474300B3552E /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		53B8F0832E080597007ABA40 /* FilterableField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterableField.swift; sourceTree = "<group>"; };
@@ -121,6 +119,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		5365EE652E0DA04F0014A88F /* Wrappers */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Wrappers;
+			sourceTree = "<group>";
+		};
 		53E1F2EF2E05CF6B00A6D888 /* Database */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Database;
@@ -179,10 +182,9 @@
 		537560AF2D820A5A00D8528B /* Nidus */ = {
 			isa = PBXGroup;
 			children = (
-				53E1F2EF2E05CF6B00A6D888 /* Database */,
 				537560A12D820A5A00D8528B /* Assets.xcassets */,
 				532F3ACD2DE61BF7006E0E40 /* Background */,
-				537560DB2D83306C00D8528B /* LocationDataManager.swift */,
+				53E1F2EF2E05CF6B00A6D888 /* Database */,
 				532F3AD22DE66D3D006E0E40 /* Logger.swift */,
 				537560C12D820FFE00D8528B /* Models */,
 				537560BE2D820F0A00D8528B /* Nidus.entitlements */,
@@ -191,6 +193,7 @@
 				537560D12D8223E800D8528B /* PreviewHelper */,
 				537560D62D82248F00D8528B /* SampleData */,
 				537560C42D82125200D8528B /* Views */,
+				5365EE652E0DA04F0014A88F /* Wrappers */,
 			);
 			path = Nidus;
 			sourceTree = "<group>";
@@ -291,6 +294,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				5365EE652E0DA04F0014A88F /* Wrappers */,
 				53E1F2EF2E05CF6B00A6D888 /* Database */,
 			);
 			name = "Nidus Notes";
@@ -433,7 +437,6 @@
 				531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */,
 				53B8F08C2E0CC914007ABA40 /* AudioRecorderView.swift in Sources */,
 				532F3B012DECEE5D006E0E40 /* InspectionDetail.swift in Sources */,
-				537560DC2D83306F00D8528B /* LocationDataManager.swift in Sources */,
 				532F3AFB2DECBFF5006E0E40 /* NotesCluster.swift in Sources */,
 				532F3AE22DEB64B4006E0E40 /* Importer.swift in Sources */,
 				537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */,
