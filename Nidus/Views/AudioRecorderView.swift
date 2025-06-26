@@ -70,7 +70,15 @@ struct AudioStatusView: View {
 	}
 }
 struct AudioRecorderView: View {
-	@StateObject private var audioRecorder = AudioRecorder()
+	@State private var audioRecorder: AudioRecorder
+
+	init(audioRecorder: AudioRecorder) {
+		self._audioRecorder = .init(wrappedValue: audioRecorder)
+	}
+
+	init() {
+		self.init(audioRecorder: AudioRecorder())
+	}
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 8) {
@@ -427,9 +435,21 @@ extension AudioRecorder: AVAudioRecorderDelegate {
 	}
 }
 
+class AudioRecorderFake: AudioRecorder {
+
+	init(hasPermissions: Bool) {
+		super.init()
+		self.hasPermissions = hasPermissions
+	}
+
+	override func requestPermissions() {
+	}
+}
 // MARK: - Preview
 struct AudioRecorder_Previews: PreviewProvider {
 	static var previews: some View {
-		AudioRecorderView()
+		AudioRecorderView(audioRecorder: AudioRecorderFake(hasPermissions: false))
+			.previewDisplayName("No Permissions")
+		AudioRecorderView(audioRecorder: AudioRecorderFake(hasPermissions: true))
 	}
 }
