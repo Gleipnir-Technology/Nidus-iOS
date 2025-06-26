@@ -75,6 +75,7 @@ struct AudioStatusView: View {
 										)
 									)
 									.font(.caption)
+									.id("transcription")
 							}.onChange(of: transcription) {
 								withAnimation(
 									.easeInOut(duration: 0.3)
