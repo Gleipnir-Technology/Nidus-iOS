@@ -69,6 +69,7 @@ class NidusModel {
 
 	func onAPIResponse(_ response: APIResponse) {
 		do {
+			Logger.background.info("Begin saving API response")
 			self.backgroundNetworkProgress = 0.0
 			let totalRecords =
 				response.requests.count + response.sources.count
@@ -92,7 +93,7 @@ class NidusModel {
 			}
 			loadNotesFromDatabase()
 			updateCluster()
-			Logger.background.info("Done saving response")
+			Logger.background.info("Done saving API response")
 		}
 		catch {
 			Logger.background.error("Failed to handle API response: \(error)")
