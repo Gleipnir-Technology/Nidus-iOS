@@ -97,7 +97,17 @@ struct AddNoteView: View {
 					)
 				}
 				Section(header: Text("Text")) {
-
+					ScrollView {
+						TextField(
+							"Additional text-only information",
+							text: $text
+						)
+						.frame(
+							maxWidth: .infinity,
+							alignment: .leading
+						)
+						.cornerRadius(10)
+					}
 				}
 			}
 			.sheet(isPresented: $showingCamera) {
