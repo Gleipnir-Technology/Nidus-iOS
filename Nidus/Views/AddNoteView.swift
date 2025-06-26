@@ -20,8 +20,13 @@ struct AddNoteView: View {
 	private var useLocationManagerWhenAvailable: Bool
 	var locationDataManager: LocationDataManager
 
-	init(location: CLLocation?, locationDataManager: LocationDataManager) {
-		self._audioRecorder = .init(wrappedValue: AudioRecorder())
+	init(
+		audioRecorder: AudioRecorder = AudioRecorder(),
+		location: CLLocation?,
+		locationDataManager: LocationDataManager,
+		onAddNote: @escaping ((NidusNote) -> Void) = { _ in }
+	) {
+		self._audioRecorder = .init(wrappedValue: audioRecorder)
 		self._location = .init(wrappedValue: location)
 		self.locationDataManager = locationDataManager
 		self.onAddNote = onAddNote
@@ -75,19 +80,7 @@ struct AddNoteView: View {
 				}
 
 				Section(header: Text("Voice Notes")) {
-					AudioRecorderView(audioRecorder: audioRecorder)
-					Text("Transcription:")
-					ScrollView {
-						Text(audioRecorder.transcribedText)
-							.padding()
-							.frame(
-								maxWidth: .infinity,
-								alignment: .leading
-							)
-							.background(Color.blue.opacity(0.1))
-							.cornerRadius(10)
-					}
-					.frame(maxHeight: 150)
+					AudioRecorderView(audioRecorder)
 				}
 
 				Section(header: Text("Photos")) {
@@ -154,18 +147,30 @@ struct AddNoteView_Previews: PreviewProvider {
 		AddNoteView(
 			location: nil,
 			locationDataManager: LocationDataManager()
-		)
+		).previewDisplayName("user location")
 		AddNoteView(
 			location: CLLocation(latitude: 32.6514, longitude: -161.4333),
 			locationDataManager: LocationDataManagerFake(
 				location: nil
 			)
-		)
+		).previewDisplayName("set location")
 		AddNoteView(
 			location: CLLocation(latitude: 32.6514, longitude: -161.4333),
 			locationDataManager: LocationDataManagerFake(
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			)
-		)
+		).previewDisplayName("set location with user location")
+		AddNoteView(
+			audioRecorder: AudioRecorderFake(
+				isRecording: true,
+				recordingDuration: TimeInterval(integerLiteral: 98),
+				transcribedText:
+					"This is a bunch of stuff that I've just said that is all over this place. Let's assume that I've just filled this with tons and tons of words so that we can see what happens when we overflow the limits of the view."
+			),
+			location: CLLocation(latitude: 32.6514, longitude: -161.4333),
+			locationDataManager: LocationDataManagerFake(
+				location: CLLocation(latitude: 33.0, longitude: -161.5)
+			)
+		).previewDisplayName("mid long recording")
 	}
 }

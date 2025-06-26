@@ -15,6 +15,7 @@ struct AudioStatusView: View {
 	var onStopRecording: () -> Void
 	var onStartRecording: () -> Void
 	var recordingTime: TimeInterval
+	var transcription: String
 
 	private func formatTime(_ time: TimeInterval) -> String {
 		let minutes = Int(time) / 60
@@ -60,6 +61,32 @@ struct AudioStatusView: View {
 							.font(.subheadline)
 							.foregroundColor(.secondary)
 					}
+					if !transcription.isEmpty {
+						ScrollViewReader { proxy in
+							ScrollView {
+								Text(transcription)
+									.frame(
+										maxWidth: .infinity,
+										alignment: .leading
+									)
+									.background(
+										Color.cyan.opacity(
+											0.1
+										)
+									)
+									.font(.caption)
+							}.onChange(of: transcription) {
+								withAnimation(
+									.easeInOut(duration: 0.3)
+								) {
+									proxy.scrollTo(
+										"transcription",
+										anchor: .bottom
+									)
+								}
+							}.frame(maxHeight: 100)
+						}
+					}
 				}
 			}
 			else {
@@ -81,6 +108,9 @@ struct AudioStatusView: View {
 }
 struct AudioRecorderView: View {
 	var audioRecorder: AudioRecorder
+	init(_ a: AudioRecorder) {
+		self.audioRecorder = a
+	}
 	var body: some View {
 		VStack(alignment: .leading, spacing: 8) {
 			AudioStatusView(
@@ -88,11 +118,11 @@ struct AudioRecorderView: View {
 				isRecording: audioRecorder.isRecording,
 				onStopRecording: audioRecorder.stopRecording,
 				onStartRecording: audioRecorder.startRecording,
-				recordingTime: audioRecorder.recordingTime
-
+				recordingTime: audioRecorder.recordingTime,
+				transcription: audioRecorder.transcribedText
 			)
 		}
-		.padding()
+		.frame(height: 130)
 		.onAppear {
 			audioRecorder.requestPermissions()
 		}
@@ -104,19 +134,18 @@ struct AudioRecorderView: View {
 struct AudioRecorder_Previews: PreviewProvider {
 	static var previews: some View {
 		AudioRecorderView(
-			audioRecorder: AudioRecorderFake(hasPermissions: false)
-		)
-		.previewDisplayName("No Permissions")
+			AudioRecorderFake(hasPermissions: false)
+		).previewDisplayName("No Permissions")
 		AudioRecorderView(
-			audioRecorder: AudioRecorderFake(isRecording: false)
-		)
-		.previewDisplayName("Not Recording")
+			AudioRecorderFake(isRecording: false)
+		).previewDisplayName("Not Recording")
 		AudioRecorderView(
-			audioRecorder: AudioRecorderFake(
+			AudioRecorderFake(
 				isRecording: true,
-				recordingDuration: TimeInterval(integerLiteral: 98)
+				recordingDuration: TimeInterval(integerLiteral: 98),
+				transcribedText:
+					"This is a bunch of stuff that I've just said that is all over this place. Let's assume that I've just filled this with tons and tons of words so that we can see what happens when we overflow the limits of the view."
 			)
-		)
-		.previewDisplayName("Is Recording")
+		).background(.green).previewDisplayName("Is Recording")
 	}
 }

@@ -284,12 +284,14 @@ class AudioRecorderFake: AudioRecorder {
 	init(
 		hasPermissions: Bool = true,
 		isRecording: Bool = false,
-		recordingDuration: TimeInterval = TimeInterval(integerLiteral: 123)
+		recordingDuration: TimeInterval = TimeInterval(integerLiteral: 123),
+		transcribedText: String = ""
 	) {
 		super.init()
 		self.hasPermissions = hasPermissions
 		self.isRecording = isRecording
 		self.recordingTime = recordingDuration
+		self.transcribedText = transcribedText
 	}
 
 	override func requestPermissions() {
