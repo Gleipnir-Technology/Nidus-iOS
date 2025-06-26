@@ -8,18 +8,21 @@
 
 import CoreLocation
 import Foundation
+import OSLog
 import SwiftUI
 
 @Observable
 class LocationDataManager: NSObject, CLLocationManagerDelegate {
 	var authorizationStatus: CLAuthorizationStatus
 	var allowAuthorizationChange: Bool
+	private var onLocationAcquiredCallbacks: [((CLLocation) -> Void)] = []
 	var isPrecise: Bool = false
 	var location: CLLocation? = nil
 	private var locationManager = CLLocationManager()
 
 	init(authorizationStatus: CLAuthorizationStatus? = nil) {
-		// Used to control what is shown in Preview
+		// Specifying the authorization status here is useful for previews
+		// to keep the preview in a static state
 		if let status = authorizationStatus {
 			self.authorizationStatus = status
 			self.allowAuthorizationChange = false
@@ -32,8 +35,21 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 		locationManager.delegate = self
 	}
 
+	func onLocationAcquired(_ action: @escaping (CLLocation) -> Void) {
+		if location != nil {
+			action(location!)
+			return
+		}
+		onLocationAcquiredCallbacks.append(action)
+	}
 	func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+		Logger.background.info(
+			"Location data manager authorization change: \(manager.authorizationStatus.rawValue)"
+		)
 		if !allowAuthorizationChange {
+			Logger.background.info(
+				"Location data manager authorization change: not allowing change"
+			)
 			return
 		}
 		switch manager.authorizationStatus {
@@ -73,10 +89,18 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 	) {
 		let location = locations.last
 		self.location = location
+		notifyCallbacks()
 	}
 
 	func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
 		print("error: \(error.localizedDescription)")
+	}
+
+	private func notifyCallbacks() {
+		while !onLocationAcquiredCallbacks.isEmpty {
+			let callback = onLocationAcquiredCallbacks.removeFirst()
+			callback(location!)
+		}
 	}
 }
 

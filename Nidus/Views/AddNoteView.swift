@@ -13,12 +13,14 @@ struct AddNoteView: View {
 	@State private var showingImagePicker = false
 	@State private var showingImageViewer = false
 
+	private var useLocationManagerWhenAvailable: Bool
 	var locationDataManager: LocationDataManager
 
 	init(location: CLLocation?, locationDataManager: LocationDataManager) {
 		self._audioRecorder = .init(wrappedValue: AudioRecorder())
 		self._location = .init(wrappedValue: location)
 		self.locationDataManager = locationDataManager
+		self.useLocationManagerWhenAvailable = (location == nil)
 	}
 
 	var locationDescription: String {
@@ -41,8 +43,16 @@ struct AddNoteView: View {
 		Form {
 			Section(header: Text("Location")) {
 				VStack(alignment: .leading, spacing: 8) {
-					LocationView(location: $location).frame(height: 300)
-					Text("Where: \(locationDescription)")
+					if location == nil {
+						ProgressView().progressViewStyle(
+							CircularProgressViewStyle()
+						).frame(height: 300)
+						Text("Getting a fix on your location...")
+					}
+					else {
+						LocationView(location: $location).frame(height: 300)
+						Text("Where: \(locationDescription)")
+					}
 				}
 			}
 
@@ -95,6 +105,12 @@ struct AddNoteView: View {
 				onImageRemove: { at in capturedImages.remove(at: at) },
 				selectedIndex: $selectedImageIndex
 			)
+		}.onAppear {
+			locationDataManager.onLocationAcquired({ userLocation in
+				if useLocationManagerWhenAvailable {
+					self.location = userLocation
+				}
+			})
 		}
 	}
 

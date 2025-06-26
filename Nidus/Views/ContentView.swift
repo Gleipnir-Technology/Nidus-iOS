@@ -33,10 +33,7 @@ struct ContentView: View {
 				TabView(selection: $selection) {
 					Tab("Create", systemImage: "plus", value: 0) {
 						AddNoteView(
-							location: CLLocation(
-								latitude: -39,
-								longitude: -111
-							),
+							location: nil,
 							locationDataManager: locationDataManager
 						)
 					}
