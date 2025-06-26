@@ -5,8 +5,13 @@ import SwiftUI
 
 struct AddNoteView: View {
 	@State private var audioRecorder: AudioRecorder
+	@State private var capturedImages: [UIImage] = []
 	@Environment(\.locale) var locale
 	@State var location: CLLocation?
+	@State private var selectedImageIndex: Int = 0
+	@State private var showingCamera = false
+	@State private var showingImagePicker = false
+	@State private var showingImageViewer = false
 
 	var locationDataManager: LocationDataManager
 
@@ -57,11 +62,30 @@ struct AddNoteView: View {
 			}
 
 			Section(header: Text("Photos")) {
-				PhotoAttachmentView()
+				PhotoAttachmentView(
+					capturedImages: $capturedImages,
+					selectedImageIndex: $selectedImageIndex,
+					showingCamera: $showingCamera,
+					showingImagePicker: $showingImagePicker,
+					showingImageViewer: $showingImageViewer
+				)
 			}
 			Section(header: Text("Text")) {
 
 			}
+		}
+		.sheet(isPresented: $showingCamera) {
+			CameraView { image in
+				capturedImages.append(image)
+			}
+		}
+		.sheet(isPresented: $showingImagePicker) {
+			PhotoPicker { images in
+				capturedImages.append(contentsOf: images)
+			}
+		}
+		.sheet(isPresented: $showingImageViewer) {
+			ImageViewer(images: capturedImages, selectedIndex: $selectedImageIndex)
 		}
 	}
 
