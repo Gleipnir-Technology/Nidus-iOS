@@ -37,12 +37,28 @@ struct AudioStatusView: View {
 			}
 			.disabled(!audioRecorder.hasPermissions)
 
-			// Recording status
-			Text(audioRecorder.isRecording ? "Recording..." : "Ready to record")
-				.font(.headline)
-				.foregroundColor(
-					audioRecorder.isRecording ? .red : .primary
-				)
+			// Permission status
+			if audioRecorder.hasPermissions {
+				// Recording status
+				Text(audioRecorder.isRecording ? "Recording..." : "Ready to record")
+					.font(.headline)
+					.foregroundColor(
+						audioRecorder.isRecording ? .red : .primary
+					)
+			}
+			else {
+				VStack {
+					Text("Permissions required:")
+						.font(.caption)
+						.foregroundColor(.red)
+					Text("• Microphone access")
+						.font(.caption2)
+						.foregroundColor(.red)
+					Text("• Speech recognition")
+						.font(.caption2)
+						.foregroundColor(.red)
+				}
+			}
 
 			// Recording duration
 			if audioRecorder.isRecording {
@@ -75,21 +91,6 @@ struct AudioRecorderView: View {
 						.cornerRadius(10)
 				}
 				.frame(maxHeight: 150)
-			}
-
-			// Permission status
-			if !audioRecorder.hasPermissions {
-				VStack {
-					Text("Permissions required:")
-						.font(.caption)
-						.foregroundColor(.red)
-					Text("• Microphone access")
-						.font(.caption2)
-						.foregroundColor(.red)
-					Text("• Speech recognition")
-						.font(.caption2)
-						.foregroundColor(.red)
-				}
 			}
 
 			// Recordings list
