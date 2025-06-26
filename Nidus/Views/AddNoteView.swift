@@ -4,11 +4,17 @@ import Speech
 import SwiftUI
 
 struct AddNoteView: View {
-	@State private var audioRecorder = AudioRecorder()
+	@State private var audioRecorder: AudioRecorder
 	@Environment(\.locale) var locale
 	@State var location: CLLocation?
 
 	var locationDataManager: LocationDataManager
+
+	init(location: CLLocation?, locationDataManager: LocationDataManager) {
+		self._audioRecorder = .init(wrappedValue: AudioRecorder())
+		self._location = .init(wrappedValue: location)
+		self.locationDataManager = locationDataManager
+	}
 
 	var locationDescription: String {
 		guard let location = location else {
@@ -30,7 +36,19 @@ struct AddNoteView: View {
 			LocationView(location: $location).frame(height: 300)
 			Text("Where: \(locationDescription)")
 
-			AudioRecorderView()
+			AudioRecorderView(audioRecorder: audioRecorder)
+			Text("Transcription:")
+			ScrollView {
+				Text(audioRecorder.transcribedText)
+					.padding()
+					.frame(
+						maxWidth: .infinity,
+						alignment: .leading
+					)
+					.background(Color.blue.opacity(0.1))
+					.cornerRadius(10)
+			}
+			.frame(maxHeight: 150)
 			Spacer()
 		}
 	}

@@ -14,8 +14,8 @@ class AudioRecorder: NSObject {
 	var hasPermissions = false
 	var recordings: [URL] = []
 	var recordingTime: TimeInterval = 0
-	var transcribedText = ""
 	var savedTranscriptions: [String: String] = [:]
+	var transcribedText: String = ""
 
 	private var audioRecorder: AVAudioRecorder?
 	private var audioPlayer: AVAudioPlayer?
@@ -281,7 +281,6 @@ extension AudioRecorder: AVAudioRecorderDelegate {
 }
 
 class AudioRecorderFake: AudioRecorder {
-
 	init(
 		hasPermissions: Bool = true,
 		isRecording: Bool = false,

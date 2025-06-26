@@ -80,16 +80,7 @@ struct AudioStatusView: View {
 	}
 }
 struct AudioRecorderView: View {
-	@State private var audioRecorder: AudioRecorder
-
-	init(audioRecorder: AudioRecorder) {
-		self._audioRecorder = .init(wrappedValue: audioRecorder)
-	}
-
-	init() {
-		self.init(audioRecorder: AudioRecorder())
-	}
-
+	var audioRecorder: AudioRecorder
 	var body: some View {
 		VStack(alignment: .leading, spacing: 8) {
 			AudioStatusView(
@@ -100,23 +91,6 @@ struct AudioRecorderView: View {
 				recordingTime: audioRecorder.recordingTime
 
 			)
-			// Live transcription
-			if audioRecorder.isRecording
-				&& !audioRecorder.transcribedText.isEmpty
-			{
-				ScrollView {
-					Text(audioRecorder.transcribedText)
-						.padding()
-						.frame(
-							maxWidth: .infinity,
-							alignment: .leading
-						)
-						.background(Color.blue.opacity(0.1))
-						.cornerRadius(10)
-				}
-				.frame(maxHeight: 150)
-			}
-
 		}
 		.padding()
 		.onAppear {
@@ -129,10 +103,14 @@ struct AudioRecorderView: View {
 // MARK: - Preview
 struct AudioRecorder_Previews: PreviewProvider {
 	static var previews: some View {
-		AudioRecorderView(audioRecorder: AudioRecorderFake(hasPermissions: false))
-			.previewDisplayName("No Permissions")
-		AudioRecorderView(audioRecorder: AudioRecorderFake(isRecording: false))
-			.previewDisplayName("Not Recording")
+		AudioRecorderView(
+			audioRecorder: AudioRecorderFake(hasPermissions: false)
+		)
+		.previewDisplayName("No Permissions")
+		AudioRecorderView(
+			audioRecorder: AudioRecorderFake(isRecording: false)
+		)
+		.previewDisplayName("Not Recording")
 		AudioRecorderView(
 			audioRecorder: AudioRecorderFake(
 				isRecording: true,
