@@ -177,13 +177,13 @@ class NidusModel {
 			)
 		)
 		let r = String(
-			format: "%f,%f,%f,%f",
+			format: "center x %f, center y %f, span latitude %f, span longitude %f",
 			currentRegion.center.latitude,
 			currentRegion.center.longitude,
 			currentRegion.span.latitudeDelta,
 			currentRegion.span.longitudeDelta
 		)
-		Logger.foreground.info("Loaded location \(r)")
+		Logger.foreground.info("Loaded current map region \(r)")
 	}
 	private func loadNotesFromDatabase() {
 		Task {
