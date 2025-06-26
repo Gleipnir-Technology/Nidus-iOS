@@ -32,26 +32,36 @@ struct AddNoteView: View {
 		) + " away"
 	}
 	var body: some View {
-		VStack(alignment: .leading, spacing: 8) {
-			LocationView(location: $location).frame(height: 300)
-			Text("Where: \(locationDescription)")
-
-			AudioRecorderView(audioRecorder: audioRecorder)
-			Text("Transcription:")
-			ScrollView {
-				Text(audioRecorder.transcribedText)
-					.padding()
-					.frame(
-						maxWidth: .infinity,
-						alignment: .leading
-					)
-					.background(Color.blue.opacity(0.1))
-					.cornerRadius(10)
+		Form {
+			Section(header: Text("Location")) {
+				VStack(alignment: .leading, spacing: 8) {
+					LocationView(location: $location).frame(height: 300)
+					Text("Where: \(locationDescription)")
+				}
 			}
-			.frame(maxHeight: 150)
-			Text("Pictures:")
 
-			Spacer()
+			Section(header: Text("Voice Notes")) {
+				AudioRecorderView(audioRecorder: audioRecorder)
+				Text("Transcription:")
+				ScrollView {
+					Text(audioRecorder.transcribedText)
+						.padding()
+						.frame(
+							maxWidth: .infinity,
+							alignment: .leading
+						)
+						.background(Color.blue.opacity(0.1))
+						.cornerRadius(10)
+				}
+				.frame(maxHeight: 150)
+			}
+
+			Section(header: Text("Photos")) {
+				PhotoAttachmentView()
+			}
+			Section(header: Text("Text")) {
+
+			}
 		}
 	}
 

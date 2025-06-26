@@ -8,9 +8,7 @@
 import PhotosUI
 import SwiftUI
 
-struct CameraNotesView: View {
-	@State private var noteTitle = ""
-	@State private var noteContent = ""
+struct PhotoAttachmentView: View {
 	@State private var capturedImages: [UIImage] = []
 	@State private var showingImagePicker = false
 	@State private var showingCamera = false
@@ -18,109 +16,90 @@ struct CameraNotesView: View {
 	@State private var selectedImageIndex = 0
 
 	var body: some View {
-		NavigationView {
-			Form {
-				Section(header: Text("Note Details")) {
-					TextField("Title", text: $noteTitle)
-					TextField("Content", text: $noteContent, axis: .vertical)
-						.lineLimit(5, reservesSpace: true)
+		VStack {
+			// Add Photo Buttons
+			HStack {
+				Button(action: {
+					showingCamera = true
+				}) {
+					Label("Take Photo", systemImage: "camera")
+						.foregroundColor(.blue)
 				}
 
-				Section(header: Text("Photos")) {
-					// Add Photo Buttons
-					HStack {
-						Button(action: {
-							showingCamera = true
-						}) {
-							Label("Take Photo", systemImage: "camera")
-								.foregroundColor(.blue)
-						}
+				Spacer()
 
-						Spacer()
-
-						Button(action: {
-							showingImagePicker = true
-						}) {
-							Label(
-								"Choose Photo",
-								systemImage: "photo.on.rectangle"
-							)
-							.foregroundColor(.blue)
-						}
-					}
-					.padding(.vertical, 8)
-
-					// Photo Thumbnails
-					if !capturedImages.isEmpty {
-						LazyVGrid(
-							columns: [
-								GridItem(.flexible()),
-								GridItem(.flexible()),
-								GridItem(.flexible()),
-							],
-							spacing: 10
-						) {
-							ForEach(
-								Array(capturedImages.enumerated()),
-								id: \.offset
-							) { index, image in
-								ZStack(alignment: .topTrailing) {
-									Image(uiImage: image)
-										.resizable()
-										.aspectRatio(
-											contentMode:
-												.fill
-										)
-										.frame(
-											width: 80,
-											height: 80
-										)
-										.clipped()
-										.cornerRadius(8)
-										.onTapGesture {
-											selectedImageIndex =
-												index
-											showingImageViewer =
-												true
-										}
-
-									// Delete button
-									Button(action: {
-										capturedImages
-											.remove(
-												at:
-													index
-											)
-									}) {
-										Image(
-											systemName:
-												"xmark.circle.fill"
-										)
-										.foregroundColor(
-											.red
-										)
-										.background(
-											Color.white
-										)
-										.clipShape(Circle())
-									}
-									.offset(x: 5, y: -5)
-								}
-							}
-						}
-						.padding(.vertical, 8)
-					}
-				}
-
-				Section {
-					Button("Save Note") {
-						saveNote()
-					}
-					.disabled(noteTitle.isEmpty)
+				Button(action: {
+					showingImagePicker = true
+				}) {
+					Label(
+						"Choose Photo",
+						systemImage: "photo.on.rectangle"
+					)
+					.foregroundColor(.blue)
 				}
 			}
-			.navigationTitle("New Note")
-			.navigationBarTitleDisplayMode(.inline)
+			.padding(.vertical, 8)
+
+			// Photo Thumbnails
+			if !capturedImages.isEmpty {
+				LazyVGrid(
+					columns: [
+						GridItem(.flexible()),
+						GridItem(.flexible()),
+						GridItem(.flexible()),
+					],
+					spacing: 10
+				) {
+					ForEach(
+						Array(capturedImages.enumerated()),
+						id: \.offset
+					) { index, image in
+						ZStack(alignment: .topTrailing) {
+							Image(uiImage: image)
+								.resizable()
+								.aspectRatio(
+									contentMode:
+										.fill
+								)
+								.frame(
+									width: 80,
+									height: 80
+								)
+								.clipped()
+								.cornerRadius(8)
+								.onTapGesture {
+									selectedImageIndex =
+										index
+									showingImageViewer =
+										true
+								}
+
+							// Delete button
+							Button(action: {
+								capturedImages
+									.remove(
+										at:
+											index
+									)
+							}) {
+								Image(
+									systemName:
+										"xmark.circle.fill"
+								)
+								.foregroundColor(
+									.red
+								)
+								.background(
+									Color.white
+								)
+								.clipShape(Circle())
+							}
+							.offset(x: 5, y: -5)
+						}
+					}
+				}
+				.padding(.vertical, 8)
+			}
 		}
 		.sheet(isPresented: $showingCamera) {
 			CameraView { image in
@@ -139,8 +118,6 @@ struct CameraNotesView: View {
 
 	private func saveNote() {
 		// Implement your save logic here
-		print("Saving note: \(noteTitle)")
-		print("Content: \(noteContent)")
 		print("Number of images: \(capturedImages.count)")
 	}
 }
@@ -282,6 +259,6 @@ struct ImageViewer: View {
 // MARK: - Preview
 struct CameraNotesView_Previews: PreviewProvider {
 	static var previews: some View {
-		CameraNotesView()
+		PhotoAttachmentView()
 	}
 }
