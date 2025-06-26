@@ -4,6 +4,12 @@ import SwiftUI
 
 private let rectWidth: Double = 80
 
+extension CLLocation {
+	public static var visaliaCenter: CLLocation {
+		.init(latitude: 36.326, longitude: -119.313191)
+	}
+}
+
 struct LocationView: View {
 
 	@Binding var location: CLLocation?
@@ -24,7 +30,7 @@ struct LocationView: View {
 	}
 
 	var body: some View {
-		MapReader { proxy in
+		ZStack {
 			Map(
 				position: $cameraPosition,
 				interactionModes: modes
@@ -38,6 +44,13 @@ struct LocationView: View {
 					pointsOfInterest: PointOfInterestCategories.excludingAll
 				)
 			)
+			.onMapCameraChange(frequency: .onEnd) { context in
+				location = CLLocation(
+					latitude: context.region.center.latitude,
+					longitude: context.region.center.longitude
+				)
+			}
+			Image(systemName: "plus.viewfinder")
 		}
 	}
 
@@ -52,15 +65,18 @@ struct LocationView: View {
 }
 
 struct LocationView_Previews: PreviewProvider {
-	@State static var location: CLLocation? = CLLocation(
-		latitude: 36.326,
-		longitude: -119.313
-	)
+	@State static var location: CLLocation? = .visaliaCenter
 
+	static var locationDescription: String {
+		guard let location = location else {
+			return "none"
+		}
+		return "\(location.coordinate.latitude), \(location.coordinate.longitude)"
+	}
 	static var previews: some View {
 		VStack {
 			LocationView(location: $location)
-			Text("\(location?.coordinate.latitude), \(location?.coordinate.longitude)")
+			Text(locationDescription)
 		}
 	}
 }
