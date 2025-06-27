@@ -285,12 +285,14 @@ class AudioRecorderFake: AudioRecorder {
 		hasPermissions: Bool = true,
 		isRecording: Bool = false,
 		recordingDuration: TimeInterval = TimeInterval(integerLiteral: 123),
+		recordings: [URL] = [],
 		transcribedText: String = ""
 	) {
 		super.init()
 		self.hasPermissions = hasPermissions
 		self.isRecording = isRecording
 		self.recordingTime = recordingDuration
+		self.recordings = recordings
 		self.transcribedText = transcribedText
 	}
 

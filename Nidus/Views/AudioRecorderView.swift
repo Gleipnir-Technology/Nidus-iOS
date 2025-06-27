@@ -139,7 +139,16 @@ struct AudioRecorder_Previews: PreviewProvider {
 		).previewDisplayName("No Permissions")
 		AudioRecorderView(
 			AudioRecorderFake(isRecording: false)
-		).previewDisplayName("Not Recording")
+		).previewDisplayName("Before Recording")
+		AudioRecorderView(
+			AudioRecorderFake(
+				isRecording: false,
+				recordings: [
+					URL(string: "file:///something.m4a")!,
+					URL(string: "file:///something.m4a")!,
+				]
+			)
+		).previewDisplayName("With recordings")
 		AudioRecorderView(
 			AudioRecorderFake(
 				isRecording: true,
