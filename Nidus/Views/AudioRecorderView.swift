@@ -10,6 +10,29 @@ import OSLog
 import SwiftUI
 
 struct AudioStatusIdleView: View {
+	var playRecording: (URL) -> Void
+	var recordings: [URL] = []
+
+	var recordingList: some View {
+		VStack(alignment: .leading, spacing: 10) {
+			ForEach(recordings, id: \.self) { recording in
+				HStack {
+					Text(recording.lastPathComponent)
+						.font(.caption)
+					Spacer()
+					Button("Play") {
+						playRecording(recording)
+					}
+					.font(.caption)
+				}
+				.padding(.horizontal)
+			}
+		}
+		.padding()
+		.background(Color.gray.opacity(0.1))
+		.cornerRadius(10)
+	}
+
 	var body: some View {
 		VStack(alignment: .leading) {
 			Text("Ready to record")
@@ -17,6 +40,9 @@ struct AudioStatusIdleView: View {
 				.foregroundColor(
 					.primary
 				)
+			if !recordings.isEmpty {
+				recordingList
+			}
 		}
 	}
 }
@@ -137,7 +163,10 @@ struct AudioRecorderView: View {
 				)
 			}
 			else {
-				AudioStatusIdleView()
+				AudioStatusIdleView(
+					playRecording: audioRecorder.playRecording,
+					recordings: audioRecorder.recordings
+				)
 			}
 			Spacer()
 		}
@@ -162,8 +191,13 @@ struct AudioRecorder_Previews: PreviewProvider {
 			AudioRecorderFake(
 				isRecording: false,
 				recordings: [
-					URL(string: "file:///something.m4a")!,
-					URL(string: "file:///something.m4a")!,
+					URL(string: "file:///one.m4a")!,
+					URL(string: "file:///two.m4a")!,
+					URL(string: "file:///three.m4a")!,
+					URL(string: "file:///four.m4a")!,
+					URL(string: "file:///five.m4a")!,
+					URL(string: "file:///six.m4a")!,
+					URL(string: "file:///seven.m4a")!,
 				]
 			)
 		).previewDisplayName("With recordings")
