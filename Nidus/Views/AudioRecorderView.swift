@@ -9,9 +9,20 @@ import CoreLocation
 import OSLog
 import SwiftUI
 
-struct AudioStatusView: View {
+struct AudioStatusIdleView: View {
+	var body: some View {
+		VStack(alignment: .leading) {
+			Text("Ready to record")
+				.font(.headline)
+				.foregroundColor(
+					.primary
+				)
+		}
+	}
+}
+
+struct AudioStatusRecordingView: View {
 	var hasPermissions: Bool
-	var isRecording: Bool
 	var recordingTime: TimeInterval
 	var transcription: String
 
@@ -39,19 +50,16 @@ struct AudioStatusView: View {
 		VStack(alignment: .leading) {
 			// Recording status
 			Text(
-				isRecording
-					? "Recording..." : "Ready to record"
+				"Recording..."
 			)
 			.font(.headline)
 			.foregroundColor(
-				isRecording ? .red : .primary
+				.red
 			)
 			// Recording duration
-			if isRecording {
-				Text("Duration: \(formatTime(recordingTime))")
-					.font(.subheadline)
-					.foregroundColor(.secondary)
-			}
+			Text("Duration: \(formatTime(recordingTime))")
+				.font(.subheadline)
+				.foregroundColor(.secondary)
 			if !transcription.isEmpty {
 				ScrollViewReader { proxy in
 					ScrollView {
@@ -121,12 +129,16 @@ struct AudioRecorderView: View {
 	var body: some View {
 		HStack(spacing: 8) {
 			recordButton
-			AudioStatusView(
-				hasPermissions: audioRecorder.hasPermissions,
-				isRecording: audioRecorder.isRecording,
-				recordingTime: audioRecorder.recordingTime,
-				transcription: audioRecorder.transcribedText
-			)
+			if audioRecorder.isRecording {
+				AudioStatusRecordingView(
+					hasPermissions: audioRecorder.hasPermissions,
+					recordingTime: audioRecorder.recordingTime,
+					transcription: audioRecorder.transcribedText
+				)
+			}
+			else {
+				AudioStatusIdleView()
+			}
 			Spacer()
 		}
 		.frame(height: 130)
