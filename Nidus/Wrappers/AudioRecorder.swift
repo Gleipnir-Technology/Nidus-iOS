@@ -235,22 +235,6 @@ class AudioRecorder: NSObject {
 		}
 	}
 
-	private func saveTranscriptions() {
-		let documentsPath = FileManager.default.urls(
-			for: .documentDirectory,
-			in: .userDomainMask
-		)[0]
-		let transcriptionsURL = documentsPath.appendingPathComponent("transcriptions.json")
-
-		do {
-			let data = try JSONEncoder().encode(savedTranscriptions)
-			try data.write(to: transcriptionsURL)
-		}
-		catch {
-			print("Failed to save transcriptions: \(error)")
-		}
-	}
-
 	private func loadTranscriptions() {
 		let documentsPath = FileManager.default.urls(
 			for: .documentDirectory,
@@ -267,6 +251,21 @@ class AudioRecorder: NSObject {
 		}
 	}
 
+	private func saveTranscriptions() {
+		let documentsPath = FileManager.default.urls(
+			for: .documentDirectory,
+			in: .userDomainMask
+		)[0]
+		let transcriptionsURL = documentsPath.appendingPathComponent("transcriptions.json")
+
+		do {
+			let data = try JSONEncoder().encode(savedTranscriptions)
+			try data.write(to: transcriptionsURL)
+		}
+		catch {
+			print("Failed to save transcriptions: \(error)")
+		}
+	}
 }
 
 extension AudioRecorder: AVAudioRecorderDelegate {
