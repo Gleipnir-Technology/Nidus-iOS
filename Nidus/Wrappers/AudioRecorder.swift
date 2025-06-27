@@ -259,22 +259,22 @@ class AudioRecorder: NSObject {
 		let transcriptionsURL = documentsPath.appendingPathComponent("transcriptions.json")
 
 		do {
-			let data = try Data(contentsOf: transcriptionsURL)
-			savedTranscriptions = try JSONDecoder().decode(
-				[String: String].self,
-				from: data
-			)
+			let data = try JSONEncoder().encode(savedTranscriptions)
+			try data.write(to: transcriptionsURL)
 		}
 		catch {
-			// File doesn't exist or couldn't be loaded, start with empty dictionary
-			savedTranscriptions = [:]
+			print("Failed to save transcriptions: \(error)")
 		}
 	}
+
 }
 
 extension AudioRecorder: AVAudioRecorderDelegate {
-	func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
-		if flag {
+	func audioRecorderDidFinishRecording(
+		_ recorder: AVAudioRecorder,
+		successfully success: Bool
+	) {
+		if success {
 			loadRecordings()
 		}
 	}
