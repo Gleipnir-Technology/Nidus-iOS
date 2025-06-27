@@ -23,25 +23,41 @@ struct AudioStatusView: View {
 		return String(format: "%02d:%02d", minutes, seconds)
 	}
 
+	var needsPermissionText: some View {
+		VStack {
+			Text("Permissions required:")
+				.font(.caption)
+				.foregroundColor(.red)
+			Text("• Microphone access")
+				.font(.caption2)
+				.foregroundColor(.red)
+			Text("• Speech recognition")
+				.font(.caption2)
+				.foregroundColor(.red)
+		}
+	}
+
+	var recordButton: some View {
+		Button(action: {
+			if isRecording {
+				onStopRecording()
+			}
+			else {
+				onStartRecording()
+			}
+		}) {
+			Image(
+				systemName: isRecording
+					? "stop.circle.fill" : "mic.circle.fill"
+			)
+			.font(.system(size: 80))
+			.foregroundColor(isRecording ? .red : .blue)
+		}
+		.disabled(!hasPermissions)
+	}
 	var body: some View {
 		HStack {
-			// Record button
-			Button(action: {
-				if isRecording {
-					onStopRecording()
-				}
-				else {
-					onStartRecording()
-				}
-			}) {
-				Image(
-					systemName: isRecording
-						? "stop.circle.fill" : "mic.circle.fill"
-				)
-				.font(.system(size: 80))
-				.foregroundColor(isRecording ? .red : .blue)
-			}
-			.disabled(!hasPermissions)
+			recordButton
 
 			// Permission status
 			if hasPermissions {
@@ -91,17 +107,7 @@ struct AudioStatusView: View {
 				}
 			}
 			else {
-				VStack {
-					Text("Permissions required:")
-						.font(.caption)
-						.foregroundColor(.red)
-					Text("• Microphone access")
-						.font(.caption2)
-						.foregroundColor(.red)
-					Text("• Speech recognition")
-						.font(.caption2)
-						.foregroundColor(.red)
-				}
+				needsPermissionText
 			}
 			Spacer()
 		}
