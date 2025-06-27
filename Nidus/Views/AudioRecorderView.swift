@@ -12,8 +12,6 @@ import SwiftUI
 struct AudioStatusView: View {
 	var hasPermissions: Bool
 	var isRecording: Bool
-	var onStopRecording: () -> Void
-	var onStartRecording: () -> Void
 	var recordingTime: TimeInterval
 	var transcription: String
 
@@ -37,79 +35,61 @@ struct AudioStatusView: View {
 		}
 	}
 
-	var recordButton: some View {
-		Button(action: {
-			if isRecording {
-				onStopRecording()
-			}
-			else {
-				onStartRecording()
-			}
-		}) {
-			Image(
-				systemName: isRecording
-					? "stop.circle.fill" : "mic.circle.fill"
+	var statusText: some View {
+		VStack(alignment: .leading) {
+			// Recording status
+			Text(
+				isRecording
+					? "Recording..." : "Ready to record"
 			)
-			.font(.system(size: 80))
-			.foregroundColor(isRecording ? .red : .blue)
+			.font(.headline)
+			.foregroundColor(
+				isRecording ? .red : .primary
+			)
+			// Recording duration
+			if isRecording {
+				Text("Duration: \(formatTime(recordingTime))")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+			}
+			if !transcription.isEmpty {
+				ScrollViewReader { proxy in
+					ScrollView {
+						Text(transcription)
+							.frame(
+								maxWidth: .infinity,
+								alignment: .leading
+							)
+							.background(
+								Color.cyan.opacity(
+									0.1
+								)
+							)
+							.font(.caption)
+							.id("transcription")
+					}.onChange(of: transcription) {
+						withAnimation(
+							.easeInOut(duration: 0.3)
+						) {
+							proxy.scrollTo(
+								"transcription",
+								anchor: .bottom
+							)
+						}
+					}.frame(maxHeight: 100)
+				}
+			}
 		}
-		.disabled(!hasPermissions)
 	}
+
 	var body: some View {
 		HStack {
-			recordButton
-
-			// Permission status
 			if hasPermissions {
-				VStack(alignment: .leading) {
-					// Recording status
-					Text(
-						isRecording
-							? "Recording..." : "Ready to record"
-					)
-					.font(.headline)
-					.foregroundColor(
-						isRecording ? .red : .primary
-					)
-					// Recording duration
-					if isRecording {
-						Text("Duration: \(formatTime(recordingTime))")
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-					}
-					if !transcription.isEmpty {
-						ScrollViewReader { proxy in
-							ScrollView {
-								Text(transcription)
-									.frame(
-										maxWidth: .infinity,
-										alignment: .leading
-									)
-									.background(
-										Color.cyan.opacity(
-											0.1
-										)
-									)
-									.font(.caption)
-									.id("transcription")
-							}.onChange(of: transcription) {
-								withAnimation(
-									.easeInOut(duration: 0.3)
-								) {
-									proxy.scrollTo(
-										"transcription",
-										anchor: .bottom
-									)
-								}
-							}.frame(maxHeight: 100)
-						}
-					}
-				}
+				statusText
 			}
 			else {
 				needsPermissionText
 			}
-			Spacer()
 		}
 	}
 }
@@ -118,16 +98,36 @@ struct AudioRecorderView: View {
 	init(_ a: AudioRecorder) {
 		self.audioRecorder = a
 	}
+
+	var recordButton: some View {
+		Button(action: {
+			if audioRecorder.isRecording {
+				audioRecorder.stopRecording()
+			}
+			else {
+				audioRecorder.startRecording()
+			}
+		}) {
+			Image(
+				systemName: audioRecorder.isRecording
+					? "stop.circle.fill" : "mic.circle.fill"
+			)
+			.font(.system(size: 80))
+			.foregroundColor(audioRecorder.isRecording ? .red : .blue)
+		}
+		.disabled(!audioRecorder.hasPermissions)
+	}
+
 	var body: some View {
-		VStack(alignment: .leading, spacing: 8) {
+		HStack(spacing: 8) {
+			recordButton
 			AudioStatusView(
 				hasPermissions: audioRecorder.hasPermissions,
 				isRecording: audioRecorder.isRecording,
-				onStopRecording: audioRecorder.stopRecording,
-				onStartRecording: audioRecorder.startRecording,
 				recordingTime: audioRecorder.recordingTime,
 				transcription: audioRecorder.transcribedText
 			)
+			Spacer()
 		}
 		.frame(height: 130)
 		.onAppear {
