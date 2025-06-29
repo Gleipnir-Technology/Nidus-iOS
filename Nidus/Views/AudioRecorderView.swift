@@ -14,7 +14,7 @@ struct AudioStatusIdleView: View {
 	var recordings: [URL] = []
 
 	var recordingList: some View {
-		VStack(alignment: .leading, spacing: 10) {
+		ScrollView {
 			ForEach(recordings, id: \.self) { recording in
 				HStack {
 					Text(recording.lastPathComponent)
@@ -200,7 +200,7 @@ struct AudioRecorder_Previews: PreviewProvider {
 					URL(string: "file:///seven.m4a")!,
 				]
 			)
-		).previewDisplayName("With recordings")
+		).background(.pink).previewDisplayName("With recordings")
 		AudioRecorderView(
 			AudioRecorderFake(
 				isRecording: true,
