@@ -245,14 +245,14 @@ struct AddNoteView_Previews: PreviewProvider {
 			locationDataManager: LocationDataManagerFake(
 				location: nil
 			),
-			note: NidusNote.forPreview(latitude: 32.6514, longitude: -161.4333)
+			note: NidusNote.forPreview()
 		).previewDisplayName("set location")
 		EditNidusNoteView(
 			audioRecorder: audioRecorder,
 			locationDataManager: LocationDataManagerFake(
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			),
-			note: NidusNote.forPreview(latitude: 32.6514, longitude: -161.4333)
+			note: NidusNote.forPreview(location: .visalia)
 		).previewDisplayName("set location with user location")
 		EditNidusNoteView(
 			audioRecorder: AudioRecorderFake(
@@ -264,7 +264,24 @@ struct AddNoteView_Previews: PreviewProvider {
 			locationDataManager: LocationDataManagerFake(
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			),
-			note: NidusNote.forPreview(latitude: 32.6514, longitude: -161.4333)
+			note: NidusNote.forPreview()
 		).previewDisplayName("mid long recording")
+		EditNidusNoteView(
+			audioRecorder: AudioRecorderFake(
+				isRecording: false
+			),
+			locationDataManager: LocationDataManagerFake(
+				location: CLLocation(latitude: 33.0, longitude: -161.5)
+			),
+			note: NidusNote.forPreview(
+				audioRecordings: [
+					AudioRecording(
+						created: Date.now.addingTimeInterval(-90),
+						duration: 123,
+						transcription: ""
+					)
+				]
+			)
+		).previewDisplayName("multiple recording")
 	}
 }

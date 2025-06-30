@@ -50,12 +50,17 @@ class NidusNote: Note {
 		self.text = text
 	}
 
-	static func forPreview(latitude: Double, longitude: Double) -> NidusNote {
+	static func forPreview(
+		audioRecordings: [AudioRecording] = [],
+		images: [NoteImage] = [],
+		location: Location = .visalia,
+		text: String = "some text"
+	) -> NidusNote {
 		return NidusNote(
-			audioRecordings: [],
-			images: [],
-			location: Location(latitude: latitude, longitude: longitude),
-			text: ""
+			audioRecordings: audioRecordings,
+			images: images,
+			location: location,
+			text: text
 		)
 	}
 	static func == (lhs: NidusNote, rhs: NidusNote) -> Bool {

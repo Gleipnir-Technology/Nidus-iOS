@@ -128,6 +128,14 @@ final class Location: Codable, Equatable, Hashable, Identifiable {
 		hasher.combine(latitude)
 		hasher.combine(longitude)
 	}
+	public static var visalia: Location {
+		.init(
+			CLLocation(
+				latitude: 36.326,
+				longitude: -119.313191
+			)
+		)
+	}
 }
 
 final class MosquitoSource: Codable, Identifiable, Note {
