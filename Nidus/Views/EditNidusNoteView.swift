@@ -120,47 +120,60 @@ struct EditNidusNoteView: View {
 
 	var body: some View {
 		NavigationView {
-			Form {
-				Section(header: Text("Location")) {
-					VStack(alignment: .leading, spacing: 8) {
-						if location == nil {
-							ProgressView().progressViewStyle(
-								CircularProgressViewStyle()
-							).frame(height: 300)
-							Text("Getting a fix on your location...")
-						}
-						else {
-							LocationView(location: $location).frame(
-								height: 300
-							)
-							Text("Where: \(locationDescription)")
+			ScrollViewReader { reader in
+				Form {
+					Section(header: Text("Location")) {
+						VStack(alignment: .leading, spacing: 8) {
+							if location == nil {
+								ProgressView()
+									.progressViewStyle(
+										CircularProgressViewStyle()
+									).frame(height: 300)
+								Text(
+									"Getting a fix on your location..."
+								)
+							}
+							else {
+								LocationView(
+									location: $location
+								).frame(
+									height: 300
+								)
+								Text(
+									"Where: \(locationDescription)"
+								)
+							}
 						}
 					}
-				}
 
-				Section(header: Text("Voice Notes")) {
-					AudioRecorderView(
-						audioRecorder: audioRecorder,
-						isShowingEditSheet: $showingAudioPicker,
-						recordings: $audioRecordings
-					)
-				}
+					Section(header: Text("Voice Notes")) {
+						AudioRecorderView(
+							audioRecorder: audioRecorder,
+							isShowingEditSheet:
+								$showingAudioPicker,
+							recordings: $audioRecordings
+						)
+					}
 
-				Section(header: Text("Photos")) {
-					PhotoAttachmentView(
-						selectedImageIndex: $selectedImageIndex,
-						showingCamera: $showingCamera,
-						showingImagePicker: $showingImagePicker,
-						showingImageViewer: $showingImageViewer
-					)
-					ThumbnailListView(
-						capturedImages: $capturedImages,
-						selectedImageIndex: $selectedImageIndex,
-						showingImageViewer: $showingImageViewer
-					)
-				}
-				Section(header: Text("Text")) {
-					ScrollView {
+					Section(header: Text("Photos")) {
+						PhotoAttachmentView(
+							selectedImageIndex:
+								$selectedImageIndex,
+							showingCamera: $showingCamera,
+							showingImagePicker:
+								$showingImagePicker,
+							showingImageViewer:
+								$showingImageViewer
+						)
+						ThumbnailListView(
+							capturedImages: $capturedImages,
+							selectedImageIndex:
+								$selectedImageIndex,
+							showingImageViewer:
+								$showingImageViewer
+						)
+					}
+					Section(header: Text("Text")) {
 						TextField(
 							"Additional text-only information",
 							text: $text
@@ -171,6 +184,14 @@ struct EditNidusNoteView: View {
 							alignment: .leading
 						)
 						.focused($isTextFieldFocused)
+						.id("textField")
+						.onChange(of: isTextFieldFocused) {
+							Logger.foreground.info("ELI")
+							reader.scrollTo(
+								"textField",
+								anchor: .bottom
+							)
+						}
 					}
 				}
 			}
