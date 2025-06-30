@@ -125,6 +125,9 @@ struct AnyNote: Note {
 	func asMosquitoSource() -> MosquitoSource? {
 		return innerNote as? MosquitoSource
 	}
+	func asNidusNote() -> NidusNote? {
+		return innerNote as? NidusNote
+	}
 	func asServiceRequest() -> ServiceRequest? {
 		return innerNote as? ServiceRequest
 	}

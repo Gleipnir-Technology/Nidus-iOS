@@ -10,12 +10,33 @@ import SQLite
 import SwiftUI
 
 struct DBSchema {
+	let audioRecording = AudioRecordingTable()
+	let image = ImageTable()
 	let inspection = InspectionTable()
 	let mosquitoSource = MosquitoSourceTable()
+	let note = NoteTable()
 	let serviceRequest = ServiceRequestTable()
 	let treatment = TreatmentTable()
 }
 var schema = DBSchema()
+
+class AudioRecordingTable {
+	let table = Table("audio_recording")
+
+	let created = SQLite.Expression<Date>("created")
+	let duration = SQLite.Expression<TimeInterval>("duration")
+	let noteUUID = SQLite.Expression<UUID>("note_uuid")
+	let transcription = SQLite.Expression<String?>("transcription")
+	let uuid = SQLite.Expression<UUID>("uuid")
+}
+
+class ImageTable {
+	let table = Table("image")
+
+	let created = SQLite.Expression<Date>("created")
+	let noteUUID = SQLite.Expression<UUID>("note_uuid")
+	let uuid = SQLite.Expression<UUID>("uuid")
+}
 
 class InspectionTable {
 	let table = Table("inspection")
@@ -49,6 +70,17 @@ class MosquitoSourceTable {
 	let longitude = SQLite.Expression<Double>("longitude")
 
 }
+
+class NoteTable {
+	let table = Table("note")
+
+	let latitude = SQLite.Expression<Double>("latitude")
+	let longitude = SQLite.Expression<Double>("longitude")
+	let text = SQLite.Expression<String>("text")
+	let timestamp = SQLite.Expression<Date>("timestamp")
+	let uuid = SQLite.Expression<UUID>("uuid")
+}
+
 class ServiceRequestTable {
 	let table = Table("service_request")
 

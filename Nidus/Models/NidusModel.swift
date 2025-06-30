@@ -67,9 +67,20 @@ class NidusModel {
 		return toShow
 	}
 
-	func onAddNote(_ note: NidusNote) {
-		Logger.foreground.info("Adding note")
+	func onSaveNote(_ note: NidusNote, _ isNew: Bool) throws {
+		Logger.foreground.info("Saving \(isNew ? "new" : "old") note \(note.id)")
+		for image in note.images {
+			try image.save()
+		}
+		for audioRecording in note.audioRecordings {
+			try audioRecording.save()
+		}
+		_ = try database.upsertNidusNote(note)
+		if isNew {
+			notes[note.id] = AnyNote(note)
+		}
 	}
+
 	func onAPIResponse(_ response: APIResponse) {
 		do {
 			Logger.background.info("Begin saving API response")

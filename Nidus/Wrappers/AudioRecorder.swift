@@ -6,16 +6,16 @@
 //
 
 import AVFoundation
+import OSLog
 import Speech
 
 @Observable
 class AudioRecorder: NSObject {
-	var isRecording = false
 	var hasPermissions = false
-	var recordings: [URL] = []
-	var recordingTime: TimeInterval = 0
-	var savedTranscriptions: [String: String] = [:]
-	var transcribedText: String = ""
+	var isRecording: Bool = false
+	var recordingDuration: TimeInterval = 0
+	var recordingTranscription: String?
+	var recordingUUID: UUID = UUID()
 
 	private var audioRecorder: AVAudioRecorder?
 	private var audioPlayer: AVAudioPlayer?
@@ -27,11 +27,11 @@ class AudioRecorder: NSObject {
 	private var hasMicrophonePermission = false
 	private var hasSpeechPermission = false
 
+	var onRecordingStop: ((AudioRecording) -> Void) = { _ in }
+
 	override init() {
 		super.init()
 		speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
-		loadRecordings()
-		loadTranscriptions()
 	}
 
 	func requestPermissions() {
@@ -67,7 +67,12 @@ class AudioRecorder: NSObject {
 	}
 
 	func startRecording() {
-		guard hasPermissions else { return }
+		guard hasPermissions else {
+			Logger.foreground.warning("Can't start recording, missing permissions")
+			return
+		}
+
+		recordingDuration = 0
 
 		// Start audio recording
 		startAudioRecording()
@@ -76,12 +81,10 @@ class AudioRecorder: NSObject {
 		startSpeechRecognition()
 
 		isRecording = true
-		recordingTime = 0
-		transcribedText = ""
 
 		// Start timer for recording duration
 		timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-			self.recordingTime += 1
+			self.recordingDuration += 1
 		}
 	}
 
@@ -89,16 +92,10 @@ class AudioRecorder: NSObject {
 		let audioSession = AVAudioSession.sharedInstance()
 
 		do {
-			try audioSession.setCategory(.playAndRecord, mode: .default)
+			try audioSession.setCategory(.record, mode: .default)
 			try audioSession.setActive(true)
 
-			let documentsPath = FileManager.default.urls(
-				for: .documentDirectory,
-				in: .userDomainMask
-			)[0]
-			let audioFilename = documentsPath.appendingPathComponent(
-				"recording_\(Date().timeIntervalSince1970).m4a"
-			)
+			let audioFilename = AudioRecording.url(for: recordingUUID)
 
 			let settings = [
 				AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
@@ -110,18 +107,20 @@ class AudioRecorder: NSObject {
 			audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
 			audioRecorder?.delegate = self
 			audioRecorder?.record()
-
+			Logger.foreground.info("Started recording audio to \(audioFilename)")
 		}
 		catch {
-			print("Failed to start audio recording: \(error)")
+			Logger.foreground.info("Failed to start audio recording: \(error)")
 		}
 	}
 
 	private func startSpeechRecognition() {
 		guard let speechRecognizer = speechRecognizer, speechRecognizer.isAvailable else {
-			print("Speech recognizer not available")
+			Logger.foreground.info("Speech recognizer not available")
+			recordingTranscription = nil
 			return
 		}
+		recordingTranscription = ""
 
 		// Cancel any previous task
 		recognitionTask?.cancel()
@@ -151,7 +150,7 @@ class AudioRecorder: NSObject {
 			{ result, error in
 				DispatchQueue.main.async {
 					if let result = result {
-						self.transcribedText =
+						self.recordingTranscription =
 							result.bestTranscription.formattedString
 					}
 
@@ -195,16 +194,15 @@ class AudioRecorder: NSObject {
 		timer?.invalidate()
 		timer = nil
 		isRecording = false
-		recordingTime = 0
+		let recording = AudioRecording(
+			created: Date.now,
+			duration: recordingDuration,
+			transcription: recordingTranscription,
+			uuid: recordingUUID
+		)
+		recordingUUID = UUID()
 
-		// Save transcription
-		if let audioRecorder = audioRecorder, !transcribedText.isEmpty {
-			let filename = audioRecorder.url.lastPathComponent
-			savedTranscriptions[filename] = transcribedText
-			saveTranscriptions()
-		}
-
-		loadRecordings()
+		onRecordingStop(recording)
 	}
 
 	func playRecording(url: URL) {
@@ -216,56 +214,6 @@ class AudioRecorder: NSObject {
 			print("Failed to play recording: \(error)")
 		}
 	}
-
-	private func loadRecordings() {
-		let documentsPath = FileManager.default.urls(
-			for: .documentDirectory,
-			in: .userDomainMask
-		)[0]
-
-		do {
-			let files = try FileManager.default.contentsOfDirectory(
-				at: documentsPath,
-				includingPropertiesForKeys: nil
-			)
-			recordings = files.filter { $0.pathExtension == "m4a" }
-		}
-		catch {
-			print("Failed to load recordings: \(error)")
-		}
-	}
-
-	private func loadTranscriptions() {
-		let documentsPath = FileManager.default.urls(
-			for: .documentDirectory,
-			in: .userDomainMask
-		)[0]
-		let transcriptionsURL = documentsPath.appendingPathComponent("transcriptions.json")
-
-		do {
-			let data = try JSONEncoder().encode(savedTranscriptions)
-			try data.write(to: transcriptionsURL)
-		}
-		catch {
-			print("Failed to save transcriptions: \(error)")
-		}
-	}
-
-	private func saveTranscriptions() {
-		let documentsPath = FileManager.default.urls(
-			for: .documentDirectory,
-			in: .userDomainMask
-		)[0]
-		let transcriptionsURL = documentsPath.appendingPathComponent("transcriptions.json")
-
-		do {
-			let data = try JSONEncoder().encode(savedTranscriptions)
-			try data.write(to: transcriptionsURL)
-		}
-		catch {
-			print("Failed to save transcriptions: \(error)")
-		}
-	}
 }
 
 extension AudioRecorder: AVAudioRecorderDelegate {
@@ -274,7 +222,7 @@ extension AudioRecorder: AVAudioRecorderDelegate {
 		successfully success: Bool
 	) {
 		if success {
-			loadRecordings()
+			Logger.background.info("Audio recording completed successfully")
 		}
 	}
 }
@@ -284,15 +232,13 @@ class AudioRecorderFake: AudioRecorder {
 		hasPermissions: Bool = true,
 		isRecording: Bool = false,
 		recordingDuration: TimeInterval = TimeInterval(integerLiteral: 123),
-		recordings: [URL] = [],
 		transcribedText: String = ""
 	) {
 		super.init()
 		self.hasPermissions = hasPermissions
 		self.isRecording = isRecording
-		self.recordingTime = recordingDuration
-		self.recordings = recordings
-		self.transcribedText = transcribedText
+		self.recordingDuration = recordingDuration
+		self.recordingTranscription = transcribedText
 	}
 
 	override func requestPermissions() {

@@ -11,21 +11,21 @@ import SwiftUI
 
 struct AudioStatusIdleView: View {
 	var playRecording: (URL) -> Void
-	var recordings: [URL] = []
+	var recordings: [AudioRecording] = []
 
+	var recordingTime: Double {
+		return recordings.reduce(
+			0.0,
+			{ accumulator, next in
+				accumulator + next.duration
+			}
+		)
+	}
 	var recordingList: some View {
-		ScrollView {
-			ForEach(recordings, id: \.self) { recording in
-				HStack {
-					Text(recording.lastPathComponent)
-						.font(.caption)
-					Spacer()
-					Button("Play") {
-						playRecording(recording)
-					}
-					.font(.caption)
-				}
-				.padding(.horizontal)
+		HStack {
+			VStack(alignment: .leading, spacing: 10) {
+				Text("\(recordings.count) recording(s)")
+				Text(verbatim: .init(format: "%.2f seconds", recordingTime))
 			}
 		}
 		.padding()
@@ -50,7 +50,7 @@ struct AudioStatusIdleView: View {
 struct AudioStatusRecordingView: View {
 	var hasPermissions: Bool
 	var recordingTime: TimeInterval
-	var transcription: String
+	var transcription: String?
 
 	private func formatTime(_ time: TimeInterval) -> String {
 		let minutes = Int(time) / 60
@@ -86,10 +86,13 @@ struct AudioStatusRecordingView: View {
 			Text("Duration: \(formatTime(recordingTime))")
 				.font(.subheadline)
 				.foregroundColor(.secondary)
-			if !transcription.isEmpty {
+			if transcription == nil {
+				Text("Transcription disabled")
+			}
+			else {
 				ScrollViewReader { proxy in
 					ScrollView {
-						Text(transcription)
+						Text(transcription!)
 							.frame(
 								maxWidth: .infinity,
 								alignment: .leading
@@ -129,10 +132,16 @@ struct AudioStatusRecordingView: View {
 }
 struct AudioRecorderView: View {
 	var audioRecorder: AudioRecorder
-	init(_ a: AudioRecorder) {
-		self.audioRecorder = a
-	}
+	@Binding var isShowingEditSheet: Bool
+	@Binding var recordings: [AudioRecording]
 
+	var editButton: some View {
+		Button(action: onPickerButton) {
+			Image(systemName: "square.and.pencil")
+				.font(.system(size: 80))
+				.foregroundColor(.blue)
+		}.buttonStyle(BorderlessButtonStyle())
+	}
 	var recordButton: some View {
 		Button(action: {
 			if audioRecorder.isRecording {
@@ -149,7 +158,11 @@ struct AudioRecorderView: View {
 			.font(.system(size: 80))
 			.foregroundColor(audioRecorder.isRecording ? .red : .blue)
 		}
+		.buttonStyle(BorderlessButtonStyle())
 		.disabled(!audioRecorder.hasPermissions)
+	}
+	func onPickerButton() {
+		isShowingEditSheet = true
 	}
 
 	var body: some View {
@@ -158,17 +171,20 @@ struct AudioRecorderView: View {
 			if audioRecorder.isRecording {
 				AudioStatusRecordingView(
 					hasPermissions: audioRecorder.hasPermissions,
-					recordingTime: audioRecorder.recordingTime,
-					transcription: audioRecorder.transcribedText
+					recordingTime: audioRecorder.recordingDuration,
+					transcription: audioRecorder.recordingTranscription
 				)
 			}
 			else {
 				AudioStatusIdleView(
 					playRecording: audioRecorder.playRecording,
-					recordings: audioRecorder.recordings
+					recordings: recordings
 				)
 			}
 			Spacer()
+			if !recordings.isEmpty {
+				editButton
+			}
 		}
 		.frame(height: 130)
 		.onAppear {
@@ -180,34 +196,64 @@ struct AudioRecorderView: View {
 
 // MARK: - Preview
 struct AudioRecorder_Previews: PreviewProvider {
+	@State static var isShowingEditSheet: Bool = false
+	@State static var recordings: [AudioRecording] = [
+		AudioRecording(
+			created: Date.now.addingTimeInterval(-100),
+			duration: TimeInterval(integerLiteral: 10)
+		),
+		AudioRecording(
+			created: Date.now.addingTimeInterval(-90),
+			duration: TimeInterval(integerLiteral: 10)
+		),
+		AudioRecording(
+			created: Date.now.addingTimeInterval(-80),
+			duration: TimeInterval(integerLiteral: 10)
+		),
+		AudioRecording(
+			created: Date.now.addingTimeInterval(-70),
+			duration: TimeInterval(integerLiteral: 10)
+		),
+		AudioRecording(
+			created: Date.now.addingTimeInterval(-60),
+			duration: TimeInterval(integerLiteral: 10)
+		),
+		AudioRecording(
+			created: Date.now.addingTimeInterval(-50),
+			duration: TimeInterval(integerLiteral: 10)
+		),
+		AudioRecording(
+			created: Date.now.addingTimeInterval(-40),
+			duration: TimeInterval(integerLiteral: 10)
+		),
+	]
 	static var previews: some View {
 		AudioRecorderView(
-			AudioRecorderFake(hasPermissions: false)
+			audioRecorder: AudioRecorderFake(hasPermissions: false),
+			isShowingEditSheet: $isShowingEditSheet,
+			recordings: $recordings
 		).previewDisplayName("No Permissions")
 		AudioRecorderView(
-			AudioRecorderFake(isRecording: false)
+			audioRecorder: AudioRecorderFake(isRecording: false),
+			isShowingEditSheet: $isShowingEditSheet,
+			recordings: $recordings
 		).previewDisplayName("Before Recording")
 		AudioRecorderView(
-			AudioRecorderFake(
-				isRecording: false,
-				recordings: [
-					URL(string: "file:///one.m4a")!,
-					URL(string: "file:///two.m4a")!,
-					URL(string: "file:///three.m4a")!,
-					URL(string: "file:///four.m4a")!,
-					URL(string: "file:///five.m4a")!,
-					URL(string: "file:///six.m4a")!,
-					URL(string: "file:///seven.m4a")!,
-				]
-			)
+			audioRecorder: AudioRecorderFake(
+				isRecording: false
+			),
+			isShowingEditSheet: $isShowingEditSheet,
+			recordings: $recordings
 		).background(.pink).previewDisplayName("With recordings")
 		AudioRecorderView(
-			AudioRecorderFake(
+			audioRecorder: AudioRecorderFake(
 				isRecording: true,
 				recordingDuration: TimeInterval(integerLiteral: 98),
 				transcribedText:
 					"This is a bunch of stuff that I've just said that is all over this place. Let's assume that I've just filled this with tons and tons of words so that we can see what happens when we overflow the limits of the view."
-			)
+			),
+			isShowingEditSheet: $isShowingEditSheet,
+			recordings: $recordings
 		).background(.green).previewDisplayName("Is Recording")
 	}
 }

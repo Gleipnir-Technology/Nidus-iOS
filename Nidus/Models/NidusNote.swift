@@ -13,13 +13,13 @@ class NidusNote: Note {
 	var category: NoteCategory { return .nidus }
 	var categoryName: String { return category.name }
 	var color: Color { return category.color }
-	var content: String { return "something something" }
+	var content: String { return text }
 	var coordinate: CLLocationCoordinate2D {
 		get {
-			return location.coordinate
+			return location.coordinate()
 		}
 		set {
-			location = CLLocation(
+			location = Location(
 				latitude: newValue.latitude,
 				longitude: newValue.longitude
 			)
@@ -29,14 +29,35 @@ class NidusNote: Note {
 	var timestamp: Date
 	/* end Note protocol */
 
-	var location: CLLocation
+	var audioRecordings: [AudioRecording]
+	var images: [NoteImage]
+	var location: Location
+	var text: String
 
-	init(location: CLLocation) {
-		self.id = UUID()
+	init(
+		audioRecordings: [AudioRecording],
+		images: [NoteImage],
+		location: Location,
+		text: String,
+		uuid: UUID = UUID()
+	) {
+
+		self.id = uuid
+		self.audioRecordings = audioRecordings
+		self.images = images
 		self.location = location
 		self.timestamp = Date.now
+		self.text = text
 	}
 
+	static func forPreview(latitude: Double, longitude: Double) -> NidusNote {
+		return NidusNote(
+			audioRecordings: [],
+			images: [],
+			location: Location(latitude: latitude, longitude: longitude),
+			text: ""
+		)
+	}
 	static func == (lhs: NidusNote, rhs: NidusNote) -> Bool {
 		return lhs.location == rhs.location
 	}

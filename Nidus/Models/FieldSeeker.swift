@@ -107,6 +107,10 @@ final class Location: Codable, Equatable, Hashable, Identifiable {
 		latitude = try container.decode(Double.self, forKey: .latitude)
 		longitude = try container.decode(Double.self, forKey: .longitude)
 	}
+	init(_ location: CLLocation) {
+		self.latitude = location.coordinate.latitude
+		self.longitude = location.coordinate.longitude
+	}
 
 	func coordinate() -> CLLocationCoordinate2D {
 		return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)

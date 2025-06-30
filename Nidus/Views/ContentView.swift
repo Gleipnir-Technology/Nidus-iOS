@@ -32,10 +32,10 @@ struct ContentView: View {
 			VStack {
 				TabView(selection: $selection) {
 					Tab("Create", systemImage: "plus", value: 0) {
-						AddNoteView(
-							location: nil,
+						EditNidusNoteView(
 							locationDataManager: locationDataManager,
-							onAddNote: model.onAddNote
+							note: nil,
+							onSave: model.onSaveNote
 						)
 					}
 					Tab("Notes", systemImage: "clock", value: 1) {
@@ -47,8 +47,10 @@ struct ContentView: View {
 									.center
 									.longitude
 							),
+							locationDataManager: locationDataManager,
 							notes: model.notesToShow,
-							onFilterAdded: model.onFilterAdded
+							onFilterAdded: model.onFilterAdded,
+							onNoteSave: model.onSaveNote
 						)
 					}
 					Tab("Map", systemImage: "map", value: 2) {

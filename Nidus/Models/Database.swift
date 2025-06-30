@@ -71,7 +71,16 @@ class Database: ObservableObject {
 			throw error
 
 		}
+		do {
+			let notes = try NativeNotes(connection)
+			for note in notes {
+				results[note.id] = note
+			}
+		}
 		return results
+	}
+	func upsertNidusNote(_ note: NidusNote) throws -> Int64 {
+		return try NoteUpsert(connection, note)
 	}
 	func upsertServiceRequest(_ serviceRequest: ServiceRequest) throws {
 		try ServiceRequestUpsert(connection: self.connection, serviceRequest)
@@ -105,7 +114,7 @@ extension Database {
 	}
 
 	static func migrations() -> [Migration] {
-		return [Migration1()]
+		return [Migration1(), Migration2()]
 	}
 
 	static func migrationsBundle() -> Bundle {

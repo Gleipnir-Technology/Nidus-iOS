@@ -10,8 +10,10 @@ import SwiftUI
 
 struct NoteListView: View {
 	var currentLocation: CLLocation
+	var locationDataManager: LocationDataManager
 	var notes: [AnyNote]
 	let onFilterAdded: (FilterInstance) -> Void
+	var onNoteSave: ((NidusNote, Bool) throws -> Void)
 
 	var body: some View {
 		if notes.count == 0 {
@@ -20,8 +22,10 @@ struct NoteListView: View {
 		else {
 			NoteList(
 				currentLocation: currentLocation,
+				locationDataManager: locationDataManager,
 				notes: notes,
-				onFilterAdded: onFilterAdded
+				onFilterAdded: onFilterAdded,
+				onNoteSave: onNoteSave
 			)
 		}
 	}
@@ -29,8 +33,10 @@ struct NoteListView: View {
 
 struct NoteList: View {
 	var currentLocation: CLLocation
+	var locationDataManager: LocationDataManager
 	var notes: [AnyNote]
 	let onFilterAdded: (FilterInstance) -> Void
+	var onNoteSave: ((NidusNote, Bool) throws -> Void)
 
 	var notesByDistance: [AnyNote] {
 		var byDistance: [AnyNote] = notes
@@ -58,6 +64,12 @@ struct NoteList: View {
 					MosquitoSourceDetail(
 						onFilterAdded: onFilterAdded,
 						source: note.asMosquitoSource()!
+					)
+				case .nidus:
+					EditNidusNoteView(
+						locationDataManager: locationDataManager,
+						note: note.asNidusNote()!,
+						onSave: onNoteSave
 					)
 				case .serviceRequest:
 					ServiceRequestDetail(

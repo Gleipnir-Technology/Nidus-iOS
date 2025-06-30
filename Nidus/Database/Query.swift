@@ -4,8 +4,35 @@
 //
 //  Created by Eli Ribble on 6/20/25.
 //
+import OSLog
 import SQLite
 import SwiftUI
+
+func AudioRecordingDelete(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
+	let delete = schema.audioRecording.table.filter(
+		SQLite.Expression<UUID>(value: noteUUID) == schema.audioRecording.noteUUID
+	).delete()
+	try connection.run(delete)
+}
+
+func AudioRecordingUpsert(
+	_ connection: SQLite.Connection,
+	_ audio_recording: AudioRecording,
+	_ noteUUID: UUID
+) throws {
+	let upsert = schema.audioRecording.table.upsert(
+		schema.audioRecording.created
+			<- SQLite.Expression<Date>(value: audio_recording.created),
+		schema.audioRecording.duration
+			<- SQLite.Expression<TimeInterval>(value: audio_recording.duration),
+		schema.audioRecording.transcription
+			<- SQLite.Expression<String?>(value: audio_recording.transcription),
+		schema.audioRecording.noteUUID <- SQLite.Expression<UUID>(value: noteUUID),
+		schema.audioRecording.uuid <- SQLite.Expression<UUID>(value: audio_recording.uuid),
+		onConflictOf: schema.audioRecording.uuid
+	)
+	try connection.run(upsert)
+}
 
 func InspectionUpsert(_ connection: SQLite.Connection, _ sID: UUID, _ inspection: Inspection) throws
 {
@@ -123,6 +150,101 @@ func MosquitoSourceUpsert(connection: SQLite.Connection, _ source: MosquitoSourc
 		onConflictOf: schema.mosquitoSource.id
 	)
 	try connection.run(upsert)
+}
+
+func NativeNotes(_ connection: Connection) throws -> [AnyNote] {
+	var results: [AnyNote] = []
+	var audio_recordings_by_note_uuid: [UUID: [AudioRecording]] = [:]
+	for row in try connection.prepare(schema.audioRecording.table) {
+		audio_recordings_by_note_uuid[row[schema.audioRecording.noteUUID], default: []]
+			.append(
+				AudioRecording(
+					created: row[schema.audioRecording.created],
+					duration: row[schema.audioRecording.duration],
+					transcription: row[schema.audioRecording.transcription],
+					uuid: row[schema.audioRecording.uuid]
+				)
+			)
+	}
+	var image_by_note_uuid: [UUID: [NoteImage]] = [:]
+	for row in try connection.prepare(schema.image.table) {
+		image_by_note_uuid[row[schema.image.noteUUID], default: []].append(
+			NoteImage(
+				created: row[schema.image.created],
+				uuid: row[schema.image.uuid]
+			)
+		)
+	}
+	for row in try connection.prepare(schema.note.table) {
+		let location = Location(
+			latitude: row[schema.note.latitude],
+			longitude: row[schema.note.longitude]
+		)
+		results.append(
+			AnyNote(
+				NidusNote(
+					audioRecordings: audio_recordings_by_note_uuid[
+						row[schema.note.uuid]
+					] ?? [],
+					images: image_by_note_uuid[row[schema.note.uuid]] ?? [],
+					location: location,
+					text: row[schema.note.text],
+					uuid: row[schema.note.uuid]
+				)
+			)
+		)
+	}
+	return results
+}
+
+func NoteImageDelete(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
+	let delete = schema.image.table.filter(
+		SQLite.Expression<UUID>(value: noteUUID) == schema.image.noteUUID
+	).delete()
+	try connection.run(delete)
+}
+
+func NoteImageUpsert(
+	_ connection: SQLite.Connection,
+	_ noteImage: NoteImage,
+	_ noteUUID: UUID
+) throws {
+	let upsert = schema.image.table.upsert(
+		schema.image.created <- SQLite.Expression<Date>(value: noteImage.created),
+		schema.image.noteUUID <- SQLite.Expression<UUID>(value: noteUUID),
+		schema.image.uuid <- SQLite.Expression<UUID>(value: noteImage.uuid),
+		onConflictOf: schema.image.uuid
+	)
+	try connection.run(upsert)
+}
+
+func NoteUpsert(_ connection: Connection, _ note: NidusNote) throws -> Int64 {
+	try AudioRecordingDelete(connection, note.id)
+	for audioRecording in note.audioRecordings {
+		try AudioRecordingUpsert(connection, audioRecording, note.id)
+	}
+	try NoteImageDelete(connection, note.id)
+	for noteImage in note.images {
+		try NoteImageUpsert(connection, noteImage, note.id)
+	}
+	let upsert = schema.note.table.upsert(
+		schema.note.latitude
+			<- SQLite.Expression<Double>(
+				value: note.location.latitude
+			),
+		schema.note.longitude
+			<- SQLite.Expression<Double>(
+				value: note.location.longitude
+			),
+		schema.note.text <- SQLite.Expression<String>(note.text),
+		schema.note.timestamp <- SQLite.Expression<Date>(value: note.timestamp),
+		schema.note.uuid <- SQLite.Expression<UUID>(value: note.id),
+		onConflictOf: schema.note.uuid
+	)
+	Logger.foreground.info("Running note upsert \(upsert)")
+	let result = try connection.run(upsert)
+	Logger.foreground.info("Note upsert \(note.id) yielded row id \(result)")
+	return result
 }
 
 func ServiceRequestAsNotes(_ connection: Connection) throws -> [AnyNote] {
