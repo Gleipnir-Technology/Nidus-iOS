@@ -13,6 +13,20 @@ struct AudioStatusIdleView: View {
 	var playRecording: (URL) -> Void
 	var recordings: [AudioRecording] = []
 
+	var durationDisplay: String {
+		let duration = recordingTime
+		if duration < 20 {
+			return String(format: "%.1f s total", duration)
+		}
+		else if duration < 60 * 2 {
+			return String(format: "%.0f s total", duration)
+		}
+		else {
+			let minutes = Int(duration) / 60
+			let remainder = Int(duration) % 60
+			return String(format: "%dm %ds total", minutes, remainder)
+		}
+	}
 	var recordingTime: Double {
 		return recordings.reduce(
 			0.0,
@@ -21,11 +35,20 @@ struct AudioStatusIdleView: View {
 			}
 		)
 	}
+	var recordingCount: String {
+		if recordings.count == 1 {
+			return "1 clip"
+		}
+		else {
+			return "\(recordings.count) clips"
+		}
+	}
+
 	var recordingList: some View {
 		HStack {
 			VStack(alignment: .leading, spacing: 10) {
-				Text("\(recordings.count) recording(s)")
-				Text(verbatim: .init(format: "%.2f seconds", recordingTime))
+				Text(recordingCount)
+				Text(durationDisplay)
 			}
 		}
 		.padding()
@@ -138,7 +161,7 @@ struct AudioRecorderView: View {
 	var editButton: some View {
 		Button(action: onPickerButton) {
 			Image(systemName: "square.and.pencil")
-				.font(.system(size: 80))
+				.font(.system(size: 60))
 				.foregroundColor(.blue)
 		}.buttonStyle(BorderlessButtonStyle())
 	}
@@ -155,7 +178,7 @@ struct AudioRecorderView: View {
 				systemName: audioRecorder.isRecording
 					? "stop.circle.fill" : "mic.circle.fill"
 			)
-			.font(.system(size: 80))
+			.font(.system(size: 60))
 			.foregroundColor(audioRecorder.isRecording ? .red : .blue)
 		}
 		.buttonStyle(BorderlessButtonStyle())
