@@ -69,10 +69,8 @@ class NidusModel {
 
 	func createBackgroundNetworkManager() {
 		self.backgroundNetworkManager = BackgroundNetworkManager(
-			onAPIResponse: onAPIResponse,
 			onError: onError,
-			onProgress: onNetworkProgress,
-			onStateChange: onNetworkStateChange
+			onProgress: onNetworkProgress
 		)
 		triggerBackgroundFetch()
 		triggerNoteUpload()
@@ -93,38 +91,6 @@ class NidusModel {
 		triggerNoteUpload()
 	}
 
-	func onAPIResponse(_ response: APIResponse) {
-		do {
-			Logger.background.info("Begin saving API response")
-			self.backgroundNetworkProgress = 0.0
-			let totalRecords =
-				response.requests.count + response.sources.count
-				+ response.traps.count
-			var i = 0
-			for r in response.requests {
-				try database.upsertServiceRequest(r)
-				i += 1
-				if i % 100 == 0 {
-					self.backgroundNetworkProgress =
-						Double(i) / Double(totalRecords)
-				}
-			}
-			for s in response.sources {
-				try database.upsertSource(s)
-				i += 1
-				if i % 100 == 0 {
-					self.backgroundNetworkProgress =
-						Double(i) / Double(totalRecords)
-				}
-			}
-			loadNotesFromDatabase()
-			updateCluster()
-			Logger.background.info("Done saving API response")
-		}
-		catch {
-			Logger.background.error("Failed to handle API response: \(error)")
-		}
-	}
 	func onError(_ error: Error) {
 		errorMessage = "\(error)"
 	}
@@ -160,9 +126,18 @@ class NidusModel {
 
 	func triggerBackgroundFetch() {
 		Task {
-			await backgroundNetworkManager!.startBackgroundDownload(
+			guard let backgroundNetworkManager = self.backgroundNetworkManager else {
+				Logger.background.error("No background network manager")
+				return
+			}
+			backgroundNetworkState = .idle
+			//try await ensureLogin(settings)
+			let noteUpdates = try await backgroundNetworkManager.fetchNoteUpdates(
 				currentSettings
 			)
+			backgroundNetworkState = .savingData
+			await saveNoteUpdates(noteUpdates)
+			backgroundNetworkState = .idle
 		}
 	}
 
@@ -194,6 +169,7 @@ class NidusModel {
 			}
 		}
 	}
+
 	private func loadCurrentRegion() {
 		guard let regionString = UserDefaults.standard.string(forKey: "currentRegion")
 		else {
@@ -254,6 +230,40 @@ class NidusModel {
 		)
 		UserDefaults.standard.set(regionString, forKey: "currentRegion")
 	}
+
+	private func saveNoteUpdates(_ response: APIResponse) async {
+		do {
+			Logger.background.info("Begin saving API response")
+			self.backgroundNetworkProgress = 0.0
+			let totalRecords =
+				response.requests.count + response.sources.count
+				+ response.traps.count
+			var i = 0
+			for r in response.requests {
+				try database.upsertServiceRequest(r)
+				i += 1
+				if i % 100 == 0 {
+					self.backgroundNetworkProgress =
+						Double(i) / Double(totalRecords)
+				}
+			}
+			for s in response.sources {
+				try database.upsertSource(s)
+				i += 1
+				if i % 100 == 0 {
+					self.backgroundNetworkProgress =
+						Double(i) / Double(totalRecords)
+				}
+			}
+			loadNotesFromDatabase()
+			updateCluster()
+			Logger.background.info("Done saving API response")
+		}
+		catch {
+			Logger.background.error("Failed to handle API response: \(error)")
+		}
+	}
+
 	private func shouldShow(_ note: AnyNote) -> Bool {
 		for filter in filterInstances.values {
 			if !filter.AllowsNote(note) {

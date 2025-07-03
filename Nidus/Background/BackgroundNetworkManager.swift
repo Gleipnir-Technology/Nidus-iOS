@@ -154,24 +154,18 @@ enum BackgroundNetworkState {
 actor BackgroundNetworkManager {
 	private var continuations: [URLSessionTask: CheckedContinuation<(), Error>] = [:]
 	private var downloadWrapper: BackgroundDownloadWrapper!
-	nonisolated let onAPIResponse: ((APIResponse) -> Void)
 	nonisolated let onError: ((any Error) -> Void)
 	nonisolated let onProgress: ((Double) -> Void)
-	nonisolated let onStateChange: ((BackgroundNetworkState) -> Void)
 
 	@Published var isLoggedIn = false
 
 	init(
-		onAPIResponse: @escaping ((APIResponse) -> Void),
 		onError: @escaping ((any Error) -> Void),
-		onProgress: @escaping ((Double) -> Void),
-		onStateChange: @escaping ((BackgroundNetworkState) -> Void)
+		onProgress: @escaping ((Double) -> Void)
 	) {
 		self.downloadWrapper = BackgroundDownloadWrapper()
-		self.onAPIResponse = onAPIResponse
 		self.onError = onError
 		self.onProgress = onProgress
-		self.onStateChange = onStateChange
 	}
 
 	nonisolated private func doLogin(_ settings: Settings) async throws {
@@ -179,24 +173,22 @@ actor BackgroundNetworkManager {
 			Logger.background.info(
 				"Refusing to do download, no username and password"
 			)
-			await updateState(.notConfigured)
 			return
 		}
 		try await login(settings)
 	}
 
-	nonisolated func startBackgroundDownload(_ settings: Settings) async {
-		do {
-			await updateState(.idle)
-			//try await ensureLogin(settings)
-			let apiResponse = try await fetchNotes(settings)
-			await updateState(.savingData)
-			onAPIResponse(apiResponse)
-			await updateState(.idle)
+	func fetchNoteUpdates(_ settings: Settings) async throws -> APIResponse {
+		let url = URL(string: settings.URL + "/api/client/ios")!
+		let request = URLRequest(url: url)
+		var response: APIResponse?
+		try await maybeLogin(settings) {
+			let tempURL = try await downloadWrapper.handle(with: request) { progress in
+				self.onProgress(progress.progress)
+			}
+			response = try parseJSON(tempURL)
 		}
-		catch {
-			await setError(error)
-		}
+		return response!
 	}
 
 	nonisolated func uploadNote(_ settings: Settings, _ note: NidusNote) async throws {
@@ -221,22 +213,7 @@ actor BackgroundNetworkManager {
 		}
 	}
 
-	private func fetchNotes(_ settings: Settings) async throws -> APIResponse {
-		updateState(.downloading)
-		let url = URL(string: settings.URL + "/api/client/ios")!
-		let request = URLRequest(url: url)
-		var response: APIResponse?
-		try await maybeLogin(settings) {
-			let tempURL = try await downloadWrapper.handle(with: request) { progress in
-				self.onProgress(progress.progress)
-			}
-			response = try parseJSON(tempURL)
-		}
-		return response!
-	}
-
 	private func login(_ settings: Settings) async throws {
-		updateState(.loggingIn)
 		let loginURL: URL = URL(string: settings.URL + "/login")!
 
 		// Create form-encoded POST request
@@ -298,15 +275,6 @@ actor BackgroundNetworkManager {
 			Logger.background.info("Text is \(text ?? "nil")")
 			throw (error)
 		}
-	}
-
-	private func setError(_ error: Error) async {
-		onError(error)
-		updateState(.error)
-	}
-
-	private func updateState(_ newState: BackgroundNetworkState) {
-		onStateChange(newState)
 	}
 }
 
