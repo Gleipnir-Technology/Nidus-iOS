@@ -34,7 +34,7 @@ class NidusModel {
 		}
 		loadCurrentRegion()
 		loadFilters()
-		loadNotesFromDatabase()
+		startLoadNotesFromDatabase()
 		updateCluster()
 	}
 
@@ -210,16 +210,7 @@ class NidusModel {
 		)
 		Logger.foreground.info("Loaded current map region \(r)")
 	}
-	private func loadNotesFromDatabase() {
-		Task {
-			do {
-				notes = try database.notes()
-			}
-			catch {
-				errorMessage = "Error loading notes: \(error)"
-			}
-		}
-	}
+
 	private func saveCurrentRegion() {
 		let regionString = String(
 			format: "%f,%f,%f,%f",
@@ -255,7 +246,7 @@ class NidusModel {
 						Double(i) / Double(totalRecords)
 				}
 			}
-			loadNotesFromDatabase()
+			startLoadNotesFromDatabase()
 			updateCluster()
 			Logger.background.info("Done saving API response")
 		}
@@ -278,6 +269,17 @@ class NidusModel {
 			return false
 		}
 		return true
+	}
+
+	private func startLoadNotesFromDatabase() {
+		Task {
+			do {
+				notes = try database.notes()
+			}
+			catch {
+				errorMessage = "Error loading notes: \(error)"
+			}
+		}
 	}
 
 	private func updateCluster() {
