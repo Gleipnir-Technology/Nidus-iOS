@@ -72,8 +72,8 @@ class NidusModel {
 			onError: onError,
 			onProgress: onNetworkProgress
 		)
-		triggerBackgroundFetch()
-		triggerNoteUpload()
+		startNoteDownload()
+		startNoteUpload()
 	}
 
 	func onSaveNote(_ note: NidusNote, _ isNew: Bool) throws {
@@ -124,7 +124,7 @@ class NidusModel {
 		self.backgroundNetworkState = state
 	}
 
-	func triggerBackgroundFetch() {
+	func startNoteDownload() {
 		Task {
 			guard let backgroundNetworkManager = self.backgroundNetworkManager else {
 				Logger.background.error("No background network manager")
@@ -141,7 +141,7 @@ class NidusModel {
 		}
 	}
 
-	func triggerNoteUpload() {
+	func startNoteUpload() {
 		Task {
 			do {
 				guard let backgroundNetworkManager = self.backgroundNetworkManager
