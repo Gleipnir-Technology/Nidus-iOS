@@ -35,7 +35,7 @@ class NidusModel {
 		loadCurrentRegion()
 		loadFilters()
 		startLoadNotesFromDatabase()
-		updateCluster()
+		startUpdateCluster()
 	}
 
 	private var currentSettings: Settings {
@@ -102,11 +102,11 @@ class NidusModel {
 		let asStrings: [String] = filterInstances.map { $1.toString() }
 		UserDefaults.standard.set(asStrings, forKey: "filters")
 		Logger.foreground.info("Saved filters \(asStrings)")
-		updateCluster()
+		startUpdateCluster()
 	}
 	func onMapPositionChange(region: MKCoordinateRegion) {
 		currentRegion = region
-		updateCluster()
+		startUpdateCluster()
 		saveCurrentRegion()
 		Logger.foreground.info(
 			"Set current location limits to \(String(describing: region))"
@@ -247,7 +247,7 @@ class NidusModel {
 				}
 			}
 			startLoadNotesFromDatabase()
-			updateCluster()
+			startUpdateCluster()
 			Logger.background.info("Done saving API response")
 		}
 		catch {
@@ -282,7 +282,7 @@ class NidusModel {
 		}
 	}
 
-	private func updateCluster() {
+	private func startUpdateCluster() {
 		Task {
 			await cluster.onNoteChanges(
 				notes: notesToShow,
