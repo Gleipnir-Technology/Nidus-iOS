@@ -67,6 +67,17 @@ class NidusModel {
 		return toShow
 	}
 
+	func createBackgroundNetworkManager() {
+		self.backgroundNetworkManager = BackgroundNetworkManager(
+			onAPIResponse: onAPIResponse,
+			onError: onError,
+			onProgress: onNetworkProgress,
+			onStateChange: onNetworkStateChange
+		)
+		triggerBackgroundFetch()
+		triggerNoteUpload()
+	}
+
 	func onSaveNote(_ note: NidusNote, _ isNew: Bool) throws {
 		Logger.foreground.info("Saving \(isNew ? "new" : "old") note \(note.id)")
 		for image in note.images {
@@ -148,18 +159,11 @@ class NidusModel {
 	}
 
 	func triggerBackgroundFetch() {
-		self.backgroundNetworkManager = BackgroundNetworkManager(
-			onAPIResponse: onAPIResponse,
-			onError: onError,
-			onProgress: onNetworkProgress,
-			onStateChange: onNetworkStateChange
-		)
 		Task {
 			await backgroundNetworkManager!.startBackgroundDownload(
 				currentSettings
 			)
 		}
-		triggerNoteUpload()
 	}
 
 	func triggerNoteUpload() {
