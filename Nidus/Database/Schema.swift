@@ -27,6 +27,7 @@ class AudioRecordingTable {
 	let duration = SQLite.Expression<TimeInterval>("duration")
 	let noteUUID = SQLite.Expression<UUID>("note_uuid")
 	let transcription = SQLite.Expression<String?>("transcription")
+	let uploaded = SQLite.Expression<Date?>("uploaded")
 	let uuid = SQLite.Expression<UUID>("uuid")
 }
 
@@ -35,6 +36,7 @@ class ImageTable {
 
 	let created = SQLite.Expression<Date>("created")
 	let noteUUID = SQLite.Expression<UUID>("note_uuid")
+	let uploaded = SQLite.Expression<Date?>("uploaded")
 	let uuid = SQLite.Expression<UUID>("uuid")
 }
 
@@ -78,6 +80,7 @@ class NoteTable {
 	let longitude = SQLite.Expression<Double>("longitude")
 	let text = SQLite.Expression<String>("text")
 	let timestamp = SQLite.Expression<Date>("timestamp")
+	let uploaded = SQLite.Expression<Date?>("uploaded")
 	let uuid = SQLite.Expression<UUID>("uuid")
 }
 

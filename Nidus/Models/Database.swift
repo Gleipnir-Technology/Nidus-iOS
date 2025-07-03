@@ -72,13 +72,22 @@ class Database: ObservableObject {
 
 		}
 		do {
-			let notes = try NativeNotes(connection)
+			let notes = try NativeNotesAll(connection)
 			for note in notes {
 				results[note.id] = note
 			}
 		}
 		return results
 	}
+
+	func notesThatNeedUpload() throws -> [NidusNote] {
+		return try NotesNeedingUpload(connection)
+	}
+
+	func noteUpdate(_ n: NidusNote) throws {
+		return try NoteUpdate(connection, n)
+	}
+
 	func upsertNidusNote(_ note: NidusNote) throws -> Int64 {
 		return try NoteUpsert(connection, note)
 	}
@@ -114,7 +123,7 @@ extension Database {
 	}
 
 	static func migrations() -> [Migration] {
-		return [Migration1(), Migration2()]
+		return [Migration1(), Migration2(), Migration3()]
 	}
 
 	static func migrationsBundle() -> Bundle {

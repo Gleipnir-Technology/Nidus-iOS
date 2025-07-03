@@ -146,6 +146,7 @@ enum BackgroundNetworkState {
 	case error
 	case idle
 	case loggingIn
+	case uploadingChanges
 	case notConfigured
 	case savingData
 }
@@ -211,10 +212,13 @@ actor BackgroundNetworkManager {
 		)
 
 		let encoder = JSONEncoder()
+		encoder.dateEncodingStrategy = .iso8601
 		let data = try encoder.encode(note.toPayload())
 		// Create json data
 		request.httpBody = data
-		_ = try await downloadWrapper.handle(with: request)
+		try await maybeLogin(settings) {
+			_ = try await downloadWrapper.handle(with: request)
+		}
 	}
 
 	private func fetchNotes(_ settings: Settings) async throws -> APIResponse {

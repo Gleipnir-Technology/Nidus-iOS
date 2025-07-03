@@ -8,6 +8,15 @@
 import MapKit
 import SwiftUI
 
+struct NidusNotePayload: Codable {
+	let uuid: UUID
+	let timestamp: Date
+	let audio: [UUID]
+	let images: [UUID]
+	let location: Location
+	let text: String
+}
+
 class NidusNote: Note {
 	/* Note protocol */
 	var category: NoteCategory { return .nidus }
@@ -33,21 +42,23 @@ class NidusNote: Note {
 	var images: [NoteImage]
 	var location: Location
 	var text: String
+	var uploaded: Date?
 
 	init(
 		audioRecordings: [AudioRecording],
 		images: [NoteImage],
 		location: Location,
 		text: String,
+		uploaded: Date? = nil,
 		uuid: UUID = UUID()
 	) {
-
 		self.id = uuid
 		self.audioRecordings = audioRecordings
 		self.images = images
 		self.location = location
 		self.timestamp = Date.now
 		self.text = text
+		self.uploaded = uploaded
 	}
 
 	static func forPreview(
@@ -66,7 +77,19 @@ class NidusNote: Note {
 	static func == (lhs: NidusNote, rhs: NidusNote) -> Bool {
 		return lhs.location == rhs.location
 	}
+
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(location)
+	}
+
+	func toPayload() -> NidusNotePayload {
+		return NidusNotePayload(
+			uuid: id,
+			timestamp: timestamp,
+			audio: audioRecordings.map(\.uuid),
+			images: images.map(\.uuid),
+			location: location,
+			text: text
+		)
 	}
 }

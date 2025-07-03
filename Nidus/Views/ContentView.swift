@@ -117,6 +117,11 @@ struct ContentView: View {
 						"Saving data",
 						value: model.backgroundNetworkProgress
 					).frame(maxWidth: 300)
+				case .uploadingChanges:
+					ProgressView(
+						"Uploading",
+						value: model.backgroundNetworkProgress
+					).frame(maxWidth: 300)
 				}
 			}
 		}.onAppear {

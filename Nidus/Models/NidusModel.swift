@@ -79,6 +79,7 @@ class NidusModel {
 		if isNew {
 			notes[note.id] = AnyNote(note)
 		}
+		triggerNoteUpload()
 	}
 
 	func onAPIResponse(_ response: APIResponse) {
@@ -157,6 +158,36 @@ class NidusModel {
 			await backgroundNetworkManager!.startBackgroundDownload(
 				currentSettings
 			)
+		}
+		triggerNoteUpload()
+	}
+
+	func triggerNoteUpload() {
+		Task {
+			do {
+				guard let backgroundNetworkManager = self.backgroundNetworkManager
+				else {
+					Logger.background.error(
+						"Background network manager is null when doing note upload"
+					)
+					return
+				}
+				// Upload notes first so that the back office gets them fastest
+				for note in try database.notesThatNeedUpload() {
+					try await backgroundNetworkManager.uploadNote(
+						currentSettings,
+						note
+					)
+					note.uploaded = Date.now
+					try database.noteUpdate(note)
+					Logger.background.info(
+						"Updated note \(note.id) to uploaded"
+					)
+				}
+			}
+			catch {
+				onError(error)
+			}
 		}
 	}
 	private func loadCurrentRegion() {
