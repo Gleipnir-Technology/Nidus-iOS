@@ -87,9 +87,25 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 
 			// Move the temporary file to permanent location
 			try FileManager.default.moveItem(at: location, to: permanentURL)
+			if let httpResponse = downloadTask.response as? HTTPURLResponse {
+				let statusCode = httpResponse.statusCode
+				switch statusCode {
+				case 200..<300:
+					// Resume continuation with permanent URL
+					continuation.resume(returning: permanentURL)
+					break
+				default:
+					Logger.background.info(
+						"Generating a URLError with status code \(statusCode)"
+					)
+					continuation.resume(
+						throwing: URLError(
+							URLError.Code(rawValue: statusCode)
+						)
+					)
+				}
+			}
 
-			// Resume continuation with permanent URL
-			continuation.resume(returning: permanentURL)
 		}
 		catch {
 			continuation.resume(throwing: error)
@@ -157,15 +173,62 @@ actor BackgroundNetworkManager {
 		self.onStateChange = onStateChange
 	}
 
-	private func fetchNotes() async throws -> APIResponse {
-		updateState(.downloading)
-		let url = URL(string: "https://sync.nidus.cloud/api/client/ios")!
-		let request = URLRequest(url: url)
-		let tempURL = try await downloadWrapper.handle(with: request) { progress in
-			self.onProgress(progress.progress)
+	nonisolated private func doLogin(_ settings: Settings) async throws {
+		if settings.username == "" || settings.password == "" {
+			Logger.background.info(
+				"Refusing to do download, no username and password"
+			)
+			await updateState(.notConfigured)
+			return
 		}
-		let notes: APIResponse = try parseJSON(tempURL)
-		return notes
+		try await login(settings)
+	}
+
+	nonisolated func startBackgroundDownload(_ settings: Settings) async {
+		do {
+			await updateState(.idle)
+			//try await ensureLogin(settings)
+			let apiResponse = try await fetchNotes(settings)
+			await updateState(.savingData)
+			onAPIResponse(apiResponse)
+			await updateState(.idle)
+		}
+		catch {
+			await setError(error)
+		}
+	}
+
+	nonisolated func uploadNote(_ settings: Settings, _ note: NidusNote) async throws {
+		let id: String = String(note.id.uuidString)
+		let updateURL: URL = URL(string: settings.URL + "/api/client/ios/note/" + id)!
+
+		// Create form-encoded POST request
+		var request = URLRequest(url: updateURL)
+		request.httpMethod = "PUT"
+		request.setValue(
+			"application/json",
+			forHTTPHeaderField: "Content-Type"
+		)
+
+		let encoder = JSONEncoder()
+		let data = try encoder.encode(note.toPayload())
+		// Create json data
+		request.httpBody = data
+		_ = try await downloadWrapper.handle(with: request)
+	}
+
+	private func fetchNotes(_ settings: Settings) async throws -> APIResponse {
+		updateState(.downloading)
+		let url = URL(string: settings.URL + "/api/client/ios")!
+		let request = URLRequest(url: url)
+		var response: APIResponse?
+		try await maybeLogin(settings) {
+			let tempURL = try await downloadWrapper.handle(with: request) { progress in
+				self.onProgress(progress.progress)
+			}
+			response = try parseJSON(tempURL)
+		}
+		return response!
 	}
 
 	private func login(_ settings: Settings) async throws {
@@ -187,39 +250,55 @@ actor BackgroundNetworkManager {
 		_ = try await downloadWrapper.handle(with: request)
 	}
 
+	private func maybeLogin(_ settings: Settings, _ block: () async throws -> Void) async throws
+	{
+		do {
+			try await block()
+		}
+		catch {
+			Logger.background.error("Request error: \(error)")
+			guard let urlError = error as? URLError else {
+				throw error
+			}
+			Logger.background.error(
+				"URL error: \(urlError) with code \(urlError.code.rawValue)"
+			)
+			if urlError.code.rawValue == 401 {
+				do {
+					try await doLogin(settings)
+				}
+				catch {
+					Logger.background.error("Failed to login: \(error)")
+				}
+				try await block()
+			}
+			else {
+				throw error
+			}
+		}
+	}
+
 	private func parseJSON<T: Decodable>(_ tempURL: URL) throws -> T {
 		let data = try Data(contentsOf: tempURL)
 		let decoder = JSONDecoder()
 		decoder.dateDecodingStrategy = .iso8601withOptionalFractionalSeconds
 		decoder.keyDecodingStrategy = .convertFromSnakeCase
-		let response = try decoder.decode(T.self, from: data)
-		return response
+		do {
+			let response = try decoder.decode(T.self, from: data)
+			return response
+		}
+		catch {
+			Logger.background.error("Failed to parse response as JSON: \(error)")
+			Logger.background.info("Trying text")
+			let text = String(data: data, encoding: .utf8)
+			Logger.background.info("Text is \(text ?? "nil")")
+			throw (error)
+		}
 	}
 
 	private func setError(_ error: Error) async {
 		onError(error)
 		updateState(.error)
-	}
-
-	nonisolated func startBackgroundDownload(_ settings: Settings) async {
-		do {
-			await updateState(.idle)
-			if settings.username == "" || settings.password == "" {
-				Logger.background.info(
-					"Refusing to do download, no username and password"
-				)
-				await updateState(.notConfigured)
-				return
-			}
-			try await login(settings)
-			let apiResponse = try await fetchNotes()
-			await updateState(.savingData)
-			onAPIResponse(apiResponse)
-			await updateState(.idle)
-		}
-		catch {
-			await setError(error)
-		}
 	}
 
 	private func updateState(_ newState: BackgroundNetworkState) {
