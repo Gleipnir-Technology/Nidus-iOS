@@ -52,6 +52,23 @@ struct ContentView: View {
 	@Bindable var model: NidusModel
 	var onAppear: () -> Void
 
+	var navTitle: String {
+		switch selection {
+		case 0:
+			return "Create Note"
+		case 1:
+			return "Notes"
+		case 2:
+			return "Map"
+		case 3:
+			return "Filters"
+		case 4:
+			return "Settings"
+		default:
+			return "Unknown Tab"
+		}
+	}
+
 	func onFilterChange() {
 		model.onFilterChange()
 	}
@@ -97,7 +114,7 @@ struct ContentView: View {
 					Tab(
 						"Filters",
 						systemImage: "line.3.horizontal.decrease",
-						value: 4
+						value: 3
 					) {
 						FilterView(
 							filterInstances: $model.filterInstances,
@@ -110,7 +127,7 @@ struct ContentView: View {
 					Tab(
 						"Sync",
 						systemImage: "gear",
-						value: 5
+						value: 4
 					) {
 						SettingView(
 							onSettingsUpdated: model
@@ -129,7 +146,7 @@ struct ContentView: View {
 						)
 					}
 					else {
-						Text("NOAAAAA")
+						Text("There is no note with UUID \(noteId)")
 					}
 				}
 				MainStatusView(
@@ -139,7 +156,8 @@ struct ContentView: View {
 				)
 			}
 			.navigationBarTitleDisplayMode(.inline)
-			.navigationTitle("Create note").toolbar {
+			.navigationTitle(navTitle)
+			.toolbar {
 				ToolbarItem {
 					Button {
 						Logger.foreground.log("Save button tapped")
