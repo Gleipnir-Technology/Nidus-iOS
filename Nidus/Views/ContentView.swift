@@ -167,3 +167,12 @@ struct ContentView: View {
 		onAppear: {}
 	)
 }
+
+#Preview("Has notes") {
+	ContentView(
+		model: NidusModelPreview(
+			notesToShow: AnyNote.previewListShort
+		),
+		onAppear: {}
+	)
+}
