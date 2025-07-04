@@ -107,7 +107,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 // A location data manager that will never get a fix
 @Observable
 class LocationDataManagerFake: LocationDataManager {
-	init(location: CLLocation?) {
+	init(location: CLLocation? = nil) {
 		super.init(authorizationStatus: .notDetermined)
 		self.location = location
 	}

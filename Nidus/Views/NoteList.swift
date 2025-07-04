@@ -5,6 +5,7 @@
 //  Created by Eli Ribble on 3/11/25.
 //
 import CoreLocation
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -16,17 +17,30 @@ struct NoteListView: View {
 	var onNoteSave: ((NidusNote, Bool) throws -> Void)
 
 	var body: some View {
-		if notes.count == 0 {
-			Text("No notes")
-		}
-		else {
-			NoteList(
-				currentLocation: currentLocation,
-				locationDataManager: locationDataManager,
-				notes: notes,
-				onFilterAdded: onFilterAdded,
-				onNoteSave: onNoteSave
-			)
+		NavigationStack {
+			if notes.count == 0 {
+				Text("No notes")
+			}
+			else {
+				NoteList(
+					currentLocation: currentLocation,
+					locationDataManager: locationDataManager,
+					notes: notes,
+					onFilterAdded: onFilterAdded,
+					onNoteSave: onNoteSave
+				).toolbar {
+					Menu("Sorting") {
+						Text("Sort by...")
+						Button("Distance") {
+							Logger.foreground.info("sort by distance")
+						}
+						Button("Tag") {
+							Logger.foreground.info("sort by tag")
+						}
+					}
+
+				}
+			}
 		}
 	}
 }
@@ -88,5 +102,30 @@ struct NoteList: View {
 				NoteRow(currentLocation: currentLocation, note: note)
 			}
 		}
+	}
+}
+
+struct NoteList_Previews: PreviewProvider {
+	static var onFilterAdded: (FilterInstance) -> Void {
+		{ _ in }
+	}
+	static var onNoteSave: (NidusNote, Bool) throws -> Void {
+		{ _, _ in }
+	}
+	static var previews: some View {
+		NoteListView(
+			currentLocation: CLLocation.visaliaCenter,
+			locationDataManager: LocationDataManagerFake(),
+			notes: [],
+			onFilterAdded: onFilterAdded,
+			onNoteSave: onNoteSave
+		).previewDisplayName("empty")
+		NoteListView(
+			currentLocation: CLLocation.visaliaCenter,
+			locationDataManager: LocationDataManagerFake(),
+			notes: AnyNote.previewListShort,
+			onFilterAdded: onFilterAdded,
+			onNoteSave: onNoteSave
+		).previewDisplayName("populated")
 	}
 }

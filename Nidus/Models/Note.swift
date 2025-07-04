@@ -105,6 +105,8 @@ struct AnyNote: Note {
 	init(_ note: any Note) {
 		innerNote = note
 	}
+	static var previewListShort: [AnyNote] = NidusNote.previewListShort.map({ n in AnyNote(n) })
+
 	var category: NoteCategory { innerNote.category }
 	var categoryName: String { innerNote.categoryName }
 	var color: Color { innerNote.color }

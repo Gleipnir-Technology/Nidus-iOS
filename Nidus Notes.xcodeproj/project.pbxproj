@@ -50,6 +50,7 @@
 		53A8FEBD2E11C95D00905D20 /* AudioRecording.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A8FEBC2E11C95800905D20 /* AudioRecording.swift */; };
 		53A8FEC22E11D26600905D20 /* NoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A8FEC12E11D26400905D20 /* NoteImage.swift */; };
 		53A8FEC42E125E3700905D20 /* AudioPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A8FEC32E125E3200905D20 /* AudioPlayerView.swift */; };
+		53A8FEF32E184A5400905D20 /* NidusNotePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A8FEF22E184A4F00905D20 /* NidusNotePreview.swift */; };
 		53B8F0842E08059A007ABA40 /* FilterableField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B8F0832E080597007ABA40 /* FilterableField.swift */; };
 		53B8F0862E080A99007ABA40 /* ServiceRequestDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B8F0852E080A94007ABA40 /* ServiceRequestDetail.swift */; };
 		53B8F0882E080C62007ABA40 /* TrapDataDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B8F0872E080C5E007ABA40 /* TrapDataDetail.swift */; };
@@ -119,6 +120,7 @@
 		53A8FEBC2E11C95800905D20 /* AudioRecording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecording.swift; sourceTree = "<group>"; };
 		53A8FEC12E11D26400905D20 /* NoteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteImage.swift; sourceTree = "<group>"; };
 		53A8FEC32E125E3200905D20 /* AudioPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerView.swift; sourceTree = "<group>"; };
+		53A8FEF22E184A4F00905D20 /* NidusNotePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NidusNotePreview.swift; sourceTree = "<group>"; };
 		53B8F0832E080597007ABA40 /* FilterableField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterableField.swift; sourceTree = "<group>"; };
 		53B8F0852E080A94007ABA40 /* ServiceRequestDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceRequestDetail.swift; sourceTree = "<group>"; };
 		53B8F0872E080C5E007ABA40 /* TrapDataDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrapDataDetail.swift; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 		537560D12D8223E800D8528B /* PreviewHelper */ = {
 			isa = PBXGroup;
 			children = (
+				53A8FEF22E184A4F00905D20 /* NidusNotePreview.swift */,
 				533F88942DF0F1E700D0DBF2 /* NidusModelPreview.swift */,
 			);
 			path = PreviewHelper;
@@ -491,6 +494,7 @@
 				5398545D2E0DB4C500D3E2EF /* PhotoPicker.swift in Sources */,
 				53A8FEC22E11D26600905D20 /* NoteImage.swift in Sources */,
 				531B36B72D8CEAEF00CE8BA0 /* SampleLocations.swift in Sources */,
+				53A8FEF32E184A5400905D20 /* NidusNotePreview.swift in Sources */,
 				537560BC2D820A5A00D8528B /* ContentView.swift in Sources */,
 				532F3AF92DECB02C006E0E40 /* MapClustered.swift in Sources */,
 				532F3AED2DEB74D8006E0E40 /* Database.swift in Sources */,
