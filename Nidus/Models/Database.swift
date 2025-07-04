@@ -22,7 +22,7 @@ class Database: ObservableObject {
 		self.migrationManager = SQLiteMigrationManager(
 			db: self.connection,
 			migrations: Database.migrations(),
-			bundle: Database.migrationsBundle()
+			bundle: nil
 		)
 	}
 
