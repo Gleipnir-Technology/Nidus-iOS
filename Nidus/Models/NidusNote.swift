@@ -8,15 +8,6 @@
 import MapKit
 import SwiftUI
 
-struct NidusNotePayload: Codable {
-	let uuid: UUID
-	let timestamp: Date
-	let audio: [UUID]
-	let images: [UUID]
-	let location: Location
-	let text: String
-}
-
 class NidusNote: Note {
 	/* Note protocol */
 	var category: NoteCategory { return .nidus }
