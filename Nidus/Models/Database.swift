@@ -26,6 +26,14 @@ class Database: ObservableObject {
 		)
 	}
 
+	func audioThatNeedsUpload() throws -> [UUID] {
+		return try AudioNeedingUpload(connection)
+	}
+
+	func audioUploaded(_ uuid: UUID) throws {
+		return try AudioUploaded(connection, uuid)
+	}
+
 	func dropOriginalTables() throws {
 		try self.connection.transaction {
 			try self.connection.run("DROP TABLE IF EXISTS inspection")
@@ -34,6 +42,15 @@ class Database: ObservableObject {
 			try self.connection.run("DROP TABLE IF EXISTS service_request")
 		}
 	}
+
+	func imagesThatNeedUpload() throws -> [UUID] {
+		return try ImagesNeedingUpload(connection)
+	}
+
+	func imageUploaded(_ uuid: UUID) throws {
+		try ImageUploaded(connection, uuid)
+	}
+
 	func migrateIfNeeded() throws {
 		if !migrationManager.hasMigrationsTable() {
 			// This can be removed after our initial testers (all 4 of them) have

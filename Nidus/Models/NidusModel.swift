@@ -73,6 +73,8 @@ class NidusModel {
 			onProgress: onNetworkProgress
 		)
 		startNoteDownload()
+		startAudioUpload()
+		startImageUpload()
 		startNoteUpload()
 	}
 
@@ -81,14 +83,17 @@ class NidusModel {
 		for image in note.images {
 			try image.save()
 		}
-		for audioRecording in note.audioRecordings {
-			try audioRecording.save()
-		}
 		_ = try database.upsertNidusNote(note)
 		if isNew {
 			notes[note.id] = AnyNote(note)
 		}
-		triggerNoteUpload()
+		startNoteUpload(note)
+		for audioRecording in note.audioRecordings {
+			startAudioUpload(audioRecording.uuid)
+		}
+		for image in note.images {
+			startImageUpload(image.uuid)
+		}
 	}
 
 	func onError(_ error: Error) {
@@ -124,14 +129,65 @@ class NidusModel {
 		self.backgroundNetworkState = state
 	}
 
+	func startAudioUpload(_ uuid: UUID? = nil) {
+		Task {
+			guard let backgroundNetworkManager = self.backgroundNetworkManager
+			else {
+				Logger.background.error(
+					"Background network manager is null when doing audio upload"
+				)
+				return
+			}
+			let toUpload: [UUID] =
+				uuid != nil ? [uuid!] : try database.audioThatNeedsUpload()
+			for audio in toUpload {
+				try await backgroundNetworkManager.uploadAudio(
+					currentSettings,
+					audio
+				)
+				try database.audioUploaded(audio)
+				Logger.background.info(
+					"Uploaded audio \(audio.uuidString)"
+				)
+			}
+		}
+	}
+
+	func startImageUpload(_ uuid: UUID? = nil) {
+		Task {
+			guard let backgroundNetworkManager = self.backgroundNetworkManager
+			else {
+				Logger.background.error(
+					"Background network manager is null when doing image upload"
+				)
+				return
+			}
+			let toUpload: [UUID] =
+				uuid != nil ? [uuid!] : try database.imagesThatNeedUpload()
+
+			for image in toUpload {
+				try await backgroundNetworkManager.uploadImage(
+					currentSettings,
+					image
+				)
+				try database.imageUploaded(image)
+				Logger.background.info(
+					"Uploaded image \(image.uuidString)"
+				)
+			}
+		}
+
+	}
+
 	func startNoteDownload() {
 		Task {
 			guard let backgroundNetworkManager = self.backgroundNetworkManager else {
-				Logger.background.error("No background network manager")
+				Logger.background.error(
+					"Background network manager is null when doing note download"
+				)
 				return
 			}
 			backgroundNetworkState = .idle
-			//try await ensureLogin(settings)
 			let noteUpdates = try await backgroundNetworkManager.fetchNoteUpdates(
 				currentSettings
 			)
@@ -141,7 +197,7 @@ class NidusModel {
 		}
 	}
 
-	func startNoteUpload() {
+	func startNoteUpload(_ note: NidusNote? = nil) {
 		Task {
 			do {
 				guard let backgroundNetworkManager = self.backgroundNetworkManager
@@ -151,8 +207,10 @@ class NidusModel {
 					)
 					return
 				}
+				let toUpload: [NidusNote] =
+					note != nil ? [note!] : try database.notesThatNeedUpload()
 				// Upload notes first so that the back office gets them fastest
-				for note in try database.notesThatNeedUpload() {
+				for note in toUpload {
 					try await backgroundNetworkManager.uploadNote(
 						currentSettings,
 						note
@@ -222,7 +280,7 @@ class NidusModel {
 		UserDefaults.standard.set(regionString, forKey: "currentRegion")
 	}
 
-	private func saveNoteUpdates(_ response: APIResponse) async {
+	private func saveNoteUpdates(_ response: NotesResponse) async {
 		do {
 			Logger.background.info("Begin saving API response")
 			self.backgroundNetworkProgress = 0.0

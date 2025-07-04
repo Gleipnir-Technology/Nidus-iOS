@@ -80,7 +80,7 @@ struct ContentView: View {
 					) {
 						SettingView(
 							onSettingsUpdated: model
-								.triggerBackgroundFetch
+								.startNoteDownload
 						)
 					}
 				}

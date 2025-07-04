@@ -8,6 +8,17 @@ import OSLog
 import SQLite
 import SwiftUI
 
+func AudioNeedingUpload(_ connection: Connection) throws -> [UUID] {
+	let query = schema.audioRecording.table.filter(schema.audioRecording.uploaded == nil)
+
+	var uuids: [UUID] = []
+	for audioRow in try connection.prepare(query) {
+		let uuid = audioRow[schema.audioRecording.uuid]
+		uuids.append(uuid)
+	}
+	return uuids
+}
+
 func AudioRecordingDelete(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
 	let delete = schema.audioRecording.table.filter(
 		SQLite.Expression<UUID>(value: noteUUID) == schema.audioRecording.noteUUID
@@ -32,6 +43,36 @@ func AudioRecordingUpsert(
 		onConflictOf: schema.audioRecording.uuid
 	)
 	try connection.run(upsert)
+}
+
+func AudioUploaded(_ connection: SQLite.Connection, _ uuid: UUID) throws {
+	let update = schema.audioRecording.table.filter(
+		SQLite.Expression<UUID>(value: uuid) == schema.audioRecording.uuid
+	).update(
+		schema.audioRecording.uploaded <- Date.now
+	)
+	try connection.run(update)
+}
+
+func ImagesNeedingUpload(_ connection: Connection) throws -> [UUID] {
+	// Query for notes where uploaded is NULL
+	let query = schema.image.table.filter(schema.image.uploaded == nil)
+
+	var uuids: [UUID] = []
+	for imageRow in try connection.prepare(query) {
+		let uuid = imageRow[schema.image.uuid]
+		uuids.append(uuid)
+	}
+	return uuids
+}
+
+func ImageUploaded(_ connection: SQLite.Connection, _ uuid: UUID) throws {
+	let update = schema.image.table.filter(
+		SQLite.Expression<UUID>(value: uuid) == schema.image.uuid
+	).update(
+		schema.image.uploaded <- Date.now
+	)
+	try connection.run(update)
 }
 
 func InspectionUpsert(_ connection: SQLite.Connection, _ sID: UUID, _ inspection: Inspection) throws

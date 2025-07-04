@@ -95,7 +95,7 @@ class AudioRecorder: NSObject {
 			try audioSession.setCategory(.record, mode: .default)
 			try audioSession.setActive(true)
 
-			let audioFilename = AudioRecording.url(for: recordingUUID)
+			let audioFilename = AudioRecording.url(recordingUUID)
 
 			let settings = [
 				AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
