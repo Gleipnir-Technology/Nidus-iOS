@@ -69,6 +69,22 @@ struct ContentView: View {
 		}
 	}
 
+	@ToolbarContentBuilder
+	func toolbarByTab() -> some ToolbarContent {
+		switch selection {
+		case 0:
+			ToolbarItem {
+				Button {
+					Logger.foreground.log("Save button tapped")
+				} label: {
+					Text("Save")
+				}
+			}
+		default:
+			ToolbarItem { EmptyView() }
+		}
+	}
+
 	func onFilterChange() {
 		model.onFilterChange()
 	}
@@ -158,13 +174,7 @@ struct ContentView: View {
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationTitle(navTitle)
 			.toolbar {
-				ToolbarItem {
-					Button {
-						Logger.foreground.log("Save button tapped")
-					} label: {
-						Text("Save")
-					}
-				}
+				toolbarByTab()
 			}
 		}.onAppear {
 			onAppear()
