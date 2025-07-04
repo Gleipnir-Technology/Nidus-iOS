@@ -14,7 +14,7 @@ struct LocationResponse: Codable {
 	}
 }
 
-final class APIResponse: Codable {
+final class NotesResponse: Codable {
 	enum CodingKeys: CodingKey {
 		case requests
 		case sources

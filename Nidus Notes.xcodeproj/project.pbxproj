@@ -10,11 +10,9 @@
 		531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531B36B42D8B962900CE8BA0 /* NoteMapView.swift */; };
 		531B36B72D8CEAEF00CE8BA0 /* SampleLocations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531B36B62D8CEAE800CE8BA0 /* SampleLocations.swift */; };
 		532F3ACC2DE5FC67006E0E40 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3ACB2DE5FC62006E0E40 /* Settings.swift */; };
-		532F3AD12DE61CE7006E0E40 /* BackgroundNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD02DE61CE1006E0E40 /* BackgroundNetworkManager.swift */; };
 		532F3AD32DE66D40006E0E40 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD22DE66D3D006E0E40 /* Logger.swift */; };
 		532F3ADA2DE7A41F006E0E40 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AD92DE7A41C006E0E40 /* Toast.swift */; };
 		532F3AE02DEA0BCD006E0E40 /* FieldSeeker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */; };
-		532F3AE22DEB64B4006E0E40 /* Importer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3AE12DEB64B0006E0E40 /* Importer.swift */; };
 		532F3AE52DEB66C5006E0E40 /* Automerge in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AE42DEB66C5006E0E40 /* Automerge */; };
 		532F3AE82DEB6765006E0E40 /* AutomergeRepo in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AE72DEB6765006E0E40 /* AutomergeRepo */; };
 		532F3AEB2DEB68C7006E0E40 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AEA2DEB68C7006E0E40 /* SQLite */; };
@@ -30,7 +28,6 @@
 		532F3B052DECF12D006E0E40 /* TreatmentDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F3B042DECF12B006E0E40 /* TreatmentDetail.swift */; };
 		533F88932DEFAAE800D0DBF2 /* NidusModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533F88922DEFAAE500D0DBF2 /* NidusModel.swift */; };
 		533F88952DF0F1ED00D0DBF2 /* NidusModelPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533F88942DF0F1E700D0DBF2 /* NidusModelPreview.swift */; };
-		533F88972DF0FB2C00D0DBF2 /* APIResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533F88962DF0FB2900D0DBF2 /* APIResponse.swift */; };
 		537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5375609F2D820A5A00D8528B /* Preview Assets.xcassets */; };
 		537560B22D820A5A00D8528B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 537560A12D820A5A00D8528B /* Assets.xcassets */; };
 		537560B92D820A5A00D8528B /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A92D820A5A00D8528B /* Note.swift */; };
@@ -85,12 +82,10 @@
 		531B36B42D8B962900CE8BA0 /* NoteMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteMapView.swift; sourceTree = "<group>"; };
 		531B36B62D8CEAE800CE8BA0 /* SampleLocations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleLocations.swift; sourceTree = "<group>"; };
 		532F3ACB2DE5FC62006E0E40 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
-		532F3AD02DE61CE1006E0E40 /* BackgroundNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundNetworkManager.swift; sourceTree = "<group>"; };
 		532F3AD22DE66D3D006E0E40 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		532F3AD82DE76EF8006E0E40 /* Nidus-Notes-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Nidus-Notes-Info.plist"; sourceTree = "<group>"; };
 		532F3AD92DE7A41C006E0E40 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldSeeker.swift; sourceTree = "<group>"; };
-		532F3AE12DEB64B0006E0E40 /* Importer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Importer.swift; sourceTree = "<group>"; };
 		532F3AEC2DEB74D3006E0E40 /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		532F3AF82DECB027006E0E40 /* MapClustered.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapClustered.swift; sourceTree = "<group>"; };
 		532F3AFA2DECBFE9006E0E40 /* NotesCluster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesCluster.swift; sourceTree = "<group>"; };
@@ -101,7 +96,6 @@
 		532F3B042DECF12B006E0E40 /* TreatmentDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentDetail.swift; sourceTree = "<group>"; };
 		533F88922DEFAAE500D0DBF2 /* NidusModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NidusModel.swift; sourceTree = "<group>"; };
 		533F88942DF0F1E700D0DBF2 /* NidusModelPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NidusModelPreview.swift; sourceTree = "<group>"; };
-		533F88962DF0FB2900D0DBF2 /* APIResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIResponse.swift; sourceTree = "<group>"; };
 		5375609F2D820A5A00D8528B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		537560A12D820A5A00D8528B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		537560A42D820A5A00D8528B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -144,6 +138,11 @@
 			path = Wrappers;
 			sourceTree = "<group>";
 		};
+		53A8FEC82E17777A00905D20 /* API */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = API;
+			sourceTree = "<group>";
+		};
 		53E1F2EF2E05CF6B00A6D888 /* Database */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Database;
@@ -182,15 +181,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		532F3ACD2DE61BF7006E0E40 /* Background */ = {
-			isa = PBXGroup;
-			children = (
-				532F3AD02DE61CE1006E0E40 /* BackgroundNetworkManager.swift */,
-				532F3AE12DEB64B0006E0E40 /* Importer.swift */,
-			);
-			path = Background;
-			sourceTree = "<group>";
-		};
 		537560A02D820A5A00D8528B /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
@@ -202,8 +192,8 @@
 		537560AF2D820A5A00D8528B /* Nidus */ = {
 			isa = PBXGroup;
 			children = (
+				53A8FEC82E17777A00905D20 /* API */,
 				537560A12D820A5A00D8528B /* Assets.xcassets */,
-				532F3ACD2DE61BF7006E0E40 /* Background */,
 				53E1F2EF2E05CF6B00A6D888 /* Database */,
 				532F3AD22DE66D3D006E0E40 /* Logger.swift */,
 				537560C12D820FFE00D8528B /* Models */,
@@ -221,7 +211,6 @@
 		537560C12D820FFE00D8528B /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				533F88962DF0FB2900D0DBF2 /* APIResponse.swift */,
 				53A8FEBC2E11C95800905D20 /* AudioRecording.swift */,
 				532F3AEC2DEB74D3006E0E40 /* Database.swift */,
 				532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */,
@@ -325,6 +314,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				5365EE652E0DA04F0014A88F /* Wrappers */,
+				53A8FEC82E17777A00905D20 /* API */,
 				53E1F2EF2E05CF6B00A6D888 /* Database */,
 			);
 			name = "Nidus Notes";
@@ -472,7 +462,6 @@
 				53A8FEBB2E11C45700905D20 /* AudioPickerView.swift in Sources */,
 				532F3B012DECEE5D006E0E40 /* InspectionDetail.swift in Sources */,
 				532F3AFB2DECBFF5006E0E40 /* NotesCluster.swift in Sources */,
-				532F3AE22DEB64B4006E0E40 /* Importer.swift in Sources */,
 				537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */,
 				532F3B052DECF12D006E0E40 /* TreatmentDetail.swift in Sources */,
 				532F3AD32DE66D40006E0E40 /* Logger.swift in Sources */,
@@ -493,13 +482,11 @@
 				5398545F2E0DB7AF00D3E2EF /* ImageViewer.swift in Sources */,
 				532F3ACC2DE5FC67006E0E40 /* Settings.swift in Sources */,
 				53E308182D8B39ED00534AB0 /* NoteCategoryAdd.swift in Sources */,
-				533F88972DF0FB2C00D0DBF2 /* APIResponse.swift in Sources */,
 				532F3B032DECF0F2006E0E40 /* TreatmentList.swift in Sources */,
 				532F3AE02DEA0BCD006E0E40 /* FieldSeeker.swift in Sources */,
 				539854612E0DBCB700D3E2EF /* ThumbnailListView.swift in Sources */,
 				533F88952DF0F1ED00D0DBF2 /* NidusModelPreview.swift in Sources */,
 				537560BA2D820A5A00D8528B /* LocationView.swift in Sources */,
-				532F3AD12DE61CE7006E0E40 /* BackgroundNetworkManager.swift in Sources */,
 				537E02672DC03DC5000F254F /* MapOverview.swift in Sources */,
 				5398545D2E0DB4C500D3E2EF /* PhotoPicker.swift in Sources */,
 				53A8FEC22E11D26600905D20 /* NoteImage.swift in Sources */,

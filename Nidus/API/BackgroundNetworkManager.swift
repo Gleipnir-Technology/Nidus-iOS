@@ -15,6 +15,34 @@ struct DownloadProgress {
 	let progress: Double
 }
 
+enum AudioUploadError: Error {
+	case fileNotFound
+	case invalidURL
+
+	var localizedDescription: String {
+		switch self {
+		case .fileNotFound:
+			return "Audio file not found"
+		case .invalidURL:
+			return "Invalid upload URL"
+		}
+	}
+}
+
+enum ImageUploadError: Error {
+	case fileNotFound
+	case invalidURL
+
+	var localizedDescription: String {
+		switch self {
+		case .fileNotFound:
+			return "Image file not found"
+		case .invalidURL:
+			return "Invalid upload URL"
+		}
+	}
+}
+
 class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadDelegate {
 	private var backgroundSession: URLSession!
 	private var continuations: [URLSessionTask: CheckedContinuation<URL, Error>] = [:]
@@ -75,28 +103,36 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		}
 
 		do {
-			// Create permanent URL
 			let originalURL =
-				downloadTask.originalRequest?.url ?? URL(string: "downloaded_file")!
-			let permanentURL = permanentURL(for: originalURL)
-
-			// Remove existing file if it exists
-			if FileManager.default.fileExists(atPath: permanentURL.path) {
-				try FileManager.default.removeItem(at: permanentURL)
-			}
-
-			// Move the temporary file to permanent location
-			try FileManager.default.moveItem(at: location, to: permanentURL)
+				downloadTask.originalRequest?.url ?? URL(
+					string: "downloaded_file"
+				)!
 			if let httpResponse = downloadTask.response as? HTTPURLResponse {
 				let statusCode = httpResponse.statusCode
 				switch statusCode {
 				case 200..<300:
+					// Create permanent URL
+					let permanentURL = permanentURL(for: originalURL)
+
+					// Remove existing file if it exists
+					if FileManager.default.fileExists(atPath: permanentURL.path)
+					{
+						try FileManager.default.removeItem(at: permanentURL)
+					}
+
+					// Move the temporary file to permanent location
+					try FileManager.default.moveItem(
+						at: location,
+						to: permanentURL
+					)
 					// Resume continuation with permanent URL
 					continuation.resume(returning: permanentURL)
 					break
 				default:
-					Logger.background.info(
-						"Generating a URLError with status code \(statusCode)"
+					let data = try Data(contentsOf: location)
+					let content = String(data: data, encoding: .utf8)
+					Logger.background.error(
+						"Generating a URLError with status code \(statusCode) for URL \(originalURL.path): \(content ?? "")"
 					)
 					continuation.resume(
 						throwing: URLError(
@@ -178,10 +214,10 @@ actor BackgroundNetworkManager {
 		try await login(settings)
 	}
 
-	func fetchNoteUpdates(_ settings: Settings) async throws -> APIResponse {
+	func fetchNoteUpdates(_ settings: Settings) async throws -> NotesResponse {
 		let url = URL(string: settings.URL + "/api/client/ios")!
 		let request = URLRequest(url: url)
-		var response: APIResponse?
+		var response: NotesResponse?
 		try await maybeLogin(settings) {
 			let tempURL = try await downloadWrapper.handle(with: request) { progress in
 				self.onProgress(progress.progress)
@@ -189,6 +225,46 @@ actor BackgroundNetworkManager {
 			response = try parseJSON(tempURL)
 		}
 		return response!
+	}
+
+	nonisolated func uploadAudio(_ settings: Settings, _ uuid: UUID) async throws {
+		let uploadURL: URL = URL(string: settings.URL + "/api/audio/" + uuid.uuidString)!
+		let audioURL = AudioRecording.url(uuid)
+
+		// Check if file exists
+		guard FileManager.default.fileExists(atPath: audioURL.path) else {
+			throw AudioUploadError.fileNotFound
+		}
+
+		// Create the request
+		var request = URLRequest(url: uploadURL)
+		request.httpMethod = "POST"
+		request.setValue("audio/m4a", forHTTPHeaderField: "Content-Type")
+
+		// Create upload task with file URL
+		try await maybeLogin(settings) {
+			_ = try await downloadWrapper.handle(with: request)
+		}
+	}
+
+	nonisolated func uploadImage(_ settings: Settings, _ uuid: UUID) async throws {
+		let uploadURL: URL = URL(string: settings.URL + "/api/image/" + uuid.uuidString)!
+		let imageURL = NoteImage.url(uuid)
+
+		// Check if file exists
+		guard FileManager.default.fileExists(atPath: imageURL.path) else {
+			throw ImageUploadError.fileNotFound
+		}
+
+		// Create the request
+		var request = URLRequest(url: uploadURL)
+		request.httpMethod = "POST"
+		request.setValue("image/png", forHTTPHeaderField: "Content-Type")
+
+		// Create upload task with file URL
+		try await maybeLogin(settings) {
+			_ = try await downloadWrapper.handle(with: request)
+		}
 	}
 
 	nonisolated func uploadNote(_ settings: Settings, _ note: NidusNote) async throws {
