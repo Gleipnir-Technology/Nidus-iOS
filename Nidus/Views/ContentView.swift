@@ -49,7 +49,7 @@ struct ContentView: View {
 	@State var currentValue: Float = 0.0
 	@State private var path = NavigationPath()
 	@State private var selection: Int = 0
-	@Bindable var model: NidusModel
+	@Bindable var model: ModelNidus
 	var onAppear: () -> Void
 
 	var navTitle: String {
@@ -75,7 +75,7 @@ struct ContentView: View {
 		case 0:
 			ToolbarItem {
 				Button {
-					Logger.foreground.log("Save button tapped")
+					onSaveNoteNew()
 				} label: {
 					Text("Save")
 				}
@@ -91,8 +91,22 @@ struct ContentView: View {
 	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
 	}
+	func onSaveNoteExisting() {
+		validateNoteSave()
+		model.onSaveNote(isNew: false)
+	}
+	func onSaveNoteNew() {
+		validateNoteSave()
+		model.onSaveNote(isNew: true)
+	}
 	func setTabNotes() {
 		selection = 0
+	}
+	private func validateNoteSave() {
+		if model.noteBuffer.location == nil {
+			model.noteBuffer.showLocationToast = true
+			return
+		}
 	}
 	var body: some View {
 		NavigationStack(path: $path) {
@@ -102,7 +116,7 @@ struct ContentView: View {
 						EditNidusNoteView(
 							locationDataManager: locationDataManager,
 							note: nil,
-							onSave: model.onSaveNote
+							noteBuffer: $model.noteBuffer
 						)
 					}
 					Tab("Notes", systemImage: "clock", value: 1) {
@@ -116,8 +130,8 @@ struct ContentView: View {
 							),
 							locationDataManager: locationDataManager,
 							notes: model.notesToShow,
-							onFilterAdded: model.onFilterAdded,
-							onNoteSave: model.onSaveNote
+							noteBuffer: $model.noteBuffer,
+							onFilterAdded: model.onFilterAdded
 						)
 					}
 					Tab("Map", systemImage: "map", value: 2) {
@@ -178,7 +192,19 @@ struct ContentView: View {
 			}
 		}.onAppear {
 			onAppear()
-		}
+		}.toast(
+			message: "Need a location first",
+			isShowing: $model.toast.showLocationToast,
+			duration: Toast.short
+		).toast(
+			message: "Note saved.",
+			isShowing: $model.toast.showSavedToast,
+			duration: Toast.short
+		).toast(
+			message: "Failed to save note, tell a developer",
+			isShowing: $model.toast.showSavedErrorToast,
+			duration: Toast.long
+		)
 	}
 }
 

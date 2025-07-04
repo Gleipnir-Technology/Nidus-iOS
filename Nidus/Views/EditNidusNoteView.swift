@@ -5,62 +5,38 @@ import Speech
 import SwiftUI
 
 struct EditNidusNoteView: View {
-	@State private var audioRecorder: AudioRecorder
-	@State var audioRecordings: [AudioRecording] = []
-	@State private var capturedImages: [UIImage]
 	@Environment(\.locale) var locale
-	@State var location: CLLocation?
+
+	var locationDataManager: LocationDataManager
+	@Binding var noteBuffer: ModelNoteBuffer
 	var note: NidusNote?
-	var onSave: ((NidusNote, Bool) throws -> Void)
+
+	@State private var audioRecorder: AudioRecorder
 	@State private var selectedImageIndex: Int = 0
 	@State private var showingAudioPicker = false
 	@State private var showingCamera = false
 	@State private var showingImagePicker = false
 	@State private var showingImageViewer = false
-	@State private var showLocationToast = false
-	@State private var showSavedToast = false
-	@State private var showSavedErrorToast = false
-	@State private var text: String
 	@FocusState private var isTextFieldFocused: Bool
 
 	private var useLocationManagerWhenAvailable: Bool
-	var locationDataManager: LocationDataManager
 
 	init(
 		audioRecorder: AudioRecorder = AudioRecorder(),
 		locationDataManager: LocationDataManager,
 		note: NidusNote? = nil,
-		onSave: @escaping ((NidusNote, Bool) throws -> Void) = { _, _ in }
+		noteBuffer: Binding<ModelNoteBuffer>
 	) {
 
 		self._audioRecorder = .init(wrappedValue: audioRecorder)
+		self._noteBuffer = .init(projectedValue: noteBuffer)
 		self.locationDataManager = locationDataManager
-		self.onSave = onSave
 		self.note = note
-		if note == nil {
-			self.audioRecordings = []
-			self.capturedImages = []
-			self._location = .init(wrappedValue: nil)
-			self.text = ""
-			self.useLocationManagerWhenAvailable = true
-		}
-		else {
-			self.audioRecordings = note!.audioRecordings
-			let maybeImages = note!.images.map { $0.toUIImage() }
-			self.capturedImages = maybeImages.compactMap { $0 }
-			self._location = .init(
-				wrappedValue: CLLocation(
-					latitude: note!.location.latitude,
-					longitude: note!.location.longitude
-				)
-			)
-			self._text = .init(wrappedValue: note!.text)
-			self.useLocationManagerWhenAvailable = false
-		}
+		self.useLocationManagerWhenAvailable = note == nil
 	}
 
 	var locationDescription: String {
-		guard let location = location else {
+		guard let location = noteBuffer.location else {
 			return "current location"
 		}
 		guard let userLocation = locationDataManager.location else {
@@ -76,46 +52,7 @@ struct EditNidusNoteView: View {
 	}
 
 	private func onRecordingStop(_ recording: AudioRecording) {
-		audioRecordings.append(recording)
-	}
-
-	private func onSaveClick() {
-		isTextFieldFocused = false
-		if location == nil {
-			showLocationToast = true
-			return
-		}
-		var isNew = false
-		var note = self.note
-		if note == nil {
-			note = NidusNote(
-				audioRecordings: audioRecordings,
-				images: capturedImages.map { NoteImage($0) },
-				location: Location(location!),
-				text: text
-			)
-			isNew = true
-		}
-		else {
-			note!.audioRecordings = audioRecordings
-			note!.images = capturedImages.map { NoteImage($0) }
-			note!.location = Location(location!)
-			note!.text = text
-			isNew = false
-		}
-		do {
-			try onSave(note!, isNew)
-			showSavedToast = true
-			if isNew {
-				audioRecordings = []
-				capturedImages = []
-				text = ""
-			}
-		}
-		catch {
-			Logger.foreground.error("Failed to save note: \(error)")
-			showSavedErrorToast = true
-		}
+		noteBuffer.audioRecordings.append(recording)
 	}
 
 	var body: some View {
@@ -123,7 +60,7 @@ struct EditNidusNoteView: View {
 			Form {
 				Section(header: Text("Location")) {
 					VStack(alignment: .leading, spacing: 8) {
-						if location == nil {
+						if noteBuffer.location == nil {
 							ProgressView()
 								.progressViewStyle(
 									CircularProgressViewStyle()
@@ -134,7 +71,7 @@ struct EditNidusNoteView: View {
 						}
 						else {
 							LocationView(
-								location: $location
+								location: $noteBuffer.location
 							).frame(
 								height: 300
 							)
@@ -150,7 +87,7 @@ struct EditNidusNoteView: View {
 						audioRecorder: audioRecorder,
 						isShowingEditSheet:
 							$showingAudioPicker,
-						recordings: $audioRecordings
+						recordings: $noteBuffer.audioRecordings
 					)
 				}
 
@@ -165,7 +102,7 @@ struct EditNidusNoteView: View {
 							$showingImageViewer
 					)
 					ThumbnailListView(
-						capturedImages: $capturedImages,
+						capturedImages: $noteBuffer.capturedImages,
 						selectedImageIndex:
 							$selectedImageIndex,
 						showingImageViewer:
@@ -175,7 +112,7 @@ struct EditNidusNoteView: View {
 				Section(header: Text("Text")) {
 					TextField(
 						"Additional text-only information",
-						text: $text
+						text: $noteBuffer.text
 					)
 					.cornerRadius(10)
 					.frame(
@@ -196,72 +133,64 @@ struct EditNidusNoteView: View {
 		}
 		.sheet(isPresented: $showingAudioPicker) {
 			AudioPickerView(
-				$audioRecordings
+				$noteBuffer.audioRecordings
 			) {
 				_ in
 			}
 		}
 		.sheet(isPresented: $showingCamera) {
 			CameraView { image in
-				capturedImages.append(image)
+				noteBuffer.capturedImages.append(image)
 			}
 		}
 		.sheet(isPresented: $showingImagePicker) {
 			PhotoPicker { images in
-				capturedImages.append(contentsOf: images)
+				noteBuffer.capturedImages.append(contentsOf: images)
 			}
 		}
 		.sheet(isPresented: $showingImageViewer) {
 			ImageViewer(
-				images: capturedImages,
-				onImageRemove: { at in capturedImages.remove(at: at) },
+				images: noteBuffer.capturedImages,
+				onImageRemove: { at in noteBuffer.capturedImages.remove(at: at) },
 				selectedIndex: $selectedImageIndex
 			)
 		}.onAppear {
 			audioRecorder.onRecordingStop = onRecordingStop
 			locationDataManager.onLocationAcquired({ userLocation in
 				if useLocationManagerWhenAvailable {
-					self.location = userLocation
+					self.noteBuffer.location = userLocation
 				}
 			})
-		}.toast(
-			message: "Need a location first",
-			isShowing: $showLocationToast,
-			duration: Toast.short
-		).toast(
-			message: "Note saved.",
-			isShowing: $showSavedToast,
-			duration: Toast.short
-		).toast(
-			message: "Failed to save note, tell a developer",
-			isShowing: $showSavedErrorToast,
-			duration: Toast.long
-		)
+		}
 	}
 }
 
 // MARK: - Preview
 struct AddNoteView_Previews: PreviewProvider {
 	static var audioRecorder = AudioRecorderFake()
+	@State static var noteBuffer = ModelNoteBuffer()
 	static var previews: some View {
 		EditNidusNoteView(
 			audioRecorder: audioRecorder,
 			locationDataManager: LocationDataManager(),
-			note: nil
+			note: nil,
+			noteBuffer: $noteBuffer
 		).previewDisplayName("user location")
 		EditNidusNoteView(
 			audioRecorder: audioRecorder,
 			locationDataManager: LocationDataManagerFake(
 				location: nil
 			),
-			note: NidusNote.forPreview()
+			note: NidusNote.forPreview(),
+			noteBuffer: $noteBuffer
 		).previewDisplayName("set location")
 		EditNidusNoteView(
 			audioRecorder: audioRecorder,
 			locationDataManager: LocationDataManagerFake(
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			),
-			note: NidusNote.forPreview(location: .visalia)
+			note: NidusNote.forPreview(location: .visalia),
+			noteBuffer: $noteBuffer
 		).previewDisplayName("set location with user location")
 		EditNidusNoteView(
 			audioRecorder: AudioRecorderFake(
@@ -273,7 +202,8 @@ struct AddNoteView_Previews: PreviewProvider {
 			locationDataManager: LocationDataManagerFake(
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			),
-			note: NidusNote.forPreview()
+			note: NidusNote.forPreview(),
+			noteBuffer: $noteBuffer
 		).previewDisplayName("mid long recording")
 		EditNidusNoteView(
 			audioRecorder: AudioRecorderFake(
@@ -290,7 +220,8 @@ struct AddNoteView_Previews: PreviewProvider {
 						transcription: ""
 					)
 				]
-			)
+			),
+			noteBuffer: $noteBuffer
 		).previewDisplayName("multiple recording")
 	}
 }

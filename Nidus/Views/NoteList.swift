@@ -13,8 +13,8 @@ struct NoteListView: View {
 	var currentLocation: CLLocation
 	var locationDataManager: LocationDataManager
 	var notes: [AnyNote]
+	@Binding var noteBuffer: ModelNoteBuffer
 	let onFilterAdded: (FilterInstance) -> Void
-	var onNoteSave: ((NidusNote, Bool) throws -> Void)
 
 	var body: some View {
 		NavigationView {
@@ -26,8 +26,8 @@ struct NoteListView: View {
 					currentLocation: currentLocation,
 					locationDataManager: locationDataManager,
 					notes: notes,
-					onFilterAdded: onFilterAdded,
-					onNoteSave: onNoteSave
+					noteBuffer: $noteBuffer,
+					onFilterAdded: onFilterAdded
 				)
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationTitle("Notes")
@@ -51,8 +51,8 @@ struct NoteList: View {
 	var currentLocation: CLLocation
 	var locationDataManager: LocationDataManager
 	var notes: [AnyNote]
+	@Binding var noteBuffer: ModelNoteBuffer
 	let onFilterAdded: (FilterInstance) -> Void
-	var onNoteSave: ((NidusNote, Bool) throws -> Void)
 
 	var notesByDistance: [AnyNote] {
 		var byDistance: [AnyNote] = notes
@@ -85,7 +85,7 @@ struct NoteList: View {
 					EditNidusNoteView(
 						locationDataManager: locationDataManager,
 						note: note.asNidusNote()!,
-						onSave: onNoteSave
+						noteBuffer: $noteBuffer
 					)
 				case .serviceRequest:
 					ServiceRequestDetail(
@@ -108,26 +108,24 @@ struct NoteList: View {
 }
 
 struct NoteList_Previews: PreviewProvider {
+	@State static var noteBuffer: ModelNoteBuffer = ModelNoteBuffer()
 	static var onFilterAdded: (FilterInstance) -> Void {
 		{ _ in }
-	}
-	static var onNoteSave: (NidusNote, Bool) throws -> Void {
-		{ _, _ in }
 	}
 	static var previews: some View {
 		NoteListView(
 			currentLocation: CLLocation.visaliaCenter,
 			locationDataManager: LocationDataManagerFake(),
 			notes: [],
-			onFilterAdded: onFilterAdded,
-			onNoteSave: onNoteSave
+			noteBuffer: $noteBuffer,
+			onFilterAdded: onFilterAdded
 		).previewDisplayName("empty")
 		NoteListView(
 			currentLocation: CLLocation.visaliaCenter,
 			locationDataManager: LocationDataManagerFake(),
 			notes: AnyNote.previewListShort,
-			onFilterAdded: onFilterAdded,
-			onNoteSave: onNoteSave
+			noteBuffer: $noteBuffer,
+			onFilterAdded: onFilterAdded
 		).previewDisplayName("populated")
 	}
 }

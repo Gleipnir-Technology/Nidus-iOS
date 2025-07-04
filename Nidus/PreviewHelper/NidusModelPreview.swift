@@ -7,7 +7,7 @@
 import SwiftUI
 
 @Observable
-class NidusModelPreview: NidusModel {
+class NidusModelPreview: ModelNidus {
 	var notesToShowOverride: [AnyNote]?
 
 	init(

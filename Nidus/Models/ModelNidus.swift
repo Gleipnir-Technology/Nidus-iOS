@@ -9,18 +9,20 @@ import OSLog
 import SwiftUI
 
 @Observable
-class NidusModel {
+class ModelNidus {
 	var backgroundNetworkManager: BackgroundNetworkManager?
 	var backgroundNetworkProgress: Double = 0.0
 	var backgroundNetworkState: BackgroundNetworkState = .idle
 	var currentRegion: MKCoordinateRegion
 	var cluster: NotesCluster = NotesCluster()
 	var database: Database
+	var isTextFieldFocused = false
 	var filterInstances: [String: FilterInstance]
 	var errorMessage: String?
 	var mapSize: CGSize = .zero
-
+	var noteBuffer: ModelNoteBuffer = ModelNoteBuffer()
 	var notes: [UUID: AnyNote] = [:]
+	var toast: ModelToast = ModelToast()
 
 	init() {
 		self.currentRegion = .visalia
@@ -78,12 +80,24 @@ class NidusModel {
 		startNoteUpload()
 	}
 
-	func onSaveNote(_ note: NidusNote, _ isNew: Bool) throws {
+	func onSaveNote(isNew: Bool) {
+		isTextFieldFocused = false
+		let note = noteBuffer.toNote()
 		Logger.foreground.info("Saving \(isNew ? "new" : "old") note \(note.id)")
-		for image in note.images {
-			try image.save()
+		do {
+			for image in note.images {
+				try image.save()
+			}
 		}
-		_ = try database.upsertNidusNote(note)
+		catch {
+			errorMessage = "Failed to save images: \(error)"
+		}
+		do {
+			_ = try database.upsertNidusNote(note)
+		}
+		catch {
+			errorMessage = "Failed to upsert note: \(error)"
+		}
 		if isNew {
 			notes[note.id] = AnyNote(note)
 		}

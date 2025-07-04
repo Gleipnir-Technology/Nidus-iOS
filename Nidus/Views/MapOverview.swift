@@ -14,7 +14,7 @@ import SwiftUI
 
 struct MapOverview: View {
 	@State private var geometrySize: CGSize = .zero
-	var model: NidusModel
+	var model: ModelNidus
 
 	var onNoteSelected: ((any Note) -> Void)
 	var userLocation: CLLocation?
