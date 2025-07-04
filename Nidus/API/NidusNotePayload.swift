@@ -7,10 +7,10 @@
 import Foundation
 
 struct NidusNotePayload: Codable {
-	let uuid: UUID
-	let timestamp: Date
-	let audio: [UUID]
-	let images: [UUID]
+	let audio: [AudioPayload]
+	let images: [ImagePayload]
 	let location: Location
 	let text: String
+	let timestamp: Date
+	let uuid: UUID
 }

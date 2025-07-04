@@ -75,12 +75,28 @@ class NidusNote: Note {
 
 	func toPayload() -> NidusNotePayload {
 		return NidusNotePayload(
-			uuid: id,
-			timestamp: timestamp,
-			audio: audioRecordings.map(\.uuid),
-			images: images.map(\.uuid),
+			audio: audioRecordings.map({ audio in
+				AudioPayload(
+					created: audio.created,
+					deleted: nil,
+					duration: audio.duration,
+					transcription: audio.transcription,
+					uuid: audio.uuid
+				)
+			}),
+			images: images.map({ image in
+				ImagePayload(
+					created: image.created,
+					deleted: nil,
+					size_x: image.size_x,
+					size_y: image.size_y,
+					uuid: image.uuid
+				)
+			}),
 			location: location,
-			text: text
+			text: text,
+			timestamp: timestamp,
+			uuid: id
 		)
 	}
 }

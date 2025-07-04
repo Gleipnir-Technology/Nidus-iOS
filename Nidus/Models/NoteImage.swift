@@ -29,6 +29,14 @@ class NoteImage {
 		self.uuid = UUID()
 	}
 
+	var size_x: Int {
+		return Int(toUIImage()?.size.width ?? 0)
+	}
+
+	var size_y: Int {
+		return Int(toUIImage()?.size.height ?? 0)
+	}
+
 	static func url(_ uuid: UUID) -> URL {
 		let supportURL = try! FileManager.default.url(
 			for: .applicationSupportDirectory,
