@@ -138,6 +138,16 @@ struct ContentView: View {
 					errorMessage: model.errorMessage
 				)
 			}
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationTitle("Create note").toolbar {
+				ToolbarItem {
+					Button {
+						Logger.foreground.log("Save button tapped")
+					} label: {
+						Text("Save")
+					}
+				}
+			}
 		}.onAppear {
 			onAppear()
 		}

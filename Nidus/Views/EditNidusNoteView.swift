@@ -119,136 +119,124 @@ struct EditNidusNoteView: View {
 	}
 
 	var body: some View {
-		NavigationView {
-			ScrollViewReader { reader in
-				Form {
-					Section(header: Text("Location")) {
-						VStack(alignment: .leading, spacing: 8) {
-							if location == nil {
-								ProgressView()
-									.progressViewStyle(
-										CircularProgressViewStyle()
-									).frame(height: 300)
-								Text(
-									"Getting a fix on your location..."
-								)
-							}
-							else {
-								LocationView(
-									location: $location
-								).frame(
-									height: 300
-								)
-								Text(
-									"Where: \(locationDescription)"
-								)
-							}
+		ScrollViewReader { reader in
+			Form {
+				Section(header: Text("Location")) {
+					VStack(alignment: .leading, spacing: 8) {
+						if location == nil {
+							ProgressView()
+								.progressViewStyle(
+									CircularProgressViewStyle()
+								).frame(height: 300)
+							Text(
+								"Getting a fix on your location..."
+							)
 						}
-					}
-
-					Section(header: Text("Voice Notes")) {
-						AudioRecorderView(
-							audioRecorder: audioRecorder,
-							isShowingEditSheet:
-								$showingAudioPicker,
-							recordings: $audioRecordings
-						)
-					}
-
-					Section(header: Text("Photos")) {
-						PhotoAttachmentView(
-							selectedImageIndex:
-								$selectedImageIndex,
-							showingCamera: $showingCamera,
-							showingImagePicker:
-								$showingImagePicker,
-							showingImageViewer:
-								$showingImageViewer
-						)
-						ThumbnailListView(
-							capturedImages: $capturedImages,
-							selectedImageIndex:
-								$selectedImageIndex,
-							showingImageViewer:
-								$showingImageViewer
-						)
-					}
-					Section(header: Text("Text")) {
-						TextField(
-							"Additional text-only information",
-							text: $text
-						)
-						.cornerRadius(10)
-						.frame(
-							maxWidth: .infinity,
-							alignment: .leading
-						)
-						.focused($isTextFieldFocused)
-						.id("textField")
-						.onChange(of: isTextFieldFocused) {
-							Logger.foreground.info("ELI")
-							reader.scrollTo(
-								"textField",
-								anchor: .bottom
+						else {
+							LocationView(
+								location: $location
+							).frame(
+								height: 300
+							)
+							Text(
+								"Where: \(locationDescription)"
 							)
 						}
 					}
 				}
-			}
-			.sheet(isPresented: $showingAudioPicker) {
-				AudioPickerView(
-					$audioRecordings
-				) {
-					_ in
+
+				Section(header: Text("Voice Notes")) {
+					AudioRecorderView(
+						audioRecorder: audioRecorder,
+						isShowingEditSheet:
+							$showingAudioPicker,
+						recordings: $audioRecordings
+					)
 				}
-			}
-			.sheet(isPresented: $showingCamera) {
-				CameraView { image in
-					capturedImages.append(image)
+
+				Section(header: Text("Photos")) {
+					PhotoAttachmentView(
+						selectedImageIndex:
+							$selectedImageIndex,
+						showingCamera: $showingCamera,
+						showingImagePicker:
+							$showingImagePicker,
+						showingImageViewer:
+							$showingImageViewer
+					)
+					ThumbnailListView(
+						capturedImages: $capturedImages,
+						selectedImageIndex:
+							$selectedImageIndex,
+						showingImageViewer:
+							$showingImageViewer
+					)
 				}
-			}
-			.sheet(isPresented: $showingImagePicker) {
-				PhotoPicker { images in
-					capturedImages.append(contentsOf: images)
-				}
-			}
-			.sheet(isPresented: $showingImageViewer) {
-				ImageViewer(
-					images: capturedImages,
-					onImageRemove: { at in capturedImages.remove(at: at) },
-					selectedIndex: $selectedImageIndex
-				)
-			}.onAppear {
-				audioRecorder.onRecordingStop = onRecordingStop
-				locationDataManager.onLocationAcquired({ userLocation in
-					if useLocationManagerWhenAvailable {
-						self.location = userLocation
+				Section(header: Text("Text")) {
+					TextField(
+						"Additional text-only information",
+						text: $text
+					)
+					.cornerRadius(10)
+					.frame(
+						maxWidth: .infinity,
+						alignment: .leading
+					)
+					.focused($isTextFieldFocused)
+					.id("textField")
+					.onChange(of: isTextFieldFocused) {
+						Logger.foreground.info("ELI")
+						reader.scrollTo(
+							"textField",
+							anchor: .bottom
+						)
 					}
-				})
-			}
-			.navigationBarTitleDisplayMode(.inline)
-			.navigationTitle(note == nil ? "Create note" : "Edit note").toolbar {
-				ToolbarItem {
-					Button {
-						onSaveClick()
-					} label: {
-						Text("Save")
-					}
 				}
-			}.toast(
-				message: "Need a location first",
-				isShowing: $showLocationToast,
-				duration: Toast.short
-			).toast(
-				message: "Note saved.",
-				isShowing: $showSavedToast,
-				duration: Toast.short
-			).toast(
-				message: "Failed to save note, tell a developer",
-				isShowing: $showSavedErrorToast,
-				duration: Toast.long
-			)
+			}
 		}
+		.sheet(isPresented: $showingAudioPicker) {
+			AudioPickerView(
+				$audioRecordings
+			) {
+				_ in
+			}
+		}
+		.sheet(isPresented: $showingCamera) {
+			CameraView { image in
+				capturedImages.append(image)
+			}
+		}
+		.sheet(isPresented: $showingImagePicker) {
+			PhotoPicker { images in
+				capturedImages.append(contentsOf: images)
+			}
+		}
+		.sheet(isPresented: $showingImageViewer) {
+			ImageViewer(
+				images: capturedImages,
+				onImageRemove: { at in capturedImages.remove(at: at) },
+				selectedIndex: $selectedImageIndex
+			)
+		}.onAppear {
+			audioRecorder.onRecordingStop = onRecordingStop
+			locationDataManager.onLocationAcquired({ userLocation in
+				if useLocationManagerWhenAvailable {
+					self.location = userLocation
+				}
+			})
+		}.toast(
+			message: "Need a location first",
+			isShowing: $showLocationToast,
+			duration: Toast.short
+		).toast(
+			message: "Note saved.",
+			isShowing: $showSavedToast,
+			duration: Toast.short
+		).toast(
+			message: "Failed to save note, tell a developer",
+			isShowing: $showSavedErrorToast,
+			duration: Toast.long
+		)
 	}
 }
 
