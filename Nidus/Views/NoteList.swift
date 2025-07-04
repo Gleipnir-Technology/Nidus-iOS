@@ -17,7 +17,7 @@ struct NoteListView: View {
 	var onNoteSave: ((NidusNote, Bool) throws -> Void)
 
 	var body: some View {
-		NavigationStack {
+		NavigationView {
 			if notes.count == 0 {
 				Text("No notes")
 			}
@@ -28,7 +28,10 @@ struct NoteListView: View {
 					notes: notes,
 					onFilterAdded: onFilterAdded,
 					onNoteSave: onNoteSave
-				).toolbar {
+				)
+				.navigationBarTitleDisplayMode(.inline)
+				.navigationTitle("Notes")
+				.toolbar {
 					Menu("Sorting") {
 						Text("Sort by...")
 						Button("Distance") {
@@ -38,7 +41,6 @@ struct NoteListView: View {
 							Logger.foreground.info("sort by tag")
 						}
 					}
-
 				}
 			}
 		}
