@@ -10,6 +10,40 @@ import OSLog
 import SwiftData
 import SwiftUI
 
+struct MainStatusView: View {
+	var backgroundNetworkState: BackgroundNetworkState
+	var backgroundNetworkProgress: Double
+	var errorMessage: String?
+
+	var body: some View {
+		switch backgroundNetworkState {
+		case .downloading:
+			ProgressView(
+				"Downloading data",
+				value: backgroundNetworkProgress
+			).frame(maxWidth: 300)
+		case .error:
+			Text("Error downloading data: \(errorMessage ?? "")")
+		case .idle:
+			EmptyView()
+		case .loggingIn:
+			Text("Logging in...")
+		case .notConfigured:
+			Text("Configure sync in settings")
+		case .savingData:
+			ProgressView(
+				"Saving data",
+				value: backgroundNetworkProgress
+			).frame(maxWidth: 300)
+		case .uploadingChanges:
+			ProgressView(
+				"Uploading",
+				value: backgroundNetworkProgress
+			).frame(maxWidth: 300)
+		}
+	}
+}
+
 struct ContentView: View {
 	@State var locationDataManager: LocationDataManager = LocationDataManager()
 	@State var currentValue: Float = 0.0
@@ -98,31 +132,11 @@ struct ContentView: View {
 						Text("NOAAAAA")
 					}
 				}
-				switch model.backgroundNetworkState {
-				case .downloading:
-					ProgressView(
-						"Downloading data",
-						value: model.backgroundNetworkProgress
-					).frame(maxWidth: 300)
-				case .error:
-					Text("Error downloading data: \(model.errorMessage ?? "")")
-				case .idle:
-					EmptyView()
-				case .loggingIn:
-					Text("Logging in...")
-				case .notConfigured:
-					Text("Configure sync in settings")
-				case .savingData:
-					ProgressView(
-						"Saving data",
-						value: model.backgroundNetworkProgress
-					).frame(maxWidth: 300)
-				case .uploadingChanges:
-					ProgressView(
-						"Uploading",
-						value: model.backgroundNetworkProgress
-					).frame(maxWidth: 300)
-				}
+				MainStatusView(
+					backgroundNetworkState: model.backgroundNetworkState,
+					backgroundNetworkProgress: model.backgroundNetworkProgress,
+					errorMessage: model.errorMessage
+				)
 			}
 		}.onAppear {
 			onAppear()
