@@ -83,6 +83,13 @@ class ModelNidus {
 	func onSaveNote(isNew: Bool) {
 		let note = noteBuffer.toNote()
 		Logger.foreground.info("Saving \(isNew ? "new" : "old") note \(note.id)")
+		if noteBuffer.location == nil {
+			Logger.foreground.info("Can't save note, it has no location")
+			errorMessage = "This note needs a location"
+			toast.showLocationToast = true
+			return
+		}
+
 		do {
 			for image in note.images {
 				try image.save()
@@ -107,6 +114,7 @@ class ModelNidus {
 		for image in note.images {
 			startImageUpload(image.uuid)
 		}
+		toast.showSavedToast = true
 	}
 
 	func onError(_ error: Error) {
