@@ -107,11 +107,15 @@ struct RootView: View {
 				locationDataManager: locationDataManager,
 				notes: model.notesToShow!,
 				noteBuffer: $model.noteBuffer,
-				onDeleteNote: model.onDeleteNote,
+				onDeleteNote: onDeleteNote,
 				onFilterAdded: model.onFilterAdded,
 				onResetChanges: model.onResetChanges
 			)
 		}
+	}
+
+	func onDeleteNote() {
+		model.onDeleteNote()
 	}
 
 	func onFilterChange() {

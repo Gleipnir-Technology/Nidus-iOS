@@ -5,6 +5,7 @@ import Speech
 import SwiftUI
 
 struct EditNidusNoteView: View {
+	@Environment(\.dismiss) private var dismiss
 	@Environment(\.locale) var locale
 
 	var locationDataManager: LocationDataManager
@@ -56,6 +57,11 @@ struct EditNidusNoteView: View {
 		return distance.formatted(
 			.measurement(width: .abbreviated, usage: .road).locale(locale)
 		) + " away"
+	}
+
+	private func deleteNote() {
+		onDeleteNote()
+		dismiss()
 	}
 
 	private func onRecordingStop(_ recording: AudioRecording) {
@@ -142,7 +148,7 @@ struct EditNidusNoteView: View {
 						)
 					}
 					if note != nil {
-						Button(action: onDeleteNote) {
+						Button(action: deleteNote) {
 							Label("Delete Note", systemImage: "trash")
 						}.foregroundStyle(.red)
 					}
