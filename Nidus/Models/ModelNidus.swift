@@ -101,7 +101,7 @@ class ModelNidus {
 		do {
 			try database.deleteNote(note)
 			notes.removeValue(forKey: note.id)
-			calculateNotesToShow()
+			notesToShow!.removeAll(where: { return note.id == $0.id })
 			startNoteUpload(note)
 		}
 		catch {
