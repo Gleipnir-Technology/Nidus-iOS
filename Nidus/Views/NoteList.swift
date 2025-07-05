@@ -20,35 +20,20 @@ struct NoteListView: View {
 	let onResetChanges: () -> Void
 
 	var body: some View {
-		NavigationView {
-			if notes.count == 0 {
-				Text("No notes")
-			}
-			else {
-				NoteList(
-					currentLocation: currentLocation,
-					isTextFieldFocused: isTextFieldFocused,
-					locationDataManager: locationDataManager,
-					notes: notes,
-					noteBuffer: $noteBuffer,
-					onDeleteNote: onDeleteNote,
-					onFilterAdded: onFilterAdded,
-					onResetChanges: onResetChanges
-				)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationTitle("Notes")
-				.toolbar {
-					Menu("Sorting") {
-						Text("Sort by...")
-						Button("Distance") {
-							Logger.foreground.info("sort by distance")
-						}
-						Button("Tag") {
-							Logger.foreground.info("sort by tag")
-						}
-					}
-				}
-			}
+		if notes.count == 0 {
+			Text("No notes")
+		}
+		else {
+			NoteList(
+				currentLocation: currentLocation,
+				isTextFieldFocused: isTextFieldFocused,
+				locationDataManager: locationDataManager,
+				notes: notes,
+				noteBuffer: $noteBuffer,
+				onDeleteNote: onDeleteNote,
+				onFilterAdded: onFilterAdded,
+				onResetChanges: onResetChanges
+			)
 		}
 	}
 }

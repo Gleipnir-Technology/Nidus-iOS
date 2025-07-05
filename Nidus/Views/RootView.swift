@@ -81,6 +81,19 @@ struct RootView: View {
 					Text("Save").disabled(model.notes == nil)
 				}
 			}
+		case 1:
+			ToolbarItem {
+				Menu("Sorting") {
+					Text("Sort by...")
+					Button("Distance") {
+						Logger.foreground.info("sort by distance")
+					}
+					Button("Tag") {
+						Logger.foreground.info("sort by tag")
+					}
+				}
+			}
+
 		default:
 			ToolbarItem { EmptyView() }
 		}
