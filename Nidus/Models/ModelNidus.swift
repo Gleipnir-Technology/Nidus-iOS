@@ -81,8 +81,20 @@ class ModelNidus {
 	}
 
 	func onDeleteNote() {
-		Logger.foreground.info("Pretend I deleted a note")
-		//try database.DeleteNote(self.noteBuffer.note)
+		guard let note = self.noteBuffer.note else {
+			Logger.foreground.error(
+				"Programmer error: Tried to delete note, but note buffer is empty"
+			)
+			return
+		}
+		do {
+			try database.deleteNote(note)
+			notes.removeValue(forKey: note.id)
+			startNoteUpload(note)
+		}
+		catch {
+			Logger.foreground.error("Failed to delete note \(note.id): \(error)")
+		}
 	}
 	func onResetChanges() {
 		noteBuffer.Reset(noteBuffer.note)

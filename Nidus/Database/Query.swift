@@ -19,11 +19,14 @@ func AudioNeedingUpload(_ connection: Connection) throws -> [UUID] {
 	return uuids
 }
 
-func AudioRecordingDelete(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
-	let delete = schema.audioRecording.table.filter(
+func AudioRecordingDeleteByNote(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
+	let update = schema.audioRecording.table.filter(
 		SQLite.Expression<UUID>(value: noteUUID) == schema.audioRecording.noteUUID
-	).delete()
-	try connection.run(delete)
+	).update(
+		schema.audioRecording.deleted <- SQLite.Expression<Date>(value: Date.now),
+		schema.audioRecording.uploaded <- nil
+	)
+	try connection.run(update)
 }
 
 func AudioRecordingUpsert(
@@ -50,6 +53,16 @@ func AudioUploaded(_ connection: SQLite.Connection, _ uuid: UUID) throws {
 		SQLite.Expression<UUID>(value: uuid) == schema.audioRecording.uuid
 	).update(
 		schema.audioRecording.uploaded <- Date.now
+	)
+	try connection.run(update)
+}
+
+func ImageDeleteByNote(_ connection: Connection, _ noteUUID: UUID) throws {
+	let update = schema.image.table.filter(
+		SQLite.Expression<UUID>(value: noteUUID) == schema.image.noteUUID
+	).update(
+		schema.image.deleted <- SQLite.Expression<Date>(value: Date.now),
+		schema.image.uploaded <- nil
 	)
 	try connection.run(update)
 }
@@ -239,6 +252,16 @@ func NativeNotesAll(_ connection: Connection) throws -> [AnyNote] {
 	return results
 }
 
+func NoteDelete(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
+	let update = schema.note.table.filter(
+		SQLite.Expression<UUID>(value: noteUUID) == schema.note.uuid
+	).update(
+		schema.note.deleted <- SQLite.Expression<Date?>(value: Date.now),
+		schema.note.uploaded <- SQLite.Expression<Date?>(value: nil)
+	)
+	try connection.run(update)
+}
+
 func NoteImageDelete(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
 	let delete = schema.image.table.filter(
 		SQLite.Expression<UUID>(value: noteUUID) == schema.image.noteUUID
@@ -339,7 +362,7 @@ func NoteUpdate(_ connection: Connection, _ n: NidusNote) throws {
 }
 
 func NoteUpsert(_ connection: Connection, _ note: NidusNote) throws -> Int64 {
-	try AudioRecordingDelete(connection, note.id)
+	try AudioRecordingDeleteByNote(connection, note.id)
 	for audioRecording in note.audioRecordings {
 		try AudioRecordingUpsert(connection, audioRecording, note.id)
 	}

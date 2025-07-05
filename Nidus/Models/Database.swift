@@ -34,6 +34,12 @@ class Database: ObservableObject {
 		return try AudioUploaded(connection, uuid)
 	}
 
+	func deleteNote(_ note: NidusNote) throws {
+		try AudioRecordingDeleteByNote(connection, note.id)
+		try ImageDeleteByNote(connection, note.id)
+		return try NoteDelete(connection, note.id)
+	}
+
 	func dropOriginalTables() throws {
 		try self.connection.transaction {
 			try self.connection.run("DROP TABLE IF EXISTS inspection")
@@ -140,7 +146,7 @@ extension Database {
 	}
 
 	static func migrations() -> [Migration] {
-		return [Migration1(), Migration2(), Migration3()]
+		return [Migration1(), Migration2(), Migration3(), Migration4()]
 	}
 
 	static func migrationsBundle() -> Bundle {
