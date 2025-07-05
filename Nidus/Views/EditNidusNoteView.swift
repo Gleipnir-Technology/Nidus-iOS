@@ -121,7 +121,6 @@ struct EditNidusNoteView: View {
 					.focused($isTextFieldFocused)
 					.id("textField")
 					.onChange(of: isTextFieldFocused) {
-						Logger.foreground.info("ELI")
 						reader.scrollTo(
 							"textField",
 							anchor: .bottom
