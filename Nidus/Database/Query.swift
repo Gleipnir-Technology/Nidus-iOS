@@ -229,7 +229,12 @@ func NativeNotesAll(_ connection: Connection) throws -> [AnyNote] {
 			)
 		)
 	}
-	for row in try connection.prepare(schema.note.table) {
+	let rows = try connection.prepare(
+		schema.note.table.filter(
+			SQLite.Expression<Date?>(value: nil) === schema.note.deleted
+		)
+	)
+	for row in rows {
 		let location = Location(
 			latitude: row[schema.note.latitude],
 			longitude: row[schema.note.longitude]
