@@ -22,6 +22,7 @@ class ModelNidus {
 	var mapSize: CGSize = .zero
 	var noteBuffer: ModelNoteBuffer = ModelNoteBuffer()
 	var notes: [UUID: AnyNote]? = nil
+	var notesToShow: [AnyNote]? = nil
 	var toast: ModelToast = ModelToast()
 
 	init() {
@@ -59,18 +60,18 @@ class ModelNidus {
 			self.filterInstances[filter.Name()] = filter
 		}
 	}
-	var notesToShow: [AnyNote]? {
+	private func calculateNotesToShow() {
 		// we haven't loaded up the notes yet
 		guard let notes = notes else {
-			return nil
+			notesToShow = nil
+			return
 		}
-		var toShow: [AnyNote] = []
+		notesToShow = []
 		for (_, note) in notes {
 			if shouldShow(note) {
-				toShow.append(note)
+				notesToShow!.append(note)
 			}
 		}
-		return toShow
 	}
 
 	func createBackgroundNetworkManager() {
@@ -100,6 +101,7 @@ class ModelNidus {
 		do {
 			try database.deleteNote(note)
 			notes.removeValue(forKey: note.id)
+			calculateNotesToShow()
 			startNoteUpload(note)
 		}
 		catch {
@@ -143,6 +145,7 @@ class ModelNidus {
 		}
 		if isNew {
 			notes[note.id] = AnyNote(note)
+			calculateNotesToShow()
 		}
 		startNoteUpload(note)
 		for audioRecording in note.audioRecordings {
@@ -165,10 +168,12 @@ class ModelNidus {
 		let asStrings: [String] = filterInstances.map { $1.toString() }
 		UserDefaults.standard.set(asStrings, forKey: "filters")
 		Logger.foreground.info("Saved filters \(asStrings)")
+		calculateNotesToShow()
 		startUpdateCluster()
 	}
 	func onMapPositionChange(region: MKCoordinateRegion) {
 		currentRegion = region
+		calculateNotesToShow()
 		startUpdateCluster()
 		saveCurrentRegion()
 		Logger.foreground.info(
@@ -178,6 +183,7 @@ class ModelNidus {
 
 	func onMapSizeChange(_ size: CGSize) {
 		self.mapSize = size
+		calculateNotesToShow()
 	}
 	func onNetworkProgress(_ progress: Double) {
 		self.backgroundNetworkProgress = progress
@@ -391,6 +397,7 @@ class ModelNidus {
 		Task {
 			do {
 				notes = try database.notes()
+				calculateNotesToShow()
 			}
 			catch {
 				errorMessage = "Error loading notes: \(error)"

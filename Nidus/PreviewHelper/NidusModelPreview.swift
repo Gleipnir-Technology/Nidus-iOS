@@ -26,13 +26,6 @@ class NidusModelPreview: ModelNidus {
 			noteMap[n.id] = n
 		}
 		self.notes = noteMap
-		self.notesToShowOverride = notesToShow
-	}
-
-	override var notesToShow: [AnyNote] {
-		if notesToShowOverride != nil {
-			return notesToShowOverride!
-		}
-		return Array(notes!.values)
+		self.notesToShow = notesToShow
 	}
 }
