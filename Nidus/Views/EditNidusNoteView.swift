@@ -8,6 +8,7 @@ struct EditNidusNoteView: View {
 	@Environment(\.locale) var locale
 
 	var locationDataManager: LocationDataManager
+	var isTextFieldFocused: FocusState<Bool>.Binding
 	@Binding var noteBuffer: ModelNoteBuffer
 	var note: NidusNote?
 
@@ -17,17 +18,18 @@ struct EditNidusNoteView: View {
 	@State private var showingCamera = false
 	@State private var showingImagePicker = false
 	@State private var showingImageViewer = false
-	@FocusState private var isTextFieldFocused: Bool
 	private var useLocationManagerWhenAvailable: Bool
 
 	init(
 		audioRecorder: AudioRecorder = AudioRecorder(),
+		isTextFieldFocused: FocusState<Bool>.Binding,
 		locationDataManager: LocationDataManager,
 		note: NidusNote? = nil,
 		noteBuffer: Binding<ModelNoteBuffer>
 	) {
 
 		self._audioRecorder = .init(wrappedValue: audioRecorder)
+		self.isTextFieldFocused = isTextFieldFocused
 		self._noteBuffer = .init(projectedValue: noteBuffer)
 		self.locationDataManager = locationDataManager
 		self.note = note
@@ -118,7 +120,7 @@ struct EditNidusNoteView: View {
 						maxWidth: .infinity,
 						alignment: .leading
 					)
-					.focused($isTextFieldFocused)
+					.focused(isTextFieldFocused)
 					.id("textField")
 					.onChange(of: isTextFieldFocused) {
 						reader.scrollTo(
@@ -167,16 +169,19 @@ struct EditNidusNoteView: View {
 // MARK: - Preview
 struct AddNoteView_Previews: PreviewProvider {
 	static var audioRecorder = AudioRecorderFake()
+	@FocusState static var isTextFieldFocused: Bool
 	@State static var noteBuffer = ModelNoteBuffer()
 	static var previews: some View {
 		EditNidusNoteView(
 			audioRecorder: audioRecorder,
+			isTextFieldFocused: $isTextFieldFocused,
 			locationDataManager: LocationDataManager(),
 			note: nil,
 			noteBuffer: $noteBuffer
 		).previewDisplayName("user location")
 		EditNidusNoteView(
 			audioRecorder: audioRecorder,
+			isTextFieldFocused: $isTextFieldFocused,
 			locationDataManager: LocationDataManagerFake(
 				location: nil
 			),
@@ -185,6 +190,7 @@ struct AddNoteView_Previews: PreviewProvider {
 		).previewDisplayName("set location")
 		EditNidusNoteView(
 			audioRecorder: audioRecorder,
+			isTextFieldFocused: $isTextFieldFocused,
 			locationDataManager: LocationDataManagerFake(
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			),
@@ -198,6 +204,7 @@ struct AddNoteView_Previews: PreviewProvider {
 				transcribedText:
 					"This is a bunch of stuff that I've just said that is all over this place. Let's assume that I've just filled this with tons and tons of words so that we can see what happens when we overflow the limits of the view."
 			),
+			isTextFieldFocused: $isTextFieldFocused,
 			locationDataManager: LocationDataManagerFake(
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			),
@@ -208,6 +215,7 @@ struct AddNoteView_Previews: PreviewProvider {
 			audioRecorder: AudioRecorderFake(
 				isRecording: false
 			),
+			isTextFieldFocused: $isTextFieldFocused,
 			locationDataManager: LocationDataManagerFake(
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			),

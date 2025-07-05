@@ -11,6 +11,7 @@ import SwiftUI
 
 struct NoteListView: View {
 	var currentLocation: CLLocation
+	var isTextFieldFocused: FocusState<Bool>.Binding
 	var locationDataManager: LocationDataManager
 	var notes: [AnyNote]
 	@Binding var noteBuffer: ModelNoteBuffer
@@ -24,6 +25,7 @@ struct NoteListView: View {
 			else {
 				NoteList(
 					currentLocation: currentLocation,
+					isTextFieldFocused: isTextFieldFocused,
 					locationDataManager: locationDataManager,
 					notes: notes,
 					noteBuffer: $noteBuffer,
@@ -49,6 +51,7 @@ struct NoteListView: View {
 
 struct NoteList: View {
 	var currentLocation: CLLocation
+	var isTextFieldFocused: FocusState<Bool>.Binding
 	var locationDataManager: LocationDataManager
 	var notes: [AnyNote]
 	@Binding var noteBuffer: ModelNoteBuffer
@@ -83,6 +86,7 @@ struct NoteList: View {
 					)
 				case .nidus:
 					EditNidusNoteView(
+						isTextFieldFocused: isTextFieldFocused,
 						locationDataManager: locationDataManager,
 						note: note.asNidusNote()!,
 						noteBuffer: $noteBuffer
@@ -108,6 +112,7 @@ struct NoteList: View {
 }
 
 struct NoteList_Previews: PreviewProvider {
+	@FocusState static var isTextFieldFocused: Bool
 	@State static var noteBuffer: ModelNoteBuffer = ModelNoteBuffer()
 	static var onFilterAdded: (FilterInstance) -> Void {
 		{ _ in }
@@ -115,6 +120,7 @@ struct NoteList_Previews: PreviewProvider {
 	static var previews: some View {
 		NoteListView(
 			currentLocation: CLLocation.visaliaCenter,
+			isTextFieldFocused: $isTextFieldFocused,
 			locationDataManager: LocationDataManagerFake(),
 			notes: [],
 			noteBuffer: $noteBuffer,
@@ -122,6 +128,7 @@ struct NoteList_Previews: PreviewProvider {
 		).previewDisplayName("empty")
 		NoteListView(
 			currentLocation: CLLocation.visaliaCenter,
+			isTextFieldFocused: $isTextFieldFocused,
 			locationDataManager: LocationDataManagerFake(),
 			notes: AnyNote.previewListShort,
 			noteBuffer: $noteBuffer,

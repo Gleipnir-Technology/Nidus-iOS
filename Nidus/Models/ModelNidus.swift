@@ -16,7 +16,6 @@ class ModelNidus {
 	var currentRegion: MKCoordinateRegion
 	var cluster: NotesCluster = NotesCluster()
 	var database: Database
-	var isTextFieldFocused = false
 	var filterInstances: [String: FilterInstance]
 	var errorMessage: String?
 	var locationDataManager = LocationDataManager()
@@ -82,7 +81,6 @@ class ModelNidus {
 	}
 
 	func onSaveNote(isNew: Bool) {
-		isTextFieldFocused = false
 		let note = noteBuffer.toNote()
 		Logger.foreground.info("Saving \(isNew ? "new" : "old") note \(note.id)")
 		do {

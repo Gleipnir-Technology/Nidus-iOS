@@ -45,6 +45,7 @@ struct MainStatusView: View {
 }
 
 struct RootView: View {
+	@FocusState var isTextFieldFocused: Bool
 	@State var locationDataManager: LocationDataManager = LocationDataManager()
 	@State var currentValue: Float = 0.0
 	@State private var path = NavigationPath()
@@ -92,30 +93,15 @@ struct RootView: View {
 		path.append(note.id)
 	}
 	func onSaveNoteExisting() {
-		if validateNoteSave() {
-			model.onSaveNote(isNew: false)
-		}
-		else {
-			Logger.foreground.info("refusing to save new note")
-		}
+		isTextFieldFocused = false
+		model.onSaveNote(isNew: false)
 	}
 	func onSaveNoteNew() {
-		if validateNoteSave() {
-			model.onSaveNote(isNew: true)
-		}
-		else {
-			Logger.foreground.info("refusing to save new note")
-		}
+		isTextFieldFocused = false
+		model.onSaveNote(isNew: true)
 	}
 	func setTabNotes() {
 		selection = 0
-	}
-	private func validateNoteSave() -> Bool {
-		if model.noteBuffer.location == nil {
-			model.noteBuffer.showLocationToast = true
-			return true
-		}
-		return false
 	}
 	var body: some View {
 		NavigationStack(path: $path) {
@@ -123,6 +109,7 @@ struct RootView: View {
 				TabView(selection: $selection) {
 					Tab("Create", systemImage: "plus", value: 0) {
 						EditNidusNoteView(
+							isTextFieldFocused: $isTextFieldFocused,
 							locationDataManager: model
 								.locationDataManager,
 							note: nil,
@@ -138,6 +125,7 @@ struct RootView: View {
 									.center
 									.longitude
 							),
+							isTextFieldFocused: $isTextFieldFocused,
 							locationDataManager: locationDataManager,
 							notes: model.notesToShow,
 							noteBuffer: $model.noteBuffer,
