@@ -80,6 +80,13 @@ class ModelNidus {
 		startNoteUpload()
 	}
 
+	func onDeleteNote() {
+		Logger.foreground.info("Pretend I deleted a note")
+		//try database.DeleteNote(self.noteBuffer.note)
+	}
+	func onResetChanges() {
+		noteBuffer.Reset(noteBuffer.note)
+	}
 	func onSaveNote(isNew: Bool) {
 		let note = noteBuffer.toNote()
 		Logger.foreground.info("Saving \(isNew ? "new" : "old") note \(note.id)")

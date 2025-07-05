@@ -15,7 +15,9 @@ struct NoteListView: View {
 	var locationDataManager: LocationDataManager
 	var notes: [AnyNote]
 	@Binding var noteBuffer: ModelNoteBuffer
+	let onDeleteNote: () -> Void
 	let onFilterAdded: (FilterInstance) -> Void
+	let onResetChanges: () -> Void
 
 	var body: some View {
 		NavigationView {
@@ -29,7 +31,9 @@ struct NoteListView: View {
 					locationDataManager: locationDataManager,
 					notes: notes,
 					noteBuffer: $noteBuffer,
-					onFilterAdded: onFilterAdded
+					onDeleteNote: onDeleteNote,
+					onFilterAdded: onFilterAdded,
+					onResetChanges: onResetChanges
 				)
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationTitle("Notes")
@@ -55,7 +59,9 @@ struct NoteList: View {
 	var locationDataManager: LocationDataManager
 	var notes: [AnyNote]
 	@Binding var noteBuffer: ModelNoteBuffer
+	let onDeleteNote: () -> Void
 	let onFilterAdded: (FilterInstance) -> Void
+	let onResetChanges: () -> Void
 
 	var notesByDistance: [AnyNote] {
 		var byDistance: [AnyNote] = notes
@@ -89,7 +95,9 @@ struct NoteList: View {
 						isTextFieldFocused: isTextFieldFocused,
 						locationDataManager: locationDataManager,
 						note: note.asNidusNote()!,
-						noteBuffer: $noteBuffer
+						noteBuffer: $noteBuffer,
+						onDeleteNote: onDeleteNote,
+						onResetChanges: onResetChanges
 					)
 				case .serviceRequest:
 					ServiceRequestDetail(
@@ -114,9 +122,9 @@ struct NoteList: View {
 struct NoteList_Previews: PreviewProvider {
 	@FocusState static var isTextFieldFocused: Bool
 	@State static var noteBuffer: ModelNoteBuffer = ModelNoteBuffer()
-	static var onFilterAdded: (FilterInstance) -> Void {
-		{ _ in }
-	}
+	static func onDeleteNote() {}
+	static func onFilterAdded(_: FilterInstance) {}
+	static func onResetChanges() {}
 	static var previews: some View {
 		NoteListView(
 			currentLocation: CLLocation.visaliaCenter,
@@ -124,7 +132,9 @@ struct NoteList_Previews: PreviewProvider {
 			locationDataManager: LocationDataManagerFake(),
 			notes: [],
 			noteBuffer: $noteBuffer,
-			onFilterAdded: onFilterAdded
+			onDeleteNote: onDeleteNote,
+			onFilterAdded: onFilterAdded,
+			onResetChanges: onResetChanges
 		).previewDisplayName("empty")
 		NoteListView(
 			currentLocation: CLLocation.visaliaCenter,
@@ -132,7 +142,9 @@ struct NoteList_Previews: PreviewProvider {
 			locationDataManager: LocationDataManagerFake(),
 			notes: AnyNote.previewListShort,
 			noteBuffer: $noteBuffer,
-			onFilterAdded: onFilterAdded
+			onDeleteNote: onDeleteNote,
+			onFilterAdded: onFilterAdded,
+			onResetChanges: onResetChanges
 		).previewDisplayName("populated")
 	}
 }

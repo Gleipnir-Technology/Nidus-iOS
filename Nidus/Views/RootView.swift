@@ -113,7 +113,9 @@ struct RootView: View {
 							locationDataManager: model
 								.locationDataManager,
 							note: nil,
-							noteBuffer: $model.noteBuffer
+							noteBuffer: $model.noteBuffer,
+							onDeleteNote: model.onDeleteNote,
+							onResetChanges: model.onResetChanges
 						)
 					}
 					Tab("Notes", systemImage: "clock", value: 1) {
@@ -129,7 +131,9 @@ struct RootView: View {
 							locationDataManager: locationDataManager,
 							notes: model.notesToShow,
 							noteBuffer: $model.noteBuffer,
-							onFilterAdded: model.onFilterAdded
+							onDeleteNote: model.onDeleteNote,
+							onFilterAdded: model.onFilterAdded,
+							onResetChanges: model.onResetChanges
 						)
 					}
 					Tab("Map", systemImage: "map", value: 2) {

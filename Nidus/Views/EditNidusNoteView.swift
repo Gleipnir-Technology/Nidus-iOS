@@ -11,6 +11,8 @@ struct EditNidusNoteView: View {
 	var isTextFieldFocused: FocusState<Bool>.Binding
 	@Binding var noteBuffer: ModelNoteBuffer
 	var note: NidusNote?
+	var onDeleteNote: (() -> Void)
+	var onResetChanges: (() -> Void)
 
 	@State private var audioRecorder: AudioRecorder
 	@State private var selectedImageIndex: Int = 0
@@ -25,7 +27,9 @@ struct EditNidusNoteView: View {
 		isTextFieldFocused: FocusState<Bool>.Binding,
 		locationDataManager: LocationDataManager,
 		note: NidusNote? = nil,
-		noteBuffer: Binding<ModelNoteBuffer>
+		noteBuffer: Binding<ModelNoteBuffer>,
+		onDeleteNote: @escaping () -> Void,
+		onResetChanges: @escaping () -> Void
 	) {
 
 		self._audioRecorder = .init(wrappedValue: audioRecorder)
@@ -33,6 +37,8 @@ struct EditNidusNoteView: View {
 		self._noteBuffer = .init(projectedValue: noteBuffer)
 		self.locationDataManager = locationDataManager
 		self.note = note
+		self.onDeleteNote = onDeleteNote
+		self.onResetChanges = onResetChanges
 		self.useLocationManagerWhenAvailable = note == nil
 	}
 
@@ -118,6 +124,7 @@ struct EditNidusNoteView: View {
 					.cornerRadius(10)
 					.frame(
 						maxWidth: .infinity,
+						minHeight: 80,
 						alignment: .leading
 					)
 					.focused(isTextFieldFocused)
@@ -126,6 +133,19 @@ struct EditNidusNoteView: View {
 						reader.scrollTo("textField", anchor: .bottom)
 					}
 
+				}
+				Section(header: Text("Actions")) {
+					Button(action: onResetChanges) {
+						Label(
+							"Reset Changes",
+							systemImage: "arrow.clockwise.circle.fill"
+						)
+					}
+					if note != nil {
+						Button(action: onDeleteNote) {
+							Label("Delete Note", systemImage: "trash")
+						}.foregroundStyle(.red)
+					}
 				}
 			}
 		}
@@ -169,13 +189,17 @@ struct AddNoteView_Previews: PreviewProvider {
 	static var audioRecorder = AudioRecorderFake()
 	@FocusState static var isTextFieldFocused: Bool
 	@State static var noteBuffer = ModelNoteBuffer()
+	static func onResetChanges() {}
+	static func onDeleteNote() {}
 	static var previews: some View {
 		EditNidusNoteView(
 			audioRecorder: audioRecorder,
 			isTextFieldFocused: $isTextFieldFocused,
 			locationDataManager: LocationDataManager(),
 			note: nil,
-			noteBuffer: $noteBuffer
+			noteBuffer: $noteBuffer,
+			onDeleteNote: onDeleteNote,
+			onResetChanges: onResetChanges
 		).previewDisplayName("user location")
 		EditNidusNoteView(
 			audioRecorder: audioRecorder,
@@ -184,7 +208,9 @@ struct AddNoteView_Previews: PreviewProvider {
 				location: nil
 			),
 			note: NidusNote.forPreview(),
-			noteBuffer: $noteBuffer
+			noteBuffer: $noteBuffer,
+			onDeleteNote: onDeleteNote,
+			onResetChanges: onResetChanges
 		).previewDisplayName("set location")
 		EditNidusNoteView(
 			audioRecorder: audioRecorder,
@@ -193,7 +219,9 @@ struct AddNoteView_Previews: PreviewProvider {
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			),
 			note: NidusNote.forPreview(location: .visalia),
-			noteBuffer: $noteBuffer
+			noteBuffer: $noteBuffer,
+			onDeleteNote: onDeleteNote,
+			onResetChanges: onResetChanges
 		).previewDisplayName("set location with user location")
 		EditNidusNoteView(
 			audioRecorder: AudioRecorderFake(
@@ -207,7 +235,9 @@ struct AddNoteView_Previews: PreviewProvider {
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			),
 			note: NidusNote.forPreview(),
-			noteBuffer: $noteBuffer
+			noteBuffer: $noteBuffer,
+			onDeleteNote: onDeleteNote,
+			onResetChanges: onResetChanges
 		).previewDisplayName("mid long recording")
 		EditNidusNoteView(
 			audioRecorder: AudioRecorderFake(
@@ -226,7 +256,9 @@ struct AddNoteView_Previews: PreviewProvider {
 					)
 				]
 			),
-			noteBuffer: $noteBuffer
+			noteBuffer: $noteBuffer,
+			onDeleteNote: onDeleteNote,
+			onResetChanges: onResetChanges
 		).previewDisplayName("multiple recording")
 	}
 }
