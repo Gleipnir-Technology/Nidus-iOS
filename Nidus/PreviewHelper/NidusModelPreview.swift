@@ -33,6 +33,6 @@ class NidusModelPreview: ModelNidus {
 		if notesToShowOverride != nil {
 			return notesToShowOverride!
 		}
-		return Array(notes.values)
+		return Array(notes!.values)
 	}
 }

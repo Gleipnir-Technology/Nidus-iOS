@@ -21,7 +21,7 @@ class ModelNidus {
 	var locationDataManager = LocationDataManager()
 	var mapSize: CGSize = .zero
 	var noteBuffer: ModelNoteBuffer = ModelNoteBuffer()
-	var notes: [UUID: AnyNote] = [:]
+	var notes: [UUID: AnyNote]? = nil
 	var toast: ModelToast = ModelToast()
 
 	init() {
@@ -59,7 +59,11 @@ class ModelNidus {
 			self.filterInstances[filter.Name()] = filter
 		}
 	}
-	var notesToShow: [AnyNote] {
+	var notesToShow: [AnyNote]? {
+		// we haven't loaded up the notes yet
+		guard let notes = notes else {
+			return nil
+		}
 		var toShow: [AnyNote] = []
 		for (_, note) in notes {
 			if shouldShow(note) {
@@ -87,6 +91,12 @@ class ModelNidus {
 			)
 			return
 		}
+		guard var notes = self.notes else {
+			Logger.foreground.info(
+				"User requested note deletion before notes are loaded from the database. Impressive. Probably not an issue."
+			)
+			return
+		}
 		do {
 			try database.deleteNote(note)
 			notes.removeValue(forKey: note.id)
@@ -100,6 +110,12 @@ class ModelNidus {
 		noteBuffer.Reset(noteBuffer.note)
 	}
 	func onSaveNote(isNew: Bool) {
+		guard var notes = self.notes else {
+			Logger.foreground.info(
+				"User requested saving a note before any notes are loaded. Seems unlikely."
+			)
+			return
+		}
 		let note = noteBuffer.toNote()
 		Logger.foreground.info("Saving \(isNew ? "new" : "old") note \(note.id)")
 		if noteBuffer.location == nil {
@@ -383,6 +399,12 @@ class ModelNidus {
 	}
 
 	private func startUpdateCluster() {
+		guard let notesToShow = self.notesToShow else {
+			Logger.background.warning(
+				"Cannot update cluster because notesToShow is nil"
+			)
+			return
+		}
 		Task {
 			await cluster.onNoteChanges(
 				notes: notesToShow,

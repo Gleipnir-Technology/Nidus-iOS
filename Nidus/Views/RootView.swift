@@ -78,11 +78,39 @@ struct RootView: View {
 				Button {
 					onSaveNoteNew()
 				} label: {
-					Text("Save")
+					Text("Save").disabled(model.notes == nil)
 				}
 			}
 		default:
 			ToolbarItem { EmptyView() }
+		}
+	}
+
+	@ViewBuilder
+	var notesList: some View {
+		if model.notesToShow == nil {
+			VStack {
+				ProgressView()
+				Text("Loading notes up from the local database...")
+			}
+		}
+		else {
+			NoteListView(
+				currentLocation: CLLocation(
+					latitude: model.currentRegion.center
+						.latitude,
+					longitude: model.currentRegion
+						.center
+						.longitude
+				),
+				isTextFieldFocused: $isTextFieldFocused,
+				locationDataManager: locationDataManager,
+				notes: model.notesToShow!,
+				noteBuffer: $model.noteBuffer,
+				onDeleteNote: model.onDeleteNote,
+				onFilterAdded: model.onFilterAdded,
+				onResetChanges: model.onResetChanges
+			)
 		}
 	}
 
@@ -119,22 +147,7 @@ struct RootView: View {
 						)
 					}
 					Tab("Notes", systemImage: "clock", value: 1) {
-						NoteListView(
-							currentLocation: CLLocation(
-								latitude: model.currentRegion.center
-									.latitude,
-								longitude: model.currentRegion
-									.center
-									.longitude
-							),
-							isTextFieldFocused: $isTextFieldFocused,
-							locationDataManager: locationDataManager,
-							notes: model.notesToShow,
-							noteBuffer: $model.noteBuffer,
-							onDeleteNote: model.onDeleteNote,
-							onFilterAdded: model.onFilterAdded,
-							onResetChanges: model.onResetChanges
-						)
+						notesList
 					}
 					Tab("Map", systemImage: "map", value: 2) {
 						MapOverview(
@@ -148,13 +161,20 @@ struct RootView: View {
 						systemImage: "line.3.horizontal.decrease",
 						value: 3
 					) {
-						FilterView(
-							filterInstances: $model.filterInstances,
-							notesCountFiltered: model.notes.count
-								- model.notesToShow.count,
-							notesCountTotal: model.notes.count,
-							onFilterChange: onFilterChange
-						)
+						if model.notes == nil || model.notesToShow == nil {
+							ProgressView()
+						}
+						else {
+							FilterView(
+								filterInstances: $model
+									.filterInstances,
+								notesCountFiltered: model.notes!
+									.count
+									- model.notesToShow!.count,
+								notesCountTotal: model.notes!.count,
+								onFilterChange: onFilterChange
+							)
+						}
 					}
 					Tab(
 						"Sync",
@@ -168,7 +188,7 @@ struct RootView: View {
 					}
 				}
 				.navigationDestination(for: UUID.self) { noteId in
-					if let note = model.notesToShow.first(where: {
+					if let note = model.notesToShow!.first(where: {
 						$0.id == noteId
 					}) {
 						NoteEditor(
