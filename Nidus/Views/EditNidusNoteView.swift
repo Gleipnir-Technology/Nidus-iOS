@@ -122,12 +122,10 @@ struct EditNidusNoteView: View {
 					)
 					.focused(isTextFieldFocused)
 					.id("textField")
-					.onChange(of: isTextFieldFocused) {
-						reader.scrollTo(
-							"textField",
-							anchor: .bottom
-						)
+					.onChange(of: isTextFieldFocused.wrappedValue) {
+						reader.scrollTo("textField", anchor: .bottom)
 					}
+
 				}
 			}
 		}
