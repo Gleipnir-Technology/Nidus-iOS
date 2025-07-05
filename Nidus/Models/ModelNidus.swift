@@ -99,6 +99,8 @@ class ModelNidus {
 			errorMessage = "Failed to save images: \(error)"
 		}
 		do {
+			// Clear the "uploaded" field so that this note will be uploaded again
+			note.uploaded = nil
 			_ = try database.upsertNidusNote(note)
 		}
 		catch {
