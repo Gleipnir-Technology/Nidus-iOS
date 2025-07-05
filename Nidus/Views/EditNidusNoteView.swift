@@ -154,12 +154,12 @@ struct EditNidusNoteView: View {
 			)
 		}.onAppear {
 			audioRecorder.onRecordingStop = onRecordingStop
+			self.noteBuffer.Reset(note)
 			locationDataManager.onLocationAcquired({ userLocation in
 				if useLocationManagerWhenAvailable {
 					self.noteBuffer.location = userLocation
 				}
 			})
-			self.noteBuffer.Reset(note)
 		}
 	}
 }
