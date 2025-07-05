@@ -19,6 +19,7 @@ class ModelNidus {
 	var isTextFieldFocused = false
 	var filterInstances: [String: FilterInstance]
 	var errorMessage: String?
+	var locationDataManager = LocationDataManager()
 	var mapSize: CGSize = .zero
 	var noteBuffer: ModelNoteBuffer = ModelNoteBuffer()
 	var notes: [UUID: AnyNote] = [:]

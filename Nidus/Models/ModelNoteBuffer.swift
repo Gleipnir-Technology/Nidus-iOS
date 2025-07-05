@@ -36,7 +36,7 @@ class ModelNoteBuffer {
 		return result
 	}
 
-	func Clear(_ note: NidusNote?) {
+	func Reset(_ note: NidusNote?) {
 		guard let note = note else {
 			self.audioRecordings = []
 			self.capturedImages = []

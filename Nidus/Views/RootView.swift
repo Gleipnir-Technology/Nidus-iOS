@@ -44,7 +44,7 @@ struct MainStatusView: View {
 	}
 }
 
-struct ContentView: View {
+struct RootView: View {
 	@State var locationDataManager: LocationDataManager = LocationDataManager()
 	@State var currentValue: Float = 0.0
 	@State private var path = NavigationPath()
@@ -92,21 +92,30 @@ struct ContentView: View {
 		path.append(note.id)
 	}
 	func onSaveNoteExisting() {
-		validateNoteSave()
-		model.onSaveNote(isNew: false)
+		if validateNoteSave() {
+			model.onSaveNote(isNew: false)
+		}
+		else {
+			Logger.foreground.info("refusing to save new note")
+		}
 	}
 	func onSaveNoteNew() {
-		validateNoteSave()
-		model.onSaveNote(isNew: true)
+		if validateNoteSave() {
+			model.onSaveNote(isNew: true)
+		}
+		else {
+			Logger.foreground.info("refusing to save new note")
+		}
 	}
 	func setTabNotes() {
 		selection = 0
 	}
-	private func validateNoteSave() {
+	private func validateNoteSave() -> Bool {
 		if model.noteBuffer.location == nil {
 			model.noteBuffer.showLocationToast = true
-			return
+			return true
 		}
+		return false
 	}
 	var body: some View {
 		NavigationStack(path: $path) {
@@ -114,7 +123,8 @@ struct ContentView: View {
 				TabView(selection: $selection) {
 					Tab("Create", systemImage: "plus", value: 0) {
 						EditNidusNoteView(
-							locationDataManager: locationDataManager,
+							locationDataManager: model
+								.locationDataManager,
 							note: nil,
 							noteBuffer: $model.noteBuffer
 						)
@@ -209,14 +219,14 @@ struct ContentView: View {
 }
 
 #Preview("No notes, no settings") {
-	ContentView(
+	RootView(
 		model: NidusModelPreview(),
 		onAppear: {}
 	)
 }
 
 #Preview("Downloading") {
-	ContentView(
+	RootView(
 		model: NidusModelPreview(
 			backgroundNetworkProgress: 0.5,
 			backgroundNetworkState: .downloading
@@ -226,7 +236,7 @@ struct ContentView: View {
 }
 
 #Preview("Error") {
-	ContentView(
+	RootView(
 		model: NidusModelPreview(
 			backgroundNetworkProgress: 0.0,
 			backgroundNetworkState: .error,
@@ -237,7 +247,7 @@ struct ContentView: View {
 }
 
 #Preview("Saving") {
-	ContentView(
+	RootView(
 		model: NidusModelPreview(
 			backgroundNetworkProgress: 0.3,
 			backgroundNetworkState: .savingData
@@ -247,7 +257,7 @@ struct ContentView: View {
 }
 
 #Preview("Has notes") {
-	ContentView(
+	RootView(
 		model: NidusModelPreview(
 			notesToShow: AnyNote.previewListShort
 		),

@@ -18,7 +18,6 @@ struct EditNidusNoteView: View {
 	@State private var showingImagePicker = false
 	@State private var showingImageViewer = false
 	@FocusState private var isTextFieldFocused: Bool
-
 	private var useLocationManagerWhenAvailable: Bool
 
 	init(
@@ -161,6 +160,7 @@ struct EditNidusNoteView: View {
 					self.noteBuffer.location = userLocation
 				}
 			})
+			self.noteBuffer.Reset(note)
 		}
 	}
 }

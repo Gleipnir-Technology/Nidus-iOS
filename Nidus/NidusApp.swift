@@ -26,16 +26,15 @@ let appContainer: ModelContainer = {
 @main
 @MainActor
 struct NidusApp: App {
-	@State private var locationDataManager = LocationDataManager()
 	@State private var model = ModelNidus()
 	@UIApplicationDelegateAdaptor private var appDelegate: NidusAppDelegate
 
 	var body: some Scene {
 		WindowGroup {
-			ContentView(
+			RootView(
 				model: model,
 				onAppear: model.createBackgroundNetworkManager
-			).environment(locationDataManager)
+			)
 		}
 		.modelContainer(appContainer)
 	}
