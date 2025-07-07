@@ -30,6 +30,8 @@ class NidusNote: Note {
 	/* end Note protocol */
 
 	var audioRecordings: [AudioRecording]
+	var created: Date
+	var due: Date?
 	var images: [NoteImage]
 	var location: Location
 	var text: String
@@ -37,6 +39,8 @@ class NidusNote: Note {
 
 	init(
 		audioRecordings: [AudioRecording],
+		created: Date = Date.now,
+		due: Date? = nil,
 		images: [NoteImage],
 		location: Location,
 		text: String,
@@ -45,6 +49,8 @@ class NidusNote: Note {
 	) {
 		self.id = uuid
 		self.audioRecordings = audioRecordings
+		self.created = created
+		self.due = due
 		self.images = images
 		self.location = location
 		self.timestamp = Date.now

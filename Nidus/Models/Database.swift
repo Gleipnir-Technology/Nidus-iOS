@@ -146,7 +146,7 @@ extension Database {
 	}
 
 	static func migrations() -> [Migration] {
-		return [Migration1(), Migration2(), Migration3(), Migration4()]
+		return [Migration1(), Migration2(), Migration3(), Migration4(), Migration5()]
 	}
 
 	static func migrationsBundle() -> Bundle {

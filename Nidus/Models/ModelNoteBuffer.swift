@@ -10,6 +10,7 @@ import SwiftUI
 @Observable
 class ModelNoteBuffer {
 	var audioRecordings: [AudioRecording] = []
+	var dueDate: Date = Date()
 	var capturedImages: [UIImage] = []
 	var location: CLLocation?
 	var text: String = ""

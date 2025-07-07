@@ -78,6 +78,7 @@ class MosquitoSourceTable {
 class NoteTable {
 	let table = Table("note")
 
+	let created = SQLite.Expression<Date>("created")
 	let deleted = SQLite.Expression<Date?>("deleted")
 	let latitude = SQLite.Expression<Double>("latitude")
 	let longitude = SQLite.Expression<Double>("longitude")

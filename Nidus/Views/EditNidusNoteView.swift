@@ -122,6 +122,22 @@ struct EditNidusNoteView: View {
 							$showingImageViewer
 					)
 				}
+				Section(header: Text("Time")) {
+					if note != nil {
+						HStack {
+							Text("Created:")
+							Text(note!.created, style: .date)
+								.foregroundStyle(.secondary)
+						}
+					}
+					HStack {
+						DatePicker(
+							selection: $noteBuffer.dueDate,
+							displayedComponents: .date,
+							label: { Text("Due Date") }
+						)
+					}
+				}
 				Section(header: Text("Text")) {
 					TextField(
 						"Additional text-only information",
