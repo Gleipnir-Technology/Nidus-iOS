@@ -140,7 +140,7 @@ struct RootView: View {
 					label: {
 						Image(systemName: "map").font(
 							.system(size: 64, weight: .regular)
-						)
+						).padding(20)
 					}
 				).foregroundColor(.secondary)
 				Button(
@@ -148,7 +148,7 @@ struct RootView: View {
 					label: {
 						Image(systemName: "microphone").font(
 							.system(size: 64, weight: .regular)
-						)
+						).padding(20)
 					}
 				).foregroundColor(.secondary)
 				Button(
@@ -156,7 +156,7 @@ struct RootView: View {
 					label: {
 						Image(systemName: "camera").font(
 							.system(size: 64, weight: .regular)
-						)
+						).padding(20)
 					}
 				).foregroundColor(.secondary)
 			}
