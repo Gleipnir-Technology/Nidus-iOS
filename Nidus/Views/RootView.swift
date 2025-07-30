@@ -10,48 +10,18 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-struct MainStatusView: View {
-	var backgroundNetworkState: BackgroundNetworkState
-	var backgroundNetworkProgress: Double
-	var errorMessage: String?
-
-	var body: some View {
-		switch backgroundNetworkState {
-		case .downloading:
-			ProgressView(
-				"Downloading data",
-				value: backgroundNetworkProgress
-			).frame(maxWidth: 300)
-		case .error:
-			Text("Error downloading data: \(errorMessage ?? "")")
-		case .idle:
-			EmptyView()
-		case .loggingIn:
-			Text("Logging in...")
-		case .notConfigured:
-			Text("Configure sync in settings")
-		case .savingData:
-			ProgressView(
-				"Saving data",
-				value: backgroundNetworkProgress
-			).frame(maxWidth: 300)
-		case .uploadingChanges:
-			ProgressView(
-				"Uploading",
-				value: backgroundNetworkProgress
-			).frame(maxWidth: 300)
-		}
-	}
-}
-
 struct RootView: View {
 	@FocusState var isTextFieldFocused: Bool
+	@State var location: CLLocation = Initial.location
 	@State var locationDataManager: LocationDataManager = LocationDataManager()
-	@State var currentValue: Float = 0.0
-	@State private var path = NavigationPath()
-	@State private var selection: Int = 0
 	@Bindable var model: ModelNidus
-	var onAppear: () -> Void
+	var onAppear: (() -> Void)? = nil
+	@State private var path = NavigationPath()
+	@State var resolution = 10
+	@State var region: MKCoordinateRegion = Initial.region
+	@State var screenSize: CGSize = .zero
+	@State private var selection: Int = 0
+	@State var selectedCells: [CellSelection] = [CellSelection]()
 
 	var navTitle: String {
 		switch selection {
@@ -127,12 +97,21 @@ struct RootView: View {
 		}
 	}
 
+	func onCameraButton() {
+		print("camera")
+	}
 	func onDeleteNote() {
 		model.onDeleteNote()
 	}
 
 	func onFilterChange() {
 		model.onFilterChange()
+	}
+	func onMapButton() {
+		print("map!")
+	}
+	func onMicButton() {
+		print("mic!")
 	}
 	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
@@ -149,6 +128,41 @@ struct RootView: View {
 		selection = 0
 	}
 	var body: some View {
+		VStack {
+			MapViewBreadcrumb(
+				location: $location,
+				region: $region,
+				screenSize: $screenSize
+			)
+			HStack {
+				Button(
+					action: onMapButton,
+					label: {
+						Image(systemName: "map").font(
+							.system(size: 64, weight: .regular)
+						)
+					}
+				).foregroundColor(.secondary)
+				Button(
+					action: onMicButton,
+					label: {
+						Image(systemName: "microphone").font(
+							.system(size: 64, weight: .regular)
+						)
+					}
+				).foregroundColor(.secondary)
+				Button(
+					action: onCameraButton,
+					label: {
+						Image(systemName: "camera").font(
+							.system(size: 64, weight: .regular)
+						)
+					}
+				).foregroundColor(.secondary)
+			}
+		}
+	}
+	var body2: some View {
 		NavigationStack(path: $path) {
 			VStack {
 				TabView(selection: $selection) {
@@ -230,7 +244,7 @@ struct RootView: View {
 				toolbarByTab()
 			}
 		}.onAppear {
-			onAppear()
+			_ = onAppear()
 		}.toast(
 			message: "Need a location first",
 			isShowing: $model.toast.showLocationToast,
@@ -249,8 +263,7 @@ struct RootView: View {
 
 #Preview("No notes, no settings") {
 	RootView(
-		model: NidusModelPreview(),
-		onAppear: {}
+		model: NidusModelPreview()
 	)
 }
 
@@ -259,8 +272,7 @@ struct RootView: View {
 		model: NidusModelPreview(
 			backgroundNetworkProgress: 0.5,
 			backgroundNetworkState: .downloading
-		),
-		onAppear: {}
+		)
 	)
 }
 
@@ -270,8 +282,7 @@ struct RootView: View {
 			backgroundNetworkProgress: 0.0,
 			backgroundNetworkState: .error,
 			errorMessage: "something bad"
-		),
-		onAppear: {}
+		)
 	)
 }
 
@@ -280,8 +291,7 @@ struct RootView: View {
 		model: NidusModelPreview(
 			backgroundNetworkProgress: 0.3,
 			backgroundNetworkState: .savingData
-		),
-		onAppear: {}
+		)
 	)
 }
 
@@ -289,7 +299,6 @@ struct RootView: View {
 	RootView(
 		model: NidusModelPreview(
 			notesToShow: AnyNote.previewListShort
-		),
-		onAppear: {}
+		)
 	)
 }

@@ -43,6 +43,14 @@
 		537560D02D821BDC00D8528B /* NoteEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560CF2D821BD500D8528B /* NoteEditor.swift */; };
 		537E02672DC03DC5000F254F /* MapOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E02662DC03DC1000F254F /* MapOverview.swift */; };
 		538784432D8B474500B3552E /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538784422D8B474300B3552E /* SettingView.swift */; };
+		538BFA8A2E3A39280064A6A5 /* MapViewBreadcrumb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFA892E3A39230064A6A5 /* MapViewBreadcrumb.swift */; };
+		538BFA8D2E3A3C0A0064A6A5 /* H3 in Frameworks */ = {isa = PBXBuildFile; productRef = 538BFA8C2E3A3C0A0064A6A5 /* H3 */; };
+		538BFACD2E3A3C680064A6A5 /* CellSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFACC2E3A3C650064A6A5 /* CellSelection.swift */; };
+		538BFACF2E3A3CA90064A6A5 /* Conversions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFACE2E3A3CA60064A6A5 /* Conversions.swift */; };
+		538BFAD12E3A3CBF0064A6A5 /* OverlayH3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD02E3A3CBB0064A6A5 /* OverlayH3.swift */; };
+		538BFAD32E3A3D410064A6A5 /* Shape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD22E3A3D3F0064A6A5 /* Shape.swift */; };
+		538BFAD52E3A3DC40064A6A5 /* MainStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD42E3A3DBF0064A6A5 /* MainStatusView.swift */; };
+		538BFAD72E3A3E1B0064A6A5 /* Initial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD62E3A3E170064A6A5 /* Initial.swift */; };
 		539854592E0DB16000D3E2EF /* PhotoAttachmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539854582E0DB15600D3E2EF /* PhotoAttachmentView.swift */; };
 		5398545B2E0DB49500D3E2EF /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5398545A2E0DB49300D3E2EF /* CameraView.swift */; };
 		5398545D2E0DB4C500D3E2EF /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */; };
@@ -116,6 +124,13 @@
 		537560CF2D821BD500D8528B /* NoteEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditor.swift; sourceTree = "<group>"; };
 		537E02662DC03DC1000F254F /* MapOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapOverview.swift; sourceTree = "<group>"; };
 		538784422D8B474300B3552E /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
+		538BFA892E3A39230064A6A5 /* MapViewBreadcrumb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewBreadcrumb.swift; sourceTree = "<group>"; };
+		538BFACC2E3A3C650064A6A5 /* CellSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellSelection.swift; sourceTree = "<group>"; };
+		538BFACE2E3A3CA60064A6A5 /* Conversions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversions.swift; sourceTree = "<group>"; };
+		538BFAD02E3A3CBB0064A6A5 /* OverlayH3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayH3.swift; sourceTree = "<group>"; };
+		538BFAD22E3A3D3F0064A6A5 /* Shape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shape.swift; sourceTree = "<group>"; };
+		538BFAD42E3A3DBF0064A6A5 /* MainStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainStatusView.swift; sourceTree = "<group>"; };
+		538BFAD62E3A3E170064A6A5 /* Initial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Initial.swift; sourceTree = "<group>"; };
 		539854582E0DB15600D3E2EF /* PhotoAttachmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAttachmentView.swift; sourceTree = "<group>"; };
 		5398545A2E0DB49300D3E2EF /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
@@ -165,6 +180,7 @@
 			files = (
 				532F3AEB2DEB68C7006E0E40 /* SQLite in Frameworks */,
 				532F3AF72DECAE26006E0E40 /* ClusterMapSwiftUI in Frameworks */,
+				538BFA8D2E3A3C0A0064A6A5 /* H3 in Frameworks */,
 				532F3AE82DEB6765006E0E40 /* AutomergeRepo in Frameworks */,
 				53E1F2FF2E05E3FA00A6D888 /* SQLiteMigrationManager in Frameworks */,
 				532F3AF52DECAE26006E0E40 /* ClusterMap in Frameworks */,
@@ -219,18 +235,21 @@
 		537560C12D820FFE00D8528B /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				534A72342E186AFE003AFAF9 /* ModelToast.swift */,
-				534A72322E186582003AFAF9 /* ModelNoteBuffer.swift */,
+				538BFAD62E3A3E170064A6A5 /* Initial.swift */,
 				53A8FEBC2E11C95800905D20 /* AudioRecording.swift */,
+				538BFACC2E3A3C650064A6A5 /* CellSelection.swift */,
 				532F3AEC2DEB74D3006E0E40 /* Database.swift */,
 				532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */,
 				53E1F2ED2E04CC0200A6D888 /* Filter.swift */,
 				533F88922DEFAAE500D0DBF2 /* ModelNidus.swift */,
+				534A72322E186582003AFAF9 /* ModelNoteBuffer.swift */,
+				534A72342E186AFE003AFAF9 /* ModelToast.swift */,
 				539854622E0DF00700D3E2EF /* NidusNote.swift */,
 				537560A92D820A5A00D8528B /* Note.swift */,
 				53A8FEC12E11D26400905D20 /* NoteImage.swift */,
 				532F3AFA2DECBFE9006E0E40 /* NotesCluster.swift */,
 				532F3ACB2DE5FC62006E0E40 /* Settings.swift */,
+				538BFAD22E3A3D3F0064A6A5 /* Shape.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -238,12 +257,13 @@
 		537560C42D82125200D8528B /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				535F02BD2E1C7F86009D9E3E /* MapH3.swift */,
+				538BFAD42E3A3DBF0064A6A5 /* MainStatusView.swift */,
 				53A8FEBA2E11C45000905D20 /* AudioPickerView.swift */,
 				53A8FEC32E125E3200905D20 /* AudioPlayerView.swift */,
 				53B8F08B2E0CC901007ABA40 /* AudioRecorderView.swift */,
 				537560C52D82127100D8528B /* ButtonAddNote.swift */,
 				5398545A2E0DB49300D3E2EF /* CameraView.swift */,
+				538BFACE2E3A3CA60064A6A5 /* Conversions.swift */,
 				53B8F0892E0C9612007ABA40 /* EditNidusNoteView.swift */,
 				53B8F0832E080597007ABA40 /* FilterableField.swift */,
 				53E1F2E92E04B7A600A6D888 /* FilterView.swift */,
@@ -252,13 +272,16 @@
 				532F3AFE2DECEDC1006E0E40 /* InspectionList.swift */,
 				537560A72D820A5A00D8528B /* LocationView.swift */,
 				532F3AF82DECB027006E0E40 /* MapClustered.swift */,
+				535F02BD2E1C7F86009D9E3E /* MapH3.swift */,
 				537E02662DC03DC1000F254F /* MapOverview.swift */,
+				538BFA892E3A39230064A6A5 /* MapViewBreadcrumb.swift */,
 				532F3AFC2DECE4E1006E0E40 /* MosquitoSourceDetail.swift */,
 				53E308172D8B39E800534AB0 /* NoteCategoryAdd.swift */,
 				537560CF2D821BD500D8528B /* NoteEditor.swift */,
 				537560C82D82127100D8528B /* NoteList.swift */,
 				531B36B42D8B962900CE8BA0 /* NoteMapView.swift */,
 				537560C92D82127100D8528B /* NoteRow.swift */,
+				538BFAD02E3A3CBB0064A6A5 /* OverlayH3.swift */,
 				539854582E0DB15600D3E2EF /* PhotoAttachmentView.swift */,
 				5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */,
 				537560A42D820A5A00D8528B /* RootView.swift */,
@@ -337,6 +360,7 @@
 				532F3AF42DECAE26006E0E40 /* ClusterMap */,
 				532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */,
 				53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */,
+				538BFA8C2E3A3C0A0064A6A5 /* H3 */,
 			);
 			productName = Nidus;
 			productReference = 53D57B4A2D79E2A20094740D /* Nidus Notes.app */;
@@ -420,7 +444,7 @@
 				532F3AE92DEB68C7006E0E40 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
 				532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */,
 				53E1F2FD2E05E3FA00A6D888 /* XCRemoteSwiftPackageReference "SQLiteMigrationManager.swift" */,
-				538BFA882E3A37130064A6A5 /* XCLocalSwiftPackageReference "../swift-h3" */,
+				538BFA8B2E3A3C0A0064A6A5 /* XCLocalSwiftPackageReference "../swift-h3" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 53D57B4B2D79E2A20094740D /* Products */;
@@ -465,8 +489,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				538BFAD12E3A3CBF0064A6A5 /* OverlayH3.swift in Sources */,
 				53A8FEBD2E11C95D00905D20 /* AudioRecording.swift in Sources */,
 				532F3ADA2DE7A41F006E0E40 /* Toast.swift in Sources */,
+				538BFAD32E3A3D410064A6A5 /* Shape.swift in Sources */,
 				537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */,
 				534A72352E186B00003AFAF9 /* ModelToast.swift in Sources */,
 				531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */,
@@ -481,6 +507,7 @@
 				532F3AD32DE66D40006E0E40 /* Logger.swift in Sources */,
 				538784432D8B474500B3552E /* SettingView.swift in Sources */,
 				53B8F08A2E0C961C007ABA40 /* EditNidusNoteView.swift in Sources */,
+				538BFAD72E3A3E1B0064A6A5 /* Initial.swift in Sources */,
 				533F88932DEFAAE800D0DBF2 /* ModelNidus.swift in Sources */,
 				53E1F2EA2E04B7A900A6D888 /* FilterView.swift in Sources */,
 				53E1F2EE2E04CC0400A6D888 /* Filter.swift in Sources */,
@@ -490,7 +517,10 @@
 				537560CE2D82127100D8528B /* NoteList.swift in Sources */,
 				53B8F0862E080A99007ABA40 /* ServiceRequestDetail.swift in Sources */,
 				537560C02D820F3D00D8528B /* NidusApp.swift in Sources */,
+				538BFACF2E3A3CA90064A6A5 /* Conversions.swift in Sources */,
 				532F3AFD2DECE4EA006E0E40 /* MosquitoSourceDetail.swift in Sources */,
+				538BFA8A2E3A39280064A6A5 /* MapViewBreadcrumb.swift in Sources */,
+				538BFACD2E3A3C680064A6A5 /* CellSelection.swift in Sources */,
 				535F02BE2E1C7F8A009D9E3E /* MapH3.swift in Sources */,
 				53A8FEC42E125E3700905D20 /* AudioPlayerView.swift in Sources */,
 				537560B92D820A5A00D8528B /* Note.swift in Sources */,
@@ -512,6 +542,7 @@
 				532F3AF92DECB02C006E0E40 /* MapClustered.swift in Sources */,
 				532F3AED2DEB74D8006E0E40 /* Database.swift in Sources */,
 				53B8F0882E080C62007ABA40 /* TrapDataDetail.swift in Sources */,
+				538BFAD52E3A3DC40064A6A5 /* MainStatusView.swift in Sources */,
 				53B8F0842E08059A007ABA40 /* FilterableField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -888,7 +919,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		538BFA882E3A37130064A6A5 /* XCLocalSwiftPackageReference "../swift-h3" */ = {
+		538BFA8B2E3A3C0A0064A6A5 /* XCLocalSwiftPackageReference "../swift-h3" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../swift-h3";
 		};
@@ -962,6 +993,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */;
 			productName = ClusterMapSwiftUI;
+		};
+		538BFA8C2E3A3C0A0064A6A5 /* H3 */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = H3;
 		};
 		53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */ = {
 			isa = XCSwiftPackageProductDependency;
