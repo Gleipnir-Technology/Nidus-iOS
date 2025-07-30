@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "Nidus.jpeg",
+      "filename" : "nidus-logo-1024.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,6 +13,7 @@
           "value" : "dark"
         }
       ],
+      "filename" : "nidus-logo-dark-1024.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

@@ -1,27 +1,6 @@
-//
-//  NidusApp.swift
-//  Nidus
-//
-//  Created by Eli Ribble on 3/6/25.
-//
 import SwiftData
 import SwiftUI
 import UIKit
-
-@MainActor
-let appContainer: ModelContainer = {
-	do {
-		let schema = Schema([
-			NoteLocation.self
-		])
-		let container = try ModelContainer(for: schema)
-
-		return container
-	}
-	catch {
-		fatalError("Failed to create container")
-	}
-}()
 
 @main
 @MainActor
@@ -36,7 +15,6 @@ struct NidusApp: App {
 				onAppear: model.createBackgroundNetworkManager
 			)
 		}
-		.modelContainer(appContainer)
 	}
 }
 
