@@ -11,6 +11,7 @@ import SwiftData
 import SwiftUI
 
 struct RootView: View {
+	@State var isShowingMap: Bool = true
 	@FocusState var isTextFieldFocused: Bool
 	@State var location: CLLocation = Initial.location
 	@State var locationDataManager: LocationDataManager = LocationDataManager()
@@ -108,7 +109,7 @@ struct RootView: View {
 		model.onFilterChange()
 	}
 	func onMapButton() {
-		print("map!")
+		isShowingMap = !isShowingMap
 	}
 	func onMicButton() {
 		print("mic!")
@@ -129,11 +130,17 @@ struct RootView: View {
 	}
 	var body: some View {
 		VStack {
-			MapViewBreadcrumb(
-				location: $location,
-				region: $region,
-				screenSize: $screenSize
-			)
+			if isShowingMap {
+				MapViewBreadcrumb(
+					location: $location,
+					region: $region,
+					screenSize: $screenSize
+				)
+			}
+			else {
+				notesList
+			}
+			Spacer()
 			HStack {
 				Button(
 					action: onMapButton,
