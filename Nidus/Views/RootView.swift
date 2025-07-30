@@ -149,7 +149,7 @@ struct RootView: View {
 							.system(size: 64, weight: .regular)
 						).padding(20)
 					}
-				).foregroundColor(.secondary)
+				).foregroundColor(isShowingMap ? Color.blue : .secondary)
 				Button(
 					action: onMicButton,
 					label: {
