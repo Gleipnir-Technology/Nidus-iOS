@@ -30,6 +30,7 @@
 		533F88952DF0F1ED00D0DBF2 /* NidusModelPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533F88942DF0F1E700D0DBF2 /* NidusModelPreview.swift */; };
 		534A72332E186586003AFAF9 /* ModelNoteBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534A72322E186582003AFAF9 /* ModelNoteBuffer.swift */; };
 		534A72352E186B00003AFAF9 /* ModelToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534A72342E186AFE003AFAF9 /* ModelToast.swift */; };
+		535F02BE2E1C7F8A009D9E3E /* MapH3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535F02BD2E1C7F86009D9E3E /* MapH3.swift */; };
 		537560B02D820A5A00D8528B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5375609F2D820A5A00D8528B /* Preview Assets.xcassets */; };
 		537560B22D820A5A00D8528B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 537560A12D820A5A00D8528B /* Assets.xcassets */; };
 		537560B92D820A5A00D8528B /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537560A92D820A5A00D8528B /* Note.swift */; };
@@ -101,6 +102,7 @@
 		533F88942DF0F1E700D0DBF2 /* NidusModelPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NidusModelPreview.swift; sourceTree = "<group>"; };
 		534A72322E186582003AFAF9 /* ModelNoteBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelNoteBuffer.swift; sourceTree = "<group>"; };
 		534A72342E186AFE003AFAF9 /* ModelToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelToast.swift; sourceTree = "<group>"; };
+		535F02BD2E1C7F86009D9E3E /* MapH3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapH3.swift; sourceTree = "<group>"; };
 		5375609F2D820A5A00D8528B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		537560A12D820A5A00D8528B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		537560A42D820A5A00D8528B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 		537560C42D82125200D8528B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				535F02BD2E1C7F86009D9E3E /* MapH3.swift */,
 				53A8FEBA2E11C45000905D20 /* AudioPickerView.swift */,
 				53A8FEC32E125E3200905D20 /* AudioPlayerView.swift */,
 				53B8F08B2E0CC901007ABA40 /* AudioRecorderView.swift */,
@@ -417,6 +420,7 @@
 				532F3AE92DEB68C7006E0E40 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
 				532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */,
 				53E1F2FD2E05E3FA00A6D888 /* XCRemoteSwiftPackageReference "SQLiteMigrationManager.swift" */,
+				538BFA882E3A37130064A6A5 /* XCLocalSwiftPackageReference "../swift-h3" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 53D57B4B2D79E2A20094740D /* Products */;
@@ -487,6 +491,7 @@
 				53B8F0862E080A99007ABA40 /* ServiceRequestDetail.swift in Sources */,
 				537560C02D820F3D00D8528B /* NidusApp.swift in Sources */,
 				532F3AFD2DECE4EA006E0E40 /* MosquitoSourceDetail.swift in Sources */,
+				535F02BE2E1C7F8A009D9E3E /* MapH3.swift in Sources */,
 				53A8FEC42E125E3700905D20 /* AudioPlayerView.swift in Sources */,
 				537560B92D820A5A00D8528B /* Note.swift in Sources */,
 				5398545F2E0DB7AF00D3E2EF /* ImageViewer.swift in Sources */,
@@ -881,6 +886,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		538BFA882E3A37130064A6A5 /* XCLocalSwiftPackageReference "../swift-h3" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../swift-h3";
+		};
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
 		532F3AE32DEB66C5006E0E40 /* XCRemoteSwiftPackageReference "automerge-swift" */ = {
