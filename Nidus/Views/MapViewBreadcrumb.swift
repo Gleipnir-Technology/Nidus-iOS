@@ -92,11 +92,7 @@ func cellToPolygon(_ cellSelection: CellSelection) -> MKPolygon {
 		var coordinates: [CLLocationCoordinate2D] = []
 		let boundary = try cellToBoundary(cell: cellSelection.cellID)
 		for b in boundary {
-			let b_deg = CLLocationCoordinate2D(
-				latitude: b.lat,
-				longitude: b.lng
-			)
-			coordinates.append(b_deg)
+			coordinates.append(b)
 		}
 		//print("polygon \(coordinates)")
 		return MKPolygon(coordinates: coordinates, count: coordinates.count)

@@ -6,13 +6,9 @@ func cellToHexagon(cell: UInt64, region: MKCoordinateRegion, screenSize: CGSize)
 	var points: [CGPoint] = []
 	let boundary = try cellToBoundary(cell: cell)
 	for b in boundary {
-		let b_deg = CLLocationCoordinate2D(
-			latitude: b.lat,
-			longitude: b.lng
-		)
 		points.append(
 			gpsToPixels(
-				coordinate: b_deg,
+				coordinate: b,
 				region: region,
 				screenSize: screenSize
 			)
@@ -38,12 +34,12 @@ func isCellInRegion(
 ) throws -> Bool {
 	let boundary = try cellToBoundary(cell: cell)
 	for b in boundary {
-		if b.lat > (region.center.latitude + region.span.latitudeDelta / 2)
-			|| b.lat
+		if b.latitude > (region.center.latitude + region.span.latitudeDelta / 2)
+			|| b.latitude
 				< (region.center.latitude - region.span.latitudeDelta / 2)
-			|| b.lng
+			|| b.longitude
 				> (region.center.longitude + region.span.longitudeDelta / 2)
-			|| b.lng
+			|| b.longitude
 				< (region.center.longitude - region.span.longitudeDelta / 2)
 		{
 			return false
