@@ -98,6 +98,12 @@ struct RootView: View {
 		}
 	}
 
+	func doOnAppear() {
+		model.location.subscribe(locationDataManager)
+		if onAppear != nil {
+			_ = onAppear()
+		}
+	}
 	func onCameraButton() {
 		print("camera")
 	}
@@ -308,4 +314,8 @@ struct RootView: View {
 			notesToShow: AnyNote.previewListShort
 		)
 	)
+}
+
+#Preview("Movement history") {
+	RootView(model: NidusModelPreview())
 }

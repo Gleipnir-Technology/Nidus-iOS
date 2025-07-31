@@ -18,7 +18,7 @@ class ModelNidus {
 	var database: Database
 	var filterInstances: [String: FilterInstance]
 	var errorMessage: String?
-	var locationDataManager = LocationDataManager()
+	var location = ModelLocation()
 	var mapSize: CGSize = .zero
 	var noteBuffer: ModelNoteBuffer = ModelNoteBuffer()
 	var notes: [UUID: AnyNote]? = nil

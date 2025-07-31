@@ -18,6 +18,7 @@ struct MapViewBreadcrumb: View {
 	@Binding var region: MKCoordinateRegion
 	@Binding var screenSize: CGSize
 	var selectedCells: Set<CellSelection> = []
+	var showsUserLocation: Bool = false
 
 	var body: some View {
 		GeometryReader { geometry in
@@ -26,6 +27,9 @@ struct MapViewBreadcrumb: View {
 					initialPosition: MapCameraPosition.region(region),
 					interactionModes: .all
 				) {
+					if showsUserLocation {
+						UserAnnotation()
+					}
 					ForEach(Array(selectedCells)) { cell in
 						cell.asMapPolygon().foregroundStyle(
 							cell.foregroundStyle()

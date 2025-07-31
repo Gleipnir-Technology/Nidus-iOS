@@ -16,6 +16,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 	var authorizationStatus: CLAuthorizationStatus
 	var allowAuthorizationChange: Bool
 	private var onLocationAcquiredCallbacks: [((CLLocation) -> Void)] = []
+	private var onLocationUpdatedCallbacks: [(([CLLocation]) -> Void)] = []
 	var isPrecise: Bool = false
 	var location: CLLocation? = nil
 	private var locationManager = CLLocationManager()
@@ -35,6 +36,8 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 		locationManager.delegate = self
 	}
 
+	// Register a callback to be fired when location data is first acquired
+	// Callback will be called at most once per registration
 	func onLocationAcquired(_ action: @escaping (CLLocation) -> Void) {
 		if location != nil {
 			action(location!)
@@ -42,6 +45,12 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 		}
 		onLocationAcquiredCallbacks.append(action)
 	}
+
+	// Register a callback to be fired every time location data is updated
+	func onLocationUpdated(_ callback: @escaping ([CLLocation]) -> Void) {
+		onLocationUpdatedCallbacks.append(callback)
+	}
+
 	func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
 		Logger.background.info(
 			"Location data manager authorization change: \(manager.authorizationStatus.rawValue)"
@@ -89,14 +98,14 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 	) {
 		let location = locations.last
 		self.location = location
-		notifyCallbacks()
+		notifyAcquiredCallbacks()
 	}
 
 	func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
 		print("error: \(error.localizedDescription)")
 	}
 
-	private func notifyCallbacks() {
+	private func notifyAcquiredCallbacks() {
 		while !onLocationAcquiredCallbacks.isEmpty {
 			let callback = onLocationAcquiredCallbacks.removeFirst()
 			callback(location!)

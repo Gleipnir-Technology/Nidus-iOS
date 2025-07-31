@@ -14,6 +14,7 @@ class NidusModelPreview: ModelNidus {
 		backgroundNetworkProgress: Double = 0.0,
 		backgroundNetworkState: BackgroundNetworkState = .idle,
 		errorMessage: String? = nil,
+		location: ModelLocation? = nil,
 		notes: [AnyNote] = [],
 		notesToShow: [AnyNote]? = nil
 	) {
@@ -27,5 +28,8 @@ class NidusModelPreview: ModelNidus {
 		}
 		self.notes = noteMap
 		self.notesToShow = notesToShow
+		if location != nil {
+			self.location = location!
+		}
 	}
 }
