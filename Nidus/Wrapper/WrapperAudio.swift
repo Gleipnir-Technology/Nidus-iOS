@@ -2,9 +2,13 @@ import AVFoundation
 import OSLog
 import Speech
 
+enum AudioError: Error {
+	case noMicrophonePermission
+	case noSpeechPermission
+}
+
 class WrapperAudio: NSObject {
-	var hasPermissions = false
-	var isRecording: Bool = false
+	var hasMicrophonePermission = false
 	var recordingDuration: TimeInterval = 0
 	var recordingTranscription: String?
 	var recordingUUID: UUID = UUID()
@@ -17,7 +21,6 @@ class WrapperAudio: NSObject {
 	private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
 	private var recognitionTask: SFSpeechRecognitionTask?
 	private var audioEngine = AVAudioEngine()
-	private var hasMicrophonePermission = false
 	private var hasSpeechPermission = false
 
 	var onRecordingStop: ((AudioRecording) -> Void) = { _ in }
@@ -67,10 +70,9 @@ class WrapperAudio: NSObject {
 		}
 	}
 
-	func startRecording() {
-		guard hasPermissions else {
-			Logger.foreground.warning("Can't start recording, missing permissions")
-			return
+	func startRecording() throws {
+		guard hasMicrophonePermission else {
+			throw AudioError.noMicrophonePermission
 		}
 
 		recordingDuration = 0
@@ -80,8 +82,6 @@ class WrapperAudio: NSObject {
 
 		// Start speech recognition
 		startSpeechRecognition()
-
-		isRecording = true
 
 		// Start timer for recording duration
 		timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
@@ -194,7 +194,6 @@ class WrapperAudio: NSObject {
 
 		timer?.invalidate()
 		timer = nil
-		isRecording = false
 		let recording = AudioRecording(
 			created: Date.now,
 			duration: recordingDuration,
@@ -236,8 +235,6 @@ class AudioRecorderFake: WrapperAudio {
 		transcribedText: String = ""
 	) {
 		super.init()
-		self.hasPermissions = hasPermissions
-		self.isRecording = isRecording
 		self.recordingDuration = recordingDuration
 		self.recordingTranscription = transcribedText
 	}

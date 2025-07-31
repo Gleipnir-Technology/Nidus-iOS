@@ -3,6 +3,7 @@ import SwiftUI
 @Observable
 class ModelAudio {
 	var isRecording: Bool = false
+	var errorMessage: String = ""
 	var hasPermissions: Bool = false
 	var recordingTime: TimeInterval = 0
 	var transcription: String? = nil
@@ -16,16 +17,23 @@ class ModelAudio {
 
 	}
 	func toggleRecording() {
-		if wrapper.isRecording {
+		if isRecording {
 			wrapper.stopRecording()
+			isRecording = false
 		}
 		else {
-			wrapper.startRecording()
+			do {
+				try wrapper.startRecording()
+				isRecording = true
+			}
+			catch {
+				self.errorMessage = error.localizedDescription
+			}
 		}
 	}
 
 	func withPermission(ok: @escaping () -> Void, cancel: @escaping () -> Void) {
-		if wrapper.hasPermissions {
+		if wrapper.hasMicrophonePermission {
 			ok()
 		}
 		else {
