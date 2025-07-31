@@ -2,6 +2,11 @@ import H3
 import MapKit
 import OSLog
 
+// The resolution at which we store location history.
+let HISTORY_RESOLUTION: Int = 15
+// The max age of location history we keep in seconds
+let HISTORY_ENTRY_MAX_AGE: TimeInterval = 60 * 5
+
 /*
  Holds information about the user's location
  */
@@ -16,22 +21,17 @@ class ModelLocation {
 	var userLocation: CLLocation? = nil
 	// The users current position as an H3 hex
 	var userLocationH3: UInt64? = nil
-	// The users previous locations as H3 indices. Index 0 is the most recent
-	var userPreviousLocationH3: [UInt64] = []
-	let userPreviousLocationsLimit: Int = 10
+	// The users previous locations mapping an H3 index to the time they first entered that location
+	var userPreviousLocations: [UInt64: Date] = [:]
 
 	private func addUserLocation(_ h3Cell: UInt64) {
-		if userPreviousLocationH3.count == 0 {
-			userPreviousLocationH3.append(h3Cell)
+		if userPreviousLocations.keys.contains(h3Cell) {
 			return
 		}
-		if userPreviousLocationH3[0] == h3Cell {
-			return
+		userPreviousLocations = userPreviousLocations.filter { key, val in
+			Date.now.timeIntervalSince(val) < HISTORY_ENTRY_MAX_AGE
 		}
-		if userPreviousLocationH3.count >= userPreviousLocationsLimit {
-			userPreviousLocationH3.removeLast()
-		}
-		userPreviousLocationH3.insert(h3Cell, at: 0)
+		userPreviousLocations[h3Cell] = Date.now
 	}
 
 	private func onLocationUpdated(_ locations: [CLLocation]) {
@@ -40,9 +40,11 @@ class ModelLocation {
 				let h3Cell = try latLngToCell(
 					latitude: location.coordinate.latitude,
 					longitude: location.coordinate.longitude,
-					resolution: resolution
+					resolution: HISTORY_RESOLUTION
 				)
 				addUserLocation(h3Cell)
+				userLocationH3 = h3Cell
+				userLocation = location
 			}
 			catch {
 				Logger.background.warning(

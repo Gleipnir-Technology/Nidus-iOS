@@ -100,10 +100,13 @@ struct RootView: View {
 						region: $region,
 						screenSize: $screenSize,
 						selectedCell: $model.location.selectedLocationH3,
-						showsGrid: true,
+						showsGrid: false,
 						showsUserLocation: true,
+						userCell: model.location.userLocationH3,
 						userPreviousCells: model.location
-							.userPreviousLocationH3
+							.userPreviousLocations.sorted(by: { a, b in
+								return a.value > b.value
+							}).map({ element in element.key })
 					)
 				}
 				else {

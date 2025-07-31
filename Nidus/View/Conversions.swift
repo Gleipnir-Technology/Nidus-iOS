@@ -1,5 +1,6 @@
 import H3
 import MapKit
+import OSLog
 
 // Given a cell and a screen to fit it into, translate the cell's boundaries into the screen space
 func cellToHexagon(cell: UInt64, region: MKCoordinateRegion, screenSize: CGSize) throws -> Shape {
@@ -104,6 +105,9 @@ func regionToCellResolution(_ region: MKCoordinateRegion, count: Int = 10) throw
 		if cells.count > count {
 			//let cellsAsHex = cells.map({ c in String(c, radix: 16) })
 			//print("Cells: \(cellsAsHex))")
+			Logger.background.info(
+				"Choosing resolution \(resolution) to get \(cells.count)/\(count) cells"
+			)
 			return resolution
 		}
 		resolution += 1
@@ -133,6 +137,19 @@ func regionToCoordinates(_ region: MKCoordinateRegion) -> [CLLocationCoordinate2
 			longitude: region.center.longitude + region.span.longitudeDelta / 2
 		),
 	]
+}
+
+/*
+ Given a cell at a smaller resolution remap it to the larger resolution
+ */
+func scaleCell(_ cell: UInt64, to resolution: Int) throws -> UInt64 {
+	let currentResolution = getResolution(cell: cell)
+	if currentResolution == resolution {
+		return cell
+	}
+	let latLng = try cellToLatLng(cell: cell)
+	let scaled = try latLngToCell(latLng: latLng, resolution: resolution)
+	return scaled
 }
 
 func screenLocationToLatLng(location: CGPoint, region: MKCoordinateRegion, screenSize: CGSize)

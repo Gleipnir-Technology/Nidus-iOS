@@ -12,7 +12,7 @@ import SwiftUI
  A map which shows an overlay of selected cells.
  */
 struct MapViewBreadcrumb: View {
-	let hexCount: Int = 100
+	let hexCount: Int = 75
 	var onClickLatLng: ((CLLocationCoordinate2D) -> Void)? = nil
 	var onClickCell: ((UInt64) -> Void)? = nil
 	@Binding var overlayResolution: Int
@@ -87,6 +87,15 @@ struct MapViewBreadcrumb: View {
 
 	private func updateResolution(_ newRegion: MKCoordinateRegion) {
 		let hexCount = hexCount
+		Logger.background.info(
+			"New region: \(newRegion.span.latitudeDelta) \(newRegion.span.longitudeDelta)"
+		)
+		if newRegion.span.latitudeDelta < 0.0005 || newRegion.span.longitudeDelta < 0.0005 {
+			Logger.background.info("Forcing resolution 15")
+			self.overlayResolution = 15
+			return
+		}
+
 		Task.detached(priority: .background) {
 			do {
 				let resolution = try regionToCellResolution(
@@ -108,7 +117,13 @@ struct MapViewBreadcrumb: View {
 		var results: [CellSelection] = []
 		for (i, cell) in userPreviousCells.enumerated() {
 			let color = previousCellColor(i)
-			results.append(CellSelection(cell, color: color))
+			do {
+				let scaledCell = try scaleCell(cell, to: overlayResolution)
+				results.append(CellSelection(scaledCell, color: color))
+			}
+			catch {
+				Logger.foreground.error("Failed to scale cell: \(error)")
+			}
 		}
 		return results
 	}

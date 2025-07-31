@@ -88,6 +88,11 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 		}
 	}
 
+	// https://developer.apple.com/documentation/corelocation/cllocationmanagerdelegate/locationmanager(_:didupdatelocations:)
+	// "...This array always contains at least one object representing the current location. If updates were deferred or if
+	// multiple locations arrived before they could be delivered, the array may contain additional entries. The objects in
+	// the array are organized in the order in which they occurred. Therefore, the most recent location update is at the
+	// end of the array.
 	func locationManager(
 		_ manager: CLLocationManager,
 		didUpdateLocations locations: [CLLocation]
@@ -95,10 +100,13 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate {
 		let location = locations.last
 		self.location = location
 		notifyAcquiredCallbacks()
+		for callback in onLocationUpdatedCallbacks {
+			callback(locations)
+		}
 	}
 
 	func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-		print("error: \(error.localizedDescription)")
+		Logger.background.error("error: \(error.localizedDescription)")
 	}
 
 	private func notifyAcquiredCallbacks() {
