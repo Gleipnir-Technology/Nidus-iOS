@@ -10,6 +10,7 @@ import SwiftUI
 
 @Observable
 class ModelNidus {
+	var audioRecorder: ModelAudio = ModelAudio()
 	var backgroundNetworkManager: BackgroundNetworkManager?
 	var backgroundNetworkProgress: Double = 0.0
 	var backgroundNetworkState: BackgroundNetworkState = .idle

@@ -1,16 +1,9 @@
-//
-//  AudioRecorder.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 6/26/25.
-//
-
 import AVFoundation
 import OSLog
 import Speech
 
 @Observable
-class AudioRecorder: NSObject {
+class WrapperAudio: NSObject {
 	var hasPermissions = false
 	var isRecording: Bool = false
 	var recordingDuration: TimeInterval = 0
@@ -216,7 +209,7 @@ class AudioRecorder: NSObject {
 	}
 }
 
-extension AudioRecorder: AVAudioRecorderDelegate {
+extension WrapperAudio: AVAudioRecorderDelegate {
 	func audioRecorderDidFinishRecording(
 		_ recorder: AVAudioRecorder,
 		successfully success: Bool
@@ -227,7 +220,7 @@ extension AudioRecorder: AVAudioRecorderDelegate {
 	}
 }
 
-class AudioRecorderFake: AudioRecorder {
+class AudioRecorderFake: WrapperAudio {
 	init(
 		hasPermissions: Bool = true,
 		isRecording: Bool = false,

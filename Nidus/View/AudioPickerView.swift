@@ -1,10 +1,3 @@
-//
-//  AudioViewer.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 6/29/25.
-//
-
 import AVFoundation
 import SwiftUI
 

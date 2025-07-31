@@ -1,15 +1,12 @@
-//
-//  ContentView.swift
-//  Nidus
-//
-//  Created by Eli Ribble on 3/6/25.
-//
 import Combine
 import MapKit
 import OSLog
 import SwiftData
 import SwiftUI
 
+/*
+ The root view of the app
+ */
 struct RootView: View {
 	@State var didSelect: Bool = false
 	@State var isShowingMap: Bool = true
@@ -80,13 +77,6 @@ struct RootView: View {
 	func onMapButtonShort() {
 		isShowingMap.toggle()
 	}
-	func onMicButtonShort() {
-		print("mic short!")
-	}
-	func onMicButtonLong() {
-		didSelect.toggle()
-		print("mic long!")
-	}
 	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
 	}
@@ -126,15 +116,10 @@ struct RootView: View {
 							).padding(20)
 						}
 					).foregroundColor(isShowingMap ? Color.blue : .secondary)
-					ButtonWithLongPress(
-						actionLong: onMicButtonLong,
-						actionShort: onMicButtonShort,
-						label: {
-							Image(systemName: "microphone").font(
-								.system(size: 64, weight: .regular)
-							).padding(20)
-						}
-					).foregroundColor(.secondary)
+					ButtonAudioRecord(
+						audioRecorder: model.audioRecorder,
+						didSelect: $didSelect
+					)
 					ButtonWithLongPress(
 						actionLong: onCameraButtonLong,
 						actionShort: onCameraButtonShort,

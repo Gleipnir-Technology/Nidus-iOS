@@ -1,7 +1,3 @@
-//
-//  Location.swift
-//  Nidus
-//
 //  Created by Cole Dennis on 9/21/22
 //  from https://github.com/coledennis/CoreLocationSwiftUITutorial/blob/main/CoreLocationSwiftUITutorial/LocationDataManager.swift
 //
