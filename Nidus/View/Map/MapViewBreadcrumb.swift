@@ -72,8 +72,8 @@ struct MapViewBreadcrumb: View {
 					initialPosition: MapCameraPosition.region(region),
 					interactionModes: .all
 				) {
-					if showsUserLocation {
-						UserAnnotation()
+					ForEach(userPreviousCellsPolygons()) { cell in
+						cell.asPolyline().stroke(cell.color, lineWidth: 2)
 					}
 					if userCell != nil {
 						CellSelection(userCell!).asPolyline().stroke(
@@ -81,8 +81,8 @@ struct MapViewBreadcrumb: View {
 							lineWidth: 2
 						)
 					}
-					ForEach(userPreviousCellsPolygons()) { cell in
-						cell.asPolyline().stroke(cell.color, lineWidth: 2)
+					if showsUserLocation {
+						UserAnnotation()
 					}
 				}
 				.mapControls {
