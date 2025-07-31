@@ -96,7 +96,6 @@ struct RootView: View {
 			VStack {
 				if isShowingMap {
 					MapViewBreadcrumb(
-						location: $location,
 						overlayResolution: $model.location.resolution,
 						region: $region,
 						screenSize: $screenSize,
