@@ -117,7 +117,7 @@ struct RootView: View {
 						}
 					).foregroundColor(isShowingMap ? Color.blue : .secondary)
 					ButtonAudioRecord(
-						audioRecorder: model.audioRecorder,
+						audio: model.audioRecorder,
 						didSelect: $didSelect
 					)
 					ButtonWithLongPress(

@@ -2,7 +2,6 @@ import AVFoundation
 import OSLog
 import Speech
 
-@Observable
 class WrapperAudio: NSObject {
 	var hasPermissions = false
 	var isRecording: Bool = false
@@ -12,6 +11,7 @@ class WrapperAudio: NSObject {
 
 	private var audioRecorder: AVAudioRecorder?
 	private var audioPlayer: AVAudioPlayer?
+	private var onPermissionCallbacks: [(Bool) -> Void] = []
 	private var timer: Timer?
 	private var speechRecognizer: SFSpeechRecognizer?
 	private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -27,13 +27,20 @@ class WrapperAudio: NSObject {
 		speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
 	}
 
-	func requestPermissions() {
+	func requestPermissions(_ onPermission: @escaping (Bool) -> Void) {
+		onPermissionCallbacks.append(onPermission)
 		// Request microphone permission
 		if #available(iOS 17.0, *) {
 			AVAudioApplication.requestRecordPermission { granted in
 				DispatchQueue.main.async {
 					self.hasMicrophonePermission = granted
-					self.updatePermissionStatus()
+					while self.onPermissionCallbacks.count > 0 {
+						if let callback = self.onPermissionCallbacks
+							.popLast()
+						{
+							callback(granted)
+						}
+					}
 				}
 			}
 		}
@@ -41,7 +48,13 @@ class WrapperAudio: NSObject {
 			AVAudioSession.sharedInstance().requestRecordPermission { granted in
 				DispatchQueue.main.async {
 					self.hasMicrophonePermission = granted
-					self.updatePermissionStatus()
+					while self.onPermissionCallbacks.count > 0 {
+						if let callback = self.onPermissionCallbacks
+							.popLast()
+						{
+							callback(granted)
+						}
+					}
 				}
 			}
 		}
@@ -50,13 +63,8 @@ class WrapperAudio: NSObject {
 		SFSpeechRecognizer.requestAuthorization { authStatus in
 			DispatchQueue.main.async {
 				self.hasSpeechPermission = authStatus == .authorized
-				self.updatePermissionStatus()
 			}
 		}
-	}
-
-	private func updatePermissionStatus() {
-		hasPermissions = hasMicrophonePermission && hasSpeechPermission
 	}
 
 	func startRecording() {
@@ -234,6 +242,4 @@ class AudioRecorderFake: WrapperAudio {
 		self.recordingTranscription = transcribedText
 	}
 
-	override func requestPermissions() {
-	}
 }

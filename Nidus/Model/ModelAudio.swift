@@ -23,4 +23,20 @@ class ModelAudio {
 			wrapper.startRecording()
 		}
 	}
+
+	func withPermission(ok: @escaping () -> Void, cancel: @escaping () -> Void) {
+		if wrapper.hasPermissions {
+			ok()
+		}
+		else {
+			wrapper.requestPermissions { granted in
+				if granted {
+					ok()
+				}
+				else {
+					cancel()
+				}
+			}
+		}
+	}
 }

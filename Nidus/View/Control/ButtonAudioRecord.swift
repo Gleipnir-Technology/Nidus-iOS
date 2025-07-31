@@ -1,33 +1,44 @@
 import SwiftUI
 
 struct ButtonAudioRecord: View {
-	var audioRecorder: ModelAudio
+	var audio: ModelAudio
 	@Binding var didSelect: Bool
 
 	func onMicButtonShort() {
-		/*if !audioRecorder.hasPermissions {
-            audioRecorder.requestPermissions()
-            }
-        audioRecorder.toggleRecording()*/
+		audio.withPermission(
+			ok: {
+				audio.toggleRecording()
+			},
+			cancel: {
+				print("Permission not granted")
+			}
+		)
 	}
 	func onMicButtonLong() {
 		didSelect.toggle()
-		print("mic long!")
 	}
 	var body: some View {
 		ButtonWithLongPress(
 			actionLong: onMicButtonLong,
 			actionShort: onMicButtonShort,
+			isAnimated: audio.isRecording,
 			label: {
 				Image(
-					systemName: audioRecorder.isRecording
+					systemName: audio.isRecording
 						? "stop.circle.fill" : "mic"
 				).font(
 					.system(size: 64, weight: .regular)
-				).foregroundColor(audioRecorder.isRecording ? .red : .gray).padding(
+				).foregroundColor(audio.isRecording ? .red : .gray).padding(
 					20
 				)
 			}
-		).disabled(!audioRecorder.hasPermissions).foregroundColor(.secondary)
+		).foregroundColor(.secondary)
+	}
+}
+
+struct ButtonAudioRecord_Previews: PreviewProvider {
+	@State static var didSelect: Bool = false
+	static var previews: some View {
+		ButtonAudioRecord(audio: PreviewAudio(), didSelect: $didSelect)
 	}
 }

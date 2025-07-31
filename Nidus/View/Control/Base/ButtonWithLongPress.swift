@@ -6,11 +6,22 @@ import SwiftUI
 struct ButtonWithLongPress<Content: View>: View {
 	let actionLong: () -> Void
 	let actionShort: () -> Void
+	let isAnimated: Bool
 	@ViewBuilder let label: Content
 
 	var isOn: Bool = true
 
-	@GestureState private var isDragging = false
+	init(
+		actionLong: @escaping () -> Void,
+		actionShort: @escaping () -> Void,
+		isAnimated: Bool = false,
+		@ViewBuilder label: () -> Content
+	) {
+		self.actionLong = actionLong
+		self.actionShort = actionShort
+		self.isAnimated = isAnimated
+		self.label = label()
+	}
 
 	var body: some View {
 		Circle()
@@ -25,5 +36,13 @@ struct ButtonWithLongPress<Content: View>: View {
 			.overlay(label)
 			.onTapGesture(perform: actionShort)
 			.onLongPressGesture(perform: actionLong)
+			.animation(
+				isAnimated
+					? .easeInOut(duration: 0.5).repeatForever(
+						autoreverses: true
+					) : .default
+			) { content in
+				content.scaleEffect(isAnimated ? 1.1 : 1.0)
+			}
 	}
 }
