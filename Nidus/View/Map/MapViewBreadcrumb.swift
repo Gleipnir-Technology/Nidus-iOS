@@ -76,13 +76,13 @@ struct MapViewBreadcrumb: View {
 						UserAnnotation()
 					}
 					if userCell != nil {
-						CellSelection(userCell!).asMapPolygon()
-							.foregroundStyle(.red)
+						CellSelection(userCell!).asPolyline().stroke(
+							.blue,
+							lineWidth: 2
+						)
 					}
 					ForEach(userPreviousCellsPolygons()) { cell in
-						cell.asMapPolygon().foregroundStyle(
-							cell.foregroundStyle()
-						)
+						cell.asPolyline().stroke(cell.color, lineWidth: 2)
 					}
 				}
 				.mapControls {
@@ -144,6 +144,22 @@ func cellToPolygon(_ cellSelection: CellSelection) -> MKPolygon {
 	}
 	catch {
 		return MKPolygon()
+	}
+}
+
+func cellToPolyline(_ cellSelection: CellSelection) -> MKPolyline {
+	do {
+		var coordinates: [CLLocationCoordinate2D] = []
+		let boundary = try cellToBoundary(cell: cellSelection.cellID)
+		for b in boundary {
+			coordinates.append(b)
+		}
+		// complete the circuit so a stroke goes all the way around the shape
+		coordinates.append(coordinates[0])
+		return MKPolyline(coordinates: coordinates, count: coordinates.count)
+	}
+	catch {
+		return MKPolyline()
 	}
 }
 

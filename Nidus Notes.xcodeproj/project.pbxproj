@@ -244,15 +244,14 @@
 		537560C12D820FFE00D8528B /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				538BFB4D2E3BAD3F0064A6A5 /* Preview */,
-				538BFB452E3BA5090064A6A5 /* ModelAudio.swift */,
-				538BFAD82E3A5E530064A6A5 /* Location.swift */,
-				538BFAD62E3A3E170064A6A5 /* Initial.swift */,
 				53A8FEBC2E11C95800905D20 /* AudioRecording.swift */,
 				538BFACC2E3A3C650064A6A5 /* CellSelection.swift */,
 				532F3AEC2DEB74D3006E0E40 /* Database.swift */,
 				532F3ADF2DEA0BC9006E0E40 /* FieldSeeker.swift */,
 				53E1F2ED2E04CC0200A6D888 /* Filter.swift */,
+				538BFAD62E3A3E170064A6A5 /* Initial.swift */,
+				538BFAD82E3A5E530064A6A5 /* Location.swift */,
+				538BFB452E3BA5090064A6A5 /* ModelAudio.swift */,
 				533F88922DEFAAE500D0DBF2 /* ModelNidus.swift */,
 				534A72322E186582003AFAF9 /* ModelNoteBuffer.swift */,
 				534A72342E186AFE003AFAF9 /* ModelToast.swift */,
@@ -260,6 +259,7 @@
 				537560A92D820A5A00D8528B /* Note.swift */,
 				53A8FEC12E11D26400905D20 /* NoteImage.swift */,
 				532F3AFA2DECBFE9006E0E40 /* NotesCluster.swift */,
+				538BFB4D2E3BAD3F0064A6A5 /* Preview */,
 				532F3ACB2DE5FC62006E0E40 /* Settings.swift */,
 				538BFAD22E3A3D3F0064A6A5 /* Shape.swift */,
 			);
