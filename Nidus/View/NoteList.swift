@@ -103,33 +103,3 @@ struct NoteList: View {
 		}
 	}
 }
-
-struct NoteList_Previews: PreviewProvider {
-	@FocusState static var isTextFieldFocused: Bool
-	@State static var noteBuffer: ModelNoteBuffer = ModelNoteBuffer()
-	static func onDeleteNote() {}
-	static func onFilterAdded(_: FilterInstance) {}
-	static func onResetChanges() {}
-	static var previews: some View {
-		NoteListView(
-			currentLocation: CLLocation.visaliaCenter,
-			isTextFieldFocused: $isTextFieldFocused,
-			locationDataManager: LocationDataManagerFake(),
-			notes: [],
-			noteBuffer: $noteBuffer,
-			onDeleteNote: onDeleteNote,
-			onFilterAdded: onFilterAdded,
-			onResetChanges: onResetChanges
-		).previewDisplayName("empty")
-		NoteListView(
-			currentLocation: CLLocation.visaliaCenter,
-			isTextFieldFocused: $isTextFieldFocused,
-			locationDataManager: LocationDataManagerFake(),
-			notes: AnyNote.previewListShort,
-			noteBuffer: $noteBuffer,
-			onDeleteNote: onDeleteNote,
-			onFilterAdded: onFilterAdded,
-			onResetChanges: onResetChanges
-		).previewDisplayName("populated")
-	}
-}
