@@ -100,7 +100,9 @@ struct RootView: View {
 						region: $region,
 						screenSize: $screenSize,
 						showsGrid: true,
-						showsUserLocation: true
+						showsUserLocation: true,
+						userPreviousCells: model.location
+							.userPreviousLocationH3
 					)
 				}
 				else {

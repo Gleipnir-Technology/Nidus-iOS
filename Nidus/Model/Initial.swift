@@ -19,9 +19,9 @@ class Initial {
 	static let userCell: UInt64 = 0x8a2_8347_0532_ffff
 
 	// near apple park again, since that's where preview location goes.
-	static let userPreviousCells: [CellSelection] = [
-		CellSelection(0x8a2_8347_05ad_ffff, color: Color.teal),
-		CellSelection(0x8a2_8347_0536_7fff, color: Color.green),
-		CellSelection(0x8a2_8347_0536_ffff, color: Color.blue),
+	static let userPreviousCells: [UInt64] = [
+		0x8a2_8347_05ad_ffff,
+		0x8a2_8347_0536_7fff,
+		0x8a2_8347_0536_ffff,
 	]
 }

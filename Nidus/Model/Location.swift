@@ -16,8 +16,25 @@ class ModelLocation {
 	var userLocation: CLLocation? = nil
 	// The users current position as an H3 hex
 	var userLocationH3: UInt64? = nil
+	// The users previous locations as H3 indices. Index 0 is the most recent
+	var userPreviousLocationH3: [UInt64] = []
+	let userPreviousLocationsLimit: Int = 10
 
-	func onLocationUpdated(_ locations: [CLLocation]) {
+	private func addUserLocation(_ h3Cell: UInt64) {
+		if userPreviousLocationH3.count == 0 {
+			userPreviousLocationH3.append(h3Cell)
+			return
+		}
+		if userPreviousLocationH3[0] == h3Cell {
+			return
+		}
+		if userPreviousLocationH3.count >= userPreviousLocationsLimit {
+			userPreviousLocationH3.removeLast()
+		}
+		userPreviousLocationH3.insert(h3Cell, at: 0)
+	}
+
+	private func onLocationUpdated(_ locations: [CLLocation]) {
 		for location in locations {
 			do {
 				let h3Cell = try latLngToCell(
@@ -25,6 +42,7 @@ class ModelLocation {
 					longitude: location.coordinate.longitude,
 					resolution: resolution
 				)
+				addUserLocation(h3Cell)
 			}
 			catch {
 				Logger.background.warning(

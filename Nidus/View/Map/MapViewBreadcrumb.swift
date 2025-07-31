@@ -20,7 +20,7 @@ struct MapViewBreadcrumb: View {
 	var showsGrid: Bool = false
 	var showsUserLocation: Bool = false
 	var userCell: UInt64?
-	var userPreviousCells: [CellSelection] = []
+	var userPreviousCells: [UInt64]
 
 	private func onMapCameraChange(_ geometry: GeometryProxy, _ context: MapCameraUpdateContext)
 	{
@@ -31,6 +31,10 @@ struct MapViewBreadcrumb: View {
 		region = context.region
 		screenSize = geometry.size
 		updateResolution(region)
+	}
+
+	private func previousCellColor(_ index: Int) -> Color {
+		Color.green.opacity(1.0 - Double(index) * 0.1)
 	}
 
 	private func updateResolution(_ newRegion: MKCoordinateRegion) {
@@ -52,6 +56,15 @@ struct MapViewBreadcrumb: View {
 		}
 	}
 
+	private func userPreviousCellsPolygons() -> [CellSelection] {
+		var results: [CellSelection] = []
+		for (i, cell) in userPreviousCells.enumerated() {
+			let color = previousCellColor(i)
+			results.append(CellSelection(cell, color: color))
+		}
+		return results
+	}
+
 	var body: some View {
 		GeometryReader { geometry in
 			ZStack {
@@ -66,7 +79,7 @@ struct MapViewBreadcrumb: View {
 						CellSelection(userCell!).asMapPolygon()
 							.foregroundStyle(.red)
 					}
-					ForEach(Array(userPreviousCells)) { cell in
+					ForEach(userPreviousCellsPolygons()) { cell in
 						cell.asMapPolygon().foregroundStyle(
 							cell.foregroundStyle()
 						)
@@ -139,13 +152,14 @@ struct MapViewBreadcrumb_Previews: PreviewProvider {
 	@State static var region: MKCoordinateRegion = Initial.region
 	@State static var screenSize: CGSize = .zero
 	static var userCell: UInt64 = Initial.userCell
-	static var userPreviousCells: [CellSelection] = Initial.userPreviousCells
+	static var userPreviousCells: [UInt64] = Initial.userPreviousCells
 	static var previews: some View {
 		MapViewBreadcrumb(
 			overlayResolution: $overlayResolution,
 			region: $region,
 			screenSize: $screenSize,
-			userCell: userCell
+			userCell: userCell,
+			userPreviousCells: []
 		).previewDisplayName("current location only")
 		MapViewBreadcrumb(
 			overlayResolution: $overlayResolution,
