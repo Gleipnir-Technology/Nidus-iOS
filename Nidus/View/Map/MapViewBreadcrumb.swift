@@ -17,10 +17,10 @@ struct MapViewBreadcrumb: View {
 	@Binding var overlayResolution: Int
 	@Binding var region: MKCoordinateRegion
 	@Binding var screenSize: CGSize
-	var selectedCells: Set<CellSelection> = []
 	var showsGrid: Bool = false
 	var showsUserLocation: Bool = false
 	var userCell: UInt64?
+	var userPreviousCells: [CellSelection] = []
 
 	private func onMapCameraChange(_ geometry: GeometryProxy, _ context: MapCameraUpdateContext)
 	{
@@ -66,7 +66,7 @@ struct MapViewBreadcrumb: View {
 						CellSelection(userCell!).asMapPolygon()
 							.foregroundStyle(.red)
 					}
-					ForEach(Array(selectedCells)) { cell in
+					ForEach(Array(userPreviousCells)) { cell in
 						cell.asMapPolygon().foregroundStyle(
 							cell.foregroundStyle()
 						)
@@ -139,12 +139,20 @@ struct MapViewBreadcrumb_Previews: PreviewProvider {
 	@State static var region: MKCoordinateRegion = Initial.region
 	@State static var screenSize: CGSize = .zero
 	static var userCell: UInt64 = Initial.userCell
+	static var userPreviousCells: [CellSelection] = Initial.userPreviousCells
 	static var previews: some View {
 		MapViewBreadcrumb(
 			overlayResolution: $overlayResolution,
 			region: $region,
 			screenSize: $screenSize,
 			userCell: userCell
-		)
+		).previewDisplayName("current location only")
+		MapViewBreadcrumb(
+			overlayResolution: $overlayResolution,
+			region: $region,
+			screenSize: $screenSize,
+			userCell: userCell,
+			userPreviousCells: userPreviousCells
+		).previewDisplayName("current location and previous")
 	}
 }
