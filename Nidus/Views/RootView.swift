@@ -60,6 +60,7 @@ struct RootView: View {
 		}
 	}
 	func onCameraButtonLong() {
+		didSelect.toggle()
 		print("camera long")
 	}
 	func onCameraButtonShort() {
@@ -83,6 +84,7 @@ struct RootView: View {
 		print("mic short!")
 	}
 	func onMicButtonLong() {
+		didSelect.toggle()
 		print("mic long!")
 	}
 	func onNoteSelected(_ note: any Note) {
@@ -156,7 +158,7 @@ struct RootView: View {
 			}
 		}.onAppear {
 			doOnAppear()
-		}
+		}.sensoryFeedback(.selection, trigger: didSelect)
 	}
 	/*
 	var body2: some View {
