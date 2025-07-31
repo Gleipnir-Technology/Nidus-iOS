@@ -99,6 +99,7 @@ struct RootView: View {
 						overlayResolution: $model.location.resolution,
 						region: $region,
 						screenSize: $screenSize,
+						selectedCell: $model.location.selectedLocationH3,
 						showsGrid: true,
 						showsUserLocation: true,
 						userPreviousCells: model.location

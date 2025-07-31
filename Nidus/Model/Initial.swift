@@ -15,6 +15,8 @@ class Initial {
 		span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
 	)
 
+	static let selectedCell: UInt64 = 0x8a2_8347_053a_ffff
+
 	// near apple park, since that's where the maps like to default to.
 	static let userCell: UInt64 = 0x8a2_8347_0532_ffff
 
