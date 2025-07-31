@@ -97,8 +97,10 @@ struct RootView: View {
 				if isShowingMap {
 					MapViewBreadcrumb(
 						location: $location,
+						overlayResolution: $model.location.resolution,
 						region: $region,
 						screenSize: $screenSize,
+						showsGrid: true,
 						showsUserLocation: true
 					)
 				}
@@ -145,95 +147,6 @@ struct RootView: View {
 			doOnAppear()
 		}.sensoryFeedback(.selection, trigger: didSelect)
 	}
-	/*
-	var body2: some View {
-		NavigationStack(path: $path) {
-			VStack {
-				TabView(selection: $selection) {
-					Tab("Create", systemImage: "plus", value: 0) {
-						EditNidusNoteView(
-							isTextFieldFocused: $isTextFieldFocused,
-							locationDataManager: model
-								.locationDataManager,
-							note: nil,
-							noteBuffer: $model.noteBuffer,
-							onDeleteNote: model.onDeleteNote,
-							onResetChanges: model.onResetChanges
-						)
-					}
-					Tab("Notes", systemImage: "clock", value: 1) {
-						notesList
-					}
-					Tab("Map", systemImage: "map", value: 2) {
-						MapOverview(
-							model: model,
-							onNoteSelected: onNoteSelected,
-							userLocation: locationDataManager.location
-						)
-					}
-					Tab(
-						"Filters",
-						systemImage: "line.3.horizontal.decrease",
-						value: 3
-					) {
-						if model.notes == nil || model.notesToShow == nil {
-							ProgressView()
-						}
-						else {
-							FilterView(
-								filterInstances: $model
-									.filterInstances,
-								notesCountFiltered: model.notes!
-									.count
-									- model.notesToShow!.count,
-								notesCountTotal: model.notes!.count,
-								onFilterChange: onFilterChange
-							)
-						}
-					}
-					Tab(
-						"Sync",
-						systemImage: "gear",
-						value: 4
-					) {
-					}
-				}
-				.navigationDestination(for: UUID.self) { noteId in
-					if let note = model.notesToShow!.first(where: {
-						$0.id == noteId
-					}) {
-						NoteEditor(
-							currentLocation: locationDataManager
-								.location,
-							note: note
-						)
-					}
-					else {
-						Text("There is no note with UUID \(noteId)")
-					}
-				}
-				MainStatusView(
-					backgroundNetworkState: model.backgroundNetworkState,
-					backgroundNetworkProgress: model.backgroundNetworkProgress,
-					errorMessage: model.errorMessage
-				)
-			}
-			.navigationBarTitleDisplayMode(.inline)
-		}.toast(
-			message: "Need a location first",
-			isShowing: $model.toast.showLocationToast,
-			duration: Toast.short
-		).toast(
-			message: "Note saved.",
-			isShowing: $model.toast.showSavedToast,
-			duration: Toast.short
-		).toast(
-			message: "Failed to save note, tell a developer",
-			isShowing: $model.toast.showSavedErrorToast,
-			duration: Toast.long
-		)
-	}
-     */
 }
 
 #Preview("No notes, no settings") {

@@ -3,9 +3,9 @@ import MapKit
 import SwiftUI
 
 /*
- Draws an H3 grid, usually used to overlay a map view
+ An overlay of H3 cell grid using a canvas
  */
-struct OverlayH3Grid: View {
+struct OverlayH3Canvas: View {
 	var fillColor: GraphicsContext.Shading = GraphicsContext.Shading.color(
 		Color.black.opacity(0.1)
 	)

@@ -46,7 +46,6 @@
 		538BFA8D2E3A3C0A0064A6A5 /* H3 in Frameworks */ = {isa = PBXBuildFile; productRef = 538BFA8C2E3A3C0A0064A6A5 /* H3 */; };
 		538BFACD2E3A3C680064A6A5 /* CellSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFACC2E3A3C650064A6A5 /* CellSelection.swift */; };
 		538BFACF2E3A3CA90064A6A5 /* Conversions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFACE2E3A3CA60064A6A5 /* Conversions.swift */; };
-		538BFAD12E3A3CBF0064A6A5 /* OverlayH3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD02E3A3CBB0064A6A5 /* OverlayH3.swift */; };
 		538BFAD32E3A3D410064A6A5 /* Shape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD22E3A3D3F0064A6A5 /* Shape.swift */; };
 		538BFAD52E3A3DC40064A6A5 /* MainStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD42E3A3DBF0064A6A5 /* MainStatusView.swift */; };
 		538BFAD72E3A3E1B0064A6A5 /* Initial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD62E3A3E170064A6A5 /* Initial.swift */; };
@@ -57,6 +56,7 @@
 		538BFB492E3BA6960064A6A5 /* ButtonAudioRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFB482E3BA6880064A6A5 /* ButtonAudioRecord.swift */; };
 		538BFB4C2E3BA87A0064A6A5 /* AudioDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFB4B2E3BA8710064A6A5 /* AudioDetail.swift */; };
 		538BFB4F2E3BAD4B0064A6A5 /* PreviewAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFB4E2E3BAD480064A6A5 /* PreviewAudio.swift */; };
+		538BFB952E3BC1A00064A6A5 /* OverlayH3Canvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFB942E3BC19C0064A6A5 /* OverlayH3Canvas.swift */; };
 		539854592E0DB16000D3E2EF /* PhotoAttachmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539854582E0DB15600D3E2EF /* PhotoAttachmentView.swift */; };
 		5398545B2E0DB49500D3E2EF /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5398545A2E0DB49300D3E2EF /* CameraView.swift */; };
 		5398545D2E0DB4C500D3E2EF /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */; };
@@ -131,7 +131,6 @@
 		538BFA892E3A39230064A6A5 /* MapViewBreadcrumb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewBreadcrumb.swift; sourceTree = "<group>"; };
 		538BFACC2E3A3C650064A6A5 /* CellSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellSelection.swift; sourceTree = "<group>"; };
 		538BFACE2E3A3CA60064A6A5 /* Conversions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversions.swift; sourceTree = "<group>"; };
-		538BFAD02E3A3CBB0064A6A5 /* OverlayH3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayH3.swift; sourceTree = "<group>"; };
 		538BFAD22E3A3D3F0064A6A5 /* Shape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shape.swift; sourceTree = "<group>"; };
 		538BFAD42E3A3DBF0064A6A5 /* MainStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainStatusView.swift; sourceTree = "<group>"; };
 		538BFAD62E3A3E170064A6A5 /* Initial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Initial.swift; sourceTree = "<group>"; };
@@ -142,6 +141,7 @@
 		538BFB482E3BA6880064A6A5 /* ButtonAudioRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonAudioRecord.swift; sourceTree = "<group>"; };
 		538BFB4B2E3BA8710064A6A5 /* AudioDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDetail.swift; sourceTree = "<group>"; };
 		538BFB4E2E3BAD480064A6A5 /* PreviewAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewAudio.swift; sourceTree = "<group>"; };
+		538BFB942E3BC19C0064A6A5 /* OverlayH3Canvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayH3Canvas.swift; sourceTree = "<group>"; };
 		539854582E0DB15600D3E2EF /* PhotoAttachmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAttachmentView.swift; sourceTree = "<group>"; };
 		5398545A2E0DB49300D3E2EF /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
@@ -269,6 +269,7 @@
 		537560C42D82125200D8528B /* View */ = {
 			isa = PBXGroup;
 			children = (
+				538BFB502E3BC16F0064A6A5 /* Map */,
 				538BFB4B2E3BA8710064A6A5 /* AudioDetail.swift */,
 				53A8FEBA2E11C45000905D20 /* AudioPickerView.swift */,
 				53A8FEC32E125E3200905D20 /* AudioPlayerView.swift */,
@@ -287,14 +288,12 @@
 				532F3AF82DECB027006E0E40 /* MapClustered.swift */,
 				535F02BD2E1C7F86009D9E3E /* MapH3.swift */,
 				537E02662DC03DC1000F254F /* MapOverview.swift */,
-				538BFA892E3A39230064A6A5 /* MapViewBreadcrumb.swift */,
 				532F3AFC2DECE4E1006E0E40 /* MosquitoSourceDetail.swift */,
 				53E308172D8B39E800534AB0 /* NoteCategoryAdd.swift */,
 				537560CF2D821BD500D8528B /* NoteEditor.swift */,
 				537560C82D82127100D8528B /* NoteList.swift */,
 				531B36B42D8B962900CE8BA0 /* NoteMapView.swift */,
 				537560C92D82127100D8528B /* NoteRow.swift */,
-				538BFAD02E3A3CBB0064A6A5 /* OverlayH3.swift */,
 				539854582E0DB15600D3E2EF /* PhotoAttachmentView.swift */,
 				5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */,
 				538BFB412E3B0CC50064A6A5 /* RecordButtonTest.swift */,
@@ -342,6 +341,15 @@
 				538BFB4E2E3BAD480064A6A5 /* PreviewAudio.swift */,
 			);
 			path = Preview;
+			sourceTree = "<group>";
+		};
+		538BFB502E3BC16F0064A6A5 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				538BFB942E3BC19C0064A6A5 /* OverlayH3Canvas.swift */,
+				538BFA892E3A39230064A6A5 /* MapViewBreadcrumb.swift */,
+			);
+			path = Map;
 			sourceTree = "<group>";
 		};
 		53D57B412D79E2A20094740D = {
@@ -520,11 +528,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				538BFAD12E3A3CBF0064A6A5 /* OverlayH3.swift in Sources */,
 				538BFB442E3B12E30064A6A5 /* ButtonWithLongPress.swift in Sources */,
 				53A8FEBD2E11C95D00905D20 /* AudioRecording.swift in Sources */,
 				532F3ADA2DE7A41F006E0E40 /* Toast.swift in Sources */,
 				538BFAD32E3A3D410064A6A5 /* Shape.swift in Sources */,
+				538BFB952E3BC1A00064A6A5 /* OverlayH3Canvas.swift in Sources */,
 				537560CA2D82127100D8528B /* ButtonAddNote.swift in Sources */,
 				534A72352E186B00003AFAF9 /* ModelToast.swift in Sources */,
 				531B36B52D8B962C00CE8BA0 /* NoteMapView.swift in Sources */,

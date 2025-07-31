@@ -91,6 +91,50 @@ func maxCellThatFits(_ region: MKCoordinateRegion) throws -> UInt64 {
 	return cell
 }
 
+/*
+ Given a region find the lowest resolution that provides at least count cells within the region
+ */
+func regionToCellResolution(_ region: MKCoordinateRegion, count: Int = 10) throws -> Int {
+	var resolution: Int = 1
+	let boundary = regionToCoordinates(region)
+	while resolution < 16 {
+		// Find the smallest cell that covers the region.
+		let cells = try polygonToCells(boundary: boundary, resolution: resolution)
+			.compactMap({ $0 != 0 ? $0 : nil })
+		if cells.count > count {
+			//let cellsAsHex = cells.map({ c in String(c, radix: 16) })
+			//print("Cells: \(cellsAsHex))")
+			return resolution
+		}
+		resolution += 1
+	}
+	return 0
+}
+
+/*
+ Convert an MKCoordinateRegion to a square of CLLocationCoordinate2D
+ */
+func regionToCoordinates(_ region: MKCoordinateRegion) -> [CLLocationCoordinate2D] {
+	return [
+		CLLocationCoordinate2D(
+			latitude: region.center.latitude - region.span.latitudeDelta / 2,
+			longitude: region.center.longitude - region.span.longitudeDelta / 2
+		),
+		CLLocationCoordinate2D(
+			latitude: region.center.latitude + region.span.latitudeDelta / 2,
+			longitude: region.center.longitude - region.span.longitudeDelta / 2
+		),
+		CLLocationCoordinate2D(
+			latitude: region.center.latitude - region.span.latitudeDelta / 2,
+			longitude: region.center.longitude + region.span.longitudeDelta / 2
+		),
+		CLLocationCoordinate2D(
+			latitude: region.center.latitude + region.span.latitudeDelta / 2,
+			longitude: region.center.longitude + region.span.longitudeDelta / 2
+		),
+	]
+}
+
 func screenLocationToLatLng(location: CGPoint, region: MKCoordinateRegion, screenSize: CGSize)
 	-> CLLocationCoordinate2D
 {
