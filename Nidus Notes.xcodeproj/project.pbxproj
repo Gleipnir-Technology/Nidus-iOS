@@ -51,6 +51,9 @@
 		538BFAD32E3A3D410064A6A5 /* Shape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD22E3A3D3F0064A6A5 /* Shape.swift */; };
 		538BFAD52E3A3DC40064A6A5 /* MainStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD42E3A3DBF0064A6A5 /* MainStatusView.swift */; };
 		538BFAD72E3A3E1B0064A6A5 /* Initial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD62E3A3E170064A6A5 /* Initial.swift */; };
+		538BFAD92E3A5E5B0064A6A5 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFAD82E3A5E530064A6A5 /* Location.swift */; };
+		538BFB422E3B0CCA0064A6A5 /* RecordButtonTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFB412E3B0CC50064A6A5 /* RecordButtonTest.swift */; };
+		538BFB442E3B12E30064A6A5 /* ButtonWithLongPress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538BFB432E3B12DE0064A6A5 /* ButtonWithLongPress.swift */; };
 		539854592E0DB16000D3E2EF /* PhotoAttachmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539854582E0DB15600D3E2EF /* PhotoAttachmentView.swift */; };
 		5398545B2E0DB49500D3E2EF /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5398545A2E0DB49300D3E2EF /* CameraView.swift */; };
 		5398545D2E0DB4C500D3E2EF /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */; };
@@ -131,6 +134,9 @@
 		538BFAD22E3A3D3F0064A6A5 /* Shape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shape.swift; sourceTree = "<group>"; };
 		538BFAD42E3A3DBF0064A6A5 /* MainStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainStatusView.swift; sourceTree = "<group>"; };
 		538BFAD62E3A3E170064A6A5 /* Initial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Initial.swift; sourceTree = "<group>"; };
+		538BFAD82E3A5E530064A6A5 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		538BFB412E3B0CC50064A6A5 /* RecordButtonTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordButtonTest.swift; sourceTree = "<group>"; };
+		538BFB432E3B12DE0064A6A5 /* ButtonWithLongPress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonWithLongPress.swift; sourceTree = "<group>"; };
 		539854582E0DB15600D3E2EF /* PhotoAttachmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAttachmentView.swift; sourceTree = "<group>"; };
 		5398545A2E0DB49300D3E2EF /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
@@ -235,6 +241,7 @@
 		537560C12D820FFE00D8528B /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				538BFAD82E3A5E530064A6A5 /* Location.swift */,
 				538BFAD62E3A3E170064A6A5 /* Initial.swift */,
 				53A8FEBC2E11C95800905D20 /* AudioRecording.swift */,
 				538BFACC2E3A3C650064A6A5 /* CellSelection.swift */,
@@ -257,7 +264,7 @@
 		537560C42D82125200D8528B /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				538BFAD42E3A3DBF0064A6A5 /* MainStatusView.swift */,
+				538BFB432E3B12DE0064A6A5 /* ButtonWithLongPress.swift */,
 				53A8FEBA2E11C45000905D20 /* AudioPickerView.swift */,
 				53A8FEC32E125E3200905D20 /* AudioPlayerView.swift */,
 				53B8F08B2E0CC901007ABA40 /* AudioRecorderView.swift */,
@@ -271,6 +278,7 @@
 				532F3B002DECEE5A006E0E40 /* InspectionDetail.swift */,
 				532F3AFE2DECEDC1006E0E40 /* InspectionList.swift */,
 				537560A72D820A5A00D8528B /* LocationView.swift */,
+				538BFAD42E3A3DBF0064A6A5 /* MainStatusView.swift */,
 				532F3AF82DECB027006E0E40 /* MapClustered.swift */,
 				535F02BD2E1C7F86009D9E3E /* MapH3.swift */,
 				537E02662DC03DC1000F254F /* MapOverview.swift */,
@@ -284,6 +292,7 @@
 				538BFAD02E3A3CBB0064A6A5 /* OverlayH3.swift */,
 				539854582E0DB15600D3E2EF /* PhotoAttachmentView.swift */,
 				5398545C2E0DB4C200D3E2EF /* PhotoPicker.swift */,
+				538BFB412E3B0CC50064A6A5 /* RecordButtonTest.swift */,
 				537560A42D820A5A00D8528B /* RootView.swift */,
 				53B8F0852E080A94007ABA40 /* ServiceRequestDetail.swift */,
 				538784422D8B474300B3552E /* SettingView.swift */,
@@ -490,6 +499,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				538BFAD12E3A3CBF0064A6A5 /* OverlayH3.swift in Sources */,
+				538BFB442E3B12E30064A6A5 /* ButtonWithLongPress.swift in Sources */,
 				53A8FEBD2E11C95D00905D20 /* AudioRecording.swift in Sources */,
 				532F3ADA2DE7A41F006E0E40 /* Toast.swift in Sources */,
 				538BFAD32E3A3D410064A6A5 /* Shape.swift in Sources */,
@@ -520,6 +530,7 @@
 				538BFACF2E3A3CA90064A6A5 /* Conversions.swift in Sources */,
 				532F3AFD2DECE4EA006E0E40 /* MosquitoSourceDetail.swift in Sources */,
 				538BFA8A2E3A39280064A6A5 /* MapViewBreadcrumb.swift in Sources */,
+				538BFB422E3B0CCA0064A6A5 /* RecordButtonTest.swift in Sources */,
 				538BFACD2E3A3C680064A6A5 /* CellSelection.swift in Sources */,
 				535F02BE2E1C7F8A009D9E3E /* MapH3.swift in Sources */,
 				53A8FEC42E125E3700905D20 /* AudioPlayerView.swift in Sources */,
@@ -541,6 +552,7 @@
 				537560BC2D820A5A00D8528B /* RootView.swift in Sources */,
 				532F3AF92DECB02C006E0E40 /* MapClustered.swift in Sources */,
 				532F3AED2DEB74D8006E0E40 /* Database.swift in Sources */,
+				538BFAD92E3A5E5B0064A6A5 /* Location.swift in Sources */,
 				53B8F0882E080C62007ABA40 /* TrapDataDetail.swift in Sources */,
 				538BFAD52E3A3DC40064A6A5 /* MainStatusView.swift in Sources */,
 				53B8F0842E08059A007ABA40 /* FilterableField.swift in Sources */,

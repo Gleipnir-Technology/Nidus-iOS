@@ -11,6 +11,7 @@ import SwiftData
 import SwiftUI
 
 struct RootView: View {
+	@State var didSelect: Bool = false
 	@State var isShowingMap: Bool = true
 	@FocusState var isTextFieldFocused: Bool
 	@State var location: CLLocation = Initial.location
@@ -23,52 +24,6 @@ struct RootView: View {
 	@State var screenSize: CGSize = .zero
 	@State private var selection: Int = 0
 	@State var selectedCells: [CellSelection] = [CellSelection]()
-
-	var navTitle: String {
-		switch selection {
-		case 0:
-			return "Create Note"
-		case 1:
-			return "Notes"
-		case 2:
-			return "Map"
-		case 3:
-			return "Filters"
-		case 4:
-			return "Settings"
-		default:
-			return "Unknown Tab"
-		}
-	}
-
-	@ToolbarContentBuilder
-	func toolbarByTab() -> some ToolbarContent {
-		switch selection {
-		case 0:
-			ToolbarItem {
-				Button {
-					onSaveNoteNew()
-				} label: {
-					Text("Save").disabled(model.notes == nil)
-				}
-			}
-		case 1:
-			ToolbarItem {
-				Menu("Sorting") {
-					Text("Sort by...")
-					Button("Distance") {
-						Logger.foreground.info("sort by distance")
-					}
-					Button("Tag") {
-						Logger.foreground.info("sort by tag")
-					}
-				}
-			}
-
-		default:
-			ToolbarItem { EmptyView() }
-		}
-	}
 
 	@ViewBuilder
 	var notesList: some View {
@@ -114,8 +69,12 @@ struct RootView: View {
 	func onFilterChange() {
 		model.onFilterChange()
 	}
-	func onMapButton() {
-		isShowingMap = !isShowingMap
+	func onMapButtonLong() {
+		didSelect.toggle()
+		path.append("map-settings")
+	}
+	func onMapButtonShort() {
+		isShowingMap.toggle()
 	}
 	func onMicButton() {
 		print("mic!")
@@ -135,46 +94,55 @@ struct RootView: View {
 		selection = 0
 	}
 	var body: some View {
-		VStack {
-			if isShowingMap {
-				MapViewBreadcrumb(
-					location: $location,
-					region: $region,
-					screenSize: $screenSize
-				)
+		NavigationStack(path: $path) {
+			VStack {
+				if isShowingMap {
+					MapViewBreadcrumb(
+						location: $location,
+						region: $region,
+						screenSize: $screenSize,
+						showsUserLocation: true
+					)
+				}
+				else {
+					notesList
+				}
+				Spacer()
+				HStack {
+					ButtonWithLongPress(
+						actionLong: onMapButtonLong,
+						actionShort: onMapButtonShort,
+						label: {
+							Image(systemName: "map").font(
+								.system(size: 64, weight: .regular)
+							).padding(20)
+						}
+					).foregroundColor(isShowingMap ? Color.blue : .secondary)
+					Button(
+						action: onMicButton,
+						label: {
+							Image(systemName: "microphone").font(
+								.system(size: 64, weight: .regular)
+							).padding(20)
+						}
+					).foregroundColor(.secondary)
+					Button(
+						action: onCameraButton,
+						label: {
+							Image(systemName: "camera").font(
+								.system(size: 64, weight: .regular)
+							).padding(20)
+						}
+					).foregroundColor(.secondary)
+				}
 			}
-			else {
-				notesList
-			}
-			Spacer()
-			HStack {
-				Button(
-					action: onMapButton,
-					label: {
-						Image(systemName: "map").font(
-							.system(size: 64, weight: .regular)
-						).padding(20)
-					}
-				).foregroundColor(isShowingMap ? Color.blue : .secondary)
-				Button(
-					action: onMicButton,
-					label: {
-						Image(systemName: "microphone").font(
-							.system(size: 64, weight: .regular)
-						).padding(20)
-					}
-				).foregroundColor(.secondary)
-				Button(
-					action: onCameraButton,
-					label: {
-						Image(systemName: "camera").font(
-							.system(size: 64, weight: .regular)
-						).padding(20)
-					}
-				).foregroundColor(.secondary)
-			}
+		}.onAppear {
+			doOnAppear()
+		}.navigationDestination(for: String.self) { p in
+			Text("String detail \(p)")
 		}
 	}
+	/*
 	var body2: some View {
 		NavigationStack(path: $path) {
 			VStack {
@@ -252,12 +220,6 @@ struct RootView: View {
 				)
 			}
 			.navigationBarTitleDisplayMode(.inline)
-			.navigationTitle(navTitle)
-			.toolbar {
-				toolbarByTab()
-			}
-		}.onAppear {
-			_ = onAppear()
 		}.toast(
 			message: "Need a location first",
 			isShowing: $model.toast.showLocationToast,
@@ -272,6 +234,7 @@ struct RootView: View {
 			duration: Toast.long
 		)
 	}
+     */
 }
 
 #Preview("No notes, no settings") {
