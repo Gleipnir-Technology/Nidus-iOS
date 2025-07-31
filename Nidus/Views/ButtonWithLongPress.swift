@@ -1,5 +1,8 @@
 import SwiftUI
 
+/*
+ A button that can do either a long press or a short press and has actions for both
+ */
 struct ButtonWithLongPress<Content: View>: View {
 	let actionLong: () -> Void
 	let actionShort: () -> Void
@@ -11,7 +14,14 @@ struct ButtonWithLongPress<Content: View>: View {
 
 	var body: some View {
 		Circle()
-			.fill(isOn ? Color.green : Color.gray)
+			.stroke(
+				style: StrokeStyle.init(
+					lineWidth: 1,
+					lineCap: .round,
+					lineJoin: .round
+				)
+			)
+			.frame(width: 100, height: 100)
 			.overlay(label)
 			.onTapGesture(perform: actionShort)
 			.onLongPressGesture(perform: actionLong)

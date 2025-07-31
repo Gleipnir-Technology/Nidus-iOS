@@ -59,8 +59,11 @@ struct RootView: View {
 			_ = onAppear()
 		}
 	}
-	func onCameraButton() {
-		print("camera")
+	func onCameraButtonLong() {
+		print("camera long")
+	}
+	func onCameraButtonShort() {
+		print("camera short")
 	}
 	func onDeleteNote() {
 		model.onDeleteNote()
@@ -76,8 +79,11 @@ struct RootView: View {
 	func onMapButtonShort() {
 		isShowingMap.toggle()
 	}
-	func onMicButton() {
-		print("mic!")
+	func onMicButtonShort() {
+		print("mic short!")
+	}
+	func onMicButtonLong() {
+		print("mic long!")
 	}
 	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
@@ -118,16 +124,18 @@ struct RootView: View {
 							).padding(20)
 						}
 					).foregroundColor(isShowingMap ? Color.blue : .secondary)
-					Button(
-						action: onMicButton,
+					ButtonWithLongPress(
+						actionLong: onMicButtonLong,
+						actionShort: onMicButtonShort,
 						label: {
 							Image(systemName: "microphone").font(
 								.system(size: 64, weight: .regular)
 							).padding(20)
 						}
 					).foregroundColor(.secondary)
-					Button(
-						action: onCameraButton,
+					ButtonWithLongPress(
+						actionLong: onCameraButtonLong,
+						actionShort: onCameraButtonShort,
 						label: {
 							Image(systemName: "camera").font(
 								.system(size: 64, weight: .regular)
