@@ -143,11 +143,19 @@ struct RootView: View {
 						}
 					).foregroundColor(.secondary)
 				}
+			}.navigationDestination(for: String.self) { p in
+				switch p {
+				case "map-settings":
+					SettingView(
+						onSettingsUpdated: model
+							.startNoteDownload
+					)
+				default:
+					Text("Unknown destination \(p)")
+				}
 			}
 		}.onAppear {
 			doOnAppear()
-		}.navigationDestination(for: String.self) { p in
-			Text("String detail \(p)")
 		}
 	}
 	/*
@@ -201,10 +209,6 @@ struct RootView: View {
 						systemImage: "gear",
 						value: 4
 					) {
-						SettingView(
-							onSettingsUpdated: model
-								.startNoteDownload
-						)
 					}
 				}
 				.navigationDestination(for: UUID.self) { noteId in
