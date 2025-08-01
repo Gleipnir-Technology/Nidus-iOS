@@ -5,7 +5,7 @@ struct AudioDetail: View {
 	var body: some View {
 		if audio.isRecording {
 			AudioStatusRecordingView(
-				hasPermissions: audio.hasPermissions,
+				hasPermissions: audio.hasPermissionMicrophone!,
 				recordingTime: audio.recordingDuration,
 				transcription: audio.transcription
 			)

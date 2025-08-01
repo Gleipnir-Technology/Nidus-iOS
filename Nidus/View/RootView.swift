@@ -9,6 +9,7 @@ import SwiftUI
  */
 struct RootView: View {
 	@State var didSelect: Bool = false
+	@State var isShowingAudioDetail: Bool = false
 	@State var isShowingMap: Bool = true
 	@FocusState var isTextFieldFocused: Bool
 	@State var location: CLLocation = Initial.location
@@ -77,6 +78,10 @@ struct RootView: View {
 	func onMapButtonShort() {
 		isShowingMap.toggle()
 	}
+	func onMicButtonLong() {
+		didSelect.toggle()
+		isShowingAudioDetail.toggle()
+	}
 	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
 	}
@@ -93,63 +98,106 @@ struct RootView: View {
 	}
 	var body: some View {
 		NavigationStack(path: $path) {
-			VStack {
-				if isShowingMap {
-					MapViewBreadcrumb(
-						overlayResolution: $model.location.resolution,
-						region: $region,
-						screenSize: $screenSize,
-						selectedCell: $model.location.selectedLocationH3,
-						showsGrid: false,
-						showsUserLocation: true,
-						userCell: model.location.userLocationH3,
-						userPreviousCells: model.location
-							.userPreviousLocations.sorted(by: { a, b in
-								return a.value > b.value
-							}).map({ element in element.key })
-					)
+			ZStack {
+				VStack {
+					if isShowingMap {
+						MapViewBreadcrumb(
+							overlayResolution: $model.location
+								.resolution,
+							region: $region,
+							screenSize: $screenSize,
+							selectedCell: $model.location
+								.selectedLocationH3,
+							showsGrid: false,
+							showsUserLocation: true,
+							userCell: model.location.userLocationH3,
+							userPreviousCells: model.location
+								.userPreviousLocations.sorted(by: {
+									a,
+									b in
+									return a.value > b.value
+								}).map({ element in element.key })
+						)
+					}
+					else {
+						notesList
+					}
+					Spacer()
+					HStack {
+						ButtonWithLongPress(
+							actionLong: onMapButtonLong,
+							actionShort: onMapButtonShort,
+							label: {
+								Image(systemName: "map").font(
+									.system(
+										size: 64,
+										weight: .regular
+									)
+								).padding(20)
+							}
+						).foregroundColor(
+							isShowingMap ? Color.blue : .secondary
+						)
+						ButtonAudioRecord(
+							audio: model.audio,
+							actionLong: onMicButtonLong
+						)
+						ButtonWithLongPress(
+							actionLong: onCameraButtonLong,
+							actionShort: onCameraButtonShort,
+							label: {
+								Image(systemName: "camera").font(
+									.system(
+										size: 64,
+										weight: .regular
+									)
+								).padding(20)
+							}
+						).foregroundColor(.secondary)
+					}
+				}.navigationDestination(for: String.self) { p in
+					switch p {
+					case "map-settings":
+						SettingView(
+							onSettingsUpdated: model
+								.startNoteDownload
+						)
+					default:
+						Text("Unknown destination \(p)")
+					}
 				}
-				else {
-					notesList
-				}
-				Spacer()
-				HStack {
-					ButtonWithLongPress(
-						actionLong: onMapButtonLong,
-						actionShort: onMapButtonShort,
-						label: {
-							Image(systemName: "map").font(
-								.system(size: 64, weight: .regular)
-							).padding(20)
-						}
-					).foregroundColor(isShowingMap ? Color.blue : .secondary)
-					ButtonAudioRecord(
-						audio: model.audioRecorder,
-						didSelect: $didSelect
-					)
-					ButtonWithLongPress(
-						actionLong: onCameraButtonLong,
-						actionShort: onCameraButtonShort,
-						label: {
-							Image(systemName: "camera").font(
-								.system(size: 64, weight: .regular)
-							).padding(20)
-						}
-					).foregroundColor(.secondary)
-				}
-			}.navigationDestination(for: String.self) { p in
-				switch p {
-				case "map-settings":
-					SettingView(
-						onSettingsUpdated: model
-							.startNoteDownload
-					)
-				default:
-					Text("Unknown destination \(p)")
+				if isShowingAudioDetail {
+					AudioDetailPane(
+						audio: model.audio,
+						isShowing: $isShowingAudioDetail
+					).frame(maxWidth: .infinity)
+						.background(Color.white)
+						.cornerRadius(20)
+						.shadow(radius: 10)
+						.animation(.spring(), value: isShowingAudioDetail)
 				}
 			}
 		}.onAppear {
 			doOnAppear()
 		}.sensoryFeedback(.selection, trigger: didSelect)
+	}
+}
+
+struct RootView_Previews: PreviewProvider {
+	static var previews: some View {
+		RootView(
+			model: ModelNidusPreview()
+		).previewDisplayName("base")
+		RootView(
+			isShowingAudioDetail: true,
+			model: ModelNidusPreview(
+				audio: ModelAudioPreview(
+					hasPermissionTranscription: true,
+					isRecording: true,
+					recordingDuration: 63,
+					transcription: "This is some words I pretended to say"
+				)
+			)
+		).previewDisplayName("recording")
 	}
 }

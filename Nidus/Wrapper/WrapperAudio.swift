@@ -9,64 +9,63 @@ enum AudioError: Error {
 
 class WrapperAudio: NSObject {
 	var hasMicrophonePermission = false
-	var recordingDuration: TimeInterval = 0
-	var recordingTranscription: String?
+	var hasTranscriptionPermission = false
 	var recordingUUID: UUID = UUID()
 
 	private var audioRecorder: AVAudioRecorder?
 	private var audioPlayer: AVAudioPlayer?
-	private var onPermissionCallbacks: [(Bool) -> Void] = []
-	private var timer: Timer?
+	private var onTranscriptionCallbacks: [(String) -> Void] = []
 	private var speechRecognizer: SFSpeechRecognizer?
 	private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
 	private var recognitionTask: SFSpeechRecognitionTask?
 	private var audioEngine = AVAudioEngine()
 	private var hasSpeechPermission = false
 
-	var onRecordingStop: ((AudioRecording) -> Void) = { _ in }
-
 	override init() {
 		super.init()
 		speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
 	}
 
-	func requestPermissions(_ onPermission: @escaping (Bool) -> Void) {
-		onPermissionCallbacks.append(onPermission)
-		// Request microphone permission
+	func onTranscriptionUpdate(_ callback: @escaping (String) -> Void) {
+		onTranscriptionCallbacks.append(callback)
+	}
+
+	private func requestMicrophonePermission(completion: @escaping (Bool) -> Void) {
 		if #available(iOS 17.0, *) {
 			AVAudioApplication.requestRecordPermission { granted in
-				DispatchQueue.main.async {
-					self.hasMicrophonePermission = granted
-					while self.onPermissionCallbacks.count > 0 {
-						if let callback = self.onPermissionCallbacks
-							.popLast()
-						{
-							callback(granted)
-						}
-					}
-				}
+				completion(granted)
 			}
 		}
 		else {
 			AVAudioSession.sharedInstance().requestRecordPermission { granted in
-				DispatchQueue.main.async {
-					self.hasMicrophonePermission = granted
-					while self.onPermissionCallbacks.count > 0 {
-						if let callback = self.onPermissionCallbacks
-							.popLast()
-						{
-							callback(granted)
-						}
-					}
-				}
+				completion(granted)
 			}
 		}
+	}
 
-		// Request speech recognition permission
+	private func requestTranscriptionPermission(completion: @escaping (Bool) -> Void) {
 		SFSpeechRecognizer.requestAuthorization { authStatus in
-			DispatchQueue.main.async {
-				self.hasSpeechPermission = authStatus == .authorized
-			}
+			completion(authStatus == .authorized)
+		}
+	}
+
+	func requestPermissions(_ onPermission: @escaping (Bool, Bool) -> Void) {
+		let group = DispatchGroup()
+
+		group.enter()
+		requestMicrophonePermission { granted in
+			self.hasMicrophonePermission = granted
+			group.leave()
+		}
+
+		group.enter()
+		requestTranscriptionPermission { granted in
+			self.hasSpeechPermission = granted
+			group.leave()
+		}
+
+		group.notify(queue: .main) {
+			onPermission(self.hasMicrophonePermission, self.hasSpeechPermission)
 		}
 	}
 
@@ -75,17 +74,42 @@ class WrapperAudio: NSObject {
 			throw AudioError.noMicrophonePermission
 		}
 
-		recordingDuration = 0
-
 		// Start audio recording
 		startAudioRecording()
 
 		// Start speech recognition
 		startSpeechRecognition()
 
-		// Start timer for recording duration
-		timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-			self.recordingDuration += 1
+	}
+
+	func stopRecording() {
+		// Stop audio recording
+		audioRecorder?.stop()
+
+		// Stop speech recognition
+		audioEngine.stop()
+		audioEngine.inputNode.removeTap(onBus: 0)
+		recognitionRequest?.endAudio()
+		recognitionRequest = nil
+		recognitionTask?.cancel()
+		recognitionTask = nil
+
+		recordingUUID = UUID()
+	}
+
+	func playRecording(url: URL) {
+		do {
+			audioPlayer = try AVAudioPlayer(contentsOf: url)
+			audioPlayer?.play()
+		}
+		catch {
+			print("Failed to play recording: \(error)")
+		}
+	}
+
+	private func handleTranscriptionUpdate(_ transcription: String) {
+		for c in onTranscriptionCallbacks {
+			c(transcription)
 		}
 	}
 
@@ -116,12 +140,12 @@ class WrapperAudio: NSObject {
 	}
 
 	private func startSpeechRecognition() {
+		Logger.foreground.info("Starting speech recognition")
 		guard let speechRecognizer = speechRecognizer, speechRecognizer.isAvailable else {
 			Logger.foreground.info("Speech recognizer not available")
-			recordingTranscription = nil
 			return
 		}
-		recordingTranscription = ""
+		handleTranscriptionUpdate("")
 
 		// Cancel any previous task
 		recognitionTask?.cancel()
@@ -151,8 +175,9 @@ class WrapperAudio: NSObject {
 			{ result, error in
 				DispatchQueue.main.async {
 					if let result = result {
-						self.recordingTranscription =
+						self.handleTranscriptionUpdate(
 							result.bestTranscription.formattedString
+						)
 					}
 
 					if error != nil {
@@ -173,47 +198,13 @@ class WrapperAudio: NSObject {
 
 			audioEngine.prepare()
 			try audioEngine.start()
-
+			Logger.foreground.info("Speech recognition started")
 		}
 		catch {
 			print("Failed to start speech recognition: \(error)")
 		}
 	}
 
-	func stopRecording() {
-		// Stop audio recording
-		audioRecorder?.stop()
-
-		// Stop speech recognition
-		audioEngine.stop()
-		audioEngine.inputNode.removeTap(onBus: 0)
-		recognitionRequest?.endAudio()
-		recognitionRequest = nil
-		recognitionTask?.cancel()
-		recognitionTask = nil
-
-		timer?.invalidate()
-		timer = nil
-		let recording = AudioRecording(
-			created: Date.now,
-			duration: recordingDuration,
-			transcription: recordingTranscription,
-			uuid: recordingUUID
-		)
-		recordingUUID = UUID()
-
-		onRecordingStop(recording)
-	}
-
-	func playRecording(url: URL) {
-		do {
-			audioPlayer = try AVAudioPlayer(contentsOf: url)
-			audioPlayer?.play()
-		}
-		catch {
-			print("Failed to play recording: \(error)")
-		}
-	}
 }
 
 extension WrapperAudio: AVAudioRecorderDelegate {
@@ -230,13 +221,9 @@ extension WrapperAudio: AVAudioRecorderDelegate {
 class AudioRecorderFake: WrapperAudio {
 	init(
 		hasPermissions: Bool = true,
-		isRecording: Bool = false,
-		recordingDuration: TimeInterval = TimeInterval(integerLiteral: 123),
-		transcribedText: String = ""
+		isRecording: Bool = false
 	) {
 		super.init()
-		self.recordingDuration = recordingDuration
-		self.recordingTranscription = transcribedText
 	}
 
 }

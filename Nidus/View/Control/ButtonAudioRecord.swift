@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ButtonAudioRecord: View {
 	var audio: ModelAudio
-	@Binding var didSelect: Bool
+	let actionLong: () -> Void
 
 	func onMicButtonShort() {
 		audio.withPermission(
@@ -14,12 +14,9 @@ struct ButtonAudioRecord: View {
 			}
 		)
 	}
-	func onMicButtonLong() {
-		didSelect.toggle()
-	}
 	var body: some View {
 		ButtonWithLongPress(
-			actionLong: onMicButtonLong,
+			actionLong: actionLong,
 			actionShort: onMicButtonShort,
 			isAnimated: audio.isRecording,
 			label: {
@@ -37,8 +34,10 @@ struct ButtonAudioRecord: View {
 }
 
 struct ButtonAudioRecord_Previews: PreviewProvider {
-	@State static var didSelect: Bool = false
+	static func onLongPress() {
+
+	}
 	static var previews: some View {
-		ButtonAudioRecord(audio: PreviewAudio(), didSelect: $didSelect)
+		ButtonAudioRecord(audio: ModelAudioPreview(), actionLong: onLongPress)
 	}
 }
