@@ -1,37 +1,5 @@
 import SwiftUI
 
-struct TranscriptionDisplay: View {
-	let transcription: String
-	var body: some View {
-		ScrollViewReader { proxy in
-			ScrollView {
-				Text(transcription)
-					.frame(
-						maxWidth: .infinity,
-						maxHeight: 200,
-						alignment: .leading
-					)
-					.background(
-						Color.cyan.opacity(
-							0.1
-						)
-					)
-					.font(.caption)
-					.id("transcription")
-			}.onChange(of: transcription) {
-				withAnimation(
-					.easeInOut(duration: 0.3)
-				) {
-					proxy.scrollTo(
-						"transcription",
-						anchor: .bottom
-					)
-				}
-			}.frame(maxHeight: 100)
-		}
-
-	}
-}
 struct AudioDetailPane: View {
 	let audio: ModelAudio
 	@Binding var isShowing: Bool

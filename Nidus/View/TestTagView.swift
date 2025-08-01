@@ -2,23 +2,7 @@ import SwiftUI
 
 struct CodeBlockView: View {
 	var code: String
-	var body: some View {
-		ScrollView(.horizontal) {
-			Text(attributedString(for: code))
-				.font(.system(.body, design: .monospaced))
-				.padding()
-				.background(Color.black)
-				.cornerRadius(8)
-				.overlay(
-					RoundedRectangle(cornerRadius: 8)
-						.stroke(Color.gray, lineWidth: 1)
-				)
-				.shadow(radius: 2)
-				.multilineTextAlignment(.leading)
-				.foregroundColor(.white)
-		}
-		.padding(.horizontal)
-	}  // Helper function to create an AttributedString with simulated syntax highlighting
+
 	func attributedString(for code: String) -> AttributedString {
 		var attributedString = AttributedString(code)  // Add syntax highlighting for Swift keywords, strings, etc.
 		let keywords = ["let", "var", "if", "else", "struct", "func", "return"]
@@ -52,6 +36,23 @@ struct CodeBlockView: View {
 		}
 		return attributedString
 	}
+
+	var body: some View {
+		ScrollView(.horizontal) {
+			Text(attributedString(for: code))
+				.font(.system(.body, design: .monospaced))
+				.padding()
+				.cornerRadius(8)
+				.overlay(
+					RoundedRectangle(cornerRadius: 8)
+						.stroke(Color.gray, lineWidth: 1)
+				)
+				.shadow(radius: 2)
+				.multilineTextAlignment(.leading)
+				.foregroundColor(.white)
+		}
+		.padding(.horizontal)
+	}  // Helper function to create an AttributedString with simulated syntax highlighting
 }
 
 extension String {
