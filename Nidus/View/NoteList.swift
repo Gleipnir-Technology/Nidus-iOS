@@ -17,10 +17,7 @@ struct NoteListView: View {
 	var body: some View {
 		NavigationStack {
 			VStack {
-				HStack {
-					NoteSearchBar()
-					NoteFilterButton()
-				}
+				NoteSearchBar(searchText: $searchText)
 
 				if controller.model.notes == nil {
 					Text("Loading")
@@ -37,7 +34,7 @@ struct NoteListView: View {
 				}
 				Spacer()
 			}
-		}.searchable(text: $searchText)
+		}
 	}
 }
 

@@ -2,6 +2,10 @@ import SwiftUI
 
 struct NoteFilterButton: View {
 	var body: some View {
-		Image(systemName: "bonjour")
+		Button {
+			// on press
+		} label: {
+			Image(systemName: "line.3.horizontal.decrease.circle").badge(4)
+		}
 	}
 }
