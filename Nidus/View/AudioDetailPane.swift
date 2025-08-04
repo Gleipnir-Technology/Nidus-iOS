@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AudioDetailPane: View {
-	let audio: ModelAudio
+	let audio: AudioController
 	@Binding var isShowing: Bool
 
 	private func timeString(_ timeInterval: TimeInterval) -> String {
@@ -67,10 +67,10 @@ struct AudioDetailPane: View {
 struct AudioDetailPane_Previews: PreviewProvider {
 	@State static var isShowing: Bool = true
 	static var previews: some View {
-		AudioDetailPane(audio: ModelAudioPreview(), isShowing: $isShowing)
+		AudioDetailPane(audio: AudioControllerPreview(), isShowing: $isShowing)
 			.previewDisplayName("Not recording")
 		AudioDetailPane(
-			audio: ModelAudioPreview(
+			audio: AudioControllerPreview(
 				isRecording: true,
 				recordingDuration: 60 * 2 + 15
 			),
@@ -81,7 +81,7 @@ struct AudioDetailPane_Previews: PreviewProvider {
 		VStack {
 			Spacer().background(.blue)
 			AudioDetailPane(
-				audio: ModelAudioPreview(
+				audio: AudioControllerPreview(
 					hasPermissionTranscription: true,
 					isRecording: true,
 					recordingDuration: 60 * 2 + 15,

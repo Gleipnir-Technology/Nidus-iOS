@@ -1,12 +1,9 @@
-//
-//  SettingView.swift
-//  Nidus
-//
-//  Created by Eli Ribble on 3/19/25.
-//
 import OSLog
 import SwiftUI
 
+/*
+ View for managing settings in the app.
+ */
 struct SettingView: View {
 	@Environment(\.dismiss) private var dismiss
 	@State private var alertMessage = ""
@@ -15,7 +12,8 @@ struct SettingView: View {
 	@State private var showPassword: Bool = false
 	@State private var url: String = "https://sync.nidus.cloud"
 	@State private var username: String = ""
-	var onSettingsUpdated: (() -> Void)
+
+	var controller: RootController
 
 	private var isFormValid: Bool {
 		!username.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -40,7 +38,6 @@ struct SettingView: View {
 		DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
 			dismiss()
 		}
-		onSettingsUpdated()
 	}
 
 	private func testLogin() {
@@ -188,5 +185,5 @@ struct SettingView: View {
 }
 
 #Preview {
-	SettingView(onSettingsUpdated: {})
+	SettingView(controller: RootController())
 }

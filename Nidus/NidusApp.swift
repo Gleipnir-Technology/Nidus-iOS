@@ -5,15 +5,11 @@ import UIKit
 @main
 @MainActor
 struct NidusApp: App {
-	@State private var model = ModelNidus()
 	@UIApplicationDelegateAdaptor private var appDelegate: NidusAppDelegate
 
 	var body: some Scene {
 		WindowGroup {
-			RootView(
-				model: model,
-				onAppear: model.createBackgroundNetworkManager
-			)
+			RootView(controller: RootController())
 		}
 	}
 }

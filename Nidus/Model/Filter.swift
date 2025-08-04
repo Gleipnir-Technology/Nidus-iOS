@@ -1,9 +1,3 @@
-//
-//  Filter.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 6/19/25.
-//
 import SwiftUI
 
 struct FilterGlobal {

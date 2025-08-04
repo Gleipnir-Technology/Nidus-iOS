@@ -1,9 +1,3 @@
-//
-//  BackgroundNetworkManager.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 5/27/25.
-//
 import Foundation
 import OSLog
 import UIKit
@@ -52,24 +46,20 @@ enum BackgroundNetworkState {
 	case savingData
 }
 
-actor BackgroundNetworkManager {
+enum NetworkServiceError: Error {
+	case settingsNotSet
+}
+
+class NetworkService {
 	private var continuations: [URLSessionTask: CheckedContinuation<(), Error>] = [:]
-	private var downloadWrapper: BackgroundDownloadWrapper!
-	nonisolated let onError: ((any Error) -> Void)
-	nonisolated let onProgress: ((Double) -> Void)
+	private var downloadWrapper: BackgroundDownloadWrapper = BackgroundDownloadWrapper()
+	private var settings: SettingsModel? = nil
+	nonisolated let onError: ((any Error) -> Void)? = nil
+	nonisolated let onProgress: ((Double) -> Void)? = nil
 
 	@Published var isLoggedIn = false
 
-	init(
-		onError: @escaping ((any Error) -> Void),
-		onProgress: @escaping ((Double) -> Void)
-	) {
-		self.downloadWrapper = BackgroundDownloadWrapper()
-		self.onError = onError
-		self.onProgress = onProgress
-	}
-
-	nonisolated private func doLogin(_ settings: Settings) async throws {
+	func connect(_ settings: SettingsModel) async throws {
 		if settings.username == "" || settings.password == "" {
 			Logger.background.info(
 				"Refusing to do download, no username and password"
@@ -79,20 +69,26 @@ actor BackgroundNetworkManager {
 		try await login(settings)
 	}
 
-	func fetchNoteUpdates(_ settings: Settings) async throws -> NotesResponse {
+	func fetchNoteUpdates() async throws -> NotesResponse {
+		guard let settings = self.settings else {
+			throw NetworkServiceError.settingsNotSet
+		}
 		let url = URL(string: settings.URL + "/api/client/ios")!
 		let request = URLRequest(url: url)
 		var response: NotesResponse?
 		try await maybeLogin(settings) {
 			let tempURL = try await downloadWrapper.handle(with: request) { progress in
-				self.onProgress(progress.progress)
+				//self.onProgress(progress.progress)
 			}
 			response = try parseJSON(tempURL)
 		}
 		return response!
 	}
 
-	nonisolated func uploadAudio(_ settings: Settings, _ uuid: UUID) async throws {
+	nonisolated func uploadAudio(_ uuid: UUID) async throws {
+		guard let settings = self.settings else {
+			throw NetworkServiceError.settingsNotSet
+		}
 		let uploadURL: URL = URL(string: settings.URL + "/api/audio/" + uuid.uuidString)!
 		let audioURL = AudioRecording.url(uuid)
 
@@ -112,7 +108,10 @@ actor BackgroundNetworkManager {
 		}
 	}
 
-	nonisolated func uploadImage(_ settings: Settings, _ uuid: UUID) async throws {
+	nonisolated func uploadImage(_ uuid: UUID) async throws {
+		guard let settings = self.settings else {
+			throw NetworkServiceError.settingsNotSet
+		}
 		let uploadURL: URL = URL(string: settings.URL + "/api/image/" + uuid.uuidString)!
 		let imageURL = NoteImage.url(uuid)
 
@@ -132,7 +131,10 @@ actor BackgroundNetworkManager {
 		}
 	}
 
-	nonisolated func uploadNote(_ settings: Settings, _ note: NidusNote) async throws {
+	nonisolated func uploadNote(_ note: NidusNote) async throws {
+		guard let settings = self.settings else {
+			throw NetworkServiceError.settingsNotSet
+		}
 		let id: String = String(note.id.uuidString)
 		let updateURL: URL = URL(string: settings.URL + "/api/client/ios/note/" + id)!
 
@@ -154,7 +156,7 @@ actor BackgroundNetworkManager {
 		}
 	}
 
-	private func login(_ settings: Settings) async throws {
+	private func login(_ settings: SettingsModel) async throws {
 		let loginURL: URL = URL(string: settings.URL + "/login")!
 
 		// Create form-encoded POST request
@@ -172,7 +174,8 @@ actor BackgroundNetworkManager {
 		_ = try await downloadWrapper.handle(with: request)
 	}
 
-	private func maybeLogin(_ settings: Settings, _ block: () async throws -> Void) async throws
+	private func maybeLogin(_ settings: SettingsModel, _ block: () async throws -> Void)
+		async throws
 	{
 		do {
 			try await block()
@@ -187,7 +190,7 @@ actor BackgroundNetworkManager {
 			)
 			if urlError.code.rawValue == 401 {
 				do {
-					try await doLogin(settings)
+					try await connect(settings)
 				}
 				catch {
 					Logger.background.error("Failed to login: \(error)")

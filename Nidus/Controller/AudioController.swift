@@ -2,7 +2,7 @@ import OSLog
 import SwiftUI
 
 @Observable
-class ModelAudio {
+class AudioController {
 	var isRecording: Bool = false
 	var errorMessage: String = ""
 	var hasPermissionMicrophone: Bool? = nil
@@ -75,5 +75,26 @@ class ModelAudio {
 
 	private func onTranscriptionUpdate(_ transcription: String) {
 		self.transcription = transcription
+	}
+}
+
+class AudioControllerPreview: AudioController {
+	init(
+		hasPermissionTranscription: Bool? = nil,
+		isRecording: Bool = false,
+		recordingDuration: TimeInterval = 0,
+		transcription: String? = nil
+	) {
+		super.init()
+		self.hasPermissionTranscription = hasPermissionTranscription
+		self.isRecording = isRecording
+		self.recordingDuration = recordingDuration
+		self.transcription = transcription
+	}
+	override func toggleRecording() {
+		isRecording.toggle()
+	}
+	override func withPermission(ok: @escaping () -> Void, cancel: @escaping () -> Void) {
+		ok()
 	}
 }

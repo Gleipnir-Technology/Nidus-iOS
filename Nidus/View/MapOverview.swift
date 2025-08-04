@@ -14,7 +14,6 @@ import SwiftUI
 
 struct MapOverview: View {
 	@State private var geometrySize: CGSize = .zero
-	var model: ModelNidus
 
 	var onNoteSelected: ((any Note) -> Void)
 	var userLocation: CLLocation?
@@ -79,12 +78,14 @@ struct MapOverview: View {
 	}
 
 	var body: some View {
+		Text("placeholder")
+		/*
 		MapClustered(
 			dataSource: model.cluster,
 			onMapSizeChange: model.onMapSizeChange,
 			onPositionChange: model.onMapPositionChange,
 			region: model.currentRegion
-		)
+		)*/
 	}
 }
 

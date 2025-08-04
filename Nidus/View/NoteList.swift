@@ -1,54 +1,50 @@
-//
-//  NoteList.swift
-//  Nidus
-//
-//  Created by Eli Ribble on 3/11/25.
-//
 import CoreLocation
 import OSLog
 import SwiftData
 import SwiftUI
 
+/*
+ A view of the various notes in the current area
+ */
 struct NoteListView: View {
-	var currentLocation: CLLocation
-	var isTextFieldFocused: FocusState<Bool>.Binding
-	var locationDataManager: LocationDataManager
-	var notes: [AnyNote]
-	@Binding var noteBuffer: ModelNoteBuffer
-	let onDeleteNote: () -> Void
-	let onFilterAdded: (FilterInstance) -> Void
-	let onResetChanges: () -> Void
+	var controller: NotesController
+	@State var searchText: String = ""
+
+	init(controller: NotesController) {
+		self.controller = controller
+	}
 
 	var body: some View {
-		if notes.count == 0 {
-			Text("No notes")
-		}
-		else {
-			NoteList(
-				currentLocation: currentLocation,
-				isTextFieldFocused: isTextFieldFocused,
-				locationDataManager: locationDataManager,
-				notes: notes,
-				noteBuffer: $noteBuffer,
-				onDeleteNote: onDeleteNote,
-				onFilterAdded: onFilterAdded,
-				onResetChanges: onResetChanges
-			)
-		}
+		NavigationStack {
+			VStack {
+				HStack {
+					NoteSearchBar()
+					NoteFilterButton()
+				}
+
+				if controller.model.notes == nil {
+					Text("Loading")
+				}
+				else {
+					if controller.model.notes!.count == 0 {
+						Text("No notes")
+					}
+					else {
+						NoteList(
+							controller: controller
+						)
+					}
+				}
+				Spacer()
+			}
+		}.searchable(text: $searchText)
 	}
 }
 
 struct NoteList: View {
-	var currentLocation: CLLocation
-	var isTextFieldFocused: FocusState<Bool>.Binding
-	var locationDataManager: LocationDataManager
-	var notes: [AnyNote]
-	@Binding var noteBuffer: ModelNoteBuffer
-	let onDeleteNote: () -> Void
-	let onFilterAdded: (FilterInstance) -> Void
-	let onResetChanges: () -> Void
+	var controller: NotesController
 
-	var notesByDistance: [AnyNote] {
+	func notesByDistance(_ notes: [AnyNote], currentLocation: CLLocation) -> [AnyNote] {
 		var byDistance: [AnyNote] = notes
 		byDistance.sort(by: { (an1: AnyNote, an2: AnyNote) -> Bool in
 			return currentLocation.distance(
@@ -66,40 +62,16 @@ struct NoteList: View {
 		})
 		return byDistance
 	}
+
 	var body: some View {
-		List(notesByDistance) { note in
-			NavigationLink {
-				switch note.category {
-				case .mosquitoSource:
-					MosquitoSourceDetail(
-						onFilterAdded: onFilterAdded,
-						source: note.asMosquitoSource()!
-					)
-				case .nidus:
-					EditNidusNoteView(
-						isTextFieldFocused: isTextFieldFocused,
-						locationDataManager: locationDataManager,
-						note: note.asNidusNote()!,
-						noteBuffer: $noteBuffer,
-						onDeleteNote: onDeleteNote,
-						onResetChanges: onResetChanges
-					)
-				case .serviceRequest:
-					ServiceRequestDetail(
-						onFilterAdded: onFilterAdded,
-						request: note.asServiceRequest()!
-					)
-				case .trapData:
-					TrapDataDetail(
-						onFilterAdded: onFilterAdded,
-						trapData: note.asTrapData()!
-					)
-				default:
-					NoteEditor(currentLocation: currentLocation, note: note)
-				}
-			} label: {
-				NoteRow(currentLocation: currentLocation, note: note)
-			}
-		}
+		Text("some stuff")
+	}
+}
+
+struct NoteList_Previews: PreviewProvider {
+	static var previews: some View {
+		NoteListView(
+			controller: NotesController()
+		).previewDisplayName("base")
 	}
 }
