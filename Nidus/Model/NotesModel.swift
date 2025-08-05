@@ -12,7 +12,10 @@ struct NotesModel {
 			NoteOverviewFlat(
 				color: .green,
 				icon: "star",
-				icons: ["star", "star"],
+				icons: [
+					"figure.barre.circle", "figure.baseball.circle",
+					"figure.roll.circle.fill", "figure.walk.treadmill",
+				],
 				time: Date.now - 3600
 			)
 		]

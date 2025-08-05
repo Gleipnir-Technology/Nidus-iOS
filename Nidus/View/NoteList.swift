@@ -79,8 +79,43 @@ struct NoteListRow: View {
 	var body: some View {
 		HStack {
 			Image(systemName: overview.icon).font(.system(size: 42.0))
+			NoteListRowIconCluster(icons: overview.icons)
 			Text("1 min ago")
 			Text("nearby")
+		}
+	}
+}
+
+struct NoteListRowIconCluster: View {
+	let icons: [String]
+
+	func calculateIconsPerRow(_ numIcons: Int) -> (Int, Int) {
+		if numIcons <= 2 { return (numIcons, 0) }
+		if numIcons % 2 == 0 {
+			return (numIcons / 2, numIcons / 2)
+		}
+		else {
+			return ((numIcons + 1) / 2, (numIcons - 1) / 2)
+		}
+	}
+
+	var body: some View {
+		let numIcons = icons.count
+		let iconsPerRow = calculateIconsPerRow(numIcons)
+		LazyVGrid(columns: [GridItem(.adaptive(minimum: 10))], spacing: 10) {
+			ForEach(0..<numIcons, id: \.self) { index in
+				let i: Int = index
+				let row: Int = ((i % 2) == 0) ? 0 : 1
+				//let offset: CGFloat = (row == 0 ? 0 : CGFloat(iconsPerRow[0] / 2.5))
+				let offset_y: CGFloat = (row == 0 ? -10 : 10)
+				let offset_x: CGFloat = CGFloat(-10 * i)
+				//Text("r\(row) o\(offset)")
+				Image(systemName: icons[index])
+					.frame(width: 50, height: 50)
+					.offset(x: offset_x, y: offset_y)
+				/*
+					.offset(y: row == 1 ? offset : -offset)*/
+			}
 		}
 	}
 }
