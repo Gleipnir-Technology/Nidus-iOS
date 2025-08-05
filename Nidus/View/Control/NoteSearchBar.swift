@@ -24,22 +24,18 @@ struct NoteSearchBar: View {
 			.padding(7)
 			.background(Color(white: 0.9))
 			.cornerRadius(10)
-			.padding(.horizontal, active ? 0 : 50)
+			//.padding(.horizontal, active ? 0 : 10)
 
-			.opacity(active ? 1 : 0)
-			.frame(width: active ? nil : 0)
 			Spacer()
-			if active {
-				Button("Cancel") {
-					withAnimation {
-						active = false
-						isSearchFieldFocused = false
-					}
+			Button("Cancel") {
+				withAnimation {
+					active = false
+					isSearchFieldFocused = false
 				}
 			}
-			else {
-				NoteFilterButton()
-			}
+			.opacity(active ? 1 : 0)
+			//.frame(width: active ? nil : 0)
+			NoteFilterButton()
 		}.padding()
 	}
 }

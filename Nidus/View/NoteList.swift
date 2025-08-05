@@ -75,27 +75,30 @@ struct NoteList: View {
 }
 
 struct NoteListRow: View {
+	let ROW_HEIGHT: CGFloat = 40.0
 	let overview: any NoteOverview
 	var body: some View {
 		HStack {
-			Image(systemName: overview.icon).font(.system(size: 42.0))
-			NoteListRowIconCluster(icons: overview.icons)
+			Image(systemName: overview.icon).font(.system(size: 42.0)).background(
+				Color.purple.opacity(0.3)
+			).frame(width: 60, height: ROW_HEIGHT)
+			NoteListRowIconCluster(icons: overview.icons).background(
+				Color.red.opacity(0.3)
+			).frame(width: 150, height: ROW_HEIGHT)
 			Spacer()
-			NoteListRowTextCluster(overview: overview)
+			NoteListRowTextCluster(overview: overview).background(
+				Color.cyan.opacity(0.3)
+			)
+			Rectangle().foregroundStyle(overview.color).cornerRadius(10).frame(
+				width: 10,
+				height: .infinity
+			).padding(.zero).offset(x: 20)
 		}
 	}
 }
 
-struct NoteListRowTextCluster: View {
-	let overview: any NoteOverview
-	var body: some View {
-		VStack {
-			Text("1 min ago")
-			Text("20m away")
-		}
-	}
-}
 struct NoteListRowIconCluster: View {
+	let iconsPerRow = 7
 	let icons: [String]
 
 	func calculateIconsPerRow(_ numIcons: Int) -> (Int, Int) {
@@ -110,24 +113,50 @@ struct NoteListRowIconCluster: View {
 
 	var body: some View {
 		let numIcons = icons.count
-		let iconsPerRow = calculateIconsPerRow(numIcons)
-		LazyVGrid(columns: [GridItem(.adaptive(minimum: 10))], spacing: 10) {
-			ForEach(0..<numIcons, id: \.self) { index in
-				let i: Int = index
-				let row: Int = ((i % 2) == 0) ? 0 : 1
-				//let offset: CGFloat = (row == 0 ? 0 : CGFloat(iconsPerRow[0] / 2.5))
-				let offset_y: CGFloat = (row == 0 ? -10 : 10)
-				let offset_x: CGFloat = CGFloat(-10 * i)
-				//Text("r\(row) o\(offset)")
-				Image(systemName: icons[index])
-					.frame(width: 50, height: 50)
-					.offset(x: offset_x, y: offset_y)
-				/*
-					.offset(y: row == 1 ? offset : -offset)*/
+		Grid(horizontalSpacing: 1, verticalSpacing: 1) {
+			GridRow {
+				ForEach(0..<iconsPerRow, id: \.self) { index in
+					if index < numIcons {
+						let i = index
+						let offset_y: CGFloat = 0  //(row == 0 ? -10 : 10)
+						let offset_x: CGFloat = 0  //CGFloat(-10 * i)
+						Image(systemName: icons[index])
+							.offset(x: offset_x, y: offset_y)
+					}
+					else {
+						Color.white.opacity(0.0)
+					}
+				}
+			}
+			GridRow {
+				ForEach(0..<iconsPerRow, id: \.self) { index in
+					if index + iconsPerRow < numIcons {
+						let i = index + iconsPerRow
+						let offset_y: CGFloat = 0  //(row == 0 ? -10 : 10)
+						let offset_x: CGFloat = 10  //CGFloat(-10 * i)
+						Image(systemName: icons[i])
+							.offset(x: offset_x, y: offset_y)
+					}
+					else {
+						//Color.blue
+						Spacer()
+					}
+				}
 			}
 		}
 	}
 }
+
+struct NoteListRowTextCluster: View {
+	let overview: any NoteOverview
+	var body: some View {
+		VStack {
+			Text("1 min ago")
+			Text("20m away")
+		}.backgroundStyle(.red.opacity(0.3))
+	}
+}
+
 struct NoteList_Previews: PreviewProvider {
 	static var previews: some View {
 		NoteListView(
