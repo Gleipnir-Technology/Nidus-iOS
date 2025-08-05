@@ -8,9 +8,12 @@ struct CameraView: View {
 	var body: some View {
 		VStack {
 			if forPreview {
-				Image(uiImage: UIImage(named: "camera-placeholder")!)
+				Spacer()
+				Image(uiImage: UIImage(named: "camera-placeholder")!).resizable()
+					.aspectRatio(contentMode: .fit).background(
+						Color.cyan.opacity(0.4)
+					)
 			}
-			ProgressView()
 			Spacer()
 			CameraControls()
 		}
@@ -20,9 +23,15 @@ struct CameraView: View {
 struct CameraControls: View {
 	var body: some View {
 		HStack {
-			Image(systemName: "photo")
-			Circle().foregroundStyle(.blue)
-			Image(systemName: "record.circle")
+			Image(systemName: "photo").font(.system(size: 64, weight: .regular))
+				.padding(20)
+			Spacer()
+			Image(systemName: "camera.aperture").font(
+				.system(size: 82, weight: .regular)
+			)
+			Spacer()
+			Image(systemName: "record.circle").font(.system(size: 64, weight: .regular))
+				.padding(20)
 		}
 	}
 }
