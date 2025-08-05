@@ -19,11 +19,11 @@ struct NoteListView: View {
 			VStack {
 				NoteSearchBar(searchText: $searchText)
 
-				if controller.model.notes == nil {
+				if controller.model.noteOverview == nil {
 					Text("Loading")
 				}
 				else {
-					if controller.model.notes!.count == 0 {
+					if controller.model.noteOverview!.count == 0 {
 						Text("No notes")
 					}
 					else {
@@ -61,14 +61,37 @@ struct NoteList: View {
 	}
 
 	var body: some View {
-		Text("some stuff")
+		if controller.model.noteOverview == nil {
+			ProgressView()
+		}
+		else {
+			List {
+				ForEach(controller.model.noteOverview!) { overview in
+					NoteListRow(overview: overview)
+				}
+			}
+		}
 	}
 }
 
+struct NoteListRow: View {
+	var overview: any NoteOverview
+	var body: some View {
+		HStack {
+			Image(systemName: overview.icon).font(.system(size: 42.0))
+			Text("1 min ago")
+			Text("nearby")
+		}
+	}
+}
 struct NoteList_Previews: PreviewProvider {
 	static var previews: some View {
 		NoteListView(
-			controller: NotesController()
+			controller: NotesControllerPreview(
+				model: NotesModel(
+					noteOverview: NotesModel.Preview.someNoteOverview
+				)
+			)
 		).previewDisplayName("base")
 	}
 }

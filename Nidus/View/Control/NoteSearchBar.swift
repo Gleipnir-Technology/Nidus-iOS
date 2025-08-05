@@ -26,16 +26,20 @@ struct NoteSearchBar: View {
 			.cornerRadius(10)
 			.padding(.horizontal, active ? 0 : 50)
 
-			Button("Cancel") {
-				withAnimation {
-					active = false
-					isSearchFieldFocused = false
-				}
-			}
 			.opacity(active ? 1 : 0)
 			.frame(width: active ? nil : 0)
 			Spacer()
-			NoteFilterButton()
+			if active {
+				Button("Cancel") {
+					withAnimation {
+						active = false
+						isSearchFieldFocused = false
+					}
+				}
+			}
+			else {
+				NoteFilterButton()
+			}
 		}.padding()
 	}
 }

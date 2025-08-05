@@ -290,3 +290,10 @@ class NotesController {
 	}
 
 }
+
+class NotesControllerPreview: NotesController {
+	init(model: NotesModel) {
+		super.init()
+		self.model = model
+	}
+}
