@@ -7,6 +7,7 @@ import SwiftUI
 @Observable
 class RootController {
 	var audio = AudioController()
+	var camera = CameraController()
 	var error = ErrorController()
 	var network = NetworkController()
 	var notes = NotesController()

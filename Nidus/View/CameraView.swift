@@ -1,10 +1,18 @@
+import MijickCamera
 import SwiftUI
 
 struct CameraView: View {
+	@State var controller: CameraController
+	// The controller that we'll trigger when the user does stuff
+
 	let forPreview: Bool
-	init(forPreview: Bool = false) {
+	// Whether or not we're showing this control as part of a preview. Helps to avoid crashing Previews.
+
+	init(controller: CameraController, forPreview: Bool = false) {
+		self.controller = controller
 		self.forPreview = forPreview
 	}
+
 	var body: some View {
 		VStack {
 			if forPreview {
@@ -13,6 +21,17 @@ struct CameraView: View {
 					.aspectRatio(contentMode: .fit).background(
 						Color.cyan.opacity(0.4)
 					)
+			}
+			else {
+				MCamera()
+					.onImageCaptured { image, camera in
+						controller.saveImage(image)
+						camera.reopenCameraScreen()
+					}
+					.onVideoCaptured { url, camera in
+						controller.saveVideo(url)
+						camera.reopenCameraScreen()
+					}.startSession()
 			}
 			Spacer()
 			CameraControls()
@@ -37,7 +56,8 @@ struct CameraControls: View {
 }
 
 struct CameraView_Previews: PreviewProvider {
+	@State static var controller: CameraController = CameraControllerPreview()
 	static var previews: some View {
-		CameraView(forPreview: true)
+		CameraView(controller: controller, forPreview: true)
 	}
 }

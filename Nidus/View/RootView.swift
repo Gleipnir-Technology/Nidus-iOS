@@ -103,7 +103,7 @@ struct RootView: View {
 				}.navigationDestination(for: String.self) { p in
 					switch p {
 					case "camera":
-						CameraView()
+						CameraView(controller: controller.camera)
 					case "map-settings":
 						SettingView(controller: controller)
 					default:
