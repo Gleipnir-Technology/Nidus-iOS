@@ -120,7 +120,7 @@ struct NoteListRowIconCluster: View {
 						let i = index
 						let offset_y: CGFloat = 0  //(row == 0 ? -10 : 10)
 						let offset_x: CGFloat = 0  //CGFloat(-10 * i)
-						Image(systemName: icons[index])
+						Image(systemName: icons[i])
 							.offset(x: offset_x, y: offset_y)
 					}
 					else {

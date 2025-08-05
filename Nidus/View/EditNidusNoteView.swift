@@ -167,9 +167,7 @@ struct EditNidusNoteView: View {
 			}
 		}
 		.sheet(isPresented: $showingCamera) {
-			CameraView { image in
-				noteBuffer.capturedImages.append(image)
-			}
+			CameraView()
 		}
 		.sheet(isPresented: $showingImagePicker) {
 			PhotoPicker { images in

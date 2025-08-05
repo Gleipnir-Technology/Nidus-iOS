@@ -34,7 +34,7 @@ struct RootView: View {
 		print("camera long")
 	}
 	func onCameraButtonShort() {
-		print("camera short")
+		path.append("camera")
 	}
 
 	func onMapButtonLong() {
@@ -102,6 +102,8 @@ struct RootView: View {
 					}
 				}.navigationDestination(for: String.self) { p in
 					switch p {
+					case "camera":
+						CameraView()
 					case "map-settings":
 						SettingView(controller: controller)
 					default:
