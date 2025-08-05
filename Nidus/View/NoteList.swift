@@ -75,17 +75,26 @@ struct NoteList: View {
 }
 
 struct NoteListRow: View {
-	var overview: any NoteOverview
+	let overview: any NoteOverview
 	var body: some View {
 		HStack {
 			Image(systemName: overview.icon).font(.system(size: 42.0))
 			NoteListRowIconCluster(icons: overview.icons)
-			Text("1 min ago")
-			Text("nearby")
+			Spacer()
+			NoteListRowTextCluster(overview: overview)
 		}
 	}
 }
 
+struct NoteListRowTextCluster: View {
+	let overview: any NoteOverview
+	var body: some View {
+		VStack {
+			Text("1 min ago")
+			Text("20m away")
+		}
+	}
+}
 struct NoteListRowIconCluster: View {
 	let icons: [String]
 
