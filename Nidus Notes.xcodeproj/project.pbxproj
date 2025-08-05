@@ -13,7 +13,7 @@
 		532F3AF52DECAE26006E0E40 /* ClusterMap in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AF42DECAE26006E0E40 /* ClusterMap */; };
 		532F3AF72DECAE26006E0E40 /* ClusterMapSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */; };
 		538BFA8D2E3A3C0A0064A6A5 /* H3 in Frameworks */ = {isa = PBXBuildFile; productRef = 538BFA8C2E3A3C0A0064A6A5 /* H3 */; };
-		538BFD102E4282E10064A6A5 /* MijickCamera in Frameworks */ = {isa = PBXBuildFile; productRef = 538BFD0F2E4282E10064A6A5 /* MijickCamera */; };
+		538BFD182E42BD0C0064A6A5 /* MijickCamera in Frameworks */ = {isa = PBXBuildFile; productRef = 538BFD172E42BD0C0064A6A5 /* MijickCamera */; };
 		53E1F2FF2E05E3FA00A6D888 /* SQLiteMigrationManager in Frameworks */ = {isa = PBXBuildFile; productRef = 53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */; };
 /* End PBXBuildFile section */
 
@@ -58,7 +58,7 @@
 				532F3AF72DECAE26006E0E40 /* ClusterMapSwiftUI in Frameworks */,
 				538BFA8D2E3A3C0A0064A6A5 /* H3 in Frameworks */,
 				532F3AE82DEB6765006E0E40 /* AutomergeRepo in Frameworks */,
-				538BFD102E4282E10064A6A5 /* MijickCamera in Frameworks */,
+				538BFD182E42BD0C0064A6A5 /* MijickCamera in Frameworks */,
 				53E1F2FF2E05E3FA00A6D888 /* SQLiteMigrationManager in Frameworks */,
 				532F3AF52DECAE26006E0E40 /* ClusterMap in Frameworks */,
 				532F3AE52DEB66C5006E0E40 /* Automerge in Frameworks */,
@@ -128,7 +128,7 @@
 				532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */,
 				53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */,
 				538BFA8C2E3A3C0A0064A6A5 /* H3 */,
-				538BFD0F2E4282E10064A6A5 /* MijickCamera */,
+				538BFD172E42BD0C0064A6A5 /* MijickCamera */,
 			);
 			productName = Nidus;
 			productReference = 53D57B4A2D79E2A20094740D /* Nidus Notes.app */;
@@ -213,7 +213,7 @@
 				532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */,
 				53E1F2FD2E05E3FA00A6D888 /* XCRemoteSwiftPackageReference "SQLiteMigrationManager.swift" */,
 				538BFA8B2E3A3C0A0064A6A5 /* XCLocalSwiftPackageReference "../swift-h3" */,
-				538BFD0E2E4282E10064A6A5 /* XCRemoteSwiftPackageReference "Camera" */,
+				538BFD142E4295AA0064A6A5 /* XCLocalSwiftPackageReference "../MijickCamera" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 53D57B4B2D79E2A20094740D /* Products */;
@@ -635,6 +635,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../swift-h3";
 		};
+		538BFD142E4295AA0064A6A5 /* XCLocalSwiftPackageReference "../MijickCamera" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../MijickCamera;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -668,14 +672,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.1.1;
-			};
-		};
-		538BFD0E2E4282E10064A6A5 /* XCRemoteSwiftPackageReference "Camera" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Mijick/Camera.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.2;
 			};
 		};
 		53E1F2FD2E05E3FA00A6D888 /* XCRemoteSwiftPackageReference "SQLiteMigrationManager.swift" */ = {
@@ -718,9 +714,8 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = H3;
 		};
-		538BFD0F2E4282E10064A6A5 /* MijickCamera */ = {
+		538BFD172E42BD0C0064A6A5 /* MijickCamera */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 538BFD0E2E4282E10064A6A5 /* XCRemoteSwiftPackageReference "Camera" */;
 			productName = MijickCamera;
 		};
 		53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */ = {

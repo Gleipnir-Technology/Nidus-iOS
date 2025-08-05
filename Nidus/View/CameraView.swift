@@ -1,6 +1,9 @@
 import MijickCamera
 import SwiftUI
 
+/*
+ Our own custom camera view with controls.
+ */
 struct CameraView: View {
 	@State var controller: CameraController
 	// The controller that we'll trigger when the user does stuff
@@ -24,6 +27,12 @@ struct CameraView: View {
 			}
 			else {
 				MCamera()
+					.setCameraScreen(
+						DefaultCameraScreenBuilder(
+							hasFlashButton: false,
+							hasLightButton: false
+						)
+					)
 					.onImageCaptured { image, camera in
 						controller.saveImage(image)
 						camera.reopenCameraScreen()
