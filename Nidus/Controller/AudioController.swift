@@ -3,12 +3,10 @@ import SwiftUI
 
 @Observable
 class AudioController {
-	var isRecording: Bool = false
+	var model: AudioModel = AudioModel()
 	var errorMessage: String = ""
 	var hasPermissionMicrophone: Bool? = nil
 	var hasPermissionTranscription: Bool? = nil
-	var recordingDuration: TimeInterval = 0
-	var transcription: String? = nil
 
 	private var timer: Timer?
 	private var wrapper: WrapperAudio = WrapperAudio()
@@ -18,9 +16,9 @@ class AudioController {
 	}
 
 	func toggleRecording() {
-		if isRecording {
+		if model.isRecording {
 			wrapper.stopRecording()
-			isRecording = false
+			model.isRecording = false
 			timer?.invalidate()
 			timer = nil
 			/*
@@ -37,12 +35,12 @@ class AudioController {
 			do {
 				wrapper.onTranscriptionUpdate(onTranscriptionUpdate)
 				try wrapper.startRecording()
-				recordingDuration = 0
-				isRecording = true
+				model.recordingDuration = 0
+				model.isRecording = true
 				// Start timer for recording duration
 				timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) {
 					_ in
-					self.recordingDuration += 1
+					self.model.recordingDuration += 1
 				}
 
 			}
@@ -74,7 +72,7 @@ class AudioController {
 	}
 
 	private func onTranscriptionUpdate(_ transcription: String) {
-		self.transcription = transcription
+		self.model.transcription = transcription
 	}
 }
 
@@ -87,12 +85,12 @@ class AudioControllerPreview: AudioController {
 	) {
 		super.init()
 		self.hasPermissionTranscription = hasPermissionTranscription
-		self.isRecording = isRecording
-		self.recordingDuration = recordingDuration
-		self.transcription = transcription
+		self.model.isRecording = isRecording
+		self.model.recordingDuration = recordingDuration
+		self.model.transcription = transcription
 	}
 	override func toggleRecording() {
-		isRecording.toggle()
+		model.isRecording.toggle()
 	}
 	override func withPermission(ok: @escaping () -> Void, cancel: @escaping () -> Void) {
 		ok()

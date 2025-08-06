@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AudioDetailPane: View {
-	let audio: AudioController
+	let controller: AudioController
 	@Binding var isShowing: Bool
 
 	private func timeString(_ timeInterval: TimeInterval) -> String {
@@ -21,13 +21,13 @@ struct AudioDetailPane: View {
 			Text("Recording Details")
 				.font(.headline)
 
-			if audio.isRecording {
+			if controller.model.isRecording {
 				// Add your process details here
 				VStack(alignment: .leading, spacing: 10) {
 					Text(
-						"Recording duration: \(timeString(audio.recordingDuration))"
+						"Recording duration: \(timeString(controller.model.recordingDuration))"
 					)
-					if audio.hasPermissionTranscription == nil {
+					if controller.hasPermissionTranscription == nil {
 						Text("Not sure if we'll get permission or not")
 						HStack {
 							Spacer()
@@ -36,14 +36,18 @@ struct AudioDetailPane: View {
 						}
 					}
 					else {
-						if audio.hasPermissionTranscription! {
-							if audio.transcription == nil {
+						if controller.hasPermissionTranscription! {
+							if controller.model.transcription == nil {
 								Text("Waiting to transcribe...")
 							}
 							else {
 								TranscriptionDisplay(
-									transcription: audio
+									transcription: controller
+										.model
 										.transcription!
+								)
+								AudioTagDisplay(
+									tags: controller.model.tags
 								)
 							}
 						}
@@ -67,10 +71,10 @@ struct AudioDetailPane: View {
 struct AudioDetailPane_Previews: PreviewProvider {
 	@State static var isShowing: Bool = true
 	static var previews: some View {
-		AudioDetailPane(audio: AudioControllerPreview(), isShowing: $isShowing)
+		AudioDetailPane(controller: AudioControllerPreview(), isShowing: $isShowing)
 			.previewDisplayName("Not recording")
 		AudioDetailPane(
-			audio: AudioControllerPreview(
+			controller: AudioControllerPreview(
 				isRecording: true,
 				recordingDuration: 60 * 2 + 15
 			),
@@ -78,10 +82,11 @@ struct AudioDetailPane_Previews: PreviewProvider {
 		).previewDisplayName(
 			"recording"
 		)
+
 		VStack {
 			Spacer().background(.blue)
 			AudioDetailPane(
-				audio: AudioControllerPreview(
+				controller: AudioControllerPreview(
 					hasPermissionTranscription: true,
 					isRecording: true,
 					recordingDuration: 60 * 2 + 15,
@@ -91,6 +96,21 @@ struct AudioDetailPane_Previews: PreviewProvider {
 			).background(.green)
 		}.previewDisplayName(
 			"with transcription"
+		)
+
+		VStack {
+			Spacer().background(.blue)
+			AudioDetailPane(
+				controller: AudioControllerPreview(
+					hasPermissionTranscription: true,
+					isRecording: true,
+					recordingDuration: 60 * 2 + 15,
+					transcription: "This is a test transcription"
+				),
+				isShowing: $isShowing
+			).background(.green)
+		}.previewDisplayName(
+			"with transcription with tags"
 		)
 	}
 }

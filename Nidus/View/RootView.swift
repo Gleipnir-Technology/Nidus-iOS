@@ -117,7 +117,7 @@ struct RootView: View {
 				}
 				if isShowingAudioDetail {
 					AudioDetailPane(
-						audio: controller.audio,
+						controller: controller.audio,
 						isShowing: $isShowingAudioDetail
 					).frame(maxWidth: .infinity)
 						.background(Color.white)
