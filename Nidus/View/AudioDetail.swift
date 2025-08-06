@@ -3,11 +3,11 @@ import SwiftUI
 struct AudioDetail: View {
 	var audio: AudioController
 	var body: some View {
-		if audio.isRecording {
+		if audio.model.isRecording {
 			AudioStatusRecordingView(
 				hasPermissions: audio.hasPermissionMicrophone!,
-				recordingTime: audio.recordingDuration,
-				transcription: audio.transcription
+				recordingTime: audio.model.recordingDuration,
+				transcription: audio.model.transcription
 			)
 		}
 		else {

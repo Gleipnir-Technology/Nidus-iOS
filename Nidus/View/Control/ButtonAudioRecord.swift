@@ -18,14 +18,14 @@ struct ButtonAudioRecord: View {
 		ButtonWithLongPress(
 			actionLong: actionLong,
 			actionShort: onMicButtonShort,
-			isAnimated: audio.isRecording,
+			isAnimated: audio.model.isRecording,
 			label: {
 				Image(
-					systemName: audio.isRecording
+					systemName: audio.model.isRecording
 						? "stop.circle.fill" : "mic"
 				).font(
 					.system(size: 64, weight: .regular)
-				).foregroundColor(audio.isRecording ? .red : .gray).padding(
+				).foregroundColor(audio.model.isRecording ? .red : .gray).padding(
 					20
 				)
 			}

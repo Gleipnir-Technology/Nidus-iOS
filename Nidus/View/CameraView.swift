@@ -33,11 +33,6 @@ struct CameraView: View {
 		}
 		else {
 			MCamera()
-				.setCameraScreen(
-					DefaultCameraScreenBuilder(
-						hasCameraOutputSwitch: false
-					)
-				)
 				.onImageCaptured { image, camera in
 					controller.saveImage(image)
 					camera.reopenCameraScreen()
