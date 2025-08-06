@@ -5,6 +5,7 @@ import SwiftUI
  Our own custom camera view with controls.
  */
 struct CameraView: View {
+	//@Environment(\.dismiss) private var dismiss
 	@State var controller: CameraController
 	// The controller that we'll trigger when the user does stuff
 
@@ -17,33 +18,33 @@ struct CameraView: View {
 	}
 
 	var body: some View {
-		VStack {
-			if forPreview {
-				Spacer()
-				Image(uiImage: UIImage(named: "camera-placeholder")!).resizable()
-					.aspectRatio(contentMode: .fit).background(
-						Color.cyan.opacity(0.4)
-					)
-			}
-			else {
-				MCamera()
-					.setCameraScreen(
-						DefaultCameraScreenBuilder(
-							hasFlashButton: false,
-							hasLightButton: false
-						)
-					)
-					.onImageCaptured { image, camera in
-						controller.saveImage(image)
-						camera.reopenCameraScreen()
-					}
-					.onVideoCaptured { url, camera in
-						controller.saveVideo(url)
-						camera.reopenCameraScreen()
-					}.startSession()
-			}
+		if forPreview {
 			Spacer()
-			CameraControls()
+			Image(uiImage: UIImage(named: "camera-placeholder")!).resizable()
+				.aspectRatio(contentMode: .fit).background(
+					Color.cyan.opacity(0.4)
+				)
+		}
+		else {
+			MCamera()
+				.setCameraScreen(
+					DefaultCameraScreenBuilder(
+						hasFlashButton: false,
+						hasLightButton: false
+					)
+				)
+				.onImageCaptured { image, camera in
+					controller.saveImage(image)
+					camera.reopenCameraScreen()
+				}
+				//.setCloseMCameraAction {
+				//dismiss()
+				//}
+				.onVideoCaptured { url, camera in
+					controller.saveVideo(url)
+					camera.reopenCameraScreen()
+				}.startSession()
+				.navigationBarBackButtonHidden(true)
 		}
 	}
 }
