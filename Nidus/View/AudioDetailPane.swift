@@ -42,9 +42,7 @@ struct AudioDetailPane: View {
 							}
 							else {
 								TranscriptionDisplay(
-									transcription: controller
-										.model
-										.transcription!
+									model: controller.model
 								)
 								AudioTagDisplay(
 									tags: controller.model.tags
@@ -75,8 +73,10 @@ struct AudioDetailPane_Previews: PreviewProvider {
 			.previewDisplayName("Not recording")
 		AudioDetailPane(
 			controller: AudioControllerPreview(
-				isRecording: true,
-				recordingDuration: 60 * 2 + 15
+				model: AudioModel(
+					isRecording: true,
+					recordingDuration: 60 * 2 + 15
+				)
 			),
 			isShowing: $isShowing
 		).previewDisplayName(
@@ -88,9 +88,11 @@ struct AudioDetailPane_Previews: PreviewProvider {
 			AudioDetailPane(
 				controller: AudioControllerPreview(
 					hasPermissionTranscription: true,
-					isRecording: true,
-					recordingDuration: 60 * 2 + 15,
-					transcription: "This is a test transcription"
+					model: AudioModel(
+						isRecording: true,
+						recordingDuration: 60 * 2 + 15,
+						transcription: "This is a test transcription"
+					)
 				),
 				isShowing: $isShowing
 			).background(.green)
@@ -103,12 +105,12 @@ struct AudioDetailPane_Previews: PreviewProvider {
 			AudioDetailPane(
 				controller: AudioControllerPreview(
 					hasPermissionTranscription: true,
-					isRecording: true,
-					recordingDuration: 60 * 2 + 15,
-					transcription: "This is a test transcription"
+					model: AudioModel.fromTranscript(
+						"Checking orchards at Avenue 300 and Road 140. 92 degrees, full sun. Rows five through nine have deep ruts still wet from last week’s flood irrigation. Soil is clay-heavy, tractor ruts holding water. Orchard is mature citrus. Took five dips, each with between twenty and a hundred larvae, mostly third and fourth instar Culex. Treated rut areas with one pound of VectoMax FG. Spoke with Jim, the foreman who manages the site. Told him the ruts are producing mosquitoes — he said he’ll have someone grade them before the next irrigation in two weeks. Gave me his number 559-555-5555 and said to call if anything comes up. Need to check back in two weeks to confirm the issue’s resolved."
+					)
 				),
 				isShowing: $isShowing
-			).background(.green)
+			)
 		}.previewDisplayName(
 			"with transcription with tags"
 		)

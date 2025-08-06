@@ -139,9 +139,12 @@ struct RootView_Previews: PreviewProvider {
 			controller: RootControllerPreview(
 				audio: AudioControllerPreview(
 					hasPermissionTranscription: true,
-					isRecording: true,
-					recordingDuration: 63,
-					transcription: "This is some words I pretended to say"
+					model: AudioModel(
+						isRecording: true,
+						recordingDuration: 63,
+						transcription:
+							"This is some words I pretended to say"
+					)
 				)
 			),
 			isShowingAudioDetail: true

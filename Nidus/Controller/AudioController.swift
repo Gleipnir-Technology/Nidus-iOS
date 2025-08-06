@@ -73,21 +73,19 @@ class AudioController {
 
 	private func onTranscriptionUpdate(_ transcription: String) {
 		self.model.transcription = transcription
+		self.model.tags = AudioTagIdentifier.parseTags(transcription)
 	}
+
 }
 
 class AudioControllerPreview: AudioController {
 	init(
 		hasPermissionTranscription: Bool? = nil,
-		isRecording: Bool = false,
-		recordingDuration: TimeInterval = 0,
-		transcription: String? = nil
+		model: AudioModel = AudioModel()
 	) {
 		super.init()
 		self.hasPermissionTranscription = hasPermissionTranscription
-		self.model.isRecording = isRecording
-		self.model.recordingDuration = recordingDuration
-		self.model.transcription = transcription
+		self.model = model
 	}
 	override func toggleRecording() {
 		model.isRecording.toggle()

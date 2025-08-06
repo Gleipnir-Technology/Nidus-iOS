@@ -6,16 +6,10 @@ struct TagLabel {
 }
 
 struct TranscriptionDisplay: View {
-	let transcription: String
+	let model: AudioModel
 
-	let TAGS: [TagLabel] = [
-		TagLabel(color: .green, keyword: "green water"),
-		TagLabel(color: .red, keyword: "mosquito source"),
-		TagLabel(color: .blue, keyword: "check back"),
-		TagLabel(color: .yellow, keyword: "next week"),
-	]
-
-	func attributedString(for text: String) -> AttributedString {
+	func attributedString(for text: String, tags: [AudioTagMatch]) -> AttributedString {
+		/*
 		var attributedString = AttributedString(text)
 		for tag in TAGS {
 			let ranges = text.ranges(of: tag.keyword)
@@ -30,13 +24,23 @@ struct TranscriptionDisplay: View {
 			}
 		}
 
+		return attributedString*/
+		var attributedString = AttributedString(text)
+		for tag in tags {
+			if let attributedRange = Range(
+				NSRange(tag.range, in: text),
+				in: attributedString
+			) {
+				attributedString[attributedRange].foregroundColor = tag.color()
+			}
+		}
 		return attributedString
 	}
 
 	var body: some View {
 		ScrollViewReader { proxy in
 			ScrollView {
-				Text(attributedString(for: transcription))
+				Text(attributedString(for: model.transcription!, tags: model.tags))
 					.frame(
 						maxWidth: .infinity,
 						maxHeight: 200,
@@ -44,7 +48,7 @@ struct TranscriptionDisplay: View {
 					)
 					.font(.caption)
 					.id("transcription")
-			}.onChange(of: transcription) {
+			}.onChange(of: model.transcription) {
 				withAnimation(
 					.easeInOut(duration: 0.3)
 				) {
@@ -61,7 +65,8 @@ struct TranscriptionDisplay: View {
 
 #Preview {
 	TranscriptionDisplay(
-		transcription:
+		model: AudioModel.fromTranscript(
 			"This bucket of green water may be a mosquito source. We should check back next week."
+		)
 	)
 }
