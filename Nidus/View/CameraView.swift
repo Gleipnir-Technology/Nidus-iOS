@@ -35,8 +35,7 @@ struct CameraView: View {
 			MCamera()
 				.setCameraScreen(
 					DefaultCameraScreenBuilder(
-						hasFlashButton: true,
-						hasLightButton: true
+						hasCameraOutputSwitch: false
 					)
 				)
 				.onImageCaptured { image, camera in
