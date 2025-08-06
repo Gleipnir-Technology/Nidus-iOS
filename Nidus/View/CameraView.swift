@@ -5,16 +5,22 @@ import SwiftUI
  Our own custom camera view with controls.
  */
 struct CameraView: View {
-	//@Environment(\.dismiss) private var dismiss
 	@State var controller: CameraController
 	// The controller that we'll trigger when the user does stuff
+	let toDismiss: () -> Void
+	// Function to dismiss this control
 
 	let forPreview: Bool
 	// Whether or not we're showing this control as part of a preview. Helps to avoid crashing Previews.
 
-	init(controller: CameraController, forPreview: Bool = false) {
+	init(
+		controller: CameraController,
+		forPreview: Bool = false,
+		toDismiss: @escaping () -> Void
+	) {
 		self.controller = controller
 		self.forPreview = forPreview
+		self.toDismiss = toDismiss
 	}
 
 	var body: some View {
@@ -29,17 +35,17 @@ struct CameraView: View {
 			MCamera()
 				.setCameraScreen(
 					DefaultCameraScreenBuilder(
-						hasFlashButton: false,
-						hasLightButton: false
+						hasFlashButton: true,
+						hasLightButton: true
 					)
 				)
 				.onImageCaptured { image, camera in
 					controller.saveImage(image)
 					camera.reopenCameraScreen()
 				}
-				//.setCloseMCameraAction {
-				//dismiss()
-				//}
+				.setCloseMCameraAction {
+					toDismiss()
+				}
 				.onVideoCaptured { url, camera in
 					controller.saveVideo(url)
 					camera.reopenCameraScreen()
@@ -68,6 +74,6 @@ struct CameraControls: View {
 struct CameraView_Previews: PreviewProvider {
 	@State static var controller: CameraController = CameraControllerPreview()
 	static var previews: some View {
-		CameraView(controller: controller, forPreview: true)
+		CameraView(controller: controller, forPreview: true, toDismiss: {})
 	}
 }
