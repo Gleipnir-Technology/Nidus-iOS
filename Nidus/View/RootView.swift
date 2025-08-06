@@ -4,6 +4,11 @@ import OSLog
 import SwiftData
 import SwiftUI
 
+enum ActiveView {
+	case audio
+	case breadcrumb
+	case notes
+}
 /*
  The root view of the app
  */
@@ -13,8 +18,7 @@ struct RootView: View {
 
 	// Stuff I'm not sure about yet
 	@State var didSelect: Bool = false
-	@State var isShowingAudioDetail: Bool
-	@State var isShowingMap: Bool = true
+	@State var activeView: ActiveView = .breadcrumb
 	@FocusState var isTextFieldFocused: Bool
 	@State var location: CLLocation = Initial.location
 	@State var locationDataManager: LocationDataManager = LocationDataManager()
@@ -26,7 +30,6 @@ struct RootView: View {
 
 	init(controller: RootController, isShowingAudioDetail: Bool = false) {
 		self.controller = controller
-		self.isShowingAudioDetail = isShowingAudioDetail
 	}
 
 	func onCameraButtonLong() {
@@ -42,11 +45,16 @@ struct RootView: View {
 		path.append("map-settings")
 	}
 	func onMapButtonShort() {
-		isShowingMap.toggle()
+		if activeView == .breadcrumb {
+			activeView = .notes
+		}
+		else {
+			activeView = .breadcrumb
+		}
 	}
 	func onMicButtonLong() {
 		didSelect.toggle()
-		isShowingAudioDetail.toggle()
+		activeView = .audio
 	}
 	func onNoteSelected(_ note: any Note) {
 		path.append(note.id)
@@ -58,13 +66,15 @@ struct RootView: View {
 		NavigationStack(path: $path) {
 			ZStack {
 				VStack {
-					if isShowingMap {
+					switch activeView {
+					case .audio:
+						AudioDetailView(controller: controller.audio)
+					case .breadcrumb:
 						MapViewBreadcrumb(
 							controller: controller.region,
 							showsGrid: false
 						)
-					}
-					else {
+					case .notes:
 						NoteListView(controller: controller.notes)
 					}
 					Spacer()
@@ -81,7 +91,8 @@ struct RootView: View {
 								).padding(20)
 							}
 						).foregroundColor(
-							isShowingMap ? Color.blue : .secondary
+							activeView == .breadcrumb
+								? Color.blue : .secondary
 						)
 						ButtonAudioRecord(
 							audio: controller.audio,
@@ -114,16 +125,6 @@ struct RootView: View {
 					default:
 						Text("Unknown destination \(p)")
 					}
-				}
-				if isShowingAudioDetail {
-					AudioDetailPane(
-						controller: controller.audio,
-						isShowing: $isShowingAudioDetail
-					).frame(maxWidth: .infinity)
-						.background(Color.white)
-						.cornerRadius(20)
-						.shadow(radius: 10)
-						.animation(.spring(), value: isShowingAudioDetail)
 				}
 			}
 		}.onAppear {

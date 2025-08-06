@@ -1,8 +1,7 @@
 import SwiftUI
 
-struct AudioDetailPane: View {
+struct AudioDetailView: View {
 	let controller: AudioController
-	@Binding var isShowing: Bool
 
 	private func timeString(_ timeInterval: TimeInterval) -> String {
 		let minutes = Int(timeInterval) / 60
@@ -12,12 +11,6 @@ struct AudioDetailPane: View {
 
 	var body: some View {
 		VStack(spacing: 20) {
-			Rectangle()
-				.fill(Color.gray.opacity(0.3))
-				.frame(width: 40, height: 5)
-				.cornerRadius(3)
-				.padding(.top, 10)
-
 			Text("Recording Details")
 				.font(.headline)
 
@@ -66,26 +59,24 @@ struct AudioDetailPane: View {
 		}
 	}
 }
-struct AudioDetailPane_Previews: PreviewProvider {
-	@State static var isShowing: Bool = true
+struct AudioDetailView_Previews: PreviewProvider {
 	static var previews: some View {
-		AudioDetailPane(controller: AudioControllerPreview(), isShowing: $isShowing)
+		AudioDetailView(controller: AudioControllerPreview())
 			.previewDisplayName("Not recording")
-		AudioDetailPane(
+		AudioDetailView(
 			controller: AudioControllerPreview(
 				model: AudioModel(
 					isRecording: true,
 					recordingDuration: 60 * 2 + 15
 				)
-			),
-			isShowing: $isShowing
+			)
 		).previewDisplayName(
 			"recording"
 		)
 
 		VStack {
 			Spacer().background(.blue)
-			AudioDetailPane(
+			AudioDetailView(
 				controller: AudioControllerPreview(
 					hasPermissionTranscription: true,
 					model: AudioModel(
@@ -93,8 +84,7 @@ struct AudioDetailPane_Previews: PreviewProvider {
 						recordingDuration: 60 * 2 + 15,
 						transcription: "This is a test transcription"
 					)
-				),
-				isShowing: $isShowing
+				)
 			).background(.green)
 		}.previewDisplayName(
 			"with transcription"
@@ -102,14 +92,13 @@ struct AudioDetailPane_Previews: PreviewProvider {
 
 		VStack {
 			Spacer().background(.blue)
-			AudioDetailPane(
+			AudioDetailView(
 				controller: AudioControllerPreview(
 					hasPermissionTranscription: true,
 					model: AudioModel.fromTranscript(
 						"Checking orchards at Avenue 300 and Road 140. 92 degrees, full sun. Rows five through nine have deep ruts still wet from last week’s flood irrigation. Soil is clay-heavy, tractor ruts holding water. Orchard is mature citrus. Took five dips, each with between twenty and a hundred larvae, mostly third and fourth instar Culex. Treated rut areas with one pound of VectoMax FG. Spoke with Jim, the foreman who manages the site. Told him the ruts are producing mosquitoes — he said he’ll have someone grade them before the next irrigation in two weeks. Gave me his number 559-555-5555 and said to call if anything comes up. Need to check back in two weeks to confirm the issue’s resolved."
 					)
-				),
-				isShowing: $isShowing
+				)
 			)
 		}.previewDisplayName(
 			"with transcription with tags"

@@ -59,7 +59,7 @@ struct AudioTagDisplayCategory: View {
 						.matchedGeometryEffect(id: tag, in: namespace)
 						.animation(.default)
 				}
-			}
+			}.animation(.smooth(duration: 1.0), value: tags)
 		}
 	}
 }
