@@ -183,11 +183,9 @@ struct NoteList_Previews: PreviewProvider {
 	static var previews: some View {
 		NoteListView(
 			controller: NotesControllerPreview(
-				model: NotesModel(
-					noteOverview: NotesModel.Preview.someNoteOverview
-				)
+				model: NotesModel.Preview.someNotes
 			),
-			userLocation: 0
+			userLocation: RegionControllerPreview.userCell
 		).previewDisplayName("base")
 	}
 }
