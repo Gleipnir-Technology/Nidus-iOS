@@ -29,7 +29,7 @@ struct OverlayH3Canvas: View {
 				resolution: resolution
 			)
 			// Determine the number of neighbors we'll need to get outside the region in each direction
-			let extremes: [UInt64] = [
+			let extremes: [H3Cell] = [
 				try latLngToCell(
 					latitude: region.center.latitude - region.span.latitudeDelta
 						/ 2,

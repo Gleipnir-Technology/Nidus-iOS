@@ -9,9 +9,6 @@ struct LocationResponse: Codable {
 	let latitude: Double
 	let longitude: Double
 
-	func asNoteLocation() -> NoteLocation {
-		NoteLocation(latitude: latitude, longitude: longitude)
-	}
 }
 
 final class NotesResponse: Codable {

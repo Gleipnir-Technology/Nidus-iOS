@@ -6,11 +6,11 @@ import SwiftUI
  * Represents an H3 cell that has been selected
  */
 struct CellSelection: Equatable, Hashable, Identifiable {
-	let cellID: UInt64
+	let cellID: H3Cell
 	var color: Color
 	let id = UUID()
 
-	init(_ cell: UInt64, color: Color = randomColor().opacity(0.3)) {
+	init(_ cell: H3Cell, color: Color = randomColor().opacity(0.3)) {
 		self.cellID = cell
 		self.color = color
 	}

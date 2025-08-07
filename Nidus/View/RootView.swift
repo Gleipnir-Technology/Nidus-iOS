@@ -75,7 +75,11 @@ struct RootView: View {
 							showsGrid: false
 						)
 					case .notes:
-						NoteListView(controller: controller.notes)
+						NoteListView(
+							controller: controller.notes,
+							userLocation: controller.region.breadcrumb
+								.userCell
+						)
 					}
 					Spacer()
 					HStack {

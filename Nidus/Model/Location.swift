@@ -12,19 +12,19 @@ let HISTORY_ENTRY_MAX_AGE: TimeInterval = 60 * 5
  */
 class ModelLocation {
 	// The previous locations the user has been in
-	var previousLocationH3s: [UInt64] = []
+	var previousLocationH3s: [H3Cell] = []
 	// The current H3 resolution we're operating at
 	var resolution: Int = 8
 	// The location the user has currently selected
-	var selectedLocationH3: UInt64? = nil
+	var selectedLocationH3: H3Cell? = nil
 	// The user's current position as Lat/Lng
 	var userLocation: CLLocation? = nil
 	// The users current position as an H3 hex
-	var userLocationH3: UInt64? = nil
+	var userLocationH3: H3Cell? = nil
 	// The users previous locations mapping an H3 index to the time they first entered that location
-	var userPreviousLocations: [UInt64: Date] = [:]
+	var userPreviousLocations: [H3Cell: Date] = [:]
 
-	private func addUserLocation(_ h3Cell: UInt64) {
+	private func addUserLocation(_ h3Cell: H3Cell) {
 		if userPreviousLocations.keys.contains(h3Cell) {
 			return
 		}

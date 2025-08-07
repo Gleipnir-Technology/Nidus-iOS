@@ -3,7 +3,7 @@ import MapKit
 import OSLog
 
 // Given a cell and a screen to fit it into, translate the cell's boundaries into the screen space
-func cellToHexagon(cell: UInt64, region: MKCoordinateRegion, screenSize: CGSize) throws -> Shape {
+func cellToHexagon(cell: H3Cell, region: MKCoordinateRegion, screenSize: CGSize) throws -> Shape {
 	var points: [CGPoint] = []
 	let boundary = try cellToBoundary(cell: cell)
 	for b in boundary {
@@ -18,7 +18,7 @@ func cellToHexagon(cell: UInt64, region: MKCoordinateRegion, screenSize: CGSize)
 	return Shape(points: points)
 }
 
-func cellToNeighbors(cell: UInt64, region: MKCoordinateRegion, screenSize: CGSize) throws -> [Shape]
+func cellToNeighbors(cell: H3Cell, region: MKCoordinateRegion, screenSize: CGSize) throws -> [Shape]
 {
 	let ring = try gridRing(origin: cell, distance: 1)
 	var neighbors: [Shape] = []
@@ -30,7 +30,7 @@ func cellToNeighbors(cell: UInt64, region: MKCoordinateRegion, screenSize: CGSiz
 
 // Given an H3 cell and a region of a map, determine if all the points of the cell are entirely within the region
 func isCellInRegion(
-	_ cell: UInt64,
+	_ cell: H3Cell,
 	_ region: MKCoordinateRegion
 ) throws -> Bool {
 	let boundary = try cellToBoundary(cell: cell)
@@ -74,7 +74,7 @@ func gpsToPixels(
 }
 
 // Given a map region, find the largest cell centered on the region that fits within the region
-func maxCellThatFits(_ region: MKCoordinateRegion) throws -> UInt64 {
+func maxCellThatFits(_ region: MKCoordinateRegion) throws -> H3Cell {
 	var resolution = 0
 	var cell = try latLngToCell(
 		latitude: region.center.latitude,
@@ -142,7 +142,7 @@ func regionToCoordinates(_ region: MKCoordinateRegion) -> [CLLocationCoordinate2
 /*
  Given a cell at a smaller resolution remap it to the larger resolution
  */
-func scaleCell(_ cell: UInt64, to resolution: Int) throws -> UInt64 {
+func scaleCell(_ cell: H3Cell, to resolution: Int) throws -> H3Cell {
 	let currentResolution = getResolution(cell: cell)
 	if currentResolution == resolution {
 		return cell

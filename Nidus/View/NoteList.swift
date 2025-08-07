@@ -8,11 +8,9 @@ import SwiftUI
  */
 struct NoteListView: View {
 	var controller: NotesController
-	@State var searchText: String = ""
+	let userLocation: H3Cell?
 
-	init(controller: NotesController) {
-		self.controller = controller
-	}
+	@State var searchText: String = ""
 
 	var body: some View {
 		NavigationStack {
@@ -28,7 +26,8 @@ struct NoteListView: View {
 					}
 					else {
 						NoteList(
-							controller: controller
+							controller: controller,
+							userLocation: userLocation
 						)
 					}
 				}
@@ -40,6 +39,7 @@ struct NoteListView: View {
 
 struct NoteList: View {
 	var controller: NotesController
+	let userLocation: H3Cell?
 
 	func notesByDistance(_ notes: [AnyNote], currentLocation: CLLocation) -> [AnyNote] {
 		var byDistance: [AnyNote] = notes
@@ -66,8 +66,8 @@ struct NoteList: View {
 		}
 		else {
 			List {
-				ForEach(controller.model.noteOverview!) { overview in
-					NoteListRow(overview: overview)
+				ForEach(controller.model.noteOverview!, id: \.self) { overview in
+					NoteListRow(overview: overview, userLocation: userLocation)
 				}
 			}
 		}
@@ -76,7 +76,8 @@ struct NoteList: View {
 
 struct NoteListRow: View {
 	let ROW_HEIGHT: CGFloat = 40.0
-	let overview: any NoteOverview
+	let overview: NoteOverview
+	let userLocation: H3Cell?
 	var body: some View {
 		HStack {
 			Image(systemName: overview.icon).font(.system(size: 42.0)).background(
@@ -86,9 +87,10 @@ struct NoteListRow: View {
 				Color.red.opacity(0.3)
 			).frame(width: 150, height: ROW_HEIGHT)
 			Spacer()
-			NoteListRowTextCluster(overview: overview).background(
-				Color.cyan.opacity(0.3)
-			)
+			NoteListRowTextCluster(overview: overview, userLocation: userLocation)
+				.background(
+					Color.cyan.opacity(0.3)
+				)
 			Rectangle().foregroundStyle(overview.color).cornerRadius(10).frame(
 				width: 10,
 				height: .infinity
@@ -148,11 +150,31 @@ struct NoteListRowIconCluster: View {
 }
 
 struct NoteListRowTextCluster: View {
-	let overview: any NoteOverview
+	@Environment(\.locale) var locale
+	let overview: NoteOverview
+	let userLocation: H3Cell?
+
+	var distanceDisplay: some View {
+		/*let distance = Measurement(
+            value: overview.location.distance(from: userLocation),
+            unit: UnitLength.meters
+        )
+
+         return Text("\(distance, formatter: LengthFormatter())")*/
+		if userLocation == nil {
+			return Text("")
+		}
+		else {
+			return Text("bar")
+		}
+	}
+	var timeDisplay: some View {
+		return Text("foo")
+	}
 	var body: some View {
 		VStack {
-			Text("1 min ago")
-			Text("20m away")
+			timeDisplay
+			distanceDisplay
 		}.backgroundStyle(.red.opacity(0.3))
 	}
 }
@@ -164,7 +186,8 @@ struct NoteList_Previews: PreviewProvider {
 				model: NotesModel(
 					noteOverview: NotesModel.Preview.someNoteOverview
 				)
-			)
+			),
+			userLocation: 0
 		).previewDisplayName("base")
 	}
 }

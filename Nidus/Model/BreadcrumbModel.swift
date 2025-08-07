@@ -2,9 +2,9 @@ import MapKit
 
 struct BreadcrumbModel {
 	var overlayResolution: Int = 8
-	var selectedCell: UInt64? = nil
-	var userCell: UInt64? = nil
-	var userPreviousCells: [UInt64] = []
+	var selectedCell: H3Cell? = nil
+	var userCell: H3Cell? = nil
+	var userPreviousCells: [H3Cell] = []
 
 	struct Preview {
 	}
