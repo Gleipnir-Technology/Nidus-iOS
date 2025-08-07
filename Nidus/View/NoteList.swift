@@ -9,6 +9,7 @@ import SwiftUI
  */
 struct NoteListView: View {
 	var controller: NotesController
+	var onNoteSelected: ((UUID) -> Void)
 	let userLocation: H3Cell?
 
 	@State var searchText: String = ""
@@ -28,6 +29,7 @@ struct NoteListView: View {
 					else {
 						NoteList(
 							controller: controller,
+							onNoteSelected: onNoteSelected,
 							userLocation: userLocation
 						)
 					}
@@ -40,6 +42,7 @@ struct NoteListView: View {
 
 struct NoteList: View {
 	var controller: NotesController
+	var onNoteSelected: ((UUID) -> Void)
 	let userLocation: H3Cell?
 
 	func notesByDistance(_ notes: [AnyNote], currentLocation: CLLocation) -> [AnyNote] {
@@ -69,6 +72,9 @@ struct NoteList: View {
 			List {
 				ForEach(controller.model.noteOverview!, id: \.self) { overview in
 					NoteListRow(overview: overview, userLocation: userLocation)
+						.onTapGesture {
+							onNoteSelected(overview.id)
+						}
 				}
 			}
 		}
@@ -195,6 +201,7 @@ struct NoteList_Previews: PreviewProvider {
 			controller: NotesControllerPreview(
 				model: NotesModel.Preview.someNotes
 			),
+			onNoteSelected: { _ in },
 			userLocation: RegionControllerPreview.userCell
 		).previewDisplayName("base")
 	}

@@ -6,18 +6,98 @@ import OSLog
 struct MosquitoSourceNote: NoteProtocol {
 	static let ICON: String = "ant.fill"
 
+	var access: String
+	var active: Bool?
+	var comments: String
+	var created: Date
+	var description: String
+	var habitat: String
 	let id: UUID
 	var location: H3Cell
-	var timestamp: Date
+	var inspections: [Inspection]
+	var lastInspectionDate: Date
+	var name: String
+	var nextActionDateScheduled: Date
+	var treatments: [Treatment]
+	var useType: String
+	var waterOrigin: String
+	var zone: String
 
-	init(id: UUID = UUID(), location: H3Cell, timestamp: Date = Date()) {
+	init(
+		access: String,
+		active: Bool?,
+		comments: String,
+		created: Date,
+		description: String,
+		habitat: String,
+		id: UUID,
+		inspections: [Inspection],
+		lastInspectionDate: Date,
+		location: H3Cell,
+		name: String,
+		nextActionDateScheduled: Date,
+		treatments: [Treatment],
+		useType: String,
+		waterOrigin: String,
+		zone: String
+	) {
+		self.access = access
+		self.active = active
+		self.comments = comments
+		self.created = created
+		self.description = description
+		self.habitat = habitat
 		self.id = id
+		self.inspections = inspections
+		self.lastInspectionDate = lastInspectionDate
 		self.location = location
-		self.timestamp = timestamp
+		self.name = name
+		self.nextActionDateScheduled = nextActionDateScheduled
+		self.treatments = treatments
+		self.useType = useType
+		self.waterOrigin = waterOrigin
+		self.zone = zone
 	}
 
 	var category: NoteType {
 		return .mosquitoSource
+	}
+
+	var coordinate: CLLocationCoordinate2D {
+		do {
+			return try cellToLatLng(cell: location)
+		}
+		catch {
+			return CLLocationCoordinate2D(latitude: -180, longitude: 180)
+		}
+	}
+	var icons: [String] {
+		var results: [String] = []
+		if active != nil && (active!) {
+			results.append("plus.circle.fill")
+		}
+		if comments.count > 0 {
+			results.append("quote.bubble")
+		}
+		if habitat != "" {
+			results.append("tree.fill")
+		}
+		if inspections.count > 0 {
+			results.append("list.clipboard")
+		}
+		if nextActionDateScheduled > Date.now {
+			results.append("clock")
+		}
+		if treatments.count > 0 {
+			results.append("pill.circle.fill")
+		}
+		if waterOrigin != "" {
+			results.append("water.waves")
+		}
+		if useType != "" {
+			results.append("house.fill")
+		}
+		return results
 	}
 
 	var mapAnnotation: NoteMapAnnotation {
@@ -42,9 +122,13 @@ struct MosquitoSourceNote: NoteProtocol {
 		return NoteOverview(
 			color: .red,
 			icon: MosquitoSourceNote.ICON,
-			icons: [],
+			icons: icons,
+			id: id,
 			location: location,
-			time: timestamp
+			time: created
 		)
+	}
+	var timestamp: Date {
+		created
 	}
 }

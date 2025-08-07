@@ -12,7 +12,7 @@ import SwiftUI
 struct MosquitoSourceDetail: View {
 	let onFilterAdded: (FilterInstance) -> Void
 	@State private var showFilterToast = false
-	let source: MosquitoSource
+	let source: MosquitoSourceNote
 
 	private func addFilter(_ type: any Filter, _ value: String) {
 		showFilterToast = true
@@ -40,7 +40,7 @@ struct MosquitoSourceDetail: View {
 			) {
 				Marker(
 					"\(source.name)",
-					systemImage: source.category.icon,
+					systemImage: iconForNoteType(source.category),
 					coordinate: source.coordinate
 				)
 			}.frame(height: 300)
@@ -120,7 +120,7 @@ struct MosquitoSourceDetail_Previews: PreviewProvider {
 		NavigationStack {
 			MosquitoSourceDetail(
 				onFilterAdded: { _ in },
-				source: MosquitoSource(
+				source: MosquitoSourceNote(
 					access: "somewhere",
 					active: true,
 					comments: "over there",
@@ -149,7 +149,7 @@ struct MosquitoSourceDetail_Previews: PreviewProvider {
 						),
 					],
 					lastInspectionDate: Date.now.addingTimeInterval(-2000),
-					location: Location(latitude: 33.3, longitude: -111.1),
+					location: 0,
 					name: "drain pipe",
 					nextActionDateScheduled: Date.now.addingTimeInterval(4000),
 					treatments: [],

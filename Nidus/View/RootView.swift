@@ -56,8 +56,9 @@ struct RootView: View {
 		didSelect.toggle()
 		activeView = .audio
 	}
-	func onNoteSelected(_ note: any Note) {
-		path.append(note.id)
+	func onNoteSelected(_ id: UUID) {
+		path.removeLast(path.count - 1)
+		path.append("note/\(id)")
 	}
 	func setTabNotes() {
 		selection = 0
@@ -73,11 +74,12 @@ struct RootView: View {
 						MapViewBreadcrumb(
 							notes: controller.notes,
 							region: controller.region,
-							showsGrid: true
+							showsGrid: false
 						)
 					case .notes:
 						NoteListView(
 							controller: controller.notes,
+							onNoteSelected: onNoteSelected,
 							userLocation: controller.region.breadcrumb
 								.userCell
 						)
@@ -128,7 +130,28 @@ struct RootView: View {
 					case "map-settings":
 						SettingView(controller: controller)
 					default:
-						Text("Unknown destination \(p)")
+						if p.starts(with: "note/") {
+							let idString: String = String(
+								p.split(separator: "/").last!
+							)
+							let id: UUID = UUID(uuidString: idString)!
+							let note = controller.notes.model.notes![
+								id
+							]!
+							if let source = note as? MosquitoSourceNote
+							{
+								MosquitoSourceDetail(
+									onFilterAdded: { _ in },
+									source: source
+								)
+							}
+							else {
+								ProgressView()
+							}
+						}
+						else {
+							Text("Unknown destination \(p)")
+						}
 					}
 				}
 			}
