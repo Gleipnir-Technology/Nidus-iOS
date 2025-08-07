@@ -1,4 +1,5 @@
 import CoreLocation
+import H3
 import OSLog
 import SwiftData
 import SwiftUI
@@ -155,17 +156,24 @@ struct NoteListRowTextCluster: View {
 	let userLocation: H3Cell?
 
 	var distanceDisplay: some View {
-		/*let distance = Measurement(
-            value: overview.location.distance(from: userLocation),
-            unit: UnitLength.meters
-        )
-
-         return Text("\(distance, formatter: LengthFormatter())")*/
 		if userLocation == nil {
 			return Text("")
 		}
-		else {
-			return Text("bar")
+		do {
+			let userLatLng = try cellToLatLng(cell: userLocation!)
+			let noteLatLng = try cellToLatLng(cell: overview.location)
+			let distance = Measurement(
+				value: userLatLng.distance(from: noteLatLng),
+				unit: UnitLength.meters
+			)
+			let text = distance.formatted(
+				.measurement(width: .abbreviated, usage: .road).locale(locale)
+			)
+			return Text("\(text)")
+		}
+		catch {
+			Logger.foreground.warning("Failed to calculate distance: \(error)")
+			return Text("")
 		}
 	}
 	var timeDisplay: some View {
