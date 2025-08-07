@@ -95,7 +95,7 @@ struct NoteListRow: View {
 			NoteListRowTextCluster(overview: overview, userLocation: userLocation)
 			Rectangle().foregroundStyle(overview.color).cornerRadius(10).frame(
 				width: 10,
-				height: .infinity
+				height: 80
 			).padding(.zero).offset(x: 20)
 		}
 	}
