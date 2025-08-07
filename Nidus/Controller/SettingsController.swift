@@ -38,6 +38,7 @@ class SettingsController {
 			region.span.longitudeDelta
 		)
 		UserDefaults.standard.set(regionString, forKey: "currentRegion")
+		Logger.background.info("Saved current region: \(regionString)")
 	}
 
 	// MARK - private functions
@@ -65,6 +66,7 @@ class SettingsController {
 		guard let longitudeDelta = scanner.scanDouble() else {
 			return nil
 		}
+		Logger.foreground.info("Loaded current region: \(regionString)")
 		let region: MKCoordinateRegion = .init(
 			center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
 			span: MKCoordinateSpan(

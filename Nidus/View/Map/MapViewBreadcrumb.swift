@@ -31,7 +31,7 @@ struct MapViewBreadcrumb: View {
 
 	private func onMapCameraChange(_ geometry: GeometryProxy, _ context: MapCameraUpdateContext)
 	{
-		region.current = context.region
+		region.handleRegionChange(context.region)
 		screenSize = geometry.size
 		updateResolution(context.region)
 	}
@@ -62,9 +62,9 @@ struct MapViewBreadcrumb: View {
 
 	private func updateResolution(_ newRegion: MKCoordinateRegion) {
 		let hexCount = hexCount
-		Logger.background.info(
-			"New region: \(newRegion.span.latitudeDelta) \(newRegion.span.longitudeDelta)"
-		)
+		//Logger.background.info(
+		//"New region: \(newRegion.span.latitudeDelta) \(newRegion.span.longitudeDelta)"
+		//)
 		if newRegion.span.latitudeDelta < 0.0005 || newRegion.span.longitudeDelta < 0.0005 {
 			Logger.background.info("Forcing resolution 15")
 			region.breadcrumb.overlayResolution = 15

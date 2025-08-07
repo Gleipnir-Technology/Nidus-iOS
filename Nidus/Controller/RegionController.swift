@@ -11,6 +11,9 @@ class RegionController {
 	// Used for displaying the breadcrumb view
 	var breadcrumb = BreadcrumbModel()
 
+	// The callbacks to fire when the current region changes
+	var currentChangeCallbacks: [(MKCoordinateRegion) -> Void] = []
+
 	// The current region the user has selected in the map view
 	var current: MKCoordinateRegion = Initial.region
 
@@ -19,12 +22,19 @@ class RegionController {
 
 	var locationDataManager: LocationDataManager = LocationDataManager()
 
+	func handleRegionChange(_ region: MKCoordinateRegion) {
+		current = region
+		for c in currentChangeCallbacks {
+			c(region)
+		}
+	}
+
 	func onAppear() {
 		locationDataManager.onLocationUpdated(onLocationUpdated)
 	}
 
-	func onRegionChange(_ region: MKCoordinateRegion) {
-		current = region
+	func onRegionChange(_ callback: @escaping (MKCoordinateRegion) -> Void) {
+		currentChangeCallbacks.append(callback)
 	}
 
 	private func addUserLocation(_ h3Cell: H3Cell) {

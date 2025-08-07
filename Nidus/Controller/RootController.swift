@@ -28,6 +28,7 @@ class RootController {
 			}
 		}
 		region.onAppear()
+		region.onRegionChange(onRegionChange)
 	}
 
 	func onInit() {
@@ -36,7 +37,6 @@ class RootController {
 	}
 
 	func onRegionChange(r: MKCoordinateRegion) {
-		region.onRegionChange(r)
 		notes.calculateNotesToShow()
 		notes.startUpdateCluster()
 		settings.saveCurrentRegion(r)
