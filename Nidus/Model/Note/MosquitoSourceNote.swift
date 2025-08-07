@@ -17,7 +17,7 @@ struct MosquitoSourceNote: NoteProtocol {
 	}
 
 	var category: NoteType {
-		return .audio
+		return .mosquitoSource
 	}
 
 	var mapAnnotation: NoteMapAnnotation {

@@ -73,7 +73,7 @@ struct RootView: View {
 						MapViewBreadcrumb(
 							notes: controller.notes,
 							region: controller.region,
-							showsGrid: false
+							showsGrid: true
 						)
 					case .notes:
 						NoteListView(

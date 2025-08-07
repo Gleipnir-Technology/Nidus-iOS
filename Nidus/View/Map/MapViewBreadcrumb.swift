@@ -8,6 +8,15 @@ import MapKit
 import OSLog
 import SwiftUI
 
+struct AnnotationSummary: Identifiable {
+	var categories: Set<NoteType> = []
+	var cell: H3Cell
+	var coordinate: CLLocationCoordinate2D
+	var count: Int = 0
+	var id: H3Cell {
+		cell
+	}
+}
 /*
  A map which shows an overlay of selected cells.
  */
@@ -27,6 +36,40 @@ struct MapViewBreadcrumb: View {
 		self.notes = notes
 		self.region = region
 		self.showsGrid = showsGrid
+	}
+
+	private func annotationsByCell() -> [AnnotationSummary] {
+		var results: [H3Cell: AnnotationSummary] = [:]
+		guard let notes = notes.model.notes else {
+			return []
+		}
+		for note in notes.values {
+			do {
+				let cell = try scaleCell(
+					note.location,
+					to: region.breadcrumb.overlayResolution
+				)
+				guard var summary: AnnotationSummary = results[cell] else {
+					let summary = AnnotationSummary(
+						categories: [note.category],
+						cell: cell,
+						coordinate: try cellToLatLng(cell: cell),
+						count: 1
+					)
+					results[cell] = summary
+					continue
+				}
+				summary.count += 1
+				summary.categories.insert(note.category)
+				results[cell] = summary
+			}
+			catch {
+				Logger.foreground.error(
+					"Failed to convert note location to H3 cell: \(error)"
+				)
+			}
+		}
+		return results.map { $0.value }
 	}
 
 	private func onMapCameraChange(_ geometry: GeometryProxy, _ context: MapCameraUpdateContext)
@@ -115,20 +158,31 @@ struct MapViewBreadcrumb: View {
 					),
 					interactionModes: .all
 				) {
-					ForEach(notes.model.mapAnnotations) { annotation in
+					ForEach(annotationsByCell()) { summary in
 						Annotation(
-							annotation.text,
-							coordinate: annotation.coordinate
+							"\(summary.count)",
+							coordinate: summary.coordinate
 						) {
 							ZStack {
 								RoundedRectangle(cornerRadius: 5)
-									.fill(.background)
-								RoundedRectangle(cornerRadius: 5)
-									.stroke(
-										.secondary,
-										lineWidth: 5
+									.fill(.yellow.opacity(0.3))
+								if summary.categories.count > 1 {
+									Image(
+										systemName:
+											"rectangle.stack.fill"
+									).foregroundStyle(.blue)
+								}
+								else {
+									Image(
+										systemName:
+											iconForNoteType(
+												summary
+													.categories
+													.first!
+											)
 									)
-								Image(systemName: annotation.icon)
+									.foregroundStyle(.yellow)
+								}
 							}
 						}
 					}
