@@ -29,6 +29,7 @@ struct RootView: View {
 
 	init(controller: RootController, isShowingAudioDetail: Bool = false) {
 		self.controller = controller
+		controller.onInit()
 	}
 
 	func onCameraButtonLong() {

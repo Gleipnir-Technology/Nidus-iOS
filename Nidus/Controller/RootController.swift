@@ -17,7 +17,6 @@ class RootController {
 
 	// MARK - public interface
 	func onAppear() {
-		settings.load()
 		settings.onChanged { update in
 			Task {
 				do {
@@ -29,6 +28,11 @@ class RootController {
 			}
 		}
 		region.onAppear()
+	}
+
+	func onInit() {
+		settings.load()
+		region.current = settings.model.region
 	}
 
 	func onRegionChange(r: MKCoordinateRegion) {
