@@ -156,7 +156,7 @@ struct MapViewBreadcrumb: View {
 					MapScaleView()
 					MapUserLocationButton()
 				}.mapStyle(
-					MapStyle.standard(
+					MapStyle.hybrid(
 						pointsOfInterest: PointOfInterestCategories
 							.excludingAll
 					)
