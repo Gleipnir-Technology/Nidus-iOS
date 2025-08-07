@@ -120,7 +120,16 @@ struct MapViewBreadcrumb: View {
 							annotation.text,
 							coordinate: annotation.coordinate
 						) {
-							Image(systemName: annotation.icon)
+							ZStack {
+								RoundedRectangle(cornerRadius: 5)
+									.fill(.background)
+								RoundedRectangle(cornerRadius: 5)
+									.stroke(
+										.secondary,
+										lineWidth: 5
+									)
+								Image(systemName: annotation.icon)
+							}
 						}
 					}
 					ForEach(userPreviousCellsPolygons()) { cell in
