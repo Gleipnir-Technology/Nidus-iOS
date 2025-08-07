@@ -173,7 +173,14 @@ class DatabaseService: CustomStringConvertible {
 		}
 		return results
 	}
-
+	func notesCount() throws -> Int {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		do {
+			return try NotesCount(connection)
+		}
+	}
 	func notesThatNeedUpload() throws -> [NidusNote] {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected

@@ -11,12 +11,22 @@ class NotesController {
 	var model = NotesModel()
 	var network: NetworkController? = nil
 
-	func load(database: DatabaseController, network: NetworkController) async {
-		self.database = database
-		self.network = network
+	func load() async {
+		guard let database = self.database else {
+			Logger.background.error("Database not set")
+			return
+		}
+		do {
+			try await database.connect()
 
-		loadFilters()
-		startUpdateCluster()
+			//loadFilters()
+			//startUpdateCluster()
+			let count = try database.service.notesCount()
+			Logger.background.info("Notes count: \(count)")
+		}
+		catch {
+			Logger.background.error("Could not connect to database: \(error)")
+		}
 	}
 
 	// MARK - public interface
@@ -74,6 +84,16 @@ class NotesController {
         }
         toast.showSavedToast = true
          */
+	}
+
+	func startLoad(database: DatabaseController, network: NetworkController) {
+		self.database = database
+		self.network = network
+
+		Task {
+			await self.load()
+			Logger.background.info("Notes load complete")
+		}
 	}
 
 	// MARK - private functions

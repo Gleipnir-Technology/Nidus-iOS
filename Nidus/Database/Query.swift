@@ -257,6 +257,11 @@ func NativeNotesAll(_ connection: Connection) throws -> [AnyNote] {
 	return results
 }
 
+func NotesCount(_ connection: SQLite.Connection) throws -> Int {
+	let result = try connection.scalar(schema.inspection.table.count)
+	return result
+}
+
 func NoteDelete(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
 	let update = schema.note.table.filter(
 		SQLite.Expression<UUID>(value: noteUUID) == schema.note.uuid

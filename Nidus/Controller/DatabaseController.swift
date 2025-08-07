@@ -10,6 +10,7 @@ class DatabaseController {
 	}
 
 	func connect() async throws {
+		try service.connect()
 		try service.migrateIfNeeded()
 	}
 }

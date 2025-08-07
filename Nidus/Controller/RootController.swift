@@ -7,6 +7,7 @@ import SwiftUI
 @Observable
 class RootController {
 	var audio = AudioController()
+	var database = DatabaseController()
 	var camera = CameraController()
 	var error = ErrorController()
 	var network = NetworkController()
@@ -32,6 +33,7 @@ class RootController {
 	}
 
 	func onInit() {
+		notes.startLoad(database: database, network: network)
 		settings.load()
 		region.current = settings.model.region
 	}
