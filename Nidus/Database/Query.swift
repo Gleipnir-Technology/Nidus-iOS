@@ -100,39 +100,16 @@ func InspectionUpsert(_ connection: SQLite.Connection, _ sID: UUID, _ inspection
 	try connection.run(upsert)
 }
 
-func MosquitoSourceAsNotes(
-	_ connection: SQLite.Connection,
-	region: MKCoordinateRegion
-) throws -> [MosquitoSourceNote] {
-	var results: [MosquitoSourceNote] = []
-	let query = schema.mosquitoSource.table.filter(
-		SQLite.Expression(value: region.maxLatitude) >= schema.mosquitoSource.latitude
-	).filter(
-		SQLite.Expression(value: region.minLatitude) <= schema.mosquitoSource.latitude
-	).filter(
-		SQLite.Expression(value: region.maxLongitude) >= schema.mosquitoSource.longitude
-	).filter(
-		SQLite.Expression(value: region.minLongitude) <= schema.mosquitoSource.longitude
+func InspectionsForSources(_ connection: SQLite.Connection, _ sourceUUIDs: [UUID]) throws -> [UUID:
+	[Inspection]]
+{
+	let start = Date.now
+	var results: [UUID: [Inspection]] = [:]
+	let query = schema.inspection.table.filter(
+		sourceUUIDs.contains(schema.inspection.sourceID)
 	)
 	for row in try connection.prepare(query) {
-		let latLng: CLLocationCoordinate2D = CLLocationCoordinate2D(
-			latitude: Double(row[schema.mosquitoSource.latitude]),
-			longitude: Double(row[schema.mosquitoSource.longitude])
-		)
-		let cell = try latLngToCell(latLng: latLng, resolution: 15)
-		results.append(
-			MosquitoSourceNote(
-				id: row[schema.mosquitoSource.id],
-				location: cell,
-				timestamp: row[schema.mosquitoSource.created]
-			)
-		)
-	}
-	return results
-	/*
-	var inspections_by_id: [UUID: [Inspection]] = [:]
-	for row in try connection.prepare(schema.inspection.table) {
-		inspections_by_id[row[schema.inspection.sourceID], default: []].append(
+		results[row[schema.inspection.sourceID], default: []].append(
 			Inspection(
 				comments: row[schema.inspection.comments],
 				condition: row[schema.inspection.condition],
@@ -142,9 +119,21 @@ func MosquitoSourceAsNotes(
 			)
 		)
 	}
-	var treatments_by_id: [UUID: [Treatment]] = [:]
-	for row in try connection.prepare(schema.treatment.table) {
-		treatments_by_id[row[schema.treatment.sourceID], default: []].append(
+	let end = Date.now
+	Logger.background.info("Inspection query took \(end.timeIntervalSince(start)) seconds")
+	return results
+}
+
+func TreatmentsForSources(_ connection: SQLite.Connection, _ sourceUUIDs: [UUID]) throws -> [UUID:
+	[Treatment]]
+{
+	let start = Date.now
+	var results: [UUID: [Treatment]] = [:]
+	let query = schema.treatment.table.filter(
+		sourceUUIDs.contains(schema.treatment.sourceID)
+	)
+	for row in try connection.prepare(query) {
+		results[row[schema.treatment.sourceID], default: []].append(
 			Treatment(
 				comments: row[schema.treatment.comments],
 				created: row[schema.treatment.created],
@@ -160,6 +149,69 @@ func MosquitoSourceAsNotes(
 			)
 		)
 	}
+	let end = Date.now
+	Logger.background.info("Treatment query took \(end.timeIntervalSince(start)) seconds")
+	return results
+}
+
+func MosquitoSourceAsNotes(
+	_ connection: SQLite.Connection,
+	region: MKCoordinateRegion
+) throws -> [MosquitoSourceNote] {
+	let start = Date.now
+	var results: [MosquitoSourceNote] = []
+	let query = schema.mosquitoSource.table.filter(
+		SQLite.Expression(value: region.maxLatitude) >= schema.mosquitoSource.latitude
+	).filter(
+		SQLite.Expression(value: region.minLatitude) <= schema.mosquitoSource.latitude
+	).filter(
+		SQLite.Expression(value: region.maxLongitude) >= schema.mosquitoSource.longitude
+	).filter(
+		SQLite.Expression(value: region.minLongitude) <= schema.mosquitoSource.longitude
+	)
+	// Get all of the source IDs so we can get the inspections and treatments
+	let rows = try connection.prepare(query)
+	let source_ids = rows.map { $0[schema.mosquitoSource.id] }
+	let inspections_by_id = try InspectionsForSources(connection, source_ids)
+	let treatments_by_id = try TreatmentsForSources(connection, source_ids)
+	for row in try connection.prepare(query) {
+		let latLng: CLLocationCoordinate2D = CLLocationCoordinate2D(
+			latitude: Double(row[schema.mosquitoSource.latitude]),
+			longitude: Double(row[schema.mosquitoSource.longitude])
+		)
+		let cell = try latLngToCell(latLng: latLng, resolution: 15)
+		results.append(
+			MosquitoSourceNote(
+				access: row[schema.mosquitoSource.access],
+				active: row[schema.mosquitoSource.active],
+				comments: row[schema.mosquitoSource.comments],
+				created: row[schema.mosquitoSource.created],
+				description: row[schema.mosquitoSource.description],
+				habitat: row[schema.mosquitoSource.habitat],
+				id: row[schema.mosquitoSource.id],
+				inspections: inspections_by_id[
+					row[schema.mosquitoSource.id]
+				] ?? [],
+				lastInspectionDate: row[
+					schema.mosquitoSource.lastInspectionDate
+				],
+				location: cell,
+				name: row[schema.mosquitoSource.name],
+				nextActionDateScheduled: row[
+					schema.mosquitoSource.nextActionDateScheduled
+				],
+				treatments: treatments_by_id[row[schema.mosquitoSource.id]]
+					?? [],
+				useType: row[schema.mosquitoSource.useType],
+				waterOrigin: row[schema.mosquitoSource.waterOrigin],
+				zone: row[schema.mosquitoSource.zone]
+			)
+		)
+	}
+	let end = Date.now
+	Logger.background.info("Source query took \(end.timeIntervalSince(start)) seconds")
+	return results
+	/*
 	for row in try connection.prepare(schema.mosquitoSource.table) {
 		let location = Location(
 			latitude: row[schema.mosquitoSource.latitude],
@@ -168,29 +220,6 @@ func MosquitoSourceAsNotes(
 		results.append(
 			AnyNote(
 				MosquitoSource(
-					access: row[schema.mosquitoSource.access],
-					active: row[schema.mosquitoSource.active],
-					comments: row[schema.mosquitoSource.comments],
-					created: row[schema.mosquitoSource.created],
-					description: row[schema.mosquitoSource.description],
-					habitat: row[schema.mosquitoSource.habitat],
-					id: row[schema.mosquitoSource.id],
-					inspections: inspections_by_id[
-						row[schema.mosquitoSource.id]
-					] ?? [],
-					lastInspectionDate: row[
-						schema.mosquitoSource.lastInspectionDate
-					],
-					location: location,
-					name: row[schema.mosquitoSource.name],
-					nextActionDateScheduled: row[
-						schema.mosquitoSource.nextActionDateScheduled
-					],
-					treatments: treatments_by_id[row[schema.mosquitoSource.id]]
-						?? [],
-					useType: row[schema.mosquitoSource.useType],
-					waterOrigin: row[schema.mosquitoSource.waterOrigin],
-					zone: row[schema.mosquitoSource.zone]
 				)
 			)
 		)
