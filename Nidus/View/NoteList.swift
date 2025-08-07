@@ -150,6 +150,13 @@ struct NoteListRowTextCluster: View {
 	let overview: NoteOverview
 	let userLocation: H3Cell?
 
+	func createdFormatted(_ created: Date) -> String {
+		let formatter = RelativeDateTimeFormatter()
+		formatter.unitsStyle = .full
+		let relativeDate = formatter.localizedString(for: created, relativeTo: Date.now)
+		return relativeDate
+	}
+
 	var distanceDisplay: some View {
 		if userLocation == nil {
 			return Text("")
@@ -172,7 +179,7 @@ struct NoteListRowTextCluster: View {
 		}
 	}
 	var timeDisplay: some View {
-		return Text("foo")
+		return Text("\(createdFormatted(overview.time))")
 	}
 	var body: some View {
 		VStack {

@@ -44,7 +44,7 @@ struct MosquitoSourceNote: NoteProtocol {
 			icon: MosquitoSourceNote.ICON,
 			icons: [],
 			location: location,
-			time: Date.now
+			time: timestamp
 		)
 	}
 }
