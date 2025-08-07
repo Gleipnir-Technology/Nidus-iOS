@@ -81,17 +81,12 @@ struct NoteListRow: View {
 	let userLocation: H3Cell?
 	var body: some View {
 		HStack {
-			Image(systemName: overview.icon).font(.system(size: 42.0)).background(
-				Color.purple.opacity(0.3)
-			).frame(width: 60, height: ROW_HEIGHT)
-			NoteListRowIconCluster(icons: overview.icons).background(
-				Color.red.opacity(0.3)
-			).frame(width: 150, height: ROW_HEIGHT)
+			Image(systemName: overview.icon).font(.system(size: 42.0))
+				.frame(width: 60, height: ROW_HEIGHT)
+			NoteListRowIconCluster(icons: overview.icons)
+				.frame(width: 150, height: ROW_HEIGHT)
 			Spacer()
 			NoteListRowTextCluster(overview: overview, userLocation: userLocation)
-				.background(
-					Color.cyan.opacity(0.3)
-				)
 			Rectangle().foregroundStyle(overview.color).cornerRadius(10).frame(
 				width: 10,
 				height: .infinity
