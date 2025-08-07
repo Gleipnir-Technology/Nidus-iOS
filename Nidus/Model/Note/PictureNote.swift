@@ -19,7 +19,7 @@ struct PictureNote: NoteProtocol {
 			color: .cyan,
 			icon: "photo",
 			icons: [],
-			location: 0,
+			location: location,
 			time: Date.now
 		)
 	}
