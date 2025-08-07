@@ -21,7 +21,6 @@ struct RootView: View {
 	@State var activeView: ActiveView = .breadcrumb
 	@FocusState var isTextFieldFocused: Bool
 	@State var location: CLLocation = Initial.location
-	@State var locationDataManager: LocationDataManager = LocationDataManager()
 	@State private var path = NavigationPath()
 	@State var resolution = 10
 	@State var region: MKCoordinateRegion = Initial.region

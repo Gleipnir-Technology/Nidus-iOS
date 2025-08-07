@@ -28,6 +28,7 @@ class RootController {
 				}
 			}
 		}
+		region.onAppear()
 	}
 
 	func onRegionChange(r: MKCoordinateRegion) {

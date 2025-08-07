@@ -95,11 +95,11 @@ struct MapViewBreadcrumb: View {
 
 	private func userPreviousCellsPolygons() -> [CellSelection] {
 		var results: [CellSelection] = []
-		for (i, cell) in controller.breadcrumb.userPreviousCells.enumerated() {
+		for (i, element) in controller.breadcrumb.userPreviousCells.enumerated() {
 			let color = previousCellColor(i)
 			do {
 				let scaledCell = try scaleCell(
-					cell,
+					element.key,
 					to: controller.breadcrumb.overlayResolution
 				)
 				results.append(CellSelection(scaledCell, color: color))
