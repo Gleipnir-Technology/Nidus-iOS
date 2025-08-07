@@ -2,6 +2,7 @@ import Foundation
 import H3
 import MapKit
 import OSLog
+import SwiftUI
 
 struct AudioNote: NoteProtocol {
 	let id: UUID
@@ -39,7 +40,7 @@ struct AudioNote: NoteProtocol {
 	var overview: NoteOverview {
 		return NoteOverview(
 			color: .red,
-			icon: "waveform",
+			icon: iconForNoteType(category),
 			icons: [],
 			location: location,
 			time: Date.now

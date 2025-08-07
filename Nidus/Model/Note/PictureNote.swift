@@ -38,7 +38,7 @@ struct PictureNote: NoteProtocol {
 	var overview: NoteOverview {
 		return NoteOverview(
 			color: .cyan,
-			icon: "photo",
+			icon: iconForNoteType(category),
 			icons: [],
 			location: location,
 			time: Date.now

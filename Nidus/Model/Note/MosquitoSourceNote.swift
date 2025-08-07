@@ -121,7 +121,7 @@ struct MosquitoSourceNote: NoteProtocol {
 	var overview: NoteOverview {
 		return NoteOverview(
 			color: .red,
-			icon: MosquitoSourceNote.ICON,
+			icon: iconForNoteType(category),
 			icons: icons,
 			id: id,
 			location: location,

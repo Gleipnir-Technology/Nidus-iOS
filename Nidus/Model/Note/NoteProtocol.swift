@@ -1,4 +1,6 @@
 import Foundation
+import SwiftUI
+import UIKit
 
 enum NoteType {
 	case audio
@@ -15,13 +17,13 @@ protocol NoteProtocol: Identifiable<UUID>, Hashable {
 	var timestamp: Date { get }
 }
 
-func iconForNoteType(_ type: NoteType) -> String {
+func iconForNoteType(_ type: NoteType) -> UIImage {
 	switch type {
 	case .audio:
-		return "waveform"
+		return UIImage(systemName: "waveform")!
 	case .mosquitoSource:
-		return "ant.fill"
+		return UIImage(named: "mosquito.sideview")!
 	case .picture:
-		return "photo"
+		return UIImage(systemName: "photo")!
 	}
 }

@@ -40,7 +40,7 @@ struct MosquitoSourceDetail: View {
 			) {
 				Marker(
 					"\(source.name)",
-					systemImage: iconForNoteType(source.category),
+					//systemImage: iconForNoteType(source.category),
 					coordinate: source.coordinate
 				)
 			}.frame(height: 300)
