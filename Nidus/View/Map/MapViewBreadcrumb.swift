@@ -16,6 +16,7 @@ struct AnnotationSummary: Identifiable {
 	var id: H3Cell {
 		cell
 	}
+	var weight: Double = 0
 }
 /*
  A map which shows an overlay of selected cells.
@@ -23,6 +24,7 @@ struct AnnotationSummary: Identifiable {
 struct MapViewBreadcrumb: View {
 	// The number of hexes we want to display at a minimum in the region. Used to calculate the H3 resolution to use
 	let hexCount: Int = 75
+	var maxCountByCell: Int = 0
 	@State var notes: NotesController
 	@State var region: RegionController
 	@State var screenSize: CGSize = .zero
@@ -69,7 +71,13 @@ struct MapViewBreadcrumb: View {
 				)
 			}
 		}
-		//
+		// This is bad...but performant
+		let maxCountByCell =
+			results.max(by: { $0.value.count < $1.value.count })?.value.count ?? 0
+		for cell in results.keys {
+			results[cell]!.weight =
+				Double(results[cell]!.count) / Double(maxCountByCell)
+		}
 		return results.map { $0.value }
 	}
 
@@ -163,7 +171,7 @@ struct MapViewBreadcrumb: View {
 						CellSelection(summary.cell).asMapPolygon()
 							.foregroundStyle(
 								Color.red.opacity(
-									0.1 * Double(summary.count)
+									summary.weight
 								)
 							)
 					}
