@@ -36,12 +36,12 @@ struct CellSelection: Equatable, Hashable, Identifiable {
 		}
 	}
 
-	func asPolyline() -> MapPolyline {
-		return MapPolyline(cellToPolyline(self))
-	}
-
 	func asMapPolygon() -> MapPolygon {
 		return MapPolygon(cellToPolygon(self))
+	}
+
+	func asMapPolyline() -> MapPolyline {
+		return MapPolyline(cellToPolyline(self))
 	}
 
 	func foregroundStyle() -> Color {

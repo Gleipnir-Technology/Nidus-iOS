@@ -69,6 +69,7 @@ struct MapViewBreadcrumb: View {
 				)
 			}
 		}
+		//
 		return results.map { $0.value }
 	}
 
@@ -159,46 +160,29 @@ struct MapViewBreadcrumb: View {
 					interactionModes: .all
 				) {
 					ForEach(annotationsByCell()) { summary in
-						Annotation(
-							"\(summary.count)",
-							coordinate: summary.coordinate
-						) {
-							ZStack {
-								RoundedRectangle(cornerRadius: 5)
-									.fill(.yellow.opacity(0.3))
-								if summary.categories.count > 1 {
-									Image(
-										systemName:
-											"rectangle.stack.fill"
-									).foregroundStyle(.blue)
-								}
-								else {
-									Image(
-										systemName:
-											iconForNoteType(
-												summary
-													.categories
-													.first!
-											)
-									)
-									.foregroundStyle(.yellow)
-								}
-							}
-						}
+						CellSelection(summary.cell).asMapPolygon()
+							.foregroundStyle(
+								Color.red.opacity(
+									0.1 * Double(summary.count)
+								)
+							)
 					}
 					ForEach(userPreviousCellsPolygons()) { cell in
-						cell.asPolyline().stroke(cell.color, lineWidth: 2)
+						cell.asMapPolyline().stroke(
+							cell.color,
+							lineWidth: 2
+						)
 					}
 					if region.breadcrumb.selectedCell != nil {
 						CellSelection(region.breadcrumb.selectedCell!)
-							.asPolyline().stroke(
+							.asMapPolyline().stroke(
 								.red,
 								lineWidth: 3
 							)
 					}
 					if region.breadcrumb.userCell != nil {
 						CellSelection(region.breadcrumb.userCell!)
-							.asPolyline().stroke(
+							.asMapPolyline().stroke(
 								.blue,
 								lineWidth: 2
 							)
