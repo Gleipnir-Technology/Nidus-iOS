@@ -1,3 +1,4 @@
+import MapKit
 import OSLog
 import SQLite
 import SQLiteMigrationManager
@@ -142,7 +143,7 @@ class DatabaseService: CustomStringConvertible {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		do {
+		/*do {
 			let sources = try MosquitoSourceAsNotes(
 				connection
 			)
@@ -153,7 +154,7 @@ class DatabaseService: CustomStringConvertible {
 		catch {
 			Logger.background.error("Failed to get source notes: \(error)")
 			throw error
-		}
+		}*/
 		do {
 			let requests = try ServiceRequestAsNotes(connection)
 			for request in requests {
@@ -173,6 +174,21 @@ class DatabaseService: CustomStringConvertible {
 		}
 		return results
 	}
+	func notesByRegion(_ region: MKCoordinateRegion) throws -> [UUID: any NoteProtocol] {
+		var results: [UUID: any NoteProtocol] = [:]
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		let sources = try MosquitoSourceAsNotes(
+			connection,
+			region: region
+		)
+		for source in sources {
+			results[source.id] = source
+		}
+		return results
+	}
+
 	func notesCount() throws -> Int {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected

@@ -39,7 +39,7 @@ class RootController {
 	}
 
 	func onRegionChange(r: MKCoordinateRegion) {
-		notes.calculateNotesToShow()
+		notes.onRegionChange(r)
 		notes.startUpdateCluster()
 		settings.saveCurrentRegion(r)
 	}

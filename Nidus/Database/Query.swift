@@ -1,9 +1,5 @@
-//
-//  Query.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 6/20/25.
-//
+import H3
+import MapKit
 import OSLog
 import SQLite
 import SwiftUI
@@ -105,9 +101,35 @@ func InspectionUpsert(_ connection: SQLite.Connection, _ sID: UUID, _ inspection
 }
 
 func MosquitoSourceAsNotes(
-	_ connection: SQLite.Connection
-) throws -> [AnyNote] {
-	var results: [AnyNote] = []
+	_ connection: SQLite.Connection,
+	region: MKCoordinateRegion
+) throws -> [MosquitoSourceNote] {
+	var results: [MosquitoSourceNote] = []
+	let query = schema.mosquitoSource.table.filter(
+		SQLite.Expression(value: region.maxLatitude) >= schema.mosquitoSource.latitude
+	).filter(
+		SQLite.Expression(value: region.minLatitude) <= schema.mosquitoSource.latitude
+	).filter(
+		SQLite.Expression(value: region.maxLongitude) >= schema.mosquitoSource.longitude
+	).filter(
+		SQLite.Expression(value: region.minLongitude) <= schema.mosquitoSource.longitude
+	)
+	for row in try connection.prepare(query) {
+		let latLng: CLLocationCoordinate2D = CLLocationCoordinate2D(
+			latitude: Double(row[schema.mosquitoSource.latitude]),
+			longitude: Double(row[schema.mosquitoSource.longitude])
+		)
+		let cell = try latLngToCell(latLng: latLng, resolution: 15)
+		results.append(
+			MosquitoSourceNote(
+				id: row[schema.mosquitoSource.id],
+				location: cell,
+				timestamp: row[schema.mosquitoSource.created]
+			)
+		)
+	}
+	return results
+	/*
 	var inspections_by_id: [UUID: [Inspection]] = [:]
 	for row in try connection.prepare(schema.inspection.table) {
 		inspections_by_id[row[schema.inspection.sourceID], default: []].append(
@@ -174,6 +196,7 @@ func MosquitoSourceAsNotes(
 		)
 	}
 	return results
+     */
 }
 
 func MosquitoSourceUpsert(connection: SQLite.Connection, _ source: MosquitoSource) throws {

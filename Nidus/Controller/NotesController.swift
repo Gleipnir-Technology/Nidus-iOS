@@ -11,6 +11,8 @@ class NotesController {
 	var model = NotesModel()
 	var network: NetworkController? = nil
 
+	private var region: MKCoordinateRegion = Initial.region
+
 	func load() async {
 		guard let database = self.database else {
 			Logger.background.error("Database not set")
@@ -86,6 +88,11 @@ class NotesController {
          */
 	}
 
+	func onRegionChange(_ region: MKCoordinateRegion) {
+		self.region = region
+		self.calculateNotesToShow()
+	}
+
 	func startLoad(database: DatabaseController, network: NetworkController) {
 		self.database = database
 		self.network = network
@@ -114,21 +121,22 @@ class NotesController {
 		startUpdateCluster()
 	}
 
-	/* private */
-	func calculateNotesToShow() {
-		// we haven't loaded up the notes yet
-		/*
-		guard let notes = notes else {
-			notesToShow = nil
+	private func calculateNotesToShow() {
+		guard let database else {
+			Logger.background.error("Database not ready yet")
 			return
 		}
-		notesToShow = []
-		for (_, note) in notes {
-			if shouldShow(note) {
-				notesToShow!.append(note)
+		Task {
+			do {
+				let notes = try database.service.notesByRegion(self.region)
+				Logger.background.info("Found \(notes.count) notes")
 			}
-		}*/
+			catch {
+				Logger.background.error("Failed to calculate notes: \(error)")
+			}
+		}
 	}
+
 	private func loadFilters() {
 		let fs = UserDefaults.standard.stringArray(forKey: "filters") ?? []
 		for f in fs {
