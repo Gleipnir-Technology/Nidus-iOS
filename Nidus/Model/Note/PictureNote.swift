@@ -1,4 +1,7 @@
 import Foundation
+import H3
+import MapKit
+import OSLog
 
 struct PictureNote: NoteProtocol {
 	let id: UUID
@@ -13,6 +16,24 @@ struct PictureNote: NoteProtocol {
 
 	var category: NoteType {
 		return .picture
+	}
+	var mapAnnotation: NoteMapAnnotation {
+		do {
+			let coordinate = try cellToLatLng(cell: location)
+			return NoteMapAnnotation(
+				coordinate: coordinate,
+				icon: "photo",
+				text: ""
+			)
+		}
+		catch {
+			Logger.foreground.warning("Faled to convert H3Cell to coordinate: \(error)")
+			return NoteMapAnnotation(
+				coordinate: CLLocationCoordinate2D(latitude: -180, longitude: 180),
+				icon: "photo",
+				text: ""
+			)
+		}
 	}
 	var overview: NoteOverview {
 		return NoteOverview(

@@ -292,7 +292,7 @@ class NotesController {
 }
 
 class NotesControllerPreview: NotesController {
-	init(model: NotesModel) {
+	init(model: NotesModel = NotesModel()) {
 		super.init()
 		self.model = model
 	}

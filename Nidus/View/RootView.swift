@@ -70,7 +70,8 @@ struct RootView: View {
 						AudioDetailView(controller: controller.audio)
 					case .breadcrumb:
 						MapViewBreadcrumb(
-							controller: controller.region,
+							notes: controller.notes,
+							region: controller.region,
 							showsGrid: false
 						)
 					case .notes:
