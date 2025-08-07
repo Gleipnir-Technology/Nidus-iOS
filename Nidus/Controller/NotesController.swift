@@ -129,7 +129,9 @@ class NotesController {
 		Task {
 			do {
 				let notes = try database.service.notesByRegion(self.region)
-				Logger.background.info("Found \(notes.count) notes")
+				model.mapAnnotations = notes.map { $0.value.mapAnnotation }
+				model.notes = notes
+				model.noteOverview = notes.map { $0.value.overview }
 			}
 			catch {
 				Logger.background.error("Failed to calculate notes: \(error)")
