@@ -79,7 +79,6 @@ struct RootView: View {
 					case .notes:
 						NoteListView(
 							controller: controller.notes,
-							onNoteSelected: onNoteSelected,
 							userLocation: controller.region.breadcrumb
 								.userCell
 						)
@@ -130,28 +129,7 @@ struct RootView: View {
 					case "map-settings":
 						SettingView(controller: controller)
 					default:
-						if p.starts(with: "note/") {
-							let idString: String = String(
-								p.split(separator: "/").last!
-							)
-							let id: UUID = UUID(uuidString: idString)!
-							let note = controller.notes.model.notes![
-								id
-							]!
-							if let source = note as? MosquitoSourceNote
-							{
-								MosquitoSourceDetail(
-									onFilterAdded: { _ in },
-									source: source
-								)
-							}
-							else {
-								ProgressView()
-							}
-						}
-						else {
-							Text("Unknown destination \(p)")
-						}
+						Text("Unknown destination \(p)")
 					}
 				}
 			}

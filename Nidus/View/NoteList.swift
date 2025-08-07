@@ -9,7 +9,6 @@ import SwiftUI
  */
 struct NoteListView: View {
 	var controller: NotesController
-	var onNoteSelected: ((UUID) -> Void)
 	let userLocation: H3Cell?
 
 	@State var searchText: String = ""
@@ -29,7 +28,6 @@ struct NoteListView: View {
 					else {
 						NoteList(
 							controller: controller,
-							onNoteSelected: onNoteSelected,
 							userLocation: userLocation
 						)
 					}
@@ -42,7 +40,6 @@ struct NoteListView: View {
 
 struct NoteList: View {
 	var controller: NotesController
-	var onNoteSelected: ((UUID) -> Void)
 	let userLocation: H3Cell?
 
 	func notesByDistance(_ notes: [AnyNote], currentLocation: CLLocation) -> [AnyNote] {
@@ -71,10 +68,11 @@ struct NoteList: View {
 		else {
 			List {
 				ForEach(controller.model.noteOverview!, id: \.self) { overview in
-					NoteListRow(overview: overview, userLocation: userLocation)
-						.onTapGesture {
-							onNoteSelected(overview.id)
-						}
+					NoteListRow(
+						controller: controller,
+						overview: overview,
+						userLocation: userLocation
+					)
 				}
 			}
 		}
@@ -83,20 +81,32 @@ struct NoteList: View {
 
 struct NoteListRow: View {
 	let ROW_HEIGHT: CGFloat = 40.0
+
+	let controller: NotesController
 	let overview: NoteOverview
 	let userLocation: H3Cell?
 	var body: some View {
-		HStack {
-			Image(systemName: overview.icon).font(.system(size: 42.0))
-				.frame(width: 60, height: ROW_HEIGHT)
-			NoteListRowIconCluster(icons: overview.icons)
-				.frame(width: 150, height: ROW_HEIGHT)
-			Spacer()
-			NoteListRowTextCluster(overview: overview, userLocation: userLocation)
-			Rectangle().foregroundStyle(overview.color).cornerRadius(10).frame(
-				width: 10,
-				height: 80
-			).padding(.zero).offset(x: 20)
+		NavigationLink(
+			destination: NoteDetailView(
+				controller: controller,
+				noteUUID: overview.id
+			)
+		) {
+			HStack {
+				Image(systemName: overview.icon).font(.system(size: 42.0))
+					.frame(width: 60, height: ROW_HEIGHT)
+				NoteListRowIconCluster(icons: overview.icons)
+					.frame(width: 150, height: ROW_HEIGHT)
+				Spacer()
+				NoteListRowTextCluster(
+					overview: overview,
+					userLocation: userLocation
+				)
+				Rectangle().foregroundStyle(overview.color).cornerRadius(10).frame(
+					width: 10,
+					height: 80
+				).padding(.zero).offset(x: 20)
+			}
 		}
 	}
 }
@@ -201,7 +211,6 @@ struct NoteList_Previews: PreviewProvider {
 			controller: NotesControllerPreview(
 				model: NotesModel.Preview.someNotes
 			),
-			onNoteSelected: { _ in },
 			userLocation: RegionControllerPreview.userCell
 		).previewDisplayName("base")
 	}
