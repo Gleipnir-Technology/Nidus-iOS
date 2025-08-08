@@ -20,8 +20,8 @@ struct AudioNote: NoteProtocol {
 	}
 
 	var location: H3Cell {
-		//return locations[locations.count - 1]
-		return RegionControllerPreview.userCell
+		return locations.isEmpty
+			? RegionControllerPreview.userCell : locations[locations.count - 1]
 	}
 
 	var mapAnnotation: NoteMapAnnotation {
