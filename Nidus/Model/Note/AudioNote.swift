@@ -46,9 +46,10 @@ struct AudioNote: NoteProtocol {
 		return NoteOverview(
 			color: .red,
 			icon: iconForNoteType(category),
+			id: id,
 			icons: [],
 			location: location,
-			time: Date.now
+			time: timestamp
 		)
 	}
 }
