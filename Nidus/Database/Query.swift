@@ -25,6 +25,37 @@ func AudioNeedingUpload(_ connection: Connection) throws -> [UUID] {
 	try connection.run(update)
 }*/
 
+func AudioRecordingAsNotes(
+	_ connection: SQLite.Connection
+) throws -> [AudioNote] {
+	let start = Date.now
+	var results: [AudioNote] = []
+	let query = schema.audioRecording.table
+	let rows = try connection.prepare(query)
+	//let audio_ids = rows.map { $0[schema.audioRecording.uuid] }
+	let audio_ids: [UUID] = []
+	let locations_by_audio_id: [UUID: [H3Cell]] = try AudioRecordingLocations(
+		connection,
+		audio_ids
+	)
+	for row in rows {
+		results.append(
+			AudioNote(
+				id: row[schema.audioRecording.uuid],
+				locations: locations_by_audio_id[row[schema.audioRecording.uuid]]
+					?? [],
+				//locations: [],
+				timestamp: row[schema.audioRecording.created]
+			)
+		)
+	}
+	let end = Date.now
+	Logger.background.info(
+		"Took \(end.timeIntervalSince(start)) seconds to load audio recordings as notes"
+	)
+	return results
+}
+
 func AudioRecordingInsert(
 	_ connection: SQLite.Connection,
 	_ audio_recording: AudioRecording
@@ -49,6 +80,28 @@ func AudioRecordingInsert(
 		)
 		try connection.run(location_insert)
 	}
+}
+
+func AudioRecordingLocations(
+	_ connection: SQLite.Connection,
+	_ audio_ids: [UUID]
+) throws -> [UUID: [H3Cell]] {
+	var results: [UUID: [H3Cell]] = [:]
+	// TODO: this was causing crashes, so now I'm just querying all of the locations
+	//let query = schema.audioRecordingLocation.table.filter(
+	//audio_ids.contains(schema.audioRecordingLocation.audioRecordingUUID)
+	//).order(schema.audioRecordingLocation.index)
+	let query = schema.audioRecordingLocation.table.order(schema.audioRecordingLocation.index)
+	for row in try connection.prepare(query) {
+		results[row[schema.audioRecordingLocation.audioRecordingUUID], default: []].append(
+			//row[schema.audioRecordingLocation.cell]
+			RegionControllerPreview.userCell
+		)
+	}
+	Logger.background.info(
+		"Pulled \(results.count) audio locations for \(audio_ids.count) audio recordings"
+	)
+	return results
 }
 
 func AudioRecordingUpsert(

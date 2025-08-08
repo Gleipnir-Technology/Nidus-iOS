@@ -6,17 +6,22 @@ import SwiftUI
 
 struct AudioNote: NoteProtocol {
 	let id: UUID
-	var location: H3Cell
+	var locations: [H3Cell]
 	var timestamp: Date
 
-	init(location: H3Cell, timestamp: Date = Date()) {
-		self.id = UUID()
-		self.location = location
+	init(id: UUID = UUID(), locations: [H3Cell], timestamp: Date = Date()) {
+		self.id = id
+		self.locations = locations
 		self.timestamp = timestamp
 	}
 
 	var category: NoteType {
 		return .audio
+	}
+
+	var location: H3Cell {
+		//return locations[locations.count - 1]
+		return RegionControllerPreview.userCell
 	}
 
 	var mapAnnotation: NoteMapAnnotation {

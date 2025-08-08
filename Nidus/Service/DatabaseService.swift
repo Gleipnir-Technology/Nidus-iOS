@@ -196,6 +196,10 @@ class DatabaseService: CustomStringConvertible {
 		for source in sources {
 			results[source.id] = source
 		}
+		let audioRecording = try AudioRecordingAsNotes(connection)
+		for ar in audioRecording {
+			results[ar.id] = ar
+		}
 		return results
 	}
 
