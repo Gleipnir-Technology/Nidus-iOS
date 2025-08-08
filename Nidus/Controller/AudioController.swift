@@ -16,8 +16,8 @@ class AudioController {
 		if model.isRecording {
 			for cell in cells {
 
-				if !model.locationWhileRecording.isEmpty
-					&& model.locationWhileRecording[
+				if model.locationWhileRecording.isEmpty
+					|| model.locationWhileRecording[
 						model.locationWhileRecording.count - 1
 					] != cell
 				{
