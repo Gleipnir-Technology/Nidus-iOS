@@ -13,22 +13,17 @@ class NotesController {
 
 	private var region: MKCoordinateRegion = Initial.region
 
-	func load() async {
+	func load() async throws {
 		guard let database = self.database else {
 			Logger.background.error("Database not set")
 			return
 		}
-		do {
-			try await database.connect()
+		try await database.connect()
 
-			//loadFilters()
-			//startUpdateCluster()
-			let count = try database.service.notesCount()
-			Logger.background.info("Notes count: \(count)")
-		}
-		catch {
-			Logger.background.error("Could not connect to database: \(error)")
-		}
+		//loadFilters()
+		//startUpdateCluster()
+		let count = try database.service.notesCount()
+		Logger.background.info("Notes count: \(count)")
 	}
 
 	// MARK - public interface
@@ -93,13 +88,26 @@ class NotesController {
 		self.calculateNotesToShow()
 	}
 
+	func saveAudioNote(_ recording: AudioRecording) throws {
+		guard let database = self.database else {
+			throw DatabaseError.notConnected
+		}
+		try database.service.insertAudioNote(recording)
+		Logger.foreground.info("Saved recording \(recording.uuid)")
+	}
+
 	func startLoad(database: DatabaseController, network: NetworkController) {
 		self.database = database
 		self.network = network
 
 		Task {
-			await self.load()
-			Logger.background.info("Notes load complete")
+			do {
+				try await self.load()
+				Logger.background.info("Notes load complete")
+			}
+			catch {
+				fatalError("Failed to load controllers: \(error)")
+			}
 		}
 	}
 

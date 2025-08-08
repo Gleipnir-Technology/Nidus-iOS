@@ -2,7 +2,9 @@ import Foundation
 
 struct AudioModel {
 	var isRecording: Bool = false
+	var locationWhileRecording: [H3Cell] = []
 	var recordingDuration: TimeInterval = 0
+	var recordingUUID: UUID? = nil
 	var tags: [AudioTagMatch] = []
 	var transcription: String? = nil
 

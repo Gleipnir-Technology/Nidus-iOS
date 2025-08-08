@@ -29,7 +29,10 @@ class DatabaseService: CustomStringConvertible {
 	}
 
 	static func migrations() -> [Migration] {
-		return [Migration1(), Migration2(), Migration3(), Migration4(), Migration5()]
+		return [
+			Migration1(), Migration2(), Migration3(), Migration4(), Migration5(),
+			Migration6(), Migration7(),
+		]
 	}
 
 	static func migrationsBundle() -> Bundle {
@@ -92,7 +95,7 @@ class DatabaseService: CustomStringConvertible {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		try AudioRecordingDeleteByNote(connection, note.id)
+		//try AudioRecordingDeleteByNote(connection, note.id)
 		try ImageDeleteByNote(connection, note.id)
 		return try NoteDelete(connection, note.id)
 	}
@@ -121,6 +124,13 @@ class DatabaseService: CustomStringConvertible {
 			throw DatabaseError.notConnected
 		}
 		try ImageUploaded(connection, uuid)
+	}
+
+	func insertAudioNote(_ recording: AudioRecording) throws {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		try AudioRecordingInsert(connection, recording)
 	}
 
 	func migrateIfNeeded() throws {

@@ -28,7 +28,18 @@ class RootController {
 				}
 			}
 		}
+		audio.onRecordingSave { recording in
+			do {
+				try self.notes.saveAudioNote(recording)
+			}
+			catch {
+				self.error.message = "Failed to save recording: \(error)"
+			}
+		}
 		region.onAppear()
+		region.onLocationUpdated { location in
+			self.audio.onLocationUpdated(location)
+		}
 		region.onRegionChange(onRegionChange)
 	}
 

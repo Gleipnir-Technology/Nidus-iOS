@@ -10,7 +10,6 @@ enum AudioError: Error {
 class WrapperAudio: NSObject {
 	var hasMicrophonePermission = false
 	var hasTranscriptionPermission = false
-	var recordingUUID: UUID = UUID()
 
 	private var audioRecorder: AVAudioRecorder?
 	private var audioPlayer: AVAudioPlayer?
@@ -69,13 +68,13 @@ class WrapperAudio: NSObject {
 		}
 	}
 
-	func startRecording() throws {
+	func startRecording(_ uuid: UUID) throws {
 		guard hasMicrophonePermission else {
 			throw AudioError.noMicrophonePermission
 		}
 
 		// Start audio recording
-		startAudioRecording()
+		startAudioRecording(uuid)
 
 		// Start speech recognition
 		startSpeechRecognition()
@@ -93,8 +92,6 @@ class WrapperAudio: NSObject {
 		recognitionRequest = nil
 		recognitionTask?.cancel()
 		recognitionTask = nil
-
-		recordingUUID = UUID()
 	}
 
 	func playRecording(url: URL) {
@@ -113,14 +110,14 @@ class WrapperAudio: NSObject {
 		}
 	}
 
-	private func startAudioRecording() {
+	private func startAudioRecording(_ uuid: UUID) {
 		let audioSession = AVAudioSession.sharedInstance()
 
 		do {
 			try audioSession.setCategory(.record, mode: .default)
 			try audioSession.setActive(true)
 
-			let audioFilename = AudioRecording.url(recordingUUID)
+			let audioFilename = AudioRecording.url(uuid)
 
 			let settings = [
 				AVFormatIDKey: Int(kAudioFormatMPEG4AAC),

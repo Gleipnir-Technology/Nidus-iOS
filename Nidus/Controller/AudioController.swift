@@ -3,13 +3,33 @@ import SwiftUI
 
 @Observable
 class AudioController {
-	var model: AudioModel = AudioModel()
 	var errorMessage: String = ""
 	var hasPermissionMicrophone: Bool? = nil
 	var hasPermissionTranscription: Bool? = nil
+	var model: AudioModel = AudioModel()
+	var recordingSaveCallbacks: [(AudioRecording) -> Void] = []
 
 	private var timer: Timer?
 	private var wrapper: WrapperAudio = WrapperAudio()
+
+	func onLocationUpdated(_ cells: [H3Cell]) {
+		if model.isRecording {
+			for cell in cells {
+
+				if !model.locationWhileRecording.isEmpty
+					&& model.locationWhileRecording[
+						model.locationWhileRecording.count - 1
+					] != cell
+				{
+					model.locationWhileRecording.append(cell)
+				}
+			}
+		}
+	}
+
+	func onRecordingSave(_ callback: @escaping (AudioRecording) -> Void) {
+		recordingSaveCallbacks.append(callback)
+	}
 
 	func playRecording(_ url: URL) {
 
@@ -21,20 +41,22 @@ class AudioController {
 			model.isRecording = false
 			timer?.invalidate()
 			timer = nil
-			/*
-             // save recording
-            let recording = AudioRecording(
-                created: Date.now,
-                duration: recordingDuration,
-                transcription: recordingTranscription,
-                uuid: recordingUUID
-            )
-             */
+			// save recording
+			let recording = AudioRecording(
+				created: Date.now,
+				duration: model.recordingDuration,
+				locations: model.locationWhileRecording,
+				transcription: model.transcription,
+				uuid: model.recordingUUID!
+			)
+			handleRecordingSave(recording)
 		}
 		else {
 			do {
 				wrapper.onTranscriptionUpdate(onTranscriptionUpdate)
-				try wrapper.startRecording()
+				model.recordingUUID = UUID()
+				model.locationWhileRecording = []
+				try wrapper.startRecording(model.recordingUUID!)
 				model.recordingDuration = 0
 				model.isRecording = true
 				// Start timer for recording duration
@@ -71,6 +93,11 @@ class AudioController {
 		}
 	}
 
+	private func handleRecordingSave(_ recording: AudioRecording) {
+		for callback in recordingSaveCallbacks {
+			callback(recording)
+		}
+	}
 	private func onTranscriptionUpdate(_ transcription: String) {
 		self.model.transcription = transcription
 		self.model.tags = AudioTagIdentifier.parseTags(transcription)

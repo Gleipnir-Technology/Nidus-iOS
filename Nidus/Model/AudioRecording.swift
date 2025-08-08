@@ -11,17 +11,20 @@ import OSLog
 class AudioRecording: Equatable {
 	var created: Date
 	var duration: TimeInterval
+	var locations: [H3Cell]
 	var transcription: String?
 	var uuid: UUID
 
 	init(
 		created: Date,
 		duration: TimeInterval,
+		locations: [H3Cell] = [],
 		transcription: String? = nil,
 		uuid: UUID = UUID()
 	) {
 		self.created = created
 		self.duration = duration
+		self.locations = locations
 		self.transcription = transcription
 		self.uuid = uuid
 	}

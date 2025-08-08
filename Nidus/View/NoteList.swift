@@ -94,7 +94,7 @@ struct NoteListRow: View {
 		) {
 			HStack {
 				Image(uiImage: overview.icon).font(.system(size: 42.0))
-					.frame(width: 60, height: ROW_HEIGHT)
+					.frame(width: 80, height: ROW_HEIGHT + 20.0)
 				NoteListRowIconCluster(icons: overview.icons)
 					.frame(width: 150, height: ROW_HEIGHT)
 				Spacer()

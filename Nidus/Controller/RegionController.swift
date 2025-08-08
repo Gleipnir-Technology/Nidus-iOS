@@ -20,6 +20,9 @@ class RegionController {
 	// The current H3 resolution we're using
 	var resolution: H3Cell = 15
 
+	// Callbacks to inform whenever we receive location data
+	var locationChangeCallbacks: [([H3Cell]) -> Void] = []
+
 	var locationDataManager: LocationDataManager = LocationDataManager()
 
 	func handleRegionChange(_ region: MKCoordinateRegion) {
@@ -30,7 +33,11 @@ class RegionController {
 	}
 
 	func onAppear() {
-		locationDataManager.onLocationUpdated(onLocationUpdated)
+		locationDataManager.onLocationUpdated(handleLocationUpdated)
+	}
+
+	func onLocationUpdated(_ callback: @escaping (([H3Cell]) -> Void)) {
+		locationChangeCallbacks.append(callback)
 	}
 
 	func onRegionChange(_ callback: @escaping (MKCoordinateRegion) -> Void) {
@@ -47,7 +54,7 @@ class RegionController {
 		breadcrumb.userPreviousCells[h3Cell] = Date.now
 	}
 
-	private func onLocationUpdated(_ locations: [CLLocation]) {
+	private func handleLocationUpdated(_ locations: [CLLocation]) {
 		for location in locations {
 			do {
 				let h3Cell = try latLngToCell(
@@ -64,6 +71,17 @@ class RegionController {
 					"Failed to get H3 cell for location \(location): \(error)"
 				)
 			}
+		}
+		do {
+			let cells = try locations.map { l in
+				try latLngToCell(latLng: l.coordinate, resolution: 15)
+			}
+			for callback in locationChangeCallbacks {
+				callback(cells)
+			}
+		}
+		catch {
+			Logger.background.error("Failed to calculate location cells: \(error)")
 		}
 	}
 

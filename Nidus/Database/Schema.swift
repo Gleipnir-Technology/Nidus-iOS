@@ -11,6 +11,7 @@ import SwiftUI
 
 struct DBSchema {
 	let audioRecording = AudioRecordingTable()
+	let audioRecordingLocation = AudioRecordingLocationTable()
 	let image = ImageTable()
 	let inspection = InspectionTable()
 	let mosquitoSource = MosquitoSourceTable()
@@ -26,10 +27,17 @@ class AudioRecordingTable {
 	let created = SQLite.Expression<Date>("created")
 	let deleted = SQLite.Expression<Date?>("deleted")
 	let duration = SQLite.Expression<TimeInterval>("duration")
-	let noteUUID = SQLite.Expression<UUID>("note_uuid")
 	let transcription = SQLite.Expression<String?>("transcription")
 	let uploaded = SQLite.Expression<Date?>("uploaded")
 	let uuid = SQLite.Expression<UUID>("uuid")
+}
+
+class AudioRecordingLocationTable {
+	let table = Table("audio_recording_location")
+
+	let audioRecordingUUID = SQLite.Expression<UUID>("audio_recording_uuid")
+	let cell = SQLite.Expression<UInt64>("cell")
+	let index = SQLite.Expression<Int>("index")
 }
 
 class ImageTable {

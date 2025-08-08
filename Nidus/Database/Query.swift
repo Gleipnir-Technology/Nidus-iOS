@@ -15,7 +15,7 @@ func AudioNeedingUpload(_ connection: Connection) throws -> [UUID] {
 	return uuids
 }
 
-func AudioRecordingDeleteByNote(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
+/*func AudioRecordingDeleteByNote(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
 	let update = schema.audioRecording.table.filter(
 		SQLite.Expression<UUID>(value: noteUUID) == schema.audioRecording.noteUUID
 	).update(
@@ -23,6 +23,32 @@ func AudioRecordingDeleteByNote(_ connection: SQLite.Connection, _ noteUUID: UUI
 		schema.audioRecording.uploaded <- nil
 	)
 	try connection.run(update)
+}*/
+
+func AudioRecordingInsert(
+	_ connection: SQLite.Connection,
+	_ audio_recording: AudioRecording
+) throws {
+	let insert = schema.audioRecording.table.insert(
+		schema.audioRecording.created
+			<- SQLite.Expression<Date>(value: audio_recording.created),
+		schema.audioRecording.duration
+			<- SQLite.Expression<TimeInterval>(value: audio_recording.duration),
+		schema.audioRecording.transcription
+			<- SQLite.Expression<String?>(value: audio_recording.transcription),
+		schema.audioRecording.uuid <- SQLite.Expression<UUID>(value: audio_recording.uuid)
+	)
+	try connection.run(insert)
+	for (i, cell) in audio_recording.locations.enumerated() {
+		let location_insert = schema.audioRecordingLocation.table.insert(
+			schema.audioRecordingLocation.audioRecordingUUID
+				<- SQLite.Expression<UUID>(value: audio_recording.uuid),
+			schema.audioRecordingLocation.cell
+				<- SQLite.Expression<UInt64>(value: cell),
+			schema.audioRecordingLocation.index <- SQLite.Expression<Int>(value: i)
+		)
+		try connection.run(location_insert)
+	}
 }
 
 func AudioRecordingUpsert(
@@ -37,7 +63,7 @@ func AudioRecordingUpsert(
 			<- SQLite.Expression<TimeInterval>(value: audio_recording.duration),
 		schema.audioRecording.transcription
 			<- SQLite.Expression<String?>(value: audio_recording.transcription),
-		schema.audioRecording.noteUUID <- SQLite.Expression<UUID>(value: noteUUID),
+		//schema.audioRecording.noteUUID <- SQLite.Expression<UUID>(value: noteUUID),
 		schema.audioRecording.uuid <- SQLite.Expression<UUID>(value: audio_recording.uuid),
 		onConflictOf: schema.audioRecording.uuid
 	)
@@ -261,7 +287,7 @@ func MosquitoSourceUpsert(connection: SQLite.Connection, _ source: MosquitoSourc
 func NativeNotesAll(_ connection: Connection) throws -> [AnyNote] {
 	var results: [AnyNote] = []
 	var audio_recordings_by_note_uuid: [UUID: [AudioRecording]] = [:]
-	for row in try connection.prepare(schema.audioRecording.table) {
+	/*for row in try connection.prepare(schema.audioRecording.table) {
 		audio_recordings_by_note_uuid[row[schema.audioRecording.noteUUID], default: []]
 			.append(
 				AudioRecording(
@@ -271,7 +297,7 @@ func NativeNotesAll(_ connection: Connection) throws -> [AnyNote] {
 					uuid: row[schema.audioRecording.uuid]
 				)
 			)
-	}
+	}*/
 	var image_by_note_uuid: [UUID: [NoteImage]] = [:]
 	for row in try connection.prepare(schema.image.table) {
 		image_by_note_uuid[row[schema.image.noteUUID], default: []].append(
@@ -364,7 +390,7 @@ func NotesNeedingUpload(_ connection: Connection) throws -> [NidusNote] {
 
 		// Query for associated audio recordings
 		var audioRecordings: [AudioRecording] = []
-		let audioQuery = schema.audioRecording.table.filter(
+		/*let audioQuery = schema.audioRecording.table.filter(
 			schema.audioRecording.noteUUID == noteUUID
 		)
 
@@ -376,7 +402,7 @@ func NotesNeedingUpload(_ connection: Connection) throws -> [NidusNote] {
 				uuid: audioRow[schema.audioRecording.uuid]
 			)
 			audioRecordings.append(audioRecording)
-		}
+		}*/
 
 		// Query for associated images
 		var images: [NoteImage] = []
@@ -424,7 +450,7 @@ func NoteUpdate(_ connection: Connection, _ n: NidusNote) throws {
 }
 
 func NoteUpsert(_ connection: Connection, _ note: NidusNote) throws -> Int64 {
-	try AudioRecordingDeleteByNote(connection, note.id)
+	//try AudioRecordingDeleteByNote(connection, note.id)
 	for audioRecording in note.audioRecordings {
 		try AudioRecordingUpsert(connection, audioRecording, note.id)
 	}
