@@ -103,4 +103,7 @@ class AudioPlaybackControllerPreview: AudioPlaybackController {
 	override init() {
 		super.init()
 	}
+	override func loadAudio(_ uuid: UUID) {
+		isLoaded = true
+	}
 }
