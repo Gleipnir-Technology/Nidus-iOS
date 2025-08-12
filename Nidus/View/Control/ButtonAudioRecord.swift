@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ButtonAudioRecord: View {
-	var audio: AudioController
+	var audio: AudioRecordingController
 	let actionLong: () -> Void
 
 	func onMicButtonShort() {
@@ -38,6 +38,6 @@ struct ButtonAudioRecord_Previews: PreviewProvider {
 
 	}
 	static var previews: some View {
-		ButtonAudioRecord(audio: AudioControllerPreview(), actionLong: onLongPress)
+		ButtonAudioRecord(audio: AudioRecordingControllerPreview(), actionLong: onLongPress)
 	}
 }

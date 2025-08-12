@@ -69,7 +69,9 @@ struct RootView: View {
 				VStack {
 					switch activeView {
 					case .audio:
-						AudioDetailView(controller: controller.audio)
+						AudioDetailView(
+							controller: controller.audioRecording
+						)
 					case .breadcrumb:
 						MapViewBreadcrumb(
 							notes: controller.notes,
@@ -78,7 +80,7 @@ struct RootView: View {
 						)
 					case .notes:
 						NoteListView(
-							controller: controller.notes,
+							controller: controller,
 							userLocation: controller.region.breadcrumb
 								.userCell
 						)
@@ -101,7 +103,7 @@ struct RootView: View {
 								? Color.blue : .secondary
 						)
 						ButtonAudioRecord(
-							audio: controller.audio,
+							audio: controller.audioRecording,
 							actionLong: onMicButtonLong
 						)
 						ButtonWithLongPress(
@@ -144,7 +146,7 @@ struct RootView_Previews: PreviewProvider {
 		RootView(controller: RootControllerPreview()).previewDisplayName("base")
 		RootView(
 			controller: RootControllerPreview(
-				audio: AudioControllerPreview(
+				audioRecording: AudioRecordingControllerPreview(
 					hasPermissionTranscription: true,
 					model: AudioModel(
 						isRecording: true,

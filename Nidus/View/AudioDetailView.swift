@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AudioDetailView: View {
-	let controller: AudioController
+	let controller: AudioRecordingController
 
 	private func timeString(_ timeInterval: TimeInterval) -> String {
 		let minutes = Int(timeInterval) / 60
@@ -61,10 +61,10 @@ struct AudioDetailView: View {
 }
 struct AudioDetailView_Previews: PreviewProvider {
 	static var previews: some View {
-		AudioDetailView(controller: AudioControllerPreview())
+		AudioDetailView(controller: AudioRecordingControllerPreview())
 			.previewDisplayName("Not recording")
 		AudioDetailView(
-			controller: AudioControllerPreview(
+			controller: AudioRecordingControllerPreview(
 				model: AudioModel(
 					isRecording: true,
 					recordingDuration: 60 * 2 + 15
@@ -77,7 +77,7 @@ struct AudioDetailView_Previews: PreviewProvider {
 		VStack {
 			Spacer().background(.blue)
 			AudioDetailView(
-				controller: AudioControllerPreview(
+				controller: AudioRecordingControllerPreview(
 					hasPermissionTranscription: true,
 					model: AudioModel(
 						isRecording: true,
@@ -93,7 +93,7 @@ struct AudioDetailView_Previews: PreviewProvider {
 		VStack {
 			Spacer().background(.blue)
 			AudioDetailView(
-				controller: AudioControllerPreview(
+				controller: AudioRecordingControllerPreview(
 					hasPermissionTranscription: true,
 					model: AudioModel.fromTranscript(
 						"Checking orchards at Avenue 300 and Road 140. 92 degrees, full sun. Rows five through nine have deep ruts still wet from last week’s flood irrigation. Soil is clay-heavy, tractor ruts holding water. Orchard is mature citrus. Took five dips, each with between twenty and a hundred larvae, mostly third and fourth instar Culex. Treated rut areas with one pound of VectoMax FG. Spoke with Jim, the foreman who manages the site. Told him the ruts are producing mosquitoes — he said he’ll have someone grade them before the next irrigation in two weeks. Gave me his number 559-555-5555 and said to call if anything comes up. Need to check back in two weeks to confirm the issue’s resolved."

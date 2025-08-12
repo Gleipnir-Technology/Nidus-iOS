@@ -6,7 +6,8 @@ import SwiftUI
  */
 @Observable
 class RootController {
-	var audio = AudioController()
+	var audioPlayback = AudioPlaybackController()
+	var audioRecording = AudioRecordingController()
 	var database = DatabaseController()
 	var camera = CameraController()
 	var error = ErrorController()
@@ -28,7 +29,7 @@ class RootController {
 				}
 			}
 		}
-		audio.onRecordingSave { recording in
+		audioRecording.onRecordingSave { recording in
 			do {
 				try self.notes.saveAudioNote(recording)
 			}
@@ -38,7 +39,7 @@ class RootController {
 		}
 		region.onAppear()
 		region.onLocationUpdated { location in
-			self.audio.onLocationUpdated(location)
+			self.audioRecording.onLocationUpdated(location)
 		}
 		region.onRegionChange(onRegionChange)
 	}
@@ -58,8 +59,12 @@ class RootController {
 }
 
 class RootControllerPreview: RootController {
-	init(audio: AudioControllerPreview = AudioControllerPreview()) {
+	init(
+		audioRecording: AudioRecordingControllerPreview = AudioRecordingControllerPreview(),
+		notes: NotesControllerPreview = NotesControllerPreview()
+	) {
 		super.init()
-
+		self.audioRecording = audioRecording
+		self.notes = notes
 	}
 }

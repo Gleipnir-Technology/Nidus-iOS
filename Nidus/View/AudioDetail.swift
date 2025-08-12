@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AudioDetail: View {
-	var audio: AudioController
+	var audio: AudioRecordingController
 	var body: some View {
 		if audio.model.isRecording {
 			AudioStatusRecordingView(

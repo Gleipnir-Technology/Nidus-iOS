@@ -8,7 +8,7 @@ import SwiftUI
  A view of the various notes in the current area
  */
 struct NoteListView: View {
-	var controller: NotesController
+	var controller: RootController
 	let userLocation: H3Cell?
 
 	@State var searchText: String = ""
@@ -18,11 +18,11 @@ struct NoteListView: View {
 			VStack {
 				NoteSearchBar(searchText: $searchText)
 
-				if controller.model.noteOverview == nil {
+				if controller.notes.model.noteOverview == nil {
 					Text("Loading")
 				}
 				else {
-					if controller.model.noteOverview!.count == 0 {
+					if controller.notes.model.noteOverview!.count == 0 {
 						Text("No notes")
 					}
 					else {
@@ -39,7 +39,7 @@ struct NoteListView: View {
 }
 
 struct NoteList: View {
-	var controller: NotesController
+	var controller: RootController
 	let userLocation: H3Cell?
 
 	func notesByDistance(_ notes: [AnyNote], currentLocation: CLLocation) -> [AnyNote] {
@@ -62,12 +62,12 @@ struct NoteList: View {
 	}
 
 	var body: some View {
-		if controller.model.noteOverview == nil {
+		if controller.notes.model.noteOverview == nil {
 			ProgressView()
 		}
 		else {
 			List {
-				ForEach(controller.model.noteOverview!) { overview in
+				ForEach(controller.notes.model.noteOverview!) { overview in
 					NoteListRow(
 						controller: controller,
 						overview: overview,
@@ -82,7 +82,7 @@ struct NoteList: View {
 struct NoteListRow: View {
 	let ROW_HEIGHT: CGFloat = 40.0
 
-	let controller: NotesController
+	let controller: RootController
 	let overview: NoteOverview
 	let userLocation: H3Cell?
 	var body: some View {
@@ -208,8 +208,10 @@ struct NoteListRowTextCluster: View {
 struct NoteList_Previews: PreviewProvider {
 	static var previews: some View {
 		NoteListView(
-			controller: NotesControllerPreview(
-				model: NotesModel.Preview.someNotes
+			controller: RootControllerPreview(
+				notes: NotesControllerPreview(
+					model: NotesModel.Preview.someNotes
+				)
 			),
 			userLocation: RegionControllerPreview.userCell
 		).previewDisplayName("base")

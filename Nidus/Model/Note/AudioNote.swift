@@ -52,4 +52,10 @@ struct AudioNote: NoteProtocol {
 			time: timestamp
 		)
 	}
+
+	struct Preview {
+		static var one = AudioNote(
+			locations: []
+		)
+	}
 }
