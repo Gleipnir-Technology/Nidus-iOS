@@ -2,9 +2,9 @@ import MapKit
 import SwiftUI
 import UIKit
 
-struct NoteOverview: Hashable, Identifiable {
+struct NoteOverview: Identifiable {
 	var color: Color
-	var icon: UIImage
+	var icon: Image
 	var icons: [String]
 	var id: UUID = UUID()
 	var location: H3Cell

@@ -67,7 +67,7 @@ struct NoteList: View {
 		}
 		else {
 			List {
-				ForEach(controller.model.noteOverview!, id: \.self) { overview in
+				ForEach(controller.model.noteOverview!) { overview in
 					NoteListRow(
 						controller: controller,
 						overview: overview,
@@ -93,19 +93,19 @@ struct NoteListRow: View {
 			)
 		) {
 			HStack {
-				Image(uiImage: overview.icon).font(.system(size: 42.0))
-					.frame(width: 80, height: ROW_HEIGHT + 20.0)
+				overview.icon.font(.system(size: 42.0))
+					.frame(width: 80, height: ROW_HEIGHT)
 				NoteListRowIconCluster(icons: overview.icons)
-					.frame(width: 150, height: ROW_HEIGHT)
+					.frame(width: 130, height: ROW_HEIGHT)
 				Spacer()
 				NoteListRowTextCluster(
 					overview: overview,
 					userLocation: userLocation
-				)
+				).frame(width: 80, height: ROW_HEIGHT)
 				Rectangle().foregroundStyle(overview.color).cornerRadius(10).frame(
 					width: 10,
-					height: 80
-				).padding(.zero).offset(x: 20)
+					height: ROW_HEIGHT
+				).padding(.zero).offset(x: 28)
 			}
 		}
 	}
@@ -168,7 +168,7 @@ struct NoteListRowTextCluster: View {
 
 	func createdFormatted(_ created: Date) -> String {
 		let formatter = RelativeDateTimeFormatter()
-		formatter.unitsStyle = .full
+		formatter.unitsStyle = .abbreviated
 		let relativeDate = formatter.localizedString(for: created, relativeTo: Date.now)
 		return relativeDate
 	}

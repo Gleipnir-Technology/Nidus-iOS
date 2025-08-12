@@ -17,13 +17,13 @@ protocol NoteProtocol: Identifiable<UUID>, Hashable {
 	var timestamp: Date { get }
 }
 
-func iconForNoteType(_ type: NoteType) -> UIImage {
+func iconForNoteType(_ type: NoteType) -> Image {
 	switch type {
 	case .audio:
-		return UIImage(systemName: "waveform")!
+		return Image(systemName: "waveform")
 	case .mosquitoSource:
-		return UIImage(named: "mosquito.sideview")!
+		return Image("mosquito.sideview")
 	case .picture:
-		return UIImage(systemName: "photo")!
+		return Image(systemName: "photo")
 	}
 }
