@@ -61,6 +61,7 @@ struct RootView: View {
 	}
 	func onMapSelectCell(_ cell: H3Cell) {
 		controller.region.breadcrumb.selectedCell = cell
+		path.append("notes-by-cell/\(cell)")
 	}
 	func onMicButtonLong() {
 		didSelect.toggle()
@@ -93,6 +94,7 @@ struct RootView: View {
 						)
 					case .notes:
 						NoteListView(
+							cell: 0x88_2834_7053_fffff,
 							controller: controller,
 							userLocation: controller.region.breadcrumb
 								.userCell
@@ -144,7 +146,21 @@ struct RootView: View {
 					case "map-settings":
 						SettingView(controller: controller)
 					default:
-						Text("Unknown destination \(p)")
+						if p.starts(with: "notes-by-cell/") {
+							let cellString: String = String(
+								p.split(separator: "/").last!
+							)
+							let cell: UInt64 = UInt64(cellString)!
+							NoteListView(
+								cell: cell,
+								controller: controller,
+								userLocation: controller.region
+									.breadcrumb.userCell
+							)
+						}
+						else {
+							Text("Unknown destination \(p)")
+						}
 					}
 				}
 			}

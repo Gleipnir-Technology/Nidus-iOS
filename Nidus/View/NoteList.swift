@@ -4,10 +4,9 @@ import OSLog
 import SwiftData
 import SwiftUI
 
-/*
- A view of the various notes in the current area
- */
+/// A view of the various notes in the current area
 struct NoteListView: View {
+	let cell: H3Cell
 	var controller: RootController
 	let userLocation: H3Cell?
 
@@ -208,6 +207,7 @@ struct NoteListRowTextCluster: View {
 struct NoteList_Previews: PreviewProvider {
 	static var previews: some View {
 		NoteListView(
+			cell: 0x88_2834_7053f_ffff,
 			controller: RootControllerPreview(
 				notes: NotesControllerPreview(
 					model: NotesModel.Preview.someNotes
