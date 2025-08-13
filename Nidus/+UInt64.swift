@@ -28,7 +28,6 @@ extension UInt64: Number, Value {
 
 extension UInt64: Value {
 	public static func fromDatatypeValue(_ datatypeValue: SQLite.Blob) throws -> UInt64 {
-		print("from datattype!")
 		guard datatypeValue.bytes.count >= MemoryLayout<UInt64>.size else { return 0 }
 		let bigEndianUInt64 = datatypeValue.bytes.withUnsafeBytes({
 			$0.load(as: UInt64.self)
@@ -37,7 +36,6 @@ extension UInt64: Value {
 	}
 
 	public var datatypeValue: SQLite.Blob {
-		print("to datattype!")
 		var bytes: [UInt8] = []
 		withUnsafeBytes(of: self) { pointer in
 			// little endian by default on iOS/macOS, so reverse to get bigEndian
