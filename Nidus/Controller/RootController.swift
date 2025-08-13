@@ -1,4 +1,5 @@
 import MapKit
+import OSLog
 import SwiftUI
 
 /*
@@ -40,6 +41,9 @@ class RootController {
 		camera.onPictureSave { picture in
 			do {
 				let location = self.region.breadcrumb.userCell
+				Logger.background.info(
+					"Saving picture with location \(String(location ?? 0, radix: 16))"
+				)
 				try self.notes.savePictureNote(picture, location)
 			}
 			catch {

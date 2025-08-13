@@ -4,7 +4,18 @@ struct PictureNoteDetail: View {
 	var note: PictureNote
 	var body: some View {
 		VStack {
-			Image(uiImage: note.uiImage)
+			if note.location != 0 {
+				MapCellView(
+					cell: note.location
+				).frame(height: 300)
+			}
+			Image(uiImage: note.uiImage).frame(height: 300)
 		}
 	}
+}
+
+#Preview {
+	PictureNoteDetail(
+		note: PictureNote.forPreview(location: 0x8f4_8eba_314c_0ac5)
+	)
 }

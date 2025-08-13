@@ -27,7 +27,6 @@ struct MapViewBreadcrumb: View {
 	let hexCount: Int = 75
 	@State var currentRegion: MKCoordinateRegion = Initial.region
 	let initialRegion: MKCoordinateRegion
-	var maxCountByCell: Int = 0
 	@State var notes: NotesController?
 	// The current H3 resolution we're operating at
 	@State var overlayResolution: Int = 8
@@ -47,9 +46,6 @@ struct MapViewBreadcrumb: View {
 		self.notes = notes
 		self.region = region
 		self.showsGrid = showsGrid
-		if region == nil {
-			Logger.foreground.warning("nil region")
-		}
 	}
 
 	private func annotationsByCell() -> [AnnotationSummary] {
