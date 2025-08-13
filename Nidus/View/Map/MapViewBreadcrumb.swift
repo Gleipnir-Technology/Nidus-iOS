@@ -22,34 +22,47 @@ struct AnnotationSummary: Identifiable {
  A map which shows an overlay of selected cells.
  */
 struct MapViewBreadcrumb: View {
+	let breadcrumbCells: [H3Cell]
 	// The number of hexes we want to display at a minimum in the region. Used to calculate the H3 resolution to use
 	let hexCount: Int = 75
+	@State var currentRegion: MKCoordinateRegion = Initial.region
+	let initialRegion: MKCoordinateRegion
 	var maxCountByCell: Int = 0
-	@State var notes: NotesController
-	@State var region: RegionController
+	@State var notes: NotesController?
+	// The current H3 resolution we're operating at
+	@State var overlayResolution: Int = 8
+	var region: RegionController?
 	@State var screenSize: CGSize = .zero
 	var showsGrid: Bool = false
 
 	init(
-		notes: NotesController,
-		region: RegionController,
+		breadcrumbCells: [H3Cell],
+		initialRegion: MKCoordinateRegion,
+		notes: NotesController?,
+		region: RegionController?,
 		showsGrid: Bool = false
 	) {
+		self.breadcrumbCells = breadcrumbCells
+		self.initialRegion = initialRegion
 		self.notes = notes
 		self.region = region
 		self.showsGrid = showsGrid
+		if region == nil {
+			Logger.foreground.warning("nil region")
+		}
 	}
 
 	private func annotationsByCell() -> [AnnotationSummary] {
-		var results: [H3Cell: AnnotationSummary] = [:]
-		guard let notes = notes.model.notes else {
+		guard let notes = notes?.model.notes else {
 			return []
 		}
+		var results: [H3Cell: AnnotationSummary] = [:]
+
 		for note in notes.values {
 			do {
 				let cell = try scaleCell(
 					note.location,
-					to: region.breadcrumb.overlayResolution
+					to: overlayResolution
 				)
 				guard var summary: AnnotationSummary = results[cell] else {
 					let summary = AnnotationSummary(
@@ -83,15 +96,22 @@ struct MapViewBreadcrumb: View {
 
 	private func onMapCameraChange(_ geometry: GeometryProxy, _ context: MapCameraUpdateContext)
 	{
-		region.handleRegionChange(context.region)
+		currentRegion = context.region
 		screenSize = geometry.size
 		updateResolution(context.region)
+		guard let region = self.region else {
+			return
+		}
+		region.handleRegionChange(context.region)
 	}
 
 	private func onTapGesture(_ geometry: GeometryProxy, _ screenLocation: CGPoint) {
+		guard let region = self.region else {
+			return
+		}
 		let gpsLocation = screenLocationToLatLng(
 			location: screenLocation,
-			region: region.current,
+			region: currentRegion,
 			screenSize: geometry.size
 		)
 		Logger.foreground.info("Tapped on \(gpsLocation.latitude) \(gpsLocation.longitude)")
@@ -99,7 +119,7 @@ struct MapViewBreadcrumb: View {
 			let cell = try latLngToCell(
 				latitude: gpsLocation.latitude,
 				longitude: gpsLocation.longitude,
-				resolution: region.breadcrumb.overlayResolution
+				resolution: overlayResolution
 			)
 			Logger.foreground.info("Tapped on cell \(String(cell, radix: 16))")
 			region.breadcrumb.selectedCell = cell
@@ -119,7 +139,7 @@ struct MapViewBreadcrumb: View {
 		//)
 		if newRegion.span.latitudeDelta < 0.0005 || newRegion.span.longitudeDelta < 0.0005 {
 			Logger.background.info("Forcing resolution 15")
-			region.breadcrumb.overlayResolution = 15
+			overlayResolution = 15
 			return
 		}
 
@@ -130,7 +150,7 @@ struct MapViewBreadcrumb: View {
 					count: hexCount
 				)
 				Task { @MainActor in
-					region.breadcrumb.overlayResolution = resolution
+					overlayResolution = resolution
 				}
 			}
 			catch {
@@ -142,12 +162,12 @@ struct MapViewBreadcrumb: View {
 
 	private func userPreviousCellsPolygons() -> [CellSelection] {
 		var results: [CellSelection] = []
-		for (i, element) in region.breadcrumb.userPreviousCells.enumerated() {
+		for (i, cell) in breadcrumbCells.enumerated() {
 			let color = previousCellColor(i)
 			do {
 				let scaledCell = try scaleCell(
-					element.key,
-					to: region.breadcrumb.overlayResolution
+					cell,
+					to: overlayResolution
 				)
 				results.append(CellSelection(scaledCell, color: color))
 			}
@@ -163,7 +183,7 @@ struct MapViewBreadcrumb: View {
 			ZStack {
 				Map(
 					initialPosition: MapCameraPosition.region(
-						region.current
+						initialRegion
 					),
 					interactionModes: .all
 				) {
@@ -181,15 +201,15 @@ struct MapViewBreadcrumb: View {
 							lineWidth: 2
 						)
 					}
-					if region.breadcrumb.selectedCell != nil {
-						CellSelection(region.breadcrumb.selectedCell!)
+					if region?.breadcrumb.selectedCell != nil {
+						CellSelection(region!.breadcrumb.selectedCell!)
 							.asMapPolyline().stroke(
 								.red,
 								lineWidth: 3
 							)
 					}
-					if region.breadcrumb.userCell != nil {
-						CellSelection(region.breadcrumb.userCell!)
+					if region?.breadcrumb.userCell != nil {
+						CellSelection(region!.breadcrumb.userCell!)
 							.asMapPolyline().stroke(
 								.blue,
 								lineWidth: 2
@@ -214,8 +234,8 @@ struct MapViewBreadcrumb: View {
 
 				if showsGrid {
 					OverlayH3Canvas(
-						region: region.current,
-						resolution: region.breadcrumb.overlayResolution,
+						region: currentRegion,
+						resolution: overlayResolution,
 						screenSize: screenSize
 					)
 				}
@@ -260,10 +280,14 @@ struct MapViewBreadcrumb_Previews: PreviewProvider {
 	@State static var region: RegionController = RegionControllerPreview()
 	static var previews: some View {
 		MapViewBreadcrumb(
+			breadcrumbCells: [],
+			initialRegion: Initial.region,
 			notes: notes,
 			region: region
 		).previewDisplayName("current location only")
 		MapViewBreadcrumb(
+			breadcrumbCells: [],
+			initialRegion: Initial.region,
 			notes: notes,
 			region: region
 		).onAppear {
@@ -271,6 +295,8 @@ struct MapViewBreadcrumb_Previews: PreviewProvider {
 				RegionControllerPreview.userPreviousCells
 		}.previewDisplayName("current location and previous")
 		MapViewBreadcrumb(
+			breadcrumbCells: [],
+			initialRegion: Initial.region,
 			notes: notes,
 			region: region
 		).onAppear {

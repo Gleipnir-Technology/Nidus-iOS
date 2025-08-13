@@ -8,8 +8,6 @@ let HISTORY_ENTRY_MAX_AGE: TimeInterval = 60 * 5
 struct BreadcrumbModel {
 	// The previous locations the user has been in
 	var previousLocationH3s: [H3Cell] = []
-	// The current H3 resolution we're operating at
-	var overlayResolution: Int = 8
 	// The location the user has currently selected
 	var selectedCell: H3Cell? = nil
 	// The user's current position as Lat/Lng

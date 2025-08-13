@@ -1,10 +1,12 @@
 import AVFoundation
+import H3
+import MapKit
 import OSLog
 import SwiftUI
 
-struct AudioNoteDetail: View {
+/// Simple widget for doing playback with pause/play and skip forward/back and a sweeper
+struct AudioPlaybackWidget: View {
 	var controller: AudioPlaybackController
-	let note: AudioNote
 
 	private func timeString(from timeInterval: TimeInterval) -> String {
 		let minutes = Int(timeInterval) / 60
@@ -70,11 +72,77 @@ struct AudioNoteDetail: View {
 		.padding(.vertical, 12)
 		.background(Color(.systemGray6))
 		.cornerRadius(12)
-		.onAppear {
-			controller.loadAudio(note.id)
-		}
 		.onDisappear {
 			controller.stop()
+		}
+	}
+}
+
+struct AudioNoteDetail: View {
+	var controller: AudioPlaybackController
+	let note: AudioNote
+
+	private func initialRegion() -> MKCoordinateRegion {
+		var sumLat = 0.0
+		var sumLong = 0.0
+		var minLat = 180.0
+		var minLong = 180.0
+		var maxLat = -180.0
+		var maxLong = -180.0
+		for cell in note.locations {
+			do {
+				let latLong = try cellToLatLng(cell: cell)
+				sumLat += latLong.latitude
+				sumLong += latLong.longitude
+
+				if latLong.latitude < minLat {
+					minLat = latLong.latitude
+				}
+				if latLong.latitude > maxLat {
+					maxLat = latLong.latitude
+				}
+				if latLong.longitude < minLong {
+					minLong = latLong.longitude
+				}
+				if latLong.longitude > maxLong {
+					maxLong = latLong.longitude
+				}
+			}
+			catch {
+				Logger.foreground.warning("Failed to parse cell \(cell)")
+			}
+		}
+
+		let center = CLLocationCoordinate2D(
+			latitude: sumLat / Double(note.locations.count),
+			longitude: sumLong / Double(note.locations.count)
+		)
+
+		return MKCoordinateRegion(
+			center: center,
+			span: MKCoordinateSpan(
+				latitudeDelta: maxLat - minLat,
+				longitudeDelta: maxLong - minLong
+			)
+		)
+	}
+
+	var body: some View {
+		HStack {
+			MapViewBreadcrumb(
+				breadcrumbCells: note.locations,
+				initialRegion: initialRegion(),
+				notes: nil,
+				region: nil,
+				showsGrid: false
+			)
+			AudioPlaybackWidget(
+				controller: controller
+			)
+
+		}
+		.onAppear {
+			controller.loadAudio(note.id)
 		}
 	}
 }

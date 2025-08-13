@@ -32,6 +32,13 @@ struct RootView: View {
 		controller.onInit()
 	}
 
+	func breadcrumbCells() -> [H3Cell] {
+		let sorted = controller.region.breadcrumb.userPreviousCells.sorted(by: {
+			$0.value < $1.value
+		})
+		return sorted.map { $0.key }
+	}
+
 	func onCameraButtonLong() {
 		didSelect.toggle()
 		print("camera long")
@@ -74,6 +81,8 @@ struct RootView: View {
 						)
 					case .breadcrumb:
 						MapViewBreadcrumb(
+							breadcrumbCells: breadcrumbCells(),
+							initialRegion: controller.region.current,
 							notes: controller.notes,
 							region: controller.region,
 							showsGrid: false
