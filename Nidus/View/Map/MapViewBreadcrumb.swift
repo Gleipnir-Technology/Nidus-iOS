@@ -27,7 +27,7 @@ struct MapViewBreadcrumb: View {
 	let hexCount: Int = 75
 	@State var currentRegion: MKCoordinateRegion = Initial.region
 	let initialRegion: MKCoordinateRegion
-	@State var notes: NotesController?
+	var notes: NotesController?
 	// The current H3 resolution we're operating at
 	@State var overlayResolution: Int = 8
 	var region: RegionController?
