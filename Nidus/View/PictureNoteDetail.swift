@@ -9,7 +9,7 @@ struct PictureNoteDetail: View {
 					cell: note.location
 				).frame(height: 300)
 			}
-			Image(uiImage: note.uiImage).frame(height: 300)
+			Image(uiImage: note.uiImage).resizable().aspectRatio(contentMode: .fit)
 		}
 	}
 }
