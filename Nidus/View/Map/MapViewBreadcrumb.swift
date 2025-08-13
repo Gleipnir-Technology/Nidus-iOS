@@ -196,7 +196,7 @@ struct MapViewBreadcrumb: View {
 						CellSelection(summary.cell).asMapPolygon()
 							.foregroundStyle(
 								Color.red.opacity(
-									summary.weight
+									max(summary.weight, 0.2)
 								)
 							)
 					}
