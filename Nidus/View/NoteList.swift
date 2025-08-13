@@ -13,26 +13,24 @@ struct NoteListView: View {
 	@State var searchText: String = ""
 
 	var body: some View {
-		NavigationStack {
-			VStack {
-				//NoteSearchBar(searchText: $searchText)
+		VStack {
+			//NoteSearchBar(searchText: $searchText)
 
-				if controller.notes.model.noteOverview == nil {
-					Text("Loading")
+			if controller.notes.model.noteOverview == nil {
+				Text("Loading")
+			}
+			else {
+				if controller.notes.model.noteOverview!.count == 0 {
+					Text("No notes")
 				}
 				else {
-					if controller.notes.model.noteOverview!.count == 0 {
-						Text("No notes")
-					}
-					else {
-						NoteList(
-							controller: controller,
-							userLocation: userLocation
-						)
-					}
+					NoteList(
+						controller: controller,
+						userLocation: userLocation
+					)
 				}
-				Spacer()
 			}
+			Spacer()
 		}
 	}
 }
