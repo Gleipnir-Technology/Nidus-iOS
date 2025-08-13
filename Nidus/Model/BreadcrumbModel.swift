@@ -1,11 +1,13 @@
 import MapKit
+import SwiftUI
 
 // The resolution at which we store location history.
 let HISTORY_RESOLUTION: Int = 15
 // The max age of location history we keep in seconds
 let HISTORY_ENTRY_MAX_AGE: TimeInterval = 60 * 5
 
-struct BreadcrumbModel {
+@Observable
+class BreadcrumbModel {
 	// The previous locations the user has been in
 	var previousLocationH3s: [H3Cell] = []
 	// The location the user has currently selected
