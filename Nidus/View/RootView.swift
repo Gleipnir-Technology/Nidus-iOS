@@ -52,12 +52,12 @@ struct RootView: View {
 		path.append("map-settings")
 	}
 	func onMapButtonShort() {
-		if activeView == .breadcrumb {
+		/*if activeView == .breadcrumb {
 			activeView = .notes
 		}
 		else {
 			activeView = .breadcrumb
-		}
+		}*/
 	}
 	func onMicButtonLong() {
 		didSelect.toggle()
