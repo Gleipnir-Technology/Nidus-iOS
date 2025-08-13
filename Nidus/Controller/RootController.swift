@@ -37,6 +37,15 @@ class RootController {
 				self.error.message = "Failed to save recording: \(error)"
 			}
 		}
+		camera.onPictureSave { picture in
+			do {
+				let location = self.region.breadcrumb.userCell
+				try self.notes.savePictureNote(picture, location)
+			}
+			catch {
+				self.error.message = "Failed to save picture: \(error)"
+			}
+		}
 		region.onAppear()
 		region.onLocationUpdated { location in
 			self.audioRecording.onLocationUpdated(location)

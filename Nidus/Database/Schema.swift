@@ -12,10 +12,10 @@ import SwiftUI
 struct DBSchema {
 	let audioRecording = AudioRecordingTable()
 	let audioRecordingLocation = AudioRecordingLocationTable()
-	let image = ImageTable()
 	let inspection = InspectionTable()
 	let mosquitoSource = MosquitoSourceTable()
 	let note = NoteTable()
+	let picture = PictureTable()
 	let serviceRequest = ServiceRequestTable()
 	let treatment = TreatmentTable()
 }
@@ -38,16 +38,6 @@ class AudioRecordingLocationTable {
 	let audioRecordingUUID = SQLite.Expression<UUID>("audio_recording_uuid")
 	let cell = SQLite.Expression<UInt64>("cell")
 	let index = SQLite.Expression<Int>("index")
-}
-
-class ImageTable {
-	let table = Table("image")
-
-	let created = SQLite.Expression<Date>("created")
-	let deleted = SQLite.Expression<Date?>("deleted")
-	let noteUUID = SQLite.Expression<UUID>("note_uuid")
-	let uploaded = SQLite.Expression<Date?>("uploaded")
-	let uuid = SQLite.Expression<UUID>("uuid")
 }
 
 class InspectionTable {
@@ -92,6 +82,16 @@ class NoteTable {
 	let longitude = SQLite.Expression<Double>("longitude")
 	let text = SQLite.Expression<String>("text")
 	let timestamp = SQLite.Expression<Date>("timestamp")
+	let uploaded = SQLite.Expression<Date?>("uploaded")
+	let uuid = SQLite.Expression<UUID>("uuid")
+}
+
+class PictureTable {
+	let table = Table("picture")
+
+	let created = SQLite.Expression<Date>("created")
+	let deleted = SQLite.Expression<Date?>("deleted")
+	let location = SQLite.Expression<UInt64?>("location")
 	let uploaded = SQLite.Expression<Date?>("uploaded")
 	let uuid = SQLite.Expression<UUID>("uuid")
 }

@@ -57,7 +57,6 @@ struct AudioTagDisplayCategory: View {
 				ForEach(tags, id: \.self) { tag in
 					Text(tag.text)
 						.matchedGeometryEffect(id: tag, in: namespace)
-						.animation(.default)
 				}
 			}.animation(.smooth(duration: 1.0), value: tags)
 		}

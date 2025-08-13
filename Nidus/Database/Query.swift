@@ -135,37 +135,6 @@ func AudioUploaded(_ connection: SQLite.Connection, _ uuid: UUID) throws {
 	try connection.run(update)
 }
 
-func ImageDeleteByNote(_ connection: Connection, _ noteUUID: UUID) throws {
-	let update = schema.image.table.filter(
-		SQLite.Expression<UUID>(value: noteUUID) == schema.image.noteUUID
-	).update(
-		schema.image.deleted <- SQLite.Expression<Date>(value: Date.now),
-		schema.image.uploaded <- nil
-	)
-	try connection.run(update)
-}
-
-func ImagesNeedingUpload(_ connection: Connection) throws -> [UUID] {
-	// Query for notes where uploaded is NULL
-	let query = schema.image.table.filter(schema.image.uploaded == nil)
-
-	var uuids: [UUID] = []
-	for imageRow in try connection.prepare(query) {
-		let uuid = imageRow[schema.image.uuid]
-		uuids.append(uuid)
-	}
-	return uuids
-}
-
-func ImageUploaded(_ connection: SQLite.Connection, _ uuid: UUID) throws {
-	let update = schema.image.table.filter(
-		SQLite.Expression<UUID>(value: uuid) == schema.image.uuid
-	).update(
-		schema.image.uploaded <- Date.now
-	)
-	try connection.run(update)
-}
-
 func InspectionUpsert(_ connection: SQLite.Connection, _ sID: UUID, _ inspection: Inspection) throws
 {
 	let upsert = schema.inspection.table.upsert(
@@ -340,57 +309,6 @@ func MosquitoSourceUpsert(connection: SQLite.Connection, _ source: MosquitoSourc
 	try connection.run(upsert)
 }
 
-func NativeNotesAll(_ connection: Connection) throws -> [AnyNote] {
-	var results: [AnyNote] = []
-	var audio_recordings_by_note_uuid: [UUID: [AudioRecording]] = [:]
-	/*for row in try connection.prepare(schema.audioRecording.table) {
-		audio_recordings_by_note_uuid[row[schema.audioRecording.noteUUID], default: []]
-			.append(
-				AudioRecording(
-					created: row[schema.audioRecording.created],
-					duration: row[schema.audioRecording.duration],
-					transcription: row[schema.audioRecording.transcription],
-					uuid: row[schema.audioRecording.uuid]
-				)
-			)
-	}*/
-	var image_by_note_uuid: [UUID: [NoteImage]] = [:]
-	for row in try connection.prepare(schema.image.table) {
-		image_by_note_uuid[row[schema.image.noteUUID], default: []].append(
-			NoteImage(
-				created: row[schema.image.created],
-				uuid: row[schema.image.uuid]
-			)
-		)
-	}
-	let rows = try connection.prepare(
-		schema.note.table.filter(
-			SQLite.Expression<Date?>(value: nil) === schema.note.deleted
-		)
-	)
-	for row in rows {
-		let location = Location(
-			latitude: row[schema.note.latitude],
-			longitude: row[schema.note.longitude]
-		)
-		results.append(
-			AnyNote(
-				NidusNote(
-					audioRecordings: audio_recordings_by_note_uuid[
-						row[schema.note.uuid]
-					] ?? [],
-					images: image_by_note_uuid[row[schema.note.uuid]] ?? [],
-					location: location,
-					text: row[schema.note.text],
-					uploaded: row[schema.note.uploaded],
-					uuid: row[schema.note.uuid]
-				)
-			)
-		)
-	}
-	return results
-}
-
 func NotesCount(_ connection: SQLite.Connection) throws -> Int {
 	let result = try connection.scalar(schema.inspection.table.count)
 	return result
@@ -404,92 +322,6 @@ func NoteDelete(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
 		schema.note.uploaded <- SQLite.Expression<Date?>(value: nil)
 	)
 	try connection.run(update)
-}
-
-func NoteImageDelete(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
-	let delete = schema.image.table.filter(
-		SQLite.Expression<UUID>(value: noteUUID) == schema.image.noteUUID
-	).delete()
-	try connection.run(delete)
-}
-
-func NoteImageUpsert(
-	_ connection: SQLite.Connection,
-	_ noteImage: NoteImage,
-	_ noteUUID: UUID
-) throws {
-	let upsert = schema.image.table.upsert(
-		schema.image.created <- SQLite.Expression<Date>(value: noteImage.created),
-		schema.image.noteUUID <- SQLite.Expression<UUID>(value: noteUUID),
-		schema.image.uuid <- SQLite.Expression<UUID>(value: noteImage.uuid),
-		onConflictOf: schema.image.uuid
-	)
-	try connection.run(upsert)
-}
-
-func NotesNeedingUpload(_ connection: Connection) throws -> [NidusNote] {
-	var notes: [NidusNote] = []
-
-	// Query for notes where uploaded is NULL
-	let query = schema.note.table.filter(schema.note.uploaded == nil)
-
-	for noteRow in try connection.prepare(query) {
-		let noteUUID = noteRow[schema.note.uuid]
-		let timestamp = noteRow[schema.note.timestamp]
-		let latitude = noteRow[schema.note.latitude]
-		let longitude = noteRow[schema.note.longitude]
-		let text = noteRow[schema.note.text]
-		let uploaded = noteRow[schema.note.uploaded]
-
-		// Create location from coordinates
-		let location = Location(latitude: latitude, longitude: longitude)
-
-		// Query for associated audio recordings
-		var audioRecordings: [AudioRecording] = []
-		/*let audioQuery = schema.audioRecording.table.filter(
-			schema.audioRecording.noteUUID == noteUUID
-		)
-
-		for audioRow in try connection.prepare(audioQuery) {
-			let audioRecording = AudioRecording(
-				created: audioRow[schema.audioRecording.created],
-				duration: audioRow[schema.audioRecording.duration],
-				transcription: audioRow[schema.audioRecording.transcription],
-				uuid: audioRow[schema.audioRecording.uuid]
-			)
-			audioRecordings.append(audioRecording)
-		}*/
-
-		// Query for associated images
-		var images: [NoteImage] = []
-		let imageQuery = schema.image.table.filter(schema.image.noteUUID == noteUUID)
-
-		for imageRow in try connection.prepare(imageQuery) {
-			let noteImage = NoteImage(
-				created: imageRow[schema.image.created],
-				uuid: imageRow[schema.image.uuid]
-			)
-			images.append(noteImage)
-		}
-
-		// Create the NidusNote with all associated data
-		let nidusNote = NidusNote(
-			audioRecordings: audioRecordings,
-			images: images,
-			location: location,
-			text: text,
-			uploaded: uploaded,
-			uuid: noteUUID
-		)
-
-		// Set the timestamp to match the database value
-		nidusNote.timestamp = timestamp
-
-		notes.append(nidusNote)
-	}
-
-	return notes
-
 }
 
 func NoteUpdate(_ connection: Connection, _ n: NidusNote) throws {
@@ -510,10 +342,6 @@ func NoteUpsert(_ connection: Connection, _ note: NidusNote) throws -> Int64 {
 	for audioRecording in note.audioRecordings {
 		try AudioRecordingUpsert(connection, audioRecording, note.id)
 	}
-	try NoteImageDelete(connection, note.id)
-	for noteImage in note.images {
-		try NoteImageUpsert(connection, noteImage, note.id)
-	}
 	let upsert = schema.note.table.upsert(
 		schema.note.latitude
 			<- SQLite.Expression<Double>(
@@ -532,6 +360,76 @@ func NoteUpsert(_ connection: Connection, _ note: NidusNote) throws -> Int64 {
 	let result = try connection.run(upsert)
 	Logger.foreground.info("Note upsert \(note.id) yielded row id \(result)")
 	return result
+}
+
+func PictureAsNotes(
+	_ connection: SQLite.Connection
+) throws -> [PictureNote] {
+	let start = Date.now
+	var results: [PictureNote] = []
+	let query = schema.picture.table.filter(
+		schema.picture.deleted == nil
+	)
+	let rows = try connection.prepare(query)
+	for row in rows {
+		results.append(
+			PictureNote(
+				id: row[schema.picture.uuid],
+				location: row[schema.picture.location],
+				timestamp: row[schema.picture.created]
+			)
+		)
+	}
+	let end = Date.now
+	Logger.background.info(
+		"Took \(end.timeIntervalSince(start)) seconds to load pictures as notes"
+	)
+	return results
+}
+
+func PictureDelete(_ connection: SQLite.Connection, _ uuid: UUID) throws {
+	let delete = schema.picture.table.filter(
+		SQLite.Expression<UUID>(value: uuid) == schema.picture.uuid
+	).update(
+		schema.picture.deleted <- Date.now
+	)
+	try connection.run(delete)
+}
+
+func PictureInsert(_ connection: Connection, uuid: UUID, location: H3Cell?, created: Date) throws {
+	let insert = schema.picture.table.insert(
+		schema.picture.created
+			<- SQLite.Expression<Date>(value: created),
+		schema.picture.deleted
+			<- SQLite.Expression<Date?>(value: nil),
+		schema.picture.location
+			<- SQLite.Expression<UInt64?>(value: location),
+		schema.picture.uploaded
+			<- SQLite.Expression<Date?>(value: nil),
+		schema.picture.uuid <- SQLite.Expression<UUID>(value: uuid)
+	)
+	try connection.run(insert)
+}
+
+func PicturesNeedingUpload(_ connection: Connection) throws -> [UUID] {
+	// Query for notes where uploaded is NULL
+	let query = schema.picture.table.filter(schema.picture.uploaded == nil)
+
+	var uuids: [UUID] = []
+	for row in try connection.prepare(query) {
+		let uuid = row[schema.picture.uuid]
+		uuids.append(uuid)
+	}
+	return uuids
+}
+
+func PictureUploaded(_ connection: SQLite.Connection, _ uuid: UUID) throws {
+	let update = schema.picture.table.filter(
+		SQLite.Expression<UUID>(value: uuid) == schema.picture.uuid
+	).update(
+		schema.picture.uploaded <- Date.now
+	)
+	try connection.run(update)
 }
 
 func ServiceRequestAsNotes(_ connection: Connection) throws -> [AnyNote] {

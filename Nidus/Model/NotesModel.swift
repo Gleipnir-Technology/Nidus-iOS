@@ -22,7 +22,7 @@ struct NotesModel {
 	struct Preview {
 		static let someNotes: NotesModel = NotesModel.forPreview(notes: [
 			AudioNote(locations: [0x8a2_8347_0531_7fff]),
-			PictureNote(location: 0x8a2_8347_0531_4fff),
+			PictureNote.forPreview(location: 0x8a2_8347_0531_4fff),
 		])
 		static let someNoteOverview: [NoteOverview] = []
 	}

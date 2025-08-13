@@ -96,6 +96,30 @@ class NotesController {
 		Logger.foreground.info("Saved recording \(recording.uuid)")
 	}
 
+	func savePictureNote(_ picture: UIImage, _ location: H3Cell?) throws {
+		guard let database = self.database else {
+			throw DatabaseError.notConnected
+		}
+		guard let png = picture.pngData() else {
+			Logger.foreground.error("Failed to get PNG data for image")
+			return
+		}
+		let uuid = UUID()
+		let url = try! FileManager.default.url(
+			for: .applicationSupportDirectory,
+			in: .userDomainMask,
+			appropriateFor: nil,
+			create: true
+		).appendingPathComponent("\(uuid).png")
+		try png.write(to: url)
+		try database.service.insertPictureNote(
+			uuid: uuid,
+			location: location,
+			created: Date.now
+		)
+		Logger.foreground.info("Saved picture \(uuid)")
+	}
+
 	func startLoad(database: DatabaseController, network: NetworkController) {
 		self.database = database
 		self.network = network
@@ -253,11 +277,12 @@ class NotesController {
 				return
 			}
 			let toUpload: [UUID] =
-				uuid != nil ? [uuid!] : try database.service.imagesThatNeedUpload()
+				uuid != nil
+				? [uuid!] : try database.service.picturesThatNeedUpload()
 
 			for image in toUpload {
 				try await network.service.uploadImage(image)
-				try database.service.imageUploaded(image)
+				try database.service.pictureUploaded(image)
 				Logger.background.info(
 					"Uploaded image \(image.uuidString)"
 				)

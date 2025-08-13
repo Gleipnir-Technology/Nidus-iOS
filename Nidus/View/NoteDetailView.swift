@@ -21,6 +21,11 @@ struct NoteDetailView: View {
 				note: note
 			)
 		}
+		else if let note = note as? PictureNote {
+			PictureNoteDetail(
+				note: note
+			)
+		}
 		else {
 			Text("Unknown Note Detail View")
 		}

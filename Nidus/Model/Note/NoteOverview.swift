@@ -6,7 +6,7 @@ struct NoteOverview: Identifiable {
 	var color: Color
 	var icon: Image
 	var icons: [String]
-	var id: UUID = UUID()
+	var id: UUID
 	var location: H3Cell
 	var time: Date
 }

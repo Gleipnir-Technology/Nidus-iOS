@@ -31,7 +31,7 @@ class DatabaseService: CustomStringConvertible {
 	static func migrations() -> [Migration] {
 		return [
 			Migration1(), Migration2(), Migration3(), Migration4(), Migration5(),
-			Migration6(), Migration7(),
+			Migration6(), Migration7(), Migration8(),
 		]
 	}
 
@@ -96,7 +96,7 @@ class DatabaseService: CustomStringConvertible {
 			throw DatabaseError.notConnected
 		}
 		//try AudioRecordingDeleteByNote(connection, note.id)
-		try ImageDeleteByNote(connection, note.id)
+		//try ImageDeleteByNote(connection, note.id)
 		return try NoteDelete(connection, note.id)
 	}
 
@@ -112,18 +112,18 @@ class DatabaseService: CustomStringConvertible {
 		}
 	}
 
-	func imagesThatNeedUpload() throws -> [UUID] {
+	func picturesThatNeedUpload() throws -> [UUID] {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		return try ImagesNeedingUpload(connection)
+		return try PicturesNeedingUpload(connection)
 	}
 
-	func imageUploaded(_ uuid: UUID) throws {
+	func pictureUploaded(_ uuid: UUID) throws {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		try ImageUploaded(connection, uuid)
+		try PictureUploaded(connection, uuid)
 	}
 
 	func insertAudioNote(_ recording: AudioRecording) throws {
@@ -131,6 +131,13 @@ class DatabaseService: CustomStringConvertible {
 			throw DatabaseError.notConnected
 		}
 		try AudioRecordingInsert(connection, recording)
+	}
+
+	func insertPictureNote(uuid: UUID, location: H3Cell?, created: Date) throws {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		try PictureInsert(connection, uuid: uuid, location: location, created: created)
 	}
 
 	func migrateIfNeeded() throws {
@@ -176,12 +183,6 @@ class DatabaseService: CustomStringConvertible {
 			throw error
 
 		}
-		do {
-			let notes = try NativeNotesAll(connection)
-			for note in notes {
-				results[note.id] = note
-			}
-		}
 		return results
 	}
 	func notesByRegion(_ region: MKCoordinateRegion) throws -> [UUID: any NoteProtocol] {
@@ -200,6 +201,10 @@ class DatabaseService: CustomStringConvertible {
 		for ar in audioRecording {
 			results[ar.id] = ar
 		}
+		let pictures = try PictureAsNotes(connection)
+		for p in pictures {
+			results[p.id] = p
+		}
 		return results
 	}
 
@@ -215,7 +220,8 @@ class DatabaseService: CustomStringConvertible {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		return try NotesNeedingUpload(connection)
+		//return try NotesNeedingUpload(connection)
+		return []
 	}
 
 	func noteUpdate(_ n: NidusNote) throws {
