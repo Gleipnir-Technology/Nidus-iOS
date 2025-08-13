@@ -56,6 +56,10 @@ struct MapViewBreadcrumb: View {
 
 		for note in notes.values {
 			do {
+				// if the note is created by the user we ignore it for display and weighting purposes
+				if note.category == .audio || note.category == .picture {
+					continue
+				}
 				let cell = try scaleCell(
 					note.location,
 					to: overlayResolution
