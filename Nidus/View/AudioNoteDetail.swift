@@ -128,14 +128,19 @@ struct AudioNoteDetail: View {
 	}
 
 	var body: some View {
-		HStack {
-			MapViewBreadcrumb(
-				breadcrumbCells: note.locations,
-				initialRegion: initialRegion(),
-				notes: nil,
-				region: nil,
-				showsGrid: false
-			)
+		VStack {
+			if note.locations.count == 0 {
+				Text("No location")
+			}
+			else {
+				MapViewBreadcrumb(
+					breadcrumbCells: note.locations,
+					initialRegion: initialRegion(),
+					notes: nil,
+					region: nil,
+					showsGrid: false
+				)
+			}
 			AudioPlaybackWidget(
 				controller: controller
 			)
