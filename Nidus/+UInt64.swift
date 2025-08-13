@@ -26,6 +26,22 @@ extension UInt64: Number, Value {
 }
 */
 
+/*
+ attempt with type conversion
+extension UInt64: Number, Value {
+    public static let declaredDatatype = "INTEGER"
+
+    public static func fromDatatypeValue(_ datatypeValue: Int64) -> UInt64 {
+        return UInt64(datatypeValue)
+    }
+
+    public var datatypeValue: Int64 {
+        // Bitwise conversion
+        return Int64(self)
+    }
+
+}
+*/
 extension UInt64: Value {
 	public static func fromDatatypeValue(_ datatypeValue: SQLite.Blob) throws -> UInt64 {
 		guard datatypeValue.bytes.count >= MemoryLayout<UInt64>.size else { return 0 }
