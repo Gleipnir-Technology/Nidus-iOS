@@ -11,12 +11,23 @@ struct PictureNote: NoteProtocol {
 	init(id: UUID, location: H3Cell?, timestamp: Date) {
 		self.id = id
 		self.location = location ?? 0
+		self.named = nil
 		self.timestamp = timestamp
 	}
 
-	static func forPreview(location: H3Cell) -> PictureNote {
-		return PictureNote(id: UUID(), location: location, timestamp: Date.now)
+	// Strictly for previews
+	let named: String?
+	init(named: String, location: H3Cell?) {
+		self.id = UUID()
+		self.named = named
+		self.location = location ?? 0
+		self.timestamp = Date.now
 	}
+
+	static func forPreview(location: H3Cell) -> PictureNote {
+		return PictureNote(named: "mosquito-wide", location: location)
+	}
+	// end previews
 
 	var category: NoteType {
 		return .picture
@@ -50,6 +61,10 @@ struct PictureNote: NoteProtocol {
 		)
 	}
 	var uiImage: UIImage {
+		// For previews!
+		if self.named != nil {
+			return UIImage(named: self.named!) ?? PLACEHOLDER!
+		}
 
 		let url = try! FileManager.default.url(
 			for: .applicationSupportDirectory,
@@ -73,6 +88,6 @@ struct PictureNote: NoteProtocol {
 }
 
 let PLACEHOLDER = UIImage(
-	systemName: "photo",
+	systemName: "photo.badge.exclamationmark",
 	withConfiguration: UIImage.SymbolConfiguration(pointSize: 72)
 )
