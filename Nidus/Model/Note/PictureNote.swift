@@ -61,13 +61,18 @@ struct PictureNote: NoteProtocol {
 			let imagedata = try Data(contentsOf: url)
 			guard let image = UIImage(data: imagedata) else {
 				Logger.foreground.error("Failed to load image from \(url)")
-				return UIImage(named: "picture")!
+				return PLACEHOLDER!
 			}
 			return image
 		}
 		catch {
 			Logger.foreground.error("Failed to read image from \(url): \(error)")
-			return UIImage(named: "picture")!
+			return PLACEHOLDER!
 		}
 	}
 }
+
+let PLACEHOLDER = UIImage(
+	systemName: "photo",
+	withConfiguration: UIImage.SymbolConfiguration(pointSize: 72)
+)
