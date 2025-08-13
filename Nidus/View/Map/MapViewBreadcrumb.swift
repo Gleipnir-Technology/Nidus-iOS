@@ -141,9 +141,14 @@ struct MapViewBreadcrumb: View {
 
 		Task.detached(priority: .background) {
 			do {
+				let start = Date.now
 				let resolution = try regionToCellResolution(
 					newRegion,
 					count: hexCount
+				)
+				let end = Date.now
+				Logger.foreground.info(
+					"Took \(end.timeIntervalSince(start)) seconds to calculate resolution \(resolution)"
 				)
 				Task { @MainActor in
 					overlayResolution = resolution
