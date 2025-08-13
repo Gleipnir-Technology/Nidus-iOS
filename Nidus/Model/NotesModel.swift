@@ -6,7 +6,7 @@ struct NotesModel {
 	var filterInstances: [String: FilterInstance] = [:]
 	var mapAnnotations: [NoteMapAnnotation] = []
 	var notes: [UUID: any NoteProtocol]? = nil
-	var noteOverview: [NoteOverview]? = []
+	var noteOverviews: [NoteOverview]? = []
 	var searchText: String = ""
 
 	static func forPreview(notes: [any NoteProtocol]) -> NotesModel {
@@ -14,7 +14,7 @@ struct NotesModel {
 		model.notes = notes.reduce(into: [:]) { result, note in
 			result[note.id] = note
 		}
-		model.noteOverview = notes.map { $0.overview }
+		model.noteOverviews = notes.map { $0.overview }
 		model.mapAnnotations = notes.map { $0.mapAnnotation }
 		return model
 	}

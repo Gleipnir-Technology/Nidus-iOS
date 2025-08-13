@@ -16,15 +16,16 @@ struct NoteListView: View {
 		VStack {
 			//NoteSearchBar(searchText: $searchText)
 
-			if controller.notes.model.noteOverview == nil {
+			if controller.notes.model.noteOverviews == nil {
 				Text("Loading")
 			}
 			else {
-				if controller.notes.model.noteOverview!.count == 0 {
+				if controller.notes.model.noteOverviews!.count == 0 {
 					Text("No notes")
 				}
 				else {
 					NoteList(
+						cell: cell,
 						controller: controller,
 						userLocation: userLocation
 					)
@@ -36,6 +37,7 @@ struct NoteListView: View {
 }
 
 struct NoteList: View {
+	let cell: H3Cell
 	var controller: RootController
 	let userLocation: H3Cell?
 
@@ -58,13 +60,77 @@ struct NoteList: View {
 		return byDistance
 	}
 
+	/**
+     Return the ordered list of overviews that are contained within the current cell
+     */
+	func overviewsInCellOrdered() -> [NoteOverview] {
+		var results: [NoteOverview] = []
+		let currentResolution = getResolution(cell: cell)
+		for o in controller.notes.model.noteOverviews! {
+			if o.location == cell {
+				results.append(o)
+				continue
+			}
+			let res = getResolution(cell: o.location)
+			if res > currentResolution {
+				do {
+					let c = try scaleCell(o.location, to: currentResolution)
+					if c == cell {
+						results.append(o)
+					}
+				}
+				catch {
+					Logger.foreground.error(
+						"Failed to scale cell: \(o.location) to \(currentResolution): \(error)"
+					)
+				}
+			}
+			else if res == currentResolution {
+				// We know from the first check above that they are different cells
+				continue
+			}
+			else {
+				Logger.foreground.warning(
+					"Got a location cell that is smaller that tapped cell \(cell), not sure what to do with this: \(o.location)"
+				)
+			}
+		}
+		// At this point we have a set of results, but they aren't in order
+		if userLocation == nil {
+			return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
+				o1.time > o2.time
+			}
+		}
+		return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
+			do {
+				let d1 = try gridDistance(
+					origin: userLocation!,
+					destination: o1.location
+				)
+				let d2 = try gridDistance(
+					origin: userLocation!,
+					destination: o2.location
+				)
+				if d1 == d2 {
+					return o1.time > o2.time
+				}
+				return d1 > d2
+
+			}
+			catch {
+				// effectively random
+				return o1.time > o2.time
+			}
+		}
+	}
+
 	var body: some View {
-		if controller.notes.model.noteOverview == nil {
+		if controller.notes.model.noteOverviews == nil {
 			ProgressView()
 		}
 		else {
 			List {
-				ForEach(controller.notes.model.noteOverview!) { overview in
+				ForEach(overviewsInCellOrdered()) { overview in
 					NoteListRow(
 						controller: controller,
 						overview: overview,

@@ -163,7 +163,7 @@ class NotesController {
 				let notes = try database.service.notesByRegion(self.region)
 				model.mapAnnotations = notes.map { $0.value.mapAnnotation }
 				model.notes = notes
-				model.noteOverview = notes.map { $0.value.overview }
+				model.noteOverviews = notes.map { $0.value.overview }
 			}
 			catch {
 				Logger.background.error("Failed to calculate notes: \(error)")
