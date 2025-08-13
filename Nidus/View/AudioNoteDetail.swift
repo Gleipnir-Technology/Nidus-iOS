@@ -137,6 +137,7 @@ struct AudioNoteDetail: View {
 					breadcrumbCells: note.locations,
 					initialRegion: initialRegion(),
 					notes: nil,
+					onSelectCell: { _ in },
 					region: nil,
 					showsGrid: false
 				)

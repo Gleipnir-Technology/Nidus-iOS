@@ -28,6 +28,8 @@ struct MapViewBreadcrumb: View {
 	@State var currentRegion: MKCoordinateRegion = Initial.region
 	let initialRegion: MKCoordinateRegion
 	var notes: NotesController?
+	// The callback when a cell is selected
+	var onSelectCell: (H3Cell) -> Void
 	// The current H3 resolution we're operating at
 	@State var overlayResolution: Int = 8
 	var region: RegionController?
@@ -38,12 +40,14 @@ struct MapViewBreadcrumb: View {
 		breadcrumbCells: [H3Cell],
 		initialRegion: MKCoordinateRegion,
 		notes: NotesController?,
+		onSelectCell: @escaping (H3Cell) -> Void,
 		region: RegionController?,
 		showsGrid: Bool = false
 	) {
 		self.breadcrumbCells = breadcrumbCells
 		self.initialRegion = initialRegion
 		self.notes = notes
+		self.onSelectCell = onSelectCell
 		self.region = region
 		self.showsGrid = showsGrid
 	}
@@ -106,9 +110,6 @@ struct MapViewBreadcrumb: View {
 	}
 
 	private func onTapGesture(_ geometry: GeometryProxy, _ screenLocation: CGPoint) {
-		guard let region = self.region else {
-			return
-		}
 		let gpsLocation = screenLocationToLatLng(
 			location: screenLocation,
 			region: currentRegion,
@@ -122,7 +123,7 @@ struct MapViewBreadcrumb: View {
 				resolution: overlayResolution
 			)
 			Logger.foreground.info("Tapped on cell \(String(cell, radix: 16))")
-			region.breadcrumb.selectedCell = cell
+			onSelectCell(cell)
 		}
 		catch {
 			print("Failed on tap: \(error)")
@@ -283,17 +284,22 @@ func cellToPolyline(_ cellSelection: CellSelection) -> MKPolyline {
 struct MapViewBreadcrumb_Previews: PreviewProvider {
 	@State static var notes: NotesController = NotesControllerPreview()
 	@State static var region: RegionController = RegionControllerPreview()
+	static func onSelectCell(_ cell: H3Cell) {
+
+	}
 	static var previews: some View {
 		MapViewBreadcrumb(
 			breadcrumbCells: [],
 			initialRegion: Initial.region,
 			notes: notes,
+			onSelectCell: onSelectCell,
 			region: region
 		).previewDisplayName("current location only")
 		MapViewBreadcrumb(
 			breadcrumbCells: [],
 			initialRegion: Initial.region,
 			notes: notes,
+			onSelectCell: onSelectCell,
 			region: region
 		).onAppear {
 			region.breadcrumb.userPreviousCells =
@@ -303,6 +309,7 @@ struct MapViewBreadcrumb_Previews: PreviewProvider {
 			breadcrumbCells: [],
 			initialRegion: Initial.region,
 			notes: notes,
+			onSelectCell: onSelectCell,
 			region: region
 		).onAppear {
 			notes.model = NotesModel.Preview.someNotes

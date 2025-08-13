@@ -59,6 +59,9 @@ struct RootView: View {
 			activeView = .breadcrumb
 		}*/
 	}
+	func onMapSelectCell(_ cell: H3Cell) {
+		controller.region.breadcrumb.selectedCell = cell
+	}
 	func onMicButtonLong() {
 		didSelect.toggle()
 		activeView = .audio
@@ -84,6 +87,7 @@ struct RootView: View {
 							breadcrumbCells: breadcrumbCells(),
 							initialRegion: controller.region.current,
 							notes: controller.notes,
+							onSelectCell: onMapSelectCell,
 							region: controller.region,
 							showsGrid: false
 						)
