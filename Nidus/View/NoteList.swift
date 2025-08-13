@@ -91,7 +91,7 @@ struct NoteList: View {
 			}
 			else {
 				Logger.foreground.warning(
-					"Got a location cell that is smaller that tapped cell \(cell), not sure what to do with this: \(o.location)"
+					"Got a location cell that is smaller that tapped cell \(String(cell, radix: 16)), not sure what to do with this: \(String(o.location, radix: 16))"
 				)
 			}
 		}
