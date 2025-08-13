@@ -45,7 +45,8 @@ func AudioRecordingAsNotes(
 				locations: locations_by_audio_id[row[schema.audioRecording.uuid]]
 					?? [],
 				//locations: [],
-				timestamp: row[schema.audioRecording.created]
+				timestamp: row[schema.audioRecording.created],
+				transcription: row[schema.audioRecording.transcription]
 			)
 		)
 	}

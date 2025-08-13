@@ -7,12 +7,21 @@ import SwiftUI
 struct AudioNote: NoteProtocol {
 	let id: UUID
 	var locations: [H3Cell]
+	var tags: [AudioTagMatch]
 	var timestamp: Date
+	var transcription: String?
 
-	init(id: UUID = UUID(), locations: [H3Cell], timestamp: Date = Date()) {
+	init(
+		id: UUID = UUID(),
+		locations: [H3Cell],
+		timestamp: Date = Date(),
+		transcription: String? = nil
+	) {
 		self.id = id
 		self.locations = locations
+		self.tags = transcription == nil ? [] : AudioTagIdentifier.parseTags(transcription!)
 		self.timestamp = timestamp
+		self.transcription = transcription
 	}
 
 	var category: NoteType {
@@ -55,7 +64,8 @@ struct AudioNote: NoteProtocol {
 
 	struct Preview {
 		static var one = AudioNote(
-			locations: []
+			locations: [0x8f4_8eba_314c_0ac5],
+			transcription: "This is something I said"
 		)
 	}
 }

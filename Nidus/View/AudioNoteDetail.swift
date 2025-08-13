@@ -144,7 +144,12 @@ struct AudioNoteDetail: View {
 			AudioPlaybackWidget(
 				controller: controller
 			)
-
+			if note.transcription != nil && !(note.transcription!.isEmpty) {
+				TranscriptionDisplay(
+					tags: note.tags,
+					transcription: note.transcription
+				)
+			}
 		}
 		.onAppear {
 			controller.loadAudio(note.id)

@@ -35,7 +35,9 @@ struct AudioDetailView: View {
 							}
 							else {
 								TranscriptionDisplay(
-									model: controller.model
+									tags: controller.model.tags,
+									transcription: controller
+										.model.transcription
 								)
 								AudioTagDisplay(
 									tags: controller.model.tags
