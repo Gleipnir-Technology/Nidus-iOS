@@ -15,7 +15,7 @@ struct NoteListView: View {
 	var body: some View {
 		NavigationStack {
 			VStack {
-				NoteSearchBar(searchText: $searchText)
+				//NoteSearchBar(searchText: $searchText)
 
 				if controller.notes.model.noteOverview == nil {
 					Text("Loading")
