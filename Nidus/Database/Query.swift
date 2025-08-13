@@ -80,6 +80,9 @@ func AudioRecordingInsert(
 		)
 		try connection.run(location_insert)
 	}
+	Logger.background.info(
+		"Saved \(audio_recording.locations.count) locations for recording \(audio_recording.uuid)"
+	)
 }
 
 func AudioRecordingLocations(
@@ -94,8 +97,7 @@ func AudioRecordingLocations(
 	let query = schema.audioRecordingLocation.table.order(schema.audioRecordingLocation.index)
 	for row in try connection.prepare(query) {
 		results[row[schema.audioRecordingLocation.audioRecordingUUID], default: []].append(
-			//row[schema.audioRecordingLocation.cell]
-			RegionControllerPreview.userCell
+			row[schema.audioRecordingLocation.cell]
 		)
 	}
 	Logger.background.info(
