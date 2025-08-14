@@ -85,9 +85,9 @@ struct MosquitoSourceDetail: View {
 			Text("Created: \(createdFormatted(source.created))")
 			Text("Description: \(source.description)")
 			HStack {
-				Button("Add Filter", systemImage: "line.3.horizontal.decrease") {
-					addFilter(filters.habitat, source.habitat)
-				}.labelStyle(.iconOnly)
+				//Button("Add Filter", systemImage: "line.3.horizontal.decrease") {
+				//addFilter(filters.habitat, source.habitat)
+				//}.labelStyle(.iconOnly)
 				Text("Habitat: \(source.habitat)")
 				Spacer()
 			}
