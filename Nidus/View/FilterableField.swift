@@ -15,9 +15,9 @@ struct FilterableField: View {
 
 	var body: some View {
 		HStack {
-			Button("Add Filter", systemImage: "line.3.horizontal.decrease") {
-				addFilter(filter, value)
-			}.labelStyle(.iconOnly)
+			//Button("Add Filter", systemImage: "line.3.horizontal.decrease") {
+			//addFilter(filter, value)
+			//}.labelStyle(.iconOnly)
 			Text("\(label): \(value)")
 			Spacer()
 		}
