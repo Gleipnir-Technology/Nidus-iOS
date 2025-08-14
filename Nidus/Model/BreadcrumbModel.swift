@@ -1,8 +1,6 @@
 import MapKit
 import SwiftUI
 
-// The resolution at which we store location history.
-let HISTORY_RESOLUTION: Int = 15
 // The max age of location history we keep in seconds
 let HISTORY_ENTRY_MAX_AGE: TimeInterval = 60 * 5
 

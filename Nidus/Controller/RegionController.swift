@@ -33,6 +33,7 @@ class RegionController {
 	}
 
 	func onAppear() {
+		locationChangeCallbacks.append(addUserLocation)
 		locationDataManager.onLocationUpdated(handleLocationUpdated)
 	}
 
@@ -44,38 +45,26 @@ class RegionController {
 		currentChangeCallbacks.append(callback)
 	}
 
-	private func addUserLocation(_ h3Cell: H3Cell) {
-		if breadcrumb.userPreviousCells.keys.contains(h3Cell) {
-			return
-		}
+	private func addUserLocation(_ cells: [H3Cell]) {
 		breadcrumb.userPreviousCells = breadcrumb.userPreviousCells.filter { key, val in
 			Date.now.timeIntervalSince(val) < HISTORY_ENTRY_MAX_AGE
 		}
-		breadcrumb.userPreviousCells[h3Cell] = Date.now
+		for c in cells {
+			breadcrumb.userPreviousCells[c] = Date.now
+		}
 	}
 
 	private func handleLocationUpdated(_ locations: [CLLocation]) {
-		for location in locations {
-			do {
-				let h3Cell = try latLngToCell(
-					latitude: location.coordinate.latitude,
-					longitude: location.coordinate.longitude,
-					resolution: HISTORY_RESOLUTION
-				)
-				addUserLocation(h3Cell)
-				breadcrumb.userCell = h3Cell
-				breadcrumb.userLocation = location
-			}
-			catch {
-				Logger.background.warning(
-					"Failed to get H3 cell for location \(location): \(error)"
-				)
-			}
-		}
 		do {
 			let cells = try locations.map { l in
-				try latLngToCell(latLng: l.coordinate, resolution: 15)
+				let resolution = meterAccuracyToH3Resolution(l.horizontalAccuracy)
+				return try latLngToCell(
+					latLng: l.coordinate,
+					resolution: resolution
+				)
 			}
+			breadcrumb.userLocation = locations.last!
+			breadcrumb.userCell = cells.last!
 			for callback in locationChangeCallbacks {
 				callback(cells)
 			}

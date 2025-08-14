@@ -171,9 +171,9 @@ struct MapViewBreadcrumb: View {
 		for (i, cell) in breadcrumbCells.enumerated() {
 			let color = previousCellColor(i)
 			do {
-				let scaledCell = try scaleCell(
+				let scaledCell = try scaleCellLower(
 					cell,
-					to: overlayResolution
+					downTo: overlayResolution
 				)
 				results.append(CellSelection(scaledCell, color: color))
 			}

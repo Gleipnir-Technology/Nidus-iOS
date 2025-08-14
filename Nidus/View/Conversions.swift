@@ -139,9 +139,62 @@ func regionToCoordinates(_ region: MKCoordinateRegion) -> [CLLocationCoordinate2
 	]
 }
 
-/*
- Given a cell at a smaller resolution remap it to the larger resolution
- */
+/// Convert from an accuracy in meters of GPS coordinates to the H3 Resolution that has at least
+/// the same area. In other words, for a GPS coordinate accuracy of 2m you have pi*(2m)^2 or ~12.5m^2
+/// of area which corresponds to resolution 13 (average area of 43.87^2) vs resolution 14 (average area 6.26m^2)
+/// See https://h3geo.org/docs/core-library/restable
+func meterAccuracyToH3Resolution(_ accuracyInMetersFromPoint: Double) -> Int {
+	let area = pow(accuracyInMetersFromPoint, 2) * .pi
+	if area < 0.895 {
+		return 15
+	}
+	else if area < 6.267 {
+		return 14
+	}
+	else if area < 43.87 {
+		return 13
+	}
+	else if area < 307.092 {
+		return 12
+	}
+	else if area < 2149.643 {
+		return 11
+	}
+	else if area < 15_047.502 {
+		return 10
+	}
+	else if area < 105_332.513 {
+		return 9
+	}
+	else if area < 737_327.598 {
+		return 8
+	}
+	else if area < 5_161_293.360 {
+		return 7
+	}
+	else if area < 36_129_062.164 {
+		return 6
+	}
+	else if area < 252_903_858.182 {
+		return 5
+	}
+	else if area < 1_770_347_654.491 {
+		return 4
+	}
+	else if area < 12_393_434_655.088 {
+		return 3
+	}
+	else if area < 86_801_780_398.997 {
+		return 2
+	}
+	else if area < 609_788_441_794.134 {
+		return 1
+	}
+	else {
+		return 0
+	}
+}
+/// Given a cell at a smaller resolution remap it to the larger resolution
 func scaleCell(_ cell: H3Cell, to resolution: Int) throws -> H3Cell {
 	let currentResolution = getResolution(cell: cell)
 	if currentResolution == resolution {
@@ -149,6 +202,17 @@ func scaleCell(_ cell: H3Cell, to resolution: Int) throws -> H3Cell {
 	}
 	let latLng = try cellToLatLng(cell: cell)
 	let scaled = try latLngToCell(latLng: latLng, resolution: resolution)
+	return scaled
+}
+
+/// Scale a cell resolution down (size up), if it is at a lower resolution. Make no change it the resolution is already low enough
+func scaleCellLower(_ cell: H3Cell, downTo minResolution: Int) throws -> H3Cell {
+	let cellResolution = getResolution(cell: cell)
+	if cellResolution <= minResolution {
+		return cell
+	}
+	let latLng = try cellToLatLng(cell: cell)
+	let scaled = try latLngToCell(latLng: latLng, resolution: minResolution)
 	return scaled
 }
 
