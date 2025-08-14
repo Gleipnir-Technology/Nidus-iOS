@@ -52,7 +52,7 @@ struct MapViewBreadcrumb: View {
 		self.showsGrid = showsGrid
 	}
 
-	private func annotationsByCell() -> [AnnotationSummary] {
+	private func noteOverlay(_ categories: Set<NoteType>) -> [AnnotationSummary] {
 		guard let notes = notes?.model.notes else {
 			return []
 		}
@@ -60,8 +60,7 @@ struct MapViewBreadcrumb: View {
 
 		for note in notes.values {
 			do {
-				// if the note is created by the user we ignore it for display and weighting purposes
-				if note.category == .audio || note.category == .picture {
+				if !categories.contains(note.category) {
 					continue
 				}
 				let cell = try scaleCell(
@@ -96,6 +95,18 @@ struct MapViewBreadcrumb: View {
 				Double(results[cell]!.count) / Double(maxCountByCell)
 		}
 		return results.map { $0.value }
+	}
+	/**
+     Get the overlay showing notes data for Nidus notes
+     */
+	private func noteOverlayNidus() -> [AnnotationSummary] {
+		return noteOverlay([.audio, .picture])
+	}
+	/**
+         Get the overlay showing notes data for FieldSeeker notes
+         */
+	private func noteOverlayFS() -> [AnnotationSummary] {
+		return noteOverlay([.mosquitoSource])
 	}
 
 	private func onMapCameraChange(_ geometry: GeometryProxy, _ context: MapCameraUpdateContext)
@@ -193,10 +204,18 @@ struct MapViewBreadcrumb: View {
 					),
 					interactionModes: .all
 				) {
-					ForEach(annotationsByCell()) { summary in
+					ForEach(noteOverlayFS()) { summary in
 						CellSelection(summary.cell).asMapPolygon()
 							.foregroundStyle(
 								Color.red.opacity(
+									max(summary.weight, 0.2)
+								)
+							)
+					}
+					ForEach(noteOverlayNidus()) { summary in
+						CellSelection(summary.cell).asMapPolygon()
+							.foregroundStyle(
+								Color.blue.opacity(
 									max(summary.weight, 0.2)
 								)
 							)
