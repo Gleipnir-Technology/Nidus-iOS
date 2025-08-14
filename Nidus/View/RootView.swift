@@ -27,6 +27,8 @@ struct RootView: View {
 	@State private var selection: Int = 0
 	@State var selectedCells: [CellSelection] = [CellSelection]()
 
+	// An indication of the scene's operational state.
+	@Environment(\.scenePhase) var scenePhase
 	init(controller: RootController, isShowingAudioDetail: Bool = false) {
 		self.controller = controller
 		controller.onInit()
@@ -137,12 +139,26 @@ struct RootView: View {
 				}.navigationDestination(for: String.self) { p in
 					switch p {
 					case "camera":
-						CameraView(
-							controller: controller.camera,
-							toDismiss: {
-								path.removeLast()
+						CameraView(camera: controller.camera)
+							.preferredColorScheme(.dark)
+							.statusBarHidden(true)
+							.task {
+								// Start the capture pipeline.
+								await controller.camera.start()
 							}
-						)
+							// Monitor the scene phase. Synchronize the persisetent state when
+							// the camera is running and the app becomes active.
+							.onChange(of: scenePhase) { _, newPhase in
+								guard
+									controller.camera.status
+										== .running,
+									newPhase == .active
+								else { return }
+								Task { @MainActor in
+									await controller.camera
+										.syncState()
+								}
+							}
 					case "map-settings":
 						SettingView(controller: controller)
 					default:

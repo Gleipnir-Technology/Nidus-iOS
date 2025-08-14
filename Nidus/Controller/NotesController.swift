@@ -96,13 +96,9 @@ class NotesController {
 		Logger.foreground.info("Saved recording \(recording.uuid)")
 	}
 
-	func savePictureNote(_ picture: UIImage, _ location: H3Cell?) throws {
+	func savePictureNote(_ picture: Photo, _ location: H3Cell?) throws {
 		guard let database = self.database else {
 			throw DatabaseError.notConnected
-		}
-		guard let png = picture.pngData() else {
-			Logger.foreground.error("Failed to get PNG data for image")
-			return
 		}
 		let uuid = UUID()
 		let url = try! FileManager.default.url(
@@ -110,8 +106,8 @@ class NotesController {
 			in: .userDomainMask,
 			appropriateFor: nil,
 			create: true
-		).appendingPathComponent("\(uuid).png")
-		try png.write(to: url)
+		).appendingPathComponent("\(uuid).photo")
+		try picture.data.write(to: url)
 		try database.service.insertPictureNote(
 			uuid: uuid,
 			location: location,

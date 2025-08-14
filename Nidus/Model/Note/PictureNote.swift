@@ -71,7 +71,7 @@ struct PictureNote: NoteProtocol {
 			in: .userDomainMask,
 			appropriateFor: nil,
 			create: true
-		).appendingPathComponent("\(id).png")
+		).appendingPathComponent("\(id).photo")
 		do {
 			let imagedata = try Data(contentsOf: url)
 			guard let image = UIImage(data: imagedata) else {

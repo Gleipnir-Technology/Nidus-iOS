@@ -1,40 +1,82 @@
-import MijickCamera
-import OSLog
+import AVFoundation
+import AVKit
 import SwiftUI
 
-/*
- Our own custom camera view with controls.
- */
-struct CameraView: View {
-	var controller: CameraController
-	// The controller that we'll trigger when the user does stuff
-	let toDismiss: () -> Void
-	// Function to dismiss this control
+@MainActor
+struct CameraView<CameraModel: Camera>: PlatformView {
 
-	init(
-		controller: CameraController,
-		toDismiss: @escaping () -> Void
-	) {
-		self.controller = controller
-		self.toDismiss = toDismiss
-	}
+	@Environment(\.verticalSizeClass) var verticalSizeClass
+	@Environment(\.horizontalSizeClass) var horizontalSizeClass
+
+	@State var camera: CameraModel
+
+	// The direction a person swipes on the camera preview or mode selector.
+	@State var swipeDirection = SwipeDirection.left
 
 	var body: some View {
-		MCamera()
-			.onError { error in
-				Logger.foreground.error("Camera error: \(error)")
+		ZStack {
+			// A container view that manages the placement of the preview.
+			PreviewContainer(camera: camera) {
+				// A view that provides a preview of the captured content.
+				CameraPreview(source: camera.previewSource)
+					// Handle capture events from device hardware buttons.
+					//.onCameraCaptureEvent(defaultSoundDisabled: true) { event in
+					.onCameraCaptureEvent(isEnabled: true) { event in
+						if event.phase == .ended {
+							//let sound: AVCaptureEventSound
+							switch camera.captureMode {
+							case .photo:
+								//sound = .cameraShutter
+								// Capture a photo when pressing a hardware button.
+								Task {
+									await camera.capturePhoto()
+								}
+							case .video:
+								//sound = camera.captureActivity.isRecording ?
+								//.endVideoRecording : .beginVideoRecording
+								// Toggle video recording when pressing a hardware button.
+								Task {
+									await camera.toggleRecording()
+								}
+							}
+							// Play a sound when capturing by clicking an AirPods stem.
+							//if event.shouldPlaySound {
+							//event.play(sound)
+							//}
+						}
+					}
+					// Focus and expose at the tapped point.
+					.onTapGesture { location in
+						Task { await camera.focusAndExpose(at: location) }
+					}
+					// Switch between capture modes by swiping left and right.
+					.simultaneousGesture(swipeGesture)
+					/// The value of `shouldFlashScreen` changes briefly to `true` when capture
+					/// starts, and then immediately changes to `false`. Use this change to
+					/// flash the screen to provide visual feedback when capturing photos.
+					.opacity(camera.shouldFlashScreen ? 0 : 1)
 			}
-			.onImageCaptured { image, camera in
-				controller.saveImage(image)
-				camera.reopenCameraScreen()
-			}
-			.setCloseMCameraAction {
-				toDismiss()
-			}
-			.onVideoCaptured { url, camera in
-				controller.saveVideo(url)
-				camera.reopenCameraScreen()
-			}.startSession()
-		//.navigationBarBackButtonHidden(true)
+			// The main camera user interface.
+			CameraUI(camera: camera, swipeDirection: $swipeDirection)
+		}
 	}
+
+	var swipeGesture: some Gesture {
+		DragGesture(minimumDistance: 50)
+			.onEnded {
+				// Capture swipe direction.
+				swipeDirection = $0.translation.width < 0 ? .left : .right
+			}
+	}
+}
+
+#Preview {
+	CameraView(camera: PreviewCameraModel())
+}
+
+enum SwipeDirection {
+	case left
+	case right
+	case up
+	case down
 }

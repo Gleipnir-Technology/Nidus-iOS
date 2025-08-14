@@ -5,6 +5,7 @@ import SwiftUI
 /*
  Root controller for the entire application
  */
+@MainActor
 @Observable
 class RootController {
 	var audioPlayback = AudioPlaybackController()
