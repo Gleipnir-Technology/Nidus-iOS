@@ -17,39 +17,46 @@ class NetworkController {
 	func onInit() {
 		self.backgroundNetworkProgress = 0.0
 		Task {
-			await service.setCallbacks(
-				onError: self.handleError,
-				onProgress: self.handleProgress
-			)
-			guard let notesController = self.notes else {
-				Logger.background.error(
-					"Notes controller not set for network controller"
+			do {
+				await service.setCallbacks(
+					onError: self.handleError,
+					onProgress: self.handleProgress
 				)
-				return
-			}
-			let response = try await service.fetchNoteUpdates()
-			Logger.background.info("Begin saving API response")
-			let totalRecords =
-				response.requests.count + response.sources.count
-				+ response.traps.count
-			var i = 0
-			for r in response.requests {
-				try notesController.upsertServiceRequest(r)
-				i += 1
-				if i % 100 == 0 {
-					self.backgroundNetworkProgress =
-						Double(i) / Double(totalRecords)
+				guard let notesController = self.notes else {
+					Logger.background.error(
+						"Notes controller not set for network controller"
+					)
+					return
 				}
-			}
-			for s in response.sources {
-				try notesController.upsertSource(s)
-				i += 1
-				if i % 100 == 0 {
-					self.backgroundNetworkProgress =
-						Double(i) / Double(totalRecords)
+				let response = try await service.fetchNoteUpdates()
+				Logger.background.info("Begin saving API response")
+				let totalRecords =
+					response.requests.count + response.sources.count
+					+ response.traps.count
+				var i = 0
+				for r in response.requests {
+					try notesController.upsertServiceRequest(r)
+					i += 1
+					if i % 100 == 0 {
+						self.backgroundNetworkProgress =
+							Double(i) / Double(totalRecords)
+					}
 				}
+				for s in response.sources {
+					try notesController.upsertSource(s)
+					i += 1
+					if i % 100 == 0 {
+						self.backgroundNetworkProgress =
+							Double(i) / Double(totalRecords)
+					}
+				}
+				Logger.background.info("Done saving API response")
 			}
-			Logger.background.info("Done saving API response")
+			catch {
+				Logger.background.error(
+					"Failed network controller initialization: \(error)"
+				)
+			}
 		}
 	}
 
