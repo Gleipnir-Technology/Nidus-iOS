@@ -21,9 +21,6 @@ class RootController {
 
 	// MARK - public interface
 	func onAppear() {
-		settings.onChanged { update in
-			self.network.onSettingsChanged(update)
-		}
 		audioRecording.onRecordingSave { recording in
 			do {
 				try self.notes.saveAudioNote(recording)
@@ -52,8 +49,11 @@ class RootController {
 	}
 
 	func onInit() {
-		notes.startLoad(database: database, network: network)
+		settings.onChanged { update in
+			self.network.onSettingsChanged(update)
+		}
 		settings.load()
+		notes.startLoad(database: database, network: network)
 		region.current = settings.model.region
 		network.notes = notes
 		network.onInit()

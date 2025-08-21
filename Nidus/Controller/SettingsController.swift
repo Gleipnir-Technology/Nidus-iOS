@@ -17,8 +17,10 @@ class SettingsController {
 			model.username = UserDefaults.standard.string(forKey: "username") ?? ""
 
 			model.region = loadCurrentRegion() ?? Initial.region
+			handleChange()
 		} onChange: {
 			Logger.foreground.info("Got new settings")
+			self.handleChange()
 		}
 	}
 
@@ -42,6 +44,11 @@ class SettingsController {
 	}
 
 	// MARK - private functions
+	private func handleChange() {
+		for callback in callbacks {
+			callback(self.model)
+		}
+	}
 	private func loadCurrentRegion() -> MKCoordinateRegion? {
 		guard let regionString = UserDefaults.standard.string(forKey: "currentRegion")
 		else {
