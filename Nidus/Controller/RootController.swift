@@ -69,10 +69,19 @@ class RootController {
 class RootControllerPreview: RootController {
 	init(
 		audioRecording: AudioRecordingControllerPreview = AudioRecordingControllerPreview(),
+		network: NetworkControllerPreview = NetworkControllerPreview(),
 		notes: NotesControllerPreview = NotesControllerPreview()
 	) {
 		super.init()
 		self.audioRecording = audioRecording
+		self.network = network
 		self.notes = notes
+	}
+
+	override func onAppear() {
+
+	}
+	override func onInit() {
+
 	}
 }

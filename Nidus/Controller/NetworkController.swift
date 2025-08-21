@@ -93,3 +93,14 @@ class NetworkController {
 		self.backgroundNetworkProgress = progress
 	}
 }
+
+class NetworkControllerPreview: NetworkController {
+	init(
+		backgroundNetworkProgress: Double = 0.0,
+		backgroundNetworkState: BackgroundNetworkState = .notConfigured
+	) {
+		super.init()
+		self.backgroundNetworkProgress = backgroundNetworkProgress
+		self.backgroundNetworkState = backgroundNetworkState
+	}
+}
