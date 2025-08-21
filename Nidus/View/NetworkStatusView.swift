@@ -10,9 +10,24 @@ struct NetworkStatusView: View {
 				.fill(Color.white)
 				.frame(width: 50, height: 50)
 
+			/*
 			ProgressView(value: controller.backgroundNetworkProgress)
 				.progressViewStyle(.circular)
 				.font(.title2)
+             */
+			Circle()
+				.trim(from: 0, to: CGFloat(controller.backgroundNetworkProgress))
+				.stroke(Color.blue, lineWidth: 4)
+				.rotationEffect(Angle(degrees: -90))
+				.frame(width: 40, height: 40)
 		}
 	}
+}
+#Preview {
+	NetworkStatusView(
+		controller: NetworkControllerPreview(
+			backgroundNetworkProgress: 0.45,
+			backgroundNetworkState: .downloading
+		)
+	).background(Color.black)
 }
