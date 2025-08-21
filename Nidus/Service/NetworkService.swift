@@ -87,7 +87,10 @@ actor NetworkService {
 		var response: NotesResponse?
 		try await maybeLogin(settings) {
 			let tempURL = try await downloadWrapper.handle(with: request) { progress in
-				//self.onProgress(progress.progress)
+				guard let onProgress = self.onProgress else {
+					return
+				}
+				onProgress(progress.progress)
 			}
 			response = try parseJSON(tempURL)
 		}
