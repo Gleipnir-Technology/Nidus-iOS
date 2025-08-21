@@ -26,14 +26,17 @@ struct NetworkStatusView: View {
 						color: Color.blue
 					)
 				case .error:
-					Image(systemName: "nosign.app").foregroundStyle(.red)
+					Image(systemName: "nosign.app").foregroundColor(.red).font(
+						.title
+					)
 				case .idle:
 					EmptyView()
 				case .loggingIn:
-					Image(systemName: "lock.rotation").foregroundStyle(.green)
+					Image(systemName: "lock.rotation").foregroundColor(.green)
+						.font(.title)
 				case .notConfigured:
 					Image(systemName: "questionmark.key.filled")
-						.foregroundStyle(.gray)
+						.foregroundColor(.gray).font(.title)
 				case .savingData:
 					ProgressCircle(
 						progress: controller.backgroundNetworkProgress,
@@ -63,11 +66,31 @@ struct ProgressCircle: View {
 	}
 }
 
-#Preview {
+private func statusPreview(_ progress: Double, _ state: BackgroundNetworkState) -> some View {
 	NetworkStatusView(
 		controller: NetworkControllerPreview(
-			backgroundNetworkProgress: 0.45,
-			backgroundNetworkState: .downloading
+			backgroundNetworkProgress: progress,
+			backgroundNetworkState: state
 		)
 	).background(Color.black)
+}
+
+#Preview("downloading") {
+	statusPreview(0.45, .downloading)
+}
+
+#Preview("error") {
+	statusPreview(0.55, .error)
+}
+
+#Preview("loggingIn") {
+	statusPreview(0.25, .loggingIn)
+}
+
+#Preview("notConfigured") {
+	statusPreview(0.35, .notConfigured)
+}
+
+#Preview("saving") {
+	statusPreview(0.75, .savingData)
 }

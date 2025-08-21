@@ -61,6 +61,7 @@ class NetworkController {
 				Logger.background.error(
 					"Failed network controller initialization: \(error)"
 				)
+				self.backgroundNetworkState = .error
 			}
 		}
 	}
