@@ -1,10 +1,3 @@
-//
-//  BackgroundDownloadWrapper.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 7/3/25.
-//
-
 import Foundation
 import OSLog
 import UIKit
@@ -22,6 +15,7 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		let config = URLSessionConfiguration.background(
 			withIdentifier: "technology.gleipnir.nidus-notes.download-session"
 		)
+		config.timeoutIntervalForRequest = 10
 		config.isDiscretionary = false
 		config.sessionSendsLaunchEvents = true
 		config.httpCookieStorage = cookieStorage
