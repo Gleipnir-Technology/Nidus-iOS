@@ -21,7 +21,6 @@ class NotesController {
 		try await database.connect()
 
 		//loadFilters()
-		//startUpdateCluster()
 		let count = try database.service.notesCount()
 		Logger.background.info("Notes count: \(count)")
 	}
@@ -146,7 +145,6 @@ class NotesController {
 		UserDefaults.standard.set(asStrings, forKey: "filters")
 		Logger.foreground.info("Saved filters \(asStrings)")
 		calculateNotesToShow()
-		startUpdateCluster()
 	}
 
 	private func calculateNotesToShow() {
@@ -335,19 +333,6 @@ class NotesController {
 			}
 		}
 	}
-
-	func startUpdateCluster() {
-		// TODO - fix
-		/*
-		Task {
-			await cluster.onNoteChanges(
-				notes: notesToShow,
-				mapSize: mapSize,
-				region: currentRegion
-			)
-		}*/
-	}
-
 }
 
 class NotesControllerPreview: NotesController {

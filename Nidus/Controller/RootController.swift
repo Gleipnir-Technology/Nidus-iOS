@@ -62,11 +62,11 @@ class RootController {
 		notes.startLoad(database: database, network: network)
 		settings.load()
 		region.current = settings.model.region
+		network.onInit()
 	}
 
 	func onRegionChange(r: MKCoordinateRegion) {
 		notes.onRegionChange(r)
-		notes.startUpdateCluster()
 		settings.saveCurrentRegion(r)
 	}
 
