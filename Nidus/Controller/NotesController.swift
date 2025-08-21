@@ -13,6 +13,7 @@ class NotesController {
 
 	private var region: MKCoordinateRegion = Initial.region
 
+	// MARK - public functions
 	func load() async throws {
 		guard let database = self.database else {
 			Logger.background.error("Database not set")
@@ -25,10 +26,25 @@ class NotesController {
 		Logger.background.info("Notes count: \(count)")
 	}
 
-	// MARK - public interface
 	func filterAdd(_ instance: FilterInstance) {
 		model.filterInstances[instance.Name()] = instance
 		onFilterChange()
+	}
+
+	func upsertServiceRequest(_ serviceRequest: ServiceRequest) throws {
+		guard let database = self.database else {
+			Logger.background.error("Database not set")
+			return
+		}
+		return try database.service.upsertServiceRequest(serviceRequest)
+	}
+
+	func upsertSource(_ source: MosquitoSource) throws {
+		guard let database = self.database else {
+			Logger.background.error("Database not set")
+			return
+		}
+		return try database.service.upsertSource(source)
 	}
 
 	func noteDelete() {
@@ -175,34 +191,9 @@ class NotesController {
 			self.model.filterInstances[filter.Name()] = filter
 		}
 	}
-	private func saveNoteUpdates(_ response: NotesResponse) async {
+	func handleNoteUpdates(_ response: NotesResponse) async {
 		/*
         do {
-            Logger.background.info("Begin saving API response")
-            self.backgroundNetworkProgress = 0.0
-            let totalRecords =
-                response.requests.count + response.sources.count
-                + response.traps.count
-            var i = 0
-            for r in response.requests {
-                try database.upsertServiceRequest(r)
-                i += 1
-                if i % 100 == 0 {
-                    self.backgroundNetworkProgress =
-                        Double(i) / Double(totalRecords)
-                }
-            }
-            for s in response.sources {
-                try database.upsertSource(s)
-                i += 1
-                if i % 100 == 0 {
-                    self.backgroundNetworkProgress =
-                        Double(i) / Double(totalRecords)
-                }
-            }
-            notes.startLoadNotesFromDatabase()
-            notes.startUpdateCluster()
-            Logger.background.info("Done saving API response")
         }
         catch {
             Logger.background.error("Failed to handle API response: \(error)")
@@ -286,19 +277,6 @@ class NotesController {
 	}
 
 	/* private */
-	func startNoteDownload() {
-		Task {
-			guard let network = network else {
-				Logger.background.error(
-					"Background network manager is null when doing note download"
-				)
-				return
-			}
-			let noteUpdates = try await network.fetchNoteUpdates()
-			await saveNoteUpdates(noteUpdates)
-		}
-	}
-
 	func startNoteUpload(_ note: NidusNote? = nil) {
 		Task {
 			do {

@@ -55,6 +55,7 @@ class RootController {
 		notes.startLoad(database: database, network: network)
 		settings.load()
 		region.current = settings.model.region
+		network.notes = notes
 		network.onInit()
 	}
 
