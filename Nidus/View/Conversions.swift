@@ -105,9 +105,9 @@ func regionToCellResolution(_ region: MKCoordinateRegion, count: Int = 10) throw
 		if cells.count > count {
 			//let cellsAsHex = cells.map({ c in String(c, radix: 16) })
 			//print("Cells: \(cellsAsHex))")
-			Logger.background.info(
-				"Choosing resolution \(resolution) to get \(cells.count)/\(count) cells"
-			)
+			//Logger.background.info(
+			//"Choosing resolution \(resolution) to get \(cells.count)/\(count) cells"
+			//)
 			return resolution
 		}
 		resolution += 1

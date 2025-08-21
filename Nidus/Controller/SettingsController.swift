@@ -40,7 +40,7 @@ class SettingsController {
 			region.span.longitudeDelta
 		)
 		UserDefaults.standard.set(regionString, forKey: "currentRegion")
-		Logger.background.info("Saved current region: \(regionString)")
+		//Logger.background.info("Saved current region: \(regionString)")
 	}
 
 	// MARK - private functions

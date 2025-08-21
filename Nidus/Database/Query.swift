@@ -28,7 +28,7 @@ func AudioNeedingUpload(_ connection: Connection) throws -> [UUID] {
 func AudioRecordingAsNotes(
 	_ connection: SQLite.Connection
 ) throws -> [AudioNote] {
-	let start = Date.now
+	//let start = Date.now
 	var results: [AudioNote] = []
 	let query = schema.audioRecording.table
 	let rows = try connection.prepare(query)
@@ -50,10 +50,10 @@ func AudioRecordingAsNotes(
 			)
 		)
 	}
-	let end = Date.now
-	Logger.background.info(
-		"Took \(end.timeIntervalSince(start)) seconds to load audio recordings as notes"
-	)
+	//let end = Date.now
+	//Logger.background.info(
+	//"Took \(end.timeIntervalSince(start)) seconds to load audio recordings as notes"
+	//)
 	return results
 }
 
@@ -101,9 +101,9 @@ func AudioRecordingLocations(
 			row[schema.audioRecordingLocation.cell]
 		)
 	}
-	Logger.background.info(
-		"Pulled \(results.count) audio locations for \(audio_ids.count) audio recordings"
-	)
+	//Logger.background.info(
+	//"Pulled \(results.count) audio locations for \(audio_ids.count) audio recordings"
+	//)
 	return results
 }
 
@@ -154,7 +154,7 @@ func InspectionUpsert(_ connection: SQLite.Connection, _ sID: UUID, _ inspection
 func InspectionsForSources(_ connection: SQLite.Connection, _ sourceUUIDs: [UUID]) throws -> [UUID:
 	[Inspection]]
 {
-	let start = Date.now
+	//let start = Date.now
 	var results: [UUID: [Inspection]] = [:]
 	let query = schema.inspection.table.filter(
 		sourceUUIDs.contains(schema.inspection.sourceID)
@@ -170,15 +170,15 @@ func InspectionsForSources(_ connection: SQLite.Connection, _ sourceUUIDs: [UUID
 			)
 		)
 	}
-	let end = Date.now
-	Logger.background.info("Inspection query took \(end.timeIntervalSince(start)) seconds")
+	//let end = Date.now
+	//Logger.background.info("Inspection query took \(end.timeIntervalSince(start)) seconds")
 	return results
 }
 
 func TreatmentsForSources(_ connection: SQLite.Connection, _ sourceUUIDs: [UUID]) throws -> [UUID:
 	[Treatment]]
 {
-	let start = Date.now
+	//let start = Date.now
 	var results: [UUID: [Treatment]] = [:]
 	let query = schema.treatment.table.filter(
 		sourceUUIDs.contains(schema.treatment.sourceID)
@@ -200,8 +200,8 @@ func TreatmentsForSources(_ connection: SQLite.Connection, _ sourceUUIDs: [UUID]
 			)
 		)
 	}
-	let end = Date.now
-	Logger.background.info("Treatment query took \(end.timeIntervalSince(start)) seconds")
+	//let end = Date.now
+	//Logger.background.info("Treatment query took \(end.timeIntervalSince(start)) seconds")
 	return results
 }
 
@@ -209,7 +209,7 @@ func MosquitoSourceAsNotes(
 	_ connection: SQLite.Connection,
 	region: MKCoordinateRegion
 ) throws -> [MosquitoSourceNote] {
-	let start = Date.now
+	//let start = Date.now
 	var results: [MosquitoSourceNote] = []
 	let query = schema.mosquitoSource.table.filter(
 		SQLite.Expression(value: region.maxLatitude) >= schema.mosquitoSource.latitude
@@ -259,8 +259,8 @@ func MosquitoSourceAsNotes(
 			)
 		)
 	}
-	let end = Date.now
-	Logger.background.info("Source query took \(end.timeIntervalSince(start)) seconds")
+	//let end = Date.now
+	//Logger.background.info("Source query took \(end.timeIntervalSince(start)) seconds")
 	return results
 	/*
 	for row in try connection.prepare(schema.mosquitoSource.table) {
@@ -365,7 +365,7 @@ func NoteUpsert(_ connection: Connection, _ note: NidusNote) throws -> Int64 {
 func PictureAsNotes(
 	_ connection: SQLite.Connection
 ) throws -> [PictureNote] {
-	let start = Date.now
+	//let start = Date.now
 	var results: [PictureNote] = []
 	let query = schema.picture.table.filter(
 		schema.picture.deleted == nil
@@ -380,10 +380,10 @@ func PictureAsNotes(
 			)
 		)
 	}
-	let end = Date.now
-	Logger.background.info(
-		"Took \(end.timeIntervalSince(start)) seconds to load pictures as notes"
-	)
+	//let end = Date.now
+	//Logger.background.info(
+	//"Took \(end.timeIntervalSince(start)) seconds to load pictures as notes"
+	//)
 	return results
 }
 
