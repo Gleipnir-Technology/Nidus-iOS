@@ -22,14 +22,7 @@ class RootController {
 	// MARK - public interface
 	func onAppear() {
 		settings.onChanged { update in
-			Task {
-				do {
-					try await self.network.service.connect(update)
-				}
-				catch {
-					self.error.onError(error)
-				}
-			}
+			self.network.onSettingsChanged(update)
 		}
 		audioRecording.onRecordingSave { recording in
 			do {

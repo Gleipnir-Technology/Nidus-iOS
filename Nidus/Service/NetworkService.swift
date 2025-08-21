@@ -50,14 +50,23 @@ enum NetworkServiceError: Error {
 	case settingsNotSet
 }
 
-class NetworkService {
+actor NetworkService {
 	private var continuations: [URLSessionTask: CheckedContinuation<(), Error>] = [:]
 	private var downloadWrapper: BackgroundDownloadWrapper = BackgroundDownloadWrapper()
 	private var settings: SettingsModel? = nil
-	nonisolated let onError: ((any Error) -> Void)? = nil
-	nonisolated let onProgress: ((Double) -> Void)? = nil
+	var onError: ((any Error) -> Void)? = nil
+	var onProgress: ((Double) -> Void)? = nil
 
-	@Published var isLoggedIn = false
+	var isLoggedIn = false
+
+	// MARK - public interfaces
+	func setCallbacks(
+		onError: @escaping (Error) -> Void,
+		onProgress: @escaping (Double) -> Void
+	) {
+		self.onError = onError
+		self.onProgress = onProgress
+	}
 
 	func connect(_ settings: SettingsModel) async throws {
 		if settings.username == "" || settings.password == "" {
@@ -85,7 +94,11 @@ class NetworkService {
 		return response!
 	}
 
-	nonisolated func uploadAudio(_ uuid: UUID) async throws {
+	func handleSettingsChanged(_ newSettings: SettingsModel) {
+		self.settings = newSettings
+	}
+
+	func uploadAudio(_ uuid: UUID) async throws {
 		guard let settings = self.settings else {
 			throw NetworkServiceError.settingsNotSet
 		}
@@ -108,7 +121,7 @@ class NetworkService {
 		}
 	}
 
-	nonisolated func uploadImage(_ uuid: UUID) async throws {
+	func uploadImage(_ uuid: UUID) async throws {
 		guard let settings = self.settings else {
 			throw NetworkServiceError.settingsNotSet
 		}
@@ -131,7 +144,7 @@ class NetworkService {
 		}
 	}
 
-	nonisolated func uploadNote(_ note: NidusNote) async throws {
+	func uploadNote(_ note: NidusNote) async throws {
 		guard let settings = self.settings else {
 			throw NetworkServiceError.settingsNotSet
 		}

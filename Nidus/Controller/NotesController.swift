@@ -245,7 +245,7 @@ class NotesController {
 			let toUpload: [UUID] =
 				uuid != nil ? [uuid!] : try database.service.audioThatNeedsUpload()
 			for audio in toUpload {
-				try await network.service.uploadAudio(audio)
+				try await network.uploadAudio(audio)
 				try database.service.audioUploaded(audio)
 				Logger.background.info(
 					"Uploaded audio \(audio.uuidString)"
@@ -275,7 +275,7 @@ class NotesController {
 				? [uuid!] : try database.service.picturesThatNeedUpload()
 
 			for image in toUpload {
-				try await network.service.uploadImage(image)
+				try await network.uploadImage(image)
 				try database.service.pictureUploaded(image)
 				Logger.background.info(
 					"Uploaded image \(image.uuidString)"
@@ -294,7 +294,7 @@ class NotesController {
 				)
 				return
 			}
-			let noteUpdates = try await network.service.fetchNoteUpdates()
+			let noteUpdates = try await network.fetchNoteUpdates()
 			await saveNoteUpdates(noteUpdates)
 		}
 	}
@@ -320,7 +320,7 @@ class NotesController {
 					? [note!] : try database.service.notesThatNeedUpload()
 				// Upload notes first so that the back office gets them fastest
 				for note in toUpload {
-					try await network.service.uploadNote(note)
+					try await network.uploadNote(note)
 					note.uploaded = Date.now
 					try database.service.noteUpdate(note)
 					Logger.background.info(
