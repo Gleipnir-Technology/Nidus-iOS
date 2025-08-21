@@ -16,6 +16,7 @@ class NetworkController {
 
 	func onInit() {
 		self.backgroundNetworkProgress = 0.0
+		self.backgroundNetworkState = .idle
 		Task {
 			do {
 				await service.setCallbacks(
@@ -28,7 +29,9 @@ class NetworkController {
 					)
 					return
 				}
+				self.backgroundNetworkState = .downloading
 				let response = try await service.fetchNoteUpdates()
+				self.backgroundNetworkState = .savingData
 				Logger.background.info("Begin saving API response")
 				let totalRecords =
 					response.requests.count + response.sources.count
@@ -50,6 +53,8 @@ class NetworkController {
 							Double(i) / Double(totalRecords)
 					}
 				}
+				self.backgroundNetworkState = .idle
+				self.backgroundNetworkProgress = 0.0
 				Logger.background.info("Done saving API response")
 			}
 			catch {
@@ -91,6 +96,7 @@ class NetworkController {
 
 	private func handleProgress(_ progress: Double) {
 		self.backgroundNetworkProgress = progress
+		//Logger.background.info("Network progress: \(progress)")
 	}
 }
 
