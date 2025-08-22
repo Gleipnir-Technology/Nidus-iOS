@@ -89,6 +89,10 @@ struct NoteList: View {
 				// We know from the first check above that they are different cells
 				continue
 			}
+			else if o.location == 0 {
+				// This is a note that has no location at all
+				continue
+			}
 			else {
 				Logger.foreground.warning(
 					"Got a location cell that is smaller that tapped cell \(String(cell, radix: 16)), not sure what to do with this: \(String(o.location, radix: 16))"
