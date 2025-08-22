@@ -101,11 +101,17 @@ actor NetworkService {
 		self.settings = newSettings
 	}
 
-	func uploadNoteAudio(_ recording: AudioNote) async throws {
+	func uploadNoteAudio(_ recording: AudioNote, _ progressCallback: @escaping (Double) -> Void)
+		async throws
+	{
 		// Upload the data for the note first because the server will validate the UUID
-		try await uploadDataAudio(recording)
+		try await uploadDataAudio(recording) { progress in
+			progressCallback(progress * 0.5)
+		}
 		// Upload the actual audio file
-		try await uploadFileAudio(recording.id)
+		try await uploadFileAudio(recording.id) { progress in
+			progressCallback((progress * 0.5) + 0.5)
+		}
 	}
 
 	func uploadNotePicture(_ recording: PictureNote) async throws {
@@ -115,7 +121,10 @@ actor NetworkService {
 		try await uploadFilePicture(recording.id)
 	}
 
-	private func uploadDataAudio(_ recording: AudioNote) async throws {
+	private func uploadDataAudio(
+		_ recording: AudioNote,
+		_ progressCallback: @escaping (Double) -> Void
+	) async throws {
 		guard let settings = self.settings else {
 			throw NetworkServiceError.settingsNotSet
 		}
@@ -131,7 +140,10 @@ actor NetworkService {
 		let data = try encoder.encode(recording)
 		request.httpBody = data
 		try await maybeLogin(settings) {
-			_ = try await downloadWrapper.handle(with: request)
+			Logger.background.info("Begin upload of audio data \(recording.id)")
+			_ = try await downloadWrapper.handle(with: request) { progress in
+				progressCallback(progress.progress)
+			}
 		}
 		Logger.background.info("Audio data \(recording.id) uploaded successfully")
 	}
@@ -152,12 +164,15 @@ actor NetworkService {
 		let data = try encoder.encode(picture)
 		request.httpBody = data
 		try await maybeLogin(settings) {
+			Logger.background.info("Begin upload of picture data \(picture.id)")
 			_ = try await downloadWrapper.handle(with: request)
 		}
 		Logger.background.info("Picture data \(picture.id) uploaded successfully")
 	}
 
-	private func uploadFileAudio(_ uuid: UUID) async throws {
+	private func uploadFileAudio(_ uuid: UUID, _ progressCallback: @escaping (Double) -> Void)
+		async throws
+	{
 		guard let settings = self.settings else {
 			throw NetworkServiceError.settingsNotSet
 		}
@@ -178,7 +193,10 @@ actor NetworkService {
 
 		// Create upload task with file URL
 		try await maybeLogin(settings) {
-			_ = try await downloadWrapper.handle(with: request)
+			Logger.background.info("Begin upload of audio file \(uuid)")
+			_ = try await downloadWrapper.handle(with: request) { progress in
+				progressCallback(progress.progress)
+			}
 		}
 		Logger.background.info("Audio file \(uuid) uploaded successfully")
 	}
@@ -204,6 +222,7 @@ actor NetworkService {
 
 		// Create upload task with file URL
 		try await maybeLogin(settings) {
+			Logger.background.info("Begin upload of picture file \(uuid)")
 			_ = try await downloadWrapper.handle(with: request)
 		}
 	}

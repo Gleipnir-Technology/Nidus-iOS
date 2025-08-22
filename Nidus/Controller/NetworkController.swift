@@ -38,7 +38,9 @@ class NetworkController {
 
 	func uploadNoteAudio(_ recording: AudioNote) async throws {
 		self.backgroundNetworkState = .uploadingChanges
-		try await service.uploadNoteAudio(recording)
+		try await service.uploadNoteAudio(recording) { progress in
+			self.backgroundNetworkProgress = progress
+		}
 	}
 	func uploadNotePicture(_ picture: PictureNote) async throws {
 		self.backgroundNetworkState = .uploadingChanges
