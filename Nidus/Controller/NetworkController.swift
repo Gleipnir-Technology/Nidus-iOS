@@ -11,11 +11,10 @@ class NetworkController {
 
 	// MARK - public interface
 	func downloadNotes(_ database: DatabaseController) async {
-		self.backgroundNetworkState = .downloading
+		setState(.downloading, 0.0)
 		do {
 			let response = try await service.fetchNoteUpdates()
-			self.backgroundNetworkState = .savingData
-			Logger.background.info("Begin saving API response")
+			setState(.savingData, 0.0)
 			let totalRecords =
 				response.requests.count + response.sources.count
 				+ response.traps.count
@@ -24,25 +23,23 @@ class NetworkController {
 				try database.service.upsertServiceRequest(r)
 				i += 1
 				if i % 100 == 0 {
-					self.backgroundNetworkProgress =
-						Double(i) / Double(totalRecords)
+					setState(.savingData, Double(i) / Double(totalRecords))
 				}
 			}
 			for s in response.sources {
 				try database.service.upsertSource(s)
 				i += 1
 				if i % 100 == 0 {
-					self.backgroundNetworkProgress =
-						Double(i) / Double(totalRecords)
+					setState(.savingData, Double(i) / Double(totalRecords))
 				}
 			}
-			self.backgroundNetworkState = .idle
-			self.backgroundNetworkProgress = 0.0
+			setState(.idle, 0.0)
 			Logger.background.info("Done saving API response")
 		}
 		catch {
 			SentrySDK.capture(error: error)
 			Logger.background.error("Failed to fetch updates: \(error)")
+			setState(.error, 0.0)
 			return
 		}
 
@@ -52,13 +49,13 @@ class NetworkController {
 	}
 
 	func onInit() {
-		self.backgroundNetworkProgress = 0.0
-		self.backgroundNetworkState = .idle
+		setState(.idle, 0.0)
 		Task {
 			await service.setCallbacks(
 				onError: self.handleError,
 				onProgress: self.handleProgress
 			)
+			Logger.background.info("Set callbacks for network service")
 		}
 	}
 
@@ -75,18 +72,16 @@ class NetworkController {
 	}
 
 	func uploadNoteAudio(_ recording: AudioNote) async throws {
-		self.backgroundNetworkState = .uploadingChanges
+		setState(.uploadingChanges, 0.0)
 		try await service.uploadNoteAudio(recording) { progress in
-			self.backgroundNetworkProgress = progress
+			self.setState(.uploadingChanges, progress)
 		}
 	}
 	func uploadNotePicture(_ picture: PictureNote) async throws {
-		self.backgroundNetworkState = .uploadingChanges
-		try await service.uploadNotePicture(picture)
-	}
-
-	func uploadNote(_ note: NidusNote) async throws {
-		try await service.uploadNote(note)
+		setState(.uploadingChanges, 0.0)
+		try await service.uploadNotePicture(picture) { progress in
+			self.setState(.uploadingChanges, progress)
+		}
 	}
 
 	/// Find all of the notes that haven't been uploaded and upload them
@@ -144,9 +139,16 @@ class NetworkController {
 
 	private func handleProgress(_ progress: Double) {
 		self.backgroundNetworkProgress = progress
-		//Logger.background.info("Network progress: \(progress)")
+		Logger.background.info("Network progress: \(progress)")
 	}
 
+	private func setState(_ state: BackgroundNetworkState, _ progress: Double) {
+		self.backgroundNetworkProgress = progress
+		self.backgroundNetworkState = state
+		Logger.background.info(
+			"Network state set: \(state.hashValue), progress: \(progress)"
+		)
+	}
 }
 
 class NetworkControllerPreview: NetworkController {

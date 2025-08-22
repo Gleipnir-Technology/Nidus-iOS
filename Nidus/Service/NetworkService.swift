@@ -2,13 +2,6 @@ import Foundation
 import OSLog
 import UIKit
 
-struct DownloadProgress {
-	let bytesWritten: Int64
-	let totalBytesExpected: Int64
-	let progress: Double
-
-}
-
 enum AudioUploadError: Error {
 	case fileNotFound
 	case invalidURL
@@ -115,11 +108,18 @@ actor NetworkService {
 		}
 	}
 
-	func uploadNotePicture(_ recording: PictureNote) async throws {
+	func uploadNotePicture(
+		_ recording: PictureNote,
+		_ progressCallback: @escaping (Double) -> Void
+	) async throws {
 		// Upload the data for the note first because the server will validate the UUID
-		try await uploadDataPicture(recording)
+		try await uploadDataPicture(recording) { progress in
+			progressCallback(progress * 0.5)
+		}
 		// Upload the actual picture file
-		try await uploadFilePicture(recording.id)
+		try await uploadFilePicture(recording.id) { progress in
+			progressCallback((progress * 0.5) + 0.5)
+		}
 	}
 
 	private func uploadDataAudio(
@@ -149,7 +149,10 @@ actor NetworkService {
 		Logger.background.info("Audio data \(recording.id) uploaded successfully")
 	}
 
-	private func uploadDataPicture(_ picture: PictureNote) async throws {
+	private func uploadDataPicture(
+		_ picture: PictureNote,
+		_ progressCallback: @escaping (Double) -> Void
+	) async throws {
 		guard let settings = self.settings else {
 			throw NetworkServiceError.settingsNotSet
 		}
@@ -166,7 +169,9 @@ actor NetworkService {
 		request.httpBody = data
 		try await maybeLogin(settings) {
 			Logger.background.info("Begin upload of picture data \(picture.id)")
-			_ = try await downloadWrapper.handle(with: request)
+			_ = try await downloadWrapper.handle(with: request) { progress in
+				progressCallback(progress.progress)
+			}
 		}
 		Logger.background.info("Picture data \(picture.id) uploaded successfully")
 	}
@@ -202,7 +207,9 @@ actor NetworkService {
 		Logger.background.info("Audio file \(uuid) uploaded successfully")
 	}
 
-	func uploadFilePicture(_ uuid: UUID) async throws {
+	func uploadFilePicture(_ uuid: UUID, _ progressCallback: @escaping (Double) -> Void)
+		async throws
+	{
 		guard let settings = self.settings else {
 			throw NetworkServiceError.settingsNotSet
 		}
@@ -224,7 +231,9 @@ actor NetworkService {
 		// Create upload task with file URL
 		try await maybeLogin(settings) {
 			Logger.background.info("Begin upload of picture file \(uuid)")
-			_ = try await downloadWrapper.handle(with: request)
+			_ = try await downloadWrapper.handle(with: request) { progress in
+				progressCallback(progress.progress)
+			}
 		}
 	}
 

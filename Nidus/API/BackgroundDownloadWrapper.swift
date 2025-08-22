@@ -1,11 +1,14 @@
 import Foundation
 import OSLog
+import Sentry
 import UIKit
 
-class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadDelegate {
+class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadDelegate,
+	URLSessionTaskDelegate, URLSessionDelegate
+{
 	private var backgroundSession: URLSession!
 	private var continuations: [URLSessionTask: CheckedContinuation<URL, Error>] = [:]
-	private var progressHandlers: [URLSessionTask: (DownloadProgress) -> Void] = [:]
+	private var progressHandlers: [URLSessionTask: (any ProgressUpdate) -> Void] = [:]
 
 	private let cookieStorage: HTTPCookieStorage
 
@@ -31,13 +34,16 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 
 	func handle(
 		with request: URLRequest,
-		progressHandler: @escaping (DownloadProgress) -> Void = { _ in }
+		progressHandler: @escaping (any ProgressUpdate) -> Void = { _ in }
 	) async throws -> URL {
 		return try await withCheckedThrowingContinuation {
 			(continuation: CheckedContinuation<URL, Error>) in
 			let task = backgroundSession.downloadTask(with: request)
 			continuations[task] = continuation
 			progressHandlers[task] = progressHandler
+			Logger.background.info(
+				"New network request to \(request.url?.absoluteString ?? "unknown")"
+			)
 			task.resume()
 		}
 	}
@@ -62,6 +68,9 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 			return
 		}
 
+		Logger.background.info(
+			"Finished downloading request to \(downloadTask.originalRequest?.url?.absoluteString ?? "unknown")"
+		)
 		do {
 			let originalURL =
 				downloadTask.originalRequest?.url ?? URL(
@@ -104,6 +113,7 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 
 		}
 		catch {
+			SentrySDK.capture(error: error)
 			continuation.resume(throwing: error)
 		}
 	}
@@ -135,4 +145,118 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 			continuation.resume(throwing: error)
 		}
 	}
+
+	func urlSession(
+		_ session: URLSession,
+		task: URLSessionTask,
+		didSendBodyData bytesSent: Int64,
+		totalBytesSent: Int64,
+		totalBytesExpectedToSend: Int64
+	) {
+		let progress = UploadProgress(
+			bytesSent: bytesSent,
+			totalBytesSent: totalBytesSent,
+			totalBytesExpectedToSend: totalBytesExpectedToSend,
+			progress: totalBytesExpectedToSend > 0
+				? Double(totalBytesSent) / Double(totalBytesExpectedToSend) : 0
+		)
+		progressHandlers[task]?(progress)
+	}
+
+	func urlSession(
+		_ session: URLSession,
+		task: URLSessionTask,
+		didReceive: URLAuthenticationChallenge,
+		completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+	) {
+		Logger.background.warning("Got auth challenge")
+	}
+	func urlSession(
+		_ session: URLSession,
+		didReceive: URLAuthenticationChallenge,
+		completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+	) {
+		Logger.background.warning("Got auth challenge 2")
+
+	}
+	func urlSession(_ session: URLSession, taskIsWaitingForConnectivity: URLSessionTask) {
+		Logger.background.warning("Waiting for connectivity")
+	}
+
+	func urlSession(
+		_ session: URLSession,
+		task: URLSessionTask,
+		willBeginDelayedRequest: URLRequest,
+		completionHandler: (URLSession.DelayedRequestDisposition, URLRequest?) -> Void
+	) {
+		Logger.background.info("will begin delayed request")
+		completionHandler(.continueLoading, nil)
+	}
+	func urlSession(
+		_ session: URLSession,
+		task: URLSessionTask,
+		needNewBodyStream: (InputStream?) -> Void
+	) {
+		Logger.background.warning("need new body stream...?")
+	}
+	func urlSession(
+		_ session: URLSession,
+		task: URLSessionTask,
+		willPerformHTTPRedirection: HTTPURLResponse,
+		newRequest: URLRequest,
+		completionHandler: (URLRequest?) -> Void
+	) {
+		Logger.background.warning("Need redirect")
+	}
+	func urlSession(
+		_ session: URLSession,
+		task: URLSessionTask,
+		didFinishCollecting: URLSessionTaskMetrics
+	) {
+		Logger.background.info("got metrics")
+	}
+	func urlSession(_ session: URLSession, didCreateTask: URLSessionTask) {
+
+		Logger.background.info("created task")
+	}
+	func urlSession(
+		_ session: URLSession,
+		task: URLSessionTask,
+		didReceiveInformationalResponse: HTTPURLResponse
+	) {
+
+		Logger.background.info("got informational response")
+	}
+	func urlSession(
+		_ session: URLSession,
+		task: URLSessionTask,
+		needNewBodyStreamFrom: Int64,
+		completionHandler: (InputStream?) -> Void
+	) {
+
+		Logger.background.info("need body stream from")
+	}
+	func urlSession(_ session: URLSession, didBecomeInvalidWithError: (any Error)?) {
+		Logger.background.info("became invalid")
+	}
+	func urlSessionDidFinishEvents(forBackgroundURLSession: URLSession) {
+		Logger.background.info("finished events")
+	}
+}
+
+protocol ProgressUpdate {
+	var progress: Double { get }
+}
+
+struct DownloadProgress: ProgressUpdate {
+	let bytesWritten: Int64
+	let totalBytesExpected: Int64
+	let progress: Double
+}
+
+struct UploadProgress: ProgressUpdate {
+	let bytesSent: Int64
+	let totalBytesSent: Int64
+	let totalBytesExpectedToSend: Int64
+	let progress: Double
 }

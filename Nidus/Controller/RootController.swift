@@ -147,9 +147,11 @@ class RootController {
 	/// Kick off the different background tasks we should be doing
 	private func startBackgroundTasks() {
 		Task {
+			Logger.background.info("Beginning background network tasks")
 			await network.downloadNotes(database)
 			await network.uploadAudioNotes(database)
 			await network.uploadPictureNotes(database)
+			Logger.background.info("Background network tasks complete")
 		}
 	}
 }
