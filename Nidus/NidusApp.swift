@@ -25,7 +25,7 @@ class NidusAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
 		SentrySDK.start { options in
 			options.dsn =
 				"https://9412221dde2447439c6e931fcfebc391@glitchtip.gleipnir.technology/1"
-			options.debug = true
+			options.debug = false
 			options.tracesSampleRate = 1.0
 		}
 		return true

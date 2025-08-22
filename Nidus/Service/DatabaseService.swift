@@ -112,7 +112,7 @@ class DatabaseService: CustomStringConvertible {
 		}
 	}
 
-	func picturesThatNeedUpload() throws -> [UUID] {
+	func picturesThatNeedUpload() throws -> [PictureNote] {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
@@ -133,11 +133,11 @@ class DatabaseService: CustomStringConvertible {
 		try AudioRecordingInsert(connection, recording)
 	}
 
-	func insertPictureNote(uuid: UUID, location: H3Cell?, created: Date) throws {
+	func insertPictureNote(_ note: PictureNote) throws {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		try PictureInsert(connection, uuid: uuid, location: location, created: created)
+		try PictureInsert(connection, note)
 	}
 
 	func migrateIfNeeded() throws {
@@ -222,6 +222,20 @@ class DatabaseService: CustomStringConvertible {
 			throw DatabaseError.notConnected
 		}
 		return try NoteUpdate(connection, n)
+	}
+
+	func updateNoteAudio(_ note: AudioNote, uploaded: Date) throws {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		return try AudioNoteUpdate(connection, note.id, uploaded: uploaded)
+	}
+
+	func updateNotePicture(_ note: PictureNote, uploaded: Date) throws {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		return try PictureNoteUpdate(connection, note.id, uploaded: uploaded)
 	}
 
 	func upsertNidusNote(_ note: NidusNote) throws -> Int64 {

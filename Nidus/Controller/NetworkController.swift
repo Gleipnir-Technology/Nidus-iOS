@@ -17,20 +17,11 @@ class NetworkController {
 	func Load() async {
 		self.backgroundNetworkProgress = 0.0
 		self.backgroundNetworkState = .idle
-		do {
-			await service.setCallbacks(
-				onError: self.handleError,
-				onProgress: self.handleProgress
-			)
-			//try await downloadNotes()
-			try await uploadAudioNotes()
-		}
-		catch {
-			Logger.background.error(
-				"Failed network controller initialization: \(error)"
-			)
-			self.backgroundNetworkState = .error
-		}
+		await service.setCallbacks(
+			onError: self.handleError,
+			onProgress: self.handleProgress
+		)
+		startTasks()
 	}
 
 	func onSettingsChanged(_ newSettings: SettingsModel) {
@@ -45,16 +36,17 @@ class NetworkController {
 		}
 	}
 
-	func uploadAudioNote(_ recording: AudioNote) async throws {
+	func uploadNoteAudio(_ recording: AudioNote) async throws {
 		self.backgroundNetworkState = .uploadingChanges
-		try await service.uploadAudioNote(recording)
+		try await service.uploadNoteAudio(recording)
 	}
-	func uploadNote(_ note: NidusNote) async throws {
-		try await service.uploadNote(note)
+	func uploadNotePicture(_ picture: PictureNote) async throws {
+		self.backgroundNetworkState = .uploadingChanges
+		try await service.uploadNotePicture(picture)
 	}
 
-	func uploadImage(_ id: UUID) async throws {
-		try await service.uploadImage(id)
+	func uploadNote(_ note: NidusNote) async throws {
+		try await service.uploadNote(note)
 	}
 
 	// MARK - private functions
@@ -103,16 +95,66 @@ class NetworkController {
 		//Logger.background.info("Network progress: \(progress)")
 	}
 
-	private func uploadAudioNotes() async throws {
+	/// Kick off the different background tasks we should be doing
+	private func startTasks() {
+		Task {
+			//await downloadNotes()
+			await uploadAudioNotes()
+			await uploadPictureNotes()
+		}
+	}
+	/// Find all of the notes that haven't been uploaded and upload them
+	private func uploadAudioNotes() async {
 		guard let notes = self.notes else {
 			Logger.background.error(
 				"Notes controller not set for network controller"
 			)
 			return
 		}
-		let audioNotes = try notes.notesNeedingUploadAudio()
-		for note in audioNotes {
-			try await uploadAudioNote(note)
+		do {
+			let audioNotes = try notes.notesNeedingUploadAudio()
+			Logger.background.info("audio notes to upload: \(audioNotes.count)")
+			for note in audioNotes {
+				do {
+					try await uploadNoteAudio(note)
+					try notes.updateNoteAudio(note, uploaded: Date.now)
+				}
+				catch {
+					Logger.background.error(
+						"Failed to upload audio note \(note.id): \(error)"
+					)
+				}
+			}
+		}
+		catch {
+			Logger.background.error("Failed to get notes that need uploading: \(error)")
+		}
+	}
+
+	private func uploadPictureNotes() async {
+		guard let notes = self.notes else {
+			Logger.background.error(
+				"Notes controller not set for network controller"
+			)
+			return
+		}
+		do {
+			let pictureNotes = try notes.notesNeedingUploadPicture()
+			Logger.background.info("picture notes to upload: \(pictureNotes.count)")
+			for note in pictureNotes {
+				do {
+					try await uploadNotePicture(note)
+					try notes.updateNotePicture(note, uploaded: Date.now)
+				}
+				catch {
+					Logger.background.error(
+						"Failed to upload picture note \(note.id): \(error)"
+					)
+				}
+			}
+		}
+		catch {
+			Logger.background.error("Failed to get notes that need uploading: \(error)")
 		}
 	}
 }

@@ -37,16 +37,6 @@ class NoteImage {
 		return Int(toUIImage()?.size.height ?? 0)
 	}
 
-	static func url(_ uuid: UUID) -> URL {
-		let supportURL = try! FileManager.default.url(
-			for: .applicationSupportDirectory,
-			in: .userDomainMask,
-			appropriateFor: nil,
-			create: true
-		)
-		return supportURL.appendingPathComponent("\(uuid).png")
-	}
-
 	private var url: URL {
 		let supportURL = try! FileManager.default.url(
 			for: .applicationSupportDirectory,

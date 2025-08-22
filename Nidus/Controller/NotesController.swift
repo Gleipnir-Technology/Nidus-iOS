@@ -107,6 +107,14 @@ class NotesController {
 		return try database.service.audioThatNeedsUpload()
 	}
 
+	func notesNeedingUploadPicture() throws -> [PictureNote] {
+		guard let database = self.database else {
+			Logger.background.error("Database not set")
+			return []
+		}
+		return try database.service.picturesThatNeedUpload()
+	}
+
 	func onRegionChange(_ region: MKCoordinateRegion) {
 		self.region = region
 		self.calculateNotesToShow()
@@ -119,7 +127,7 @@ class NotesController {
 		try database.service.insertAudioNote(recording)
 	}
 
-	func savePictureNote(_ picture: Photo, _ location: H3Cell?) throws {
+	func savePictureNote(_ picture: Photo, _ location: H3Cell?) throws -> PictureNote {
 		guard let database = self.database else {
 			throw DatabaseError.notConnected
 		}
@@ -131,12 +139,28 @@ class NotesController {
 			create: true
 		).appendingPathComponent("\(uuid).photo")
 		try picture.data.write(to: url)
-		try database.service.insertPictureNote(
-			uuid: uuid,
-			location: location,
+		let note = PictureNote(
+			id: uuid,
+			cell: location,
 			created: Date.now
 		)
+		try database.service.insertPictureNote(note)
 		Logger.foreground.info("Saved picture \(uuid)")
+		return note
+	}
+
+	func updateNoteAudio(_ note: AudioNote, uploaded: Date) throws {
+		guard let database = self.database else {
+			throw DatabaseError.notConnected
+		}
+		try database.service.updateNoteAudio(note, uploaded: uploaded)
+	}
+
+	func updateNotePicture(_ note: PictureNote, uploaded: Date) throws {
+		guard let database = self.database else {
+			throw DatabaseError.notConnected
+		}
+		try database.service.updateNotePicture(note, uploaded: uploaded)
 	}
 
 	func Load(database: DatabaseController, network: NetworkController) async throws {
@@ -216,37 +240,6 @@ class NotesController {
 			return false
 		}
 		return true
-	}
-
-	func startImageUpload(_ uuid: UUID? = nil) {
-		Task {
-			guard let network = self.network
-			else {
-				Logger.background.error(
-					"Background network manager is null when doing image upload"
-				)
-				return
-			}
-			guard let database = self.database
-			else {
-				Logger.background.error(
-					"Database controlleris null when doing audio upload"
-				)
-				return
-			}
-			let toUpload: [UUID] =
-				uuid != nil
-				? [uuid!] : try database.service.picturesThatNeedUpload()
-
-			for image in toUpload {
-				try await network.uploadImage(image)
-				try database.service.pictureUploaded(image)
-				Logger.background.info(
-					"Uploaded image \(image.uuidString)"
-				)
-			}
-		}
-
 	}
 
 	/* private */

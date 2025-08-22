@@ -1,5 +1,6 @@
 import MapKit
 import OSLog
+import Sentry
 import SwiftUI
 
 /*
@@ -28,7 +29,7 @@ class RootController {
 					Logger.background.info(
 						"Saved recording \(recording.id) to database"
 					)
-					try await self.network.uploadAudioNote(recording)
+					try await self.network.uploadNoteAudio(recording)
 					Logger.background.info(
 						"Uploaded recording \(recording.id) to server"
 					)
@@ -45,7 +46,18 @@ class RootController {
 				Logger.background.info(
 					"Saving picture with location \(String(location ?? 0, radix: 16))"
 				)
-				try self.notes.savePictureNote(picture, location)
+				let note = try self.notes.savePictureNote(picture, location)
+				Task {
+					do {
+						try await self.network.uploadNotePicture(note)
+					}
+					catch {
+						SentrySDK.capture(error: error)
+						Logger.background.error(
+							"Failed to upload picture: \(error)"
+						)
+					}
+				}
 			}
 			catch {
 				self.error.message = "Failed to save picture: \(error)"
@@ -59,6 +71,12 @@ class RootController {
 	}
 
 	func onInit() {
+		do {
+			throw DatabaseError.notConnected
+		}
+		catch {
+			SentrySDK.capture(error: error)
+		}
 		settings.onChanged { update in
 			self.network.onSettingsChanged(update)
 		}

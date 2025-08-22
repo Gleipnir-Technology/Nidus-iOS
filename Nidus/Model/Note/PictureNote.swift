@@ -20,11 +20,11 @@ class PictureNote: NoteProtocol, Codable {
 		return created
 	}
 
-	init(id: UUID, location: H3Cell?, timestamp: Date) {
+	init(id: UUID, cell: H3Cell?, created: Date) {
 		self.id = id
-		self.cell = location ?? 0
+		self.cell = cell ?? 0
+		self.created = created
 		self.named = nil
-		self.created = timestamp
 	}
 
 	required init(from decoder: Decoder) throws {
@@ -51,6 +51,16 @@ class PictureNote: NoteProtocol, Codable {
 
 	var category: NoteType {
 		return .picture
+	}
+
+	static func url(_ uuid: UUID) -> URL {
+		let supportURL = try! FileManager.default.url(
+			for: .applicationSupportDirectory,
+			in: .userDomainMask,
+			appropriateFor: nil,
+			create: true
+		)
+		return supportURL.appendingPathComponent("\(uuid).png")
 	}
 
 	func encode(to encoder: Encoder) throws {
