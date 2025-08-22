@@ -42,10 +42,11 @@ func AudioRecordingAsNotes(
 		results.append(
 			AudioNote(
 				id: row[schema.audioRecording.uuid],
+				created: row[schema.audioRecording.created],
+				duration: row[schema.audioRecording.duration],
 				locations: locations_by_audio_id[row[schema.audioRecording.uuid]]
 					?? [],
 				//locations: [],
-				timestamp: row[schema.audioRecording.created],
 				transcription: row[schema.audioRecording.transcription]
 			)
 		)
@@ -59,22 +60,22 @@ func AudioRecordingAsNotes(
 
 func AudioRecordingInsert(
 	_ connection: SQLite.Connection,
-	_ audio_recording: AudioRecording
+	_ audioNote: AudioNote
 ) throws {
 	let insert = schema.audioRecording.table.insert(
 		schema.audioRecording.created
-			<- SQLite.Expression<Date>(value: audio_recording.created),
+			<- SQLite.Expression<Date>(value: audioNote.timestamp),
 		schema.audioRecording.duration
-			<- SQLite.Expression<TimeInterval>(value: audio_recording.duration),
+			<- SQLite.Expression<TimeInterval>(value: audioNote.duration),
 		schema.audioRecording.transcription
-			<- SQLite.Expression<String?>(value: audio_recording.transcription),
-		schema.audioRecording.uuid <- SQLite.Expression<UUID>(value: audio_recording.uuid)
+			<- SQLite.Expression<String?>(value: audioNote.transcription),
+		schema.audioRecording.uuid <- SQLite.Expression<UUID>(value: audioNote.id)
 	)
 	try connection.run(insert)
-	for (i, cell) in audio_recording.locations.enumerated() {
+	for (i, cell) in audioNote.locations.enumerated() {
 		let location_insert = schema.audioRecordingLocation.table.insert(
 			schema.audioRecordingLocation.audioRecordingUUID
-				<- SQLite.Expression<UUID>(value: audio_recording.uuid),
+				<- SQLite.Expression<UUID>(value: audioNote.id),
 			schema.audioRecordingLocation.cell
 				<- SQLite.Expression<UInt64>(value: cell),
 			schema.audioRecordingLocation.index <- SQLite.Expression<Int>(value: i)
@@ -82,7 +83,7 @@ func AudioRecordingInsert(
 		try connection.run(location_insert)
 	}
 	Logger.background.info(
-		"Saved \(audio_recording.locations.count) locations for recording \(audio_recording.uuid)"
+		"Saved \(audioNote.locations.count) locations for recording \(audioNote.id)"
 	)
 }
 
@@ -109,18 +110,18 @@ func AudioRecordingLocations(
 
 func AudioRecordingUpsert(
 	_ connection: SQLite.Connection,
-	_ audio_recording: AudioRecording,
+	_ audioNote: AudioNote,
 	_ noteUUID: UUID
 ) throws {
 	let upsert = schema.audioRecording.table.upsert(
 		schema.audioRecording.created
-			<- SQLite.Expression<Date>(value: audio_recording.created),
+			<- SQLite.Expression<Date>(value: audioNote.timestamp),
 		schema.audioRecording.duration
-			<- SQLite.Expression<TimeInterval>(value: audio_recording.duration),
+			<- SQLite.Expression<TimeInterval>(value: audioNote.duration),
 		schema.audioRecording.transcription
-			<- SQLite.Expression<String?>(value: audio_recording.transcription),
+			<- SQLite.Expression<String?>(value: audioNote.transcription),
 		//schema.audioRecording.noteUUID <- SQLite.Expression<UUID>(value: noteUUID),
-		schema.audioRecording.uuid <- SQLite.Expression<UUID>(value: audio_recording.uuid),
+		schema.audioRecording.uuid <- SQLite.Expression<UUID>(value: audioNote.id),
 		onConflictOf: schema.audioRecording.uuid
 	)
 	try connection.run(upsert)
@@ -339,9 +340,6 @@ func NoteUpdate(_ connection: Connection, _ n: NidusNote) throws {
 
 func NoteUpsert(_ connection: Connection, _ note: NidusNote) throws -> Int64 {
 	//try AudioRecordingDeleteByNote(connection, note.id)
-	for audioRecording in note.audioRecordings {
-		try AudioRecordingUpsert(connection, audioRecording, note.id)
-	}
 	let upsert = schema.note.table.upsert(
 		schema.note.latitude
 			<- SQLite.Expression<Double>(

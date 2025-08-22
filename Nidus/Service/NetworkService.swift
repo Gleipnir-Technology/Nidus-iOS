@@ -101,12 +101,35 @@ actor NetworkService {
 		self.settings = newSettings
 	}
 
-	func uploadAudio(_ uuid: UUID) async throws {
+	func uploadAudioNote(_ recording: AudioNote) async throws {
+		// Upload the data for the recording first because the server will validate the UUID
+		try await uploadAudioData(recording)
+		// Upload the actual audio file
+		try await uploadAudioFile(recording.id)
+	}
+
+	private func uploadAudioData(_ recording: AudioNote) async throws {
+		guard let settings = self.settings else {
+			throw NetworkServiceError.settingsNotSet
+		}
+		let uploadURL: URL = URL(
+			string: settings.URL + "/api/audio/" + recording.id.uuidString
+		)!
+
+		var request = URLRequest(url: uploadURL)
+		request.httpMethod = "PUT"
+		request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+		let encoder = JSONEncoder()
+		encoder.dateEncodingStrategy = .iso8601
+		let data = try encoder.encode(recording)
+
+	}
+	private func uploadAudioFile(_ uuid: UUID) async throws {
 		guard let settings = self.settings else {
 			throw NetworkServiceError.settingsNotSet
 		}
 		let uploadURL: URL = URL(string: settings.URL + "/api/audio/" + uuid.uuidString)!
-		let audioURL = AudioRecording.url(uuid)
+		let audioURL = AudioNote.url(uuid)
 
 		// Check if file exists
 		guard FileManager.default.fileExists(atPath: audioURL.path) else {

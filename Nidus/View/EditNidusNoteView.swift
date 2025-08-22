@@ -61,10 +61,6 @@ struct EditNidusNoteView: View {
 		dismiss()
 	}
 
-	private func onRecordingStop(_ recording: AudioRecording) {
-		noteBuffer.audioRecordings.append(recording)
-	}
-
 	var body: some View {
 		ScrollViewReader { reader in
 			Form {
@@ -159,13 +155,6 @@ struct EditNidusNoteView: View {
 				}
 			}
 		}
-		.sheet(isPresented: $showingAudioPicker) {
-			AudioPickerView(
-				$noteBuffer.audioRecordings
-			) {
-				_ in
-			}
-		}
 		.sheet(isPresented: $showingImagePicker) {
 			PhotoPicker { images in
 				noteBuffer.capturedImages.append(contentsOf: images)
@@ -239,15 +228,7 @@ struct AddNoteView_Previews: PreviewProvider {
 			locationDataManager: LocationDataManagerFake(
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			),
-			note: NidusNote.forPreview(
-				audioRecordings: [
-					AudioRecording(
-						created: Date.now.addingTimeInterval(-90),
-						duration: 123,
-						transcription: ""
-					)
-				]
-			),
+			note: NidusNote.forPreview(),
 			noteBuffer: $noteBuffer,
 			onDeleteNote: onDeleteNote,
 			onResetChanges: onResetChanges

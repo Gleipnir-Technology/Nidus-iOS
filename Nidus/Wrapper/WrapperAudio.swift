@@ -117,7 +117,7 @@ class WrapperAudio: NSObject {
 			try audioSession.setCategory(.record, mode: .default)
 			try audioSession.setActive(true)
 
-			let audioFilename = AudioRecording.url(uuid)
+			let audioFilename = AudioNote.url(uuid)
 
 			let settings = [
 				AVFormatIDKey: Int(kAudioFormatMPEG4AAC),

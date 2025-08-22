@@ -103,12 +103,11 @@ class NotesController {
 		self.calculateNotesToShow()
 	}
 
-	func saveAudioNote(_ recording: AudioRecording) throws {
+	func saveAudioNote(_ recording: AudioNote) async throws {
 		guard let database = self.database else {
 			throw DatabaseError.notConnected
 		}
 		try database.service.insertAudioNote(recording)
-		Logger.foreground.info("Saved recording \(recording.uuid)")
 	}
 
 	func savePictureNote(_ picture: Photo, _ location: H3Cell?) throws {
@@ -217,34 +216,6 @@ class NotesController {
 		return true
 	}
 
-	func startAudioUpload(_ uuid: UUID? = nil) {
-		Task {
-			guard let network = self.network
-			else {
-				Logger.background.error(
-					"Network controller is null when doing audio upload"
-				)
-				return
-			}
-			guard let database = self.database
-			else {
-				Logger.background.error(
-					"Database controlleris null when doing audio upload"
-				)
-				return
-			}
-			let toUpload: [UUID] =
-				uuid != nil ? [uuid!] : try database.service.audioThatNeedsUpload()
-			for audio in toUpload {
-				try await network.uploadAudio(audio)
-				try database.service.audioUploaded(audio)
-				Logger.background.info(
-					"Uploaded audio \(audio.uuidString)"
-				)
-			}
-		}
-	}
-
 	func startImageUpload(_ uuid: UUID? = nil) {
 		Task {
 			guard let network = self.network
@@ -293,7 +264,10 @@ class NotesController {
 					)
 					return
 				}
-				let toUpload: [NidusNote] =
+				Logger.background.info(
+					"Should be uploading notes here, but I'm not yet."
+				)
+				/*let toUpload: [NidusNote] =
 					note != nil
 					? [note!] : try database.service.notesThatNeedUpload()
 				// Upload notes first so that the back office gets them fastest
@@ -304,7 +278,7 @@ class NotesController {
 					Logger.background.info(
 						"Updated note \(note.id) to uploaded"
 					)
-				}
+				}*/
 			}
 			catch {
 				doError(error)

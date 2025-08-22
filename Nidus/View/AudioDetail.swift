@@ -19,7 +19,7 @@ struct AudioDetail: View {
 }
 struct AudioStatusIdleView: View {
 	var playRecording: (URL) -> Void
-	var recordings: [AudioRecording] = []
+	var recordings: [AudioNote] = []
 
 	var durationDisplay: String {
 		let duration = recordingTime

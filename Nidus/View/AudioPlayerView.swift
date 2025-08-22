@@ -4,9 +4,9 @@ import SwiftUI
 
 struct AudioPlayerView: View {
 	@StateObject private var audioManager = AudioManager()
-	var recording: AudioRecording
+	var recording: AudioNote
 
-	func loadAudio(_ recording: AudioRecording) {
+	func loadAudio(_ recording: AudioNote) {
 		audioManager.loadAudio(recording)
 	}
 
@@ -93,7 +93,7 @@ class AudioManager: ObservableObject {
 	@Published var currentTime: TimeInterval = 0
 	@Published var duration: TimeInterval = 0
 
-	var recording: AudioRecording?
+	var recording: AudioNote?
 
 	private var audioDelegate: AudioPlayerDelegate2?
 	private var audioPlayer: AVAudioPlayer?
@@ -113,7 +113,7 @@ class AudioManager: ObservableObject {
 		}
 	}
 
-	func loadAudio(_ recording: AudioRecording) {
+	func loadAudio(_ recording: AudioNote) {
 		self.recording = recording
 		// Make sure to add your audio file to your app bundle
 		do {

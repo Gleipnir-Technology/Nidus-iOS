@@ -126,7 +126,7 @@ class DatabaseService: CustomStringConvertible {
 		try PictureUploaded(connection, uuid)
 	}
 
-	func insertAudioNote(_ recording: AudioRecording) throws {
+	func insertAudioNote(_ recording: AudioNote) throws {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
@@ -215,13 +215,6 @@ class DatabaseService: CustomStringConvertible {
 		do {
 			return try NotesCount(connection)
 		}
-	}
-	func notesThatNeedUpload() throws -> [NidusNote] {
-		guard let connection = connection else {
-			throw DatabaseError.notConnected
-		}
-		//return try NotesNeedingUpload(connection)
-		return []
 	}
 
 	func noteUpdate(_ n: NidusNote) throws {

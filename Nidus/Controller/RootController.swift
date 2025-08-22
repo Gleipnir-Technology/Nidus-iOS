@@ -22,11 +22,21 @@ class RootController {
 	// MARK - public interface
 	func onAppear() {
 		audioRecording.onRecordingSave { recording in
-			do {
-				try self.notes.saveAudioNote(recording)
-			}
-			catch {
-				self.error.message = "Failed to save recording: \(error)"
+			Task {
+				do {
+					try await self.notes.saveAudioNote(recording)
+					Logger.background.info(
+						"Saved recording \(recording.id) to database"
+					)
+					try await self.network.uploadAudioNote(recording)
+					Logger.background.info(
+						"Uploaded recording \(recording.id) to server"
+					)
+					try self.database.service.audioUploaded(recording.id)
+				}
+				catch {
+					self.error.message = "Failed to save recording: \(error)"
+				}
 			}
 		}
 		camera.onPictureSave { picture in

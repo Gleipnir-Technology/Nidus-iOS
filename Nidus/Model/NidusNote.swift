@@ -29,7 +29,6 @@ class NidusNote: Note {
 	var timestamp: Date
 	/* end Note protocol */
 
-	var audioRecordings: [AudioRecording]
 	var created: Date
 	var due: Date?
 	var images: [NoteImage]
@@ -38,7 +37,6 @@ class NidusNote: Note {
 	var uploaded: Date?
 
 	init(
-		audioRecordings: [AudioRecording],
 		created: Date = Date.now,
 		due: Date? = nil,
 		images: [NoteImage],
@@ -48,7 +46,6 @@ class NidusNote: Note {
 		uuid: UUID = UUID()
 	) {
 		self.id = uuid
-		self.audioRecordings = audioRecordings
 		self.created = created
 		self.due = due
 		self.images = images
@@ -59,13 +56,11 @@ class NidusNote: Note {
 	}
 
 	static func forPreview(
-		audioRecordings: [AudioRecording] = [],
 		images: [NoteImage] = [],
 		location: Location = .visalia,
 		text: String = "some text"
 	) -> NidusNote {
 		return NidusNote(
-			audioRecordings: audioRecordings,
 			images: images,
 			location: location,
 			text: text
@@ -81,15 +76,7 @@ class NidusNote: Note {
 
 	func toPayload() -> NidusNotePayload {
 		return NidusNotePayload(
-			audio: audioRecordings.map({ audio in
-				AudioPayload(
-					created: audio.created,
-					deleted: nil,
-					duration: audio.duration,
-					transcription: audio.transcription,
-					uuid: audio.uuid
-				)
-			}),
+			audio: [],
 			images: images.map({ image in
 				ImagePayload(
 					created: image.created,

@@ -78,10 +78,10 @@ class NetworkController {
 		}
 	}
 
-	func uploadAudio(_ id: UUID) async throws {
-		try await service.uploadAudio(id)
+	func uploadAudioNote(_ recording: AudioNote) async throws {
+		self.backgroundNetworkState = .uploadingChanges
+		try await service.uploadAudioNote(recording)
 	}
-
 	func uploadNote(_ note: NidusNote) async throws {
 		try await service.uploadNote(note)
 	}

@@ -7,7 +7,7 @@ class AudioRecordingController {
 	var hasPermissionMicrophone: Bool? = nil
 	var hasPermissionTranscription: Bool? = nil
 	var model: AudioModel = AudioModel()
-	var recordingSaveCallbacks: [(AudioRecording) -> Void] = []
+	var recordingSaveCallbacks: [(AudioNote) -> Void] = []
 
 	private var timer: Timer?
 	private var wrapper: WrapperAudio = WrapperAudio()
@@ -27,7 +27,7 @@ class AudioRecordingController {
 		}
 	}
 
-	func onRecordingSave(_ callback: @escaping (AudioRecording) -> Void) {
+	func onRecordingSave(_ callback: @escaping (AudioNote) -> Void) {
 		recordingSaveCallbacks.append(callback)
 	}
 
@@ -42,14 +42,14 @@ class AudioRecordingController {
 			timer?.invalidate()
 			timer = nil
 			// save recording
-			let recording = AudioRecording(
+			let note = AudioNote(
+				id: model.recordingUUID!,
 				created: Date.now,
 				duration: model.recordingDuration,
 				locations: model.locationWhileRecording,
-				transcription: model.transcription,
-				uuid: model.recordingUUID!
+				transcription: model.transcription
 			)
-			handleRecordingSave(recording)
+			handleRecordingSave(note)
 		}
 		else {
 			do {
@@ -93,7 +93,7 @@ class AudioRecordingController {
 		}
 	}
 
-	private func handleRecordingSave(_ recording: AudioRecording) {
+	private func handleRecordingSave(_ recording: AudioNote) {
 		for callback in recordingSaveCallbacks {
 			callback(recording)
 		}
