@@ -4,15 +4,35 @@ import OSLog
 import SQLite
 import SwiftUI
 
-func AudioNeedingUpload(_ connection: Connection) throws -> [UUID] {
-	let query = schema.audioRecording.table.filter(schema.audioRecording.uploaded == nil)
-
-	var uuids: [UUID] = []
-	for audioRow in try connection.prepare(query) {
-		let uuid = audioRow[schema.audioRecording.uuid]
-		uuids.append(uuid)
+private func RowToAudioNote(connection: Connection, query: QueryType) throws -> [AudioNote] {
+	let rows = try connection.prepare(query)
+	let results = rows.map { row in
+		AudioNote(
+			id: row[schema.audioRecording.uuid],
+			breadcrumbs: [],
+			created: row[schema.audioRecording.created],
+			duration: row[schema.audioRecording.duration],
+			transcription: row[schema.audioRecording.transcription]
+		)
 	}
-	return uuids
+	let uuids = results.map { note in
+		note.id
+	}
+	let locations_by_audio_id: [UUID: [AudioNoteBreadcrumb]] = try AudioRecordingLocations(
+		connection,
+		uuids
+	)
+	for result in results {
+		result.breadcrumbs = locations_by_audio_id[result.id] ?? []
+	}
+	return results
+}
+
+func AudioNeedingUpload(_ connection: Connection) throws -> [AudioNote] {
+	return try RowToAudioNote(
+		connection: connection,
+		query: schema.audioRecording.table.filter(schema.audioRecording.uploaded == nil)
+	)
 }
 
 /*func AudioRecordingDeleteByNote(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
@@ -28,34 +48,7 @@ func AudioNeedingUpload(_ connection: Connection) throws -> [UUID] {
 func AudioRecordingAsNotes(
 	_ connection: SQLite.Connection
 ) throws -> [AudioNote] {
-	//let start = Date.now
-	var results: [AudioNote] = []
-	let query = schema.audioRecording.table
-	let rows = try connection.prepare(query)
-	//let audio_ids = rows.map { $0[schema.audioRecording.uuid] }
-	let audio_ids: [UUID] = []
-	let locations_by_audio_id: [UUID: [H3Cell]] = try AudioRecordingLocations(
-		connection,
-		audio_ids
-	)
-	for row in rows {
-		results.append(
-			AudioNote(
-				id: row[schema.audioRecording.uuid],
-				created: row[schema.audioRecording.created],
-				duration: row[schema.audioRecording.duration],
-				locations: locations_by_audio_id[row[schema.audioRecording.uuid]]
-					?? [],
-				//locations: [],
-				transcription: row[schema.audioRecording.transcription]
-			)
-		)
-	}
-	//let end = Date.now
-	//Logger.background.info(
-	//"Took \(end.timeIntervalSince(start)) seconds to load audio recordings as notes"
-	//)
-	return results
+	return try RowToAudioNote(connection: connection, query: schema.audioRecording.table)
 }
 
 func AudioRecordingInsert(
@@ -72,39 +65,39 @@ func AudioRecordingInsert(
 		schema.audioRecording.uuid <- SQLite.Expression<UUID>(value: audioNote.id)
 	)
 	try connection.run(insert)
-	for (i, cell) in audioNote.locations.enumerated() {
+	for (i, breadcrumb) in audioNote.breadcrumbs.enumerated() {
 		let location_insert = schema.audioRecordingLocation.table.insert(
 			schema.audioRecordingLocation.audioRecordingUUID
 				<- SQLite.Expression<UUID>(value: audioNote.id),
 			schema.audioRecordingLocation.cell
-				<- SQLite.Expression<UInt64>(value: cell),
+				<- SQLite.Expression<UInt64>(value: breadcrumb.cell),
+			schema.audioRecordingLocation.created
+				<- SQLite.Expression<Date>(value: breadcrumb.created),
 			schema.audioRecordingLocation.index <- SQLite.Expression<Int>(value: i)
 		)
 		try connection.run(location_insert)
 	}
 	Logger.background.info(
-		"Saved \(audioNote.locations.count) locations for recording \(audioNote.id)"
+		"Saved \(audioNote.breadcrumbs.count) locations for recording \(audioNote.id)"
 	)
 }
 
 func AudioRecordingLocations(
 	_ connection: SQLite.Connection,
 	_ audio_ids: [UUID]
-) throws -> [UUID: [H3Cell]] {
-	var results: [UUID: [H3Cell]] = [:]
-	// TODO: this was causing crashes, so now I'm just querying all of the locations
-	//let query = schema.audioRecordingLocation.table.filter(
-	//audio_ids.contains(schema.audioRecordingLocation.audioRecordingUUID)
-	//).order(schema.audioRecordingLocation.index)
-	let query = schema.audioRecordingLocation.table.order(schema.audioRecordingLocation.index)
+) throws -> [UUID: [AudioNoteBreadcrumb]] {
+	var results: [UUID: [AudioNoteBreadcrumb]] = [:]
+	let query = schema.audioRecordingLocation.table.filter(
+		audio_ids.contains(schema.audioRecordingLocation.audioRecordingUUID)
+	).order(schema.audioRecordingLocation.index)
 	for row in try connection.prepare(query) {
 		results[row[schema.audioRecordingLocation.audioRecordingUUID], default: []].append(
-			row[schema.audioRecordingLocation.cell]
+			AudioNoteBreadcrumb(
+				cell: row[schema.audioRecordingLocation.cell],
+				created: row[schema.audioRecordingLocation.created]
+			)
 		)
 	}
-	//Logger.background.info(
-	//"Pulled \(results.count) audio locations for \(audio_ids.count) audio recordings"
-	//)
 	return results
 }
 

@@ -117,18 +117,25 @@ actor NetworkService {
 		)!
 
 		var request = URLRequest(url: uploadURL)
-		request.httpMethod = "PUT"
+		request.httpMethod = "POST"
 		request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 		let encoder = JSONEncoder()
 		encoder.dateEncodingStrategy = .iso8601
 		let data = try encoder.encode(recording)
-
+		request.httpBody = data
+		try await maybeLogin(settings) {
+			_ = try await downloadWrapper.handle(with: request)
+		}
+		Logger.background.info("Audio data \(recording.id) uploaded successfully")
 	}
+
 	private func uploadAudioFile(_ uuid: UUID) async throws {
 		guard let settings = self.settings else {
 			throw NetworkServiceError.settingsNotSet
 		}
-		let uploadURL: URL = URL(string: settings.URL + "/api/audio/" + uuid.uuidString)!
+		let uploadURL: URL = URL(
+			string: settings.URL + "/api/audio/" + uuid.uuidString + "/content"
+		)!
 		let audioURL = AudioNote.url(uuid)
 
 		// Check if file exists
@@ -145,6 +152,7 @@ actor NetworkService {
 		try await maybeLogin(settings) {
 			_ = try await downloadWrapper.handle(with: request)
 		}
+		Logger.background.info("Audio file \(uuid) uploaded successfully")
 	}
 
 	func uploadImage(_ uuid: UUID) async throws {

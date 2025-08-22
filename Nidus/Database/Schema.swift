@@ -37,6 +37,7 @@ class AudioRecordingLocationTable {
 
 	let audioRecordingUUID = SQLite.Expression<UUID>("audio_recording_uuid")
 	let cell = SQLite.Expression<UInt64>("cell")
+	let created = SQLite.Expression<Date>("created")
 	let index = SQLite.Expression<Int>("index")
 }
 

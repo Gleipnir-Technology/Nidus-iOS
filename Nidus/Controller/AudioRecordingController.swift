@@ -19,9 +19,11 @@ class AudioRecordingController {
 				if model.locationWhileRecording.isEmpty
 					|| model.locationWhileRecording[
 						model.locationWhileRecording.count - 1
-					] != cell
+					].cell != cell
 				{
-					model.locationWhileRecording.append(cell)
+					model.locationWhileRecording.append(
+						AudioNoteBreadcrumb(cell: cell, created: Date.now)
+					)
 				}
 			}
 		}
@@ -44,9 +46,9 @@ class AudioRecordingController {
 			// save recording
 			let note = AudioNote(
 				id: model.recordingUUID!,
+				breadcrumbs: model.locationWhileRecording,
 				created: Date.now,
 				duration: model.recordingDuration,
-				locations: model.locationWhileRecording,
 				transcription: model.transcription
 			)
 			handleRecordingSave(note)

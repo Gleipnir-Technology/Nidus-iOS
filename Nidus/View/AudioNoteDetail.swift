@@ -89,9 +89,9 @@ struct AudioNoteDetail: View {
 		var minLong = 180.0
 		var maxLat = -180.0
 		var maxLong = -180.0
-		for cell in note.locations {
+		for breadcrumb in note.breadcrumbs {
 			do {
-				let latLong = try cellToLatLng(cell: cell)
+				let latLong = try cellToLatLng(cell: breadcrumb.cell)
 				sumLat += latLong.latitude
 				sumLong += latLong.longitude
 
@@ -109,13 +109,13 @@ struct AudioNoteDetail: View {
 				}
 			}
 			catch {
-				Logger.foreground.warning("Failed to parse cell \(cell)")
+				Logger.foreground.warning("Failed to parse cell \(breadcrumb.cell)")
 			}
 		}
 
 		let center = CLLocationCoordinate2D(
-			latitude: sumLat / Double(note.locations.count),
-			longitude: sumLong / Double(note.locations.count)
+			latitude: sumLat / Double(note.breadcrumbs.count),
+			longitude: sumLong / Double(note.breadcrumbs.count)
 		)
 
 		return MKCoordinateRegion(
@@ -129,12 +129,12 @@ struct AudioNoteDetail: View {
 
 	var body: some View {
 		VStack {
-			if note.locations.count == 0 {
+			if note.breadcrumbs.count == 0 {
 				Text("No location")
 			}
 			else {
 				MapViewBreadcrumb(
-					breadcrumbCells: note.locations,
+					breadcrumbCells: note.breadcrumbs.map { b in b.cell },
 					initialRegion: initialRegion(),
 					notes: nil,
 					onSelectCell: { _ in },

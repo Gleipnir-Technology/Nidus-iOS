@@ -31,7 +31,7 @@ class DatabaseService: CustomStringConvertible {
 	static func migrations() -> [Migration] {
 		return [
 			Migration1(), Migration2(), Migration3(), Migration4(), Migration5(),
-			Migration6(), Migration7(), Migration8(),
+			Migration6(), Migration7(), Migration8(), Migration9(),
 		]
 	}
 
@@ -77,7 +77,7 @@ class DatabaseService: CustomStringConvertible {
 
 	}
 
-	func audioThatNeedsUpload() throws -> [UUID] {
+	func audioThatNeedsUpload() throws -> [AudioNote] {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}

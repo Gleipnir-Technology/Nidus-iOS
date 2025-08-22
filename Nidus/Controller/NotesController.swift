@@ -23,7 +23,7 @@ class NotesController {
 
 		//loadFilters()
 		let count = try database.service.notesCount()
-		Logger.background.info("Notes count: \(count)")
+		Logger.background.info("Database loaded. Notes count: \(count)")
 	}
 
 	func filterAdd(_ instance: FilterInstance) {
@@ -98,6 +98,15 @@ class NotesController {
          */
 	}
 
+	func notesNeedingUploadAudio() throws -> [AudioNote] {
+		guard let database = self.database else {
+			Logger.background.error("Database not set")
+			return []
+		}
+
+		return try database.service.audioThatNeedsUpload()
+	}
+
 	func onRegionChange(_ region: MKCoordinateRegion) {
 		self.region = region
 		self.calculateNotesToShow()
@@ -130,19 +139,12 @@ class NotesController {
 		Logger.foreground.info("Saved picture \(uuid)")
 	}
 
-	func startLoad(database: DatabaseController, network: NetworkController) {
+	func Load(database: DatabaseController, network: NetworkController) async throws {
 		self.database = database
 		self.network = network
 
-		Task {
-			do {
-				try await self.load()
-				Logger.background.info("Notes load complete")
-			}
-			catch {
-				fatalError("Failed to load controllers: \(error)")
-			}
-		}
+		try await self.load()
+		Logger.background.info("Notes load complete")
 	}
 
 	// MARK - private functions

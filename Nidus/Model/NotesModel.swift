@@ -21,7 +21,15 @@ struct NotesModel {
 
 	struct Preview {
 		static let someNotes: NotesModel = NotesModel.forPreview(notes: [
-			AudioNote(duration: 12, locations: [0x8a2_8347_0531_7fff]),
+			AudioNote(
+				breadcrumbs: [
+					AudioNoteBreadcrumb(
+						cell: 0x8a2_8347_0531_7fff,
+						created: Date.now.advanced(by: -30)
+					)
+				],
+				duration: 12
+			),
 			PictureNote.forPreview(location: 0x8a2_8347_0531_4fff),
 		])
 		static let someNoteOverview: [NoteOverview] = []

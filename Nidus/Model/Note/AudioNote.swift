@@ -9,15 +9,15 @@ class AudioNote: NoteProtocol, Codable {
 		case id
 		case created
 		case duration
-		case locations
+		case breadcrumbs
 		case tags
 		case transcription
 	}
 
 	let id: UUID
+	var breadcrumbs: [AudioNoteBreadcrumb]
 	let created: Date
 	let duration: TimeInterval
-	var locations: [H3Cell]
 	var tags: [AudioTagMatch]
 	var transcription: String?
 
@@ -30,15 +30,15 @@ class AudioNote: NoteProtocol, Codable {
 
 	init(
 		id: UUID = UUID(),
+		breadcrumbs: [AudioNoteBreadcrumb],
 		created: Date = Date(),
 		duration: TimeInterval,
-		locations: [H3Cell],
 		transcription: String? = nil
 	) {
 		self.id = id
+		self.breadcrumbs = breadcrumbs
 		self.created = created
 		self.duration = duration
-		self.locations = locations
 		self.tags = transcription == nil ? [] : AudioTagIdentifier.parseTags(transcription!)
 		self.transcription = transcription
 	}
@@ -48,10 +48,14 @@ class AudioNote: NoteProtocol, Codable {
 		id = try container.decodeIfPresent(UUID.self, forKey: .id)!
 		created = try container.decode(Date.self, forKey: .created)
 		duration = try container.decode(TimeInterval.self, forKey: .duration)
-		locations = try container.decodeIfPresent([H3Cell].self, forKey: .locations) ?? []
-		//tags = try container.decodeIfPresent(String.self, forKey: .tags)
-		tags = []
+		breadcrumbs =
+			try container.decodeIfPresent(
+				[AudioNoteBreadcrumb].self,
+				forKey: .breadcrumbs
+			) ?? []
 		transcription = try container.decode(String.self, forKey: .transcription)
+
+		tags = AudioTagIdentifier.parseTags(transcription ?? "")
 	}
 
 	var category: NoteType {
@@ -59,8 +63,8 @@ class AudioNote: NoteProtocol, Codable {
 	}
 
 	var location: H3Cell {
-		return locations.isEmpty
-			? RegionControllerPreview.userCell : locations[locations.count - 1]
+		return breadcrumbs.isEmpty
+			? RegionControllerPreview.userCell : breadcrumbs[breadcrumbs.count - 1].cell
 	}
 
 	var mapAnnotation: NoteMapAnnotation {
@@ -97,21 +101,21 @@ class AudioNote: NoteProtocol, Codable {
 		try container.encode(id, forKey: .id)
 		try container.encode(created, forKey: .created)
 		try container.encode(duration, forKey: .duration)
-		try container.encode(locations, forKey: .locations)
+		try container.encode(breadcrumbs, forKey: .breadcrumbs)
 		//try container.encode(tags, forKey: .tags)
 		try container.encode(transcription, forKey: .transcription)
 	}
 
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(id)
-		hasher.combine(locations)
+		hasher.combine(breadcrumbs)
 		hasher.combine(timestamp)
 		hasher.combine(tags)
 		hasher.combine(transcription)
 	}
 
 	static func == (lhs: AudioNote, rhs: AudioNote) -> Bool {
-		return lhs.id == rhs.id && lhs.locations == rhs.locations
+		return lhs.id == rhs.id && lhs.breadcrumbs == rhs.breadcrumbs
 			&& lhs.tags == rhs.tags && lhs.timestamp == rhs.timestamp
 			&& lhs.transcription == rhs.transcription
 	}
@@ -128,8 +132,13 @@ class AudioNote: NoteProtocol, Codable {
 
 	struct Preview {
 		static var one = AudioNote(
+			breadcrumbs: [
+				AudioNoteBreadcrumb(
+					cell: 0x8f4_8eba_314c_0ac5,
+					created: Date.now.advanced(by: -30)
+				)
+			],
 			duration: 12,
-			locations: [0x8f4_8eba_314c_0ac5],
 			transcription: "This is something I said"
 		)
 	}

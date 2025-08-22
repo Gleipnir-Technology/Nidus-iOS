@@ -63,10 +63,17 @@ class RootController {
 			self.network.onSettingsChanged(update)
 		}
 		settings.load()
-		notes.startLoad(database: database, network: network)
 		region.current = settings.model.region
 		network.notes = notes
-		network.onInit()
+		Task {
+			do {
+				try await notes.Load(database: database, network: network)
+				await network.Load()
+			}
+			catch {
+				Logger.background.error("Faild in root controller onInit: \(error)")
+			}
+		}
 	}
 
 	func onRegionChange(r: MKCoordinateRegion) {
