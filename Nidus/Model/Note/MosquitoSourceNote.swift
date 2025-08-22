@@ -13,7 +13,7 @@ struct MosquitoSourceNote: NoteProtocol {
 	var description: String
 	var habitat: String
 	let id: UUID
-	var location: H3Cell
+	var cell: H3Cell
 	var inspections: [Inspection]
 	var lastInspectionDate: Date
 	var name: String
@@ -50,7 +50,7 @@ struct MosquitoSourceNote: NoteProtocol {
 		self.id = id
 		self.inspections = inspections
 		self.lastInspectionDate = lastInspectionDate
-		self.location = location
+		self.cell = location
 		self.name = name
 		self.nextActionDateScheduled = nextActionDateScheduled
 		self.treatments = treatments
@@ -65,7 +65,7 @@ struct MosquitoSourceNote: NoteProtocol {
 
 	var coordinate: CLLocationCoordinate2D {
 		do {
-			return try cellToLatLng(cell: location)
+			return try cellToLatLng(cell: cell)
 		}
 		catch {
 			return CLLocationCoordinate2D(latitude: -180, longitude: 180)
@@ -102,7 +102,7 @@ struct MosquitoSourceNote: NoteProtocol {
 
 	var mapAnnotation: NoteMapAnnotation {
 		do {
-			let coordinate = try cellToLatLng(cell: location)
+			let coordinate = try cellToLatLng(cell: cell)
 			return NoteMapAnnotation(
 				coordinate: coordinate,
 				icon: MosquitoSourceNote.ICON,
@@ -124,7 +124,7 @@ struct MosquitoSourceNote: NoteProtocol {
 			icon: iconForNoteType(category),
 			icons: icons,
 			id: id,
-			location: location,
+			location: cell,
 			time: created
 		)
 	}

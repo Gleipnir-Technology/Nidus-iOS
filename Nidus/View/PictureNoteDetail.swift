@@ -4,9 +4,9 @@ struct PictureNoteDetail: View {
 	var note: PictureNote
 	var body: some View {
 		VStack {
-			if note.location != 0 {
+			if note.cell != 0 {
 				MapCellView(
-					cell: note.location
+					cell: note.cell
 				).frame(height: 300)
 			}
 			Image(uiImage: note.uiImage).resizable().aspectRatio(contentMode: .fit)

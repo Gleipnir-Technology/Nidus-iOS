@@ -64,7 +64,7 @@ struct MapViewBreadcrumb: View {
 					continue
 				}
 				let cell = try scaleCell(
-					note.location,
+					note.cell,
 					to: overlayResolution
 				)
 				guard var summary: AnnotationSummary = results[cell] else {

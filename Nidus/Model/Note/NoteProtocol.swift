@@ -10,11 +10,11 @@ enum NoteType {
 
 protocol NoteProtocol: Identifiable<UUID>, Hashable {
 	var category: NoteType { get }
-	var location: H3Cell { get }
+	var cell: H3Cell { get }
 	var id: UUID { get }
 	var mapAnnotation: NoteMapAnnotation { get }
 	var overview: NoteOverview { get }
-	var timestamp: Date { get }
+	var created: Date { get }
 }
 
 func iconForNoteType(_ type: NoteType) -> Image {

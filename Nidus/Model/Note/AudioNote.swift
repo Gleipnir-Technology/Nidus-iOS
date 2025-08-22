@@ -62,14 +62,14 @@ class AudioNote: NoteProtocol, Codable {
 		return .audio
 	}
 
-	var location: H3Cell {
+	var cell: H3Cell {
 		return breadcrumbs.isEmpty
 			? RegionControllerPreview.userCell : breadcrumbs[breadcrumbs.count - 1].cell
 	}
 
 	var mapAnnotation: NoteMapAnnotation {
 		do {
-			let coordinate = try cellToLatLng(cell: location)
+			let coordinate = try cellToLatLng(cell: cell)
 			return NoteMapAnnotation(
 				coordinate: coordinate,
 				icon: "waveform",
@@ -91,8 +91,8 @@ class AudioNote: NoteProtocol, Codable {
 			icon: iconForNoteType(category),
 			icons: [],
 			id: id,
-			location: location,
-			time: timestamp
+			location: cell,
+			time: created
 		)
 	}
 
@@ -109,14 +109,14 @@ class AudioNote: NoteProtocol, Codable {
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(id)
 		hasher.combine(breadcrumbs)
-		hasher.combine(timestamp)
+		hasher.combine(created)
 		hasher.combine(tags)
 		hasher.combine(transcription)
 	}
 
 	static func == (lhs: AudioNote, rhs: AudioNote) -> Bool {
 		return lhs.id == rhs.id && lhs.breadcrumbs == rhs.breadcrumbs
-			&& lhs.tags == rhs.tags && lhs.timestamp == rhs.timestamp
+			&& lhs.tags == rhs.tags && lhs.created == rhs.created
 			&& lhs.transcription == rhs.transcription
 	}
 

@@ -57,7 +57,7 @@ func AudioRecordingInsert(
 ) throws {
 	let insert = schema.audioRecording.table.insert(
 		schema.audioRecording.created
-			<- SQLite.Expression<Date>(value: audioNote.timestamp),
+			<- SQLite.Expression<Date>(value: audioNote.created),
 		schema.audioRecording.duration
 			<- SQLite.Expression<TimeInterval>(value: audioNote.duration),
 		schema.audioRecording.transcription
@@ -108,7 +108,7 @@ func AudioRecordingUpsert(
 ) throws {
 	let upsert = schema.audioRecording.table.upsert(
 		schema.audioRecording.created
-			<- SQLite.Expression<Date>(value: audioNote.timestamp),
+			<- SQLite.Expression<Date>(value: audioNote.created),
 		schema.audioRecording.duration
 			<- SQLite.Expression<TimeInterval>(value: audioNote.duration),
 		schema.audioRecording.transcription
