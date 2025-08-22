@@ -6,6 +6,7 @@ struct DownloadProgress {
 	let bytesWritten: Int64
 	let totalBytesExpected: Int64
 	let progress: Double
+
 }
 
 enum AudioUploadError: Error {

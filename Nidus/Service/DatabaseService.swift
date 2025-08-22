@@ -3,7 +3,7 @@ import OSLog
 import SQLite
 import SQLiteMigrationManager
 
-enum DatabaseError: Error {
+private enum DatabaseError: Error {
 	case notConnected
 }
 

@@ -9,7 +9,7 @@ class DatabaseController {
 		self.service = DatabaseService()
 	}
 
-	func connect() async throws {
+	func connect() throws {
 		try service.connect()
 		try service.migrateIfNeeded()
 	}

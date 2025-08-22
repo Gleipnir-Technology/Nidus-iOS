@@ -7,168 +7,25 @@ import SwiftUI
  */
 @Observable
 class NotesController {
-	var database: DatabaseController? = nil
 	var model = NotesModel()
-	var network: NetworkController? = nil
-
-	private var region: MKCoordinateRegion = Initial.region
-
-	// MARK - public functions
-	func load() async throws {
-		guard let database = self.database else {
-			Logger.background.error("Database not set")
-			return
-		}
-		try await database.connect()
-
-		//loadFilters()
-		let count = try database.service.notesCount()
-		Logger.background.info("Database loaded. Notes count: \(count)")
-	}
 
 	func filterAdd(_ instance: FilterInstance) {
 		model.filterInstances[instance.Name()] = instance
 		onFilterChange()
 	}
 
-	func upsertServiceRequest(_ serviceRequest: ServiceRequest) throws {
-		guard let database = self.database else {
-			Logger.background.error("Database not set")
-			return
-		}
-		return try database.service.upsertServiceRequest(serviceRequest)
-	}
-
-	func upsertSource(_ source: MosquitoSource) throws {
-		guard let database = self.database else {
-			Logger.background.error("Database not set")
-			return
-		}
-		return try database.service.upsertSource(source)
-	}
-
 	func noteDelete() {
 		Logger.foreground.warning("deleteNote not implemented")
 	}
 
-	func noteSave(isNew: Bool) {
-		/*
-        guard var notes = self.model.notes else {
-            Logger.foreground.info(
-                "User requested saving a note before any notes are loaded. Seems unlikely."
-            )
-            return
-        }
-        let note = noteBuffer.toNote()
-        Logger.foreground.info("Saving \(isNew ? "new" : "old") note \(note.id)")
-        if noteBuffer.location == nil {
-            Logger.foreground.info("Can't save note, it has no location")
-            errorMessage = "This note needs a location"
-            return
-        }
-
-        do {
-            for image in note.images {
-                try image.save()
-            }
-        }
-        catch {
-            errorMessage = "Failed to save images: \(error)"
-        }
-        do {
-            // Clear the "uploaded" field so that this note will be uploaded again
-            note.uploaded = nil
-            _ = try database.upsertNidusNote(note)
-        }
-        catch {
-            errorMessage = "Failed to upsert note: \(error)"
-        }
-        if isNew {
-            notes[note.id] = AnyNote(note)
-            calculateNotesToShow()
-        }
-        startNoteUpload(note)
-        for audioRecording in note.audioRecordings {
-            startAudioUpload(audioRecording.uuid)
-        }
-        for image in note.images {
-            startImageUpload(image.uuid)
-        }
-        toast.showSavedToast = true
-         */
-	}
-
-	func notesNeedingUploadAudio() throws -> [AudioNote] {
-		guard let database = self.database else {
-			Logger.background.error("Database not set")
-			return []
-		}
-
-		return try database.service.audioThatNeedsUpload()
-	}
-
-	func notesNeedingUploadPicture() throws -> [PictureNote] {
-		guard let database = self.database else {
-			Logger.background.error("Database not set")
-			return []
-		}
-		return try database.service.picturesThatNeedUpload()
-	}
-
-	func onRegionChange(_ region: MKCoordinateRegion) {
-		self.region = region
-		self.calculateNotesToShow()
-	}
-
-	func saveAudioNote(_ recording: AudioNote) async throws {
-		guard let database = self.database else {
-			throw DatabaseError.notConnected
-		}
-		try database.service.insertAudioNote(recording)
-	}
-
-	func savePictureNote(_ picture: Photo, _ location: H3Cell?) throws -> PictureNote {
-		guard let database = self.database else {
-			throw DatabaseError.notConnected
-		}
-		let uuid = UUID()
-		let url = try! FileManager.default.url(
-			for: .applicationSupportDirectory,
-			in: .userDomainMask,
-			appropriateFor: nil,
-			create: true
-		).appendingPathComponent("\(uuid).photo")
-		try picture.data.write(to: url)
-		let note = PictureNote(
-			id: uuid,
-			cell: location,
-			created: Date.now
-		)
-		try database.service.insertPictureNote(note)
-		Logger.foreground.info("Saved picture \(uuid)")
-		return note
-	}
-
-	func updateNoteAudio(_ note: AudioNote, uploaded: Date) throws {
-		guard let database = self.database else {
-			throw DatabaseError.notConnected
-		}
-		try database.service.updateNoteAudio(note, uploaded: uploaded)
-	}
-
-	func updateNotePicture(_ note: PictureNote, uploaded: Date) throws {
-		guard let database = self.database else {
-			throw DatabaseError.notConnected
-		}
-		try database.service.updateNotePicture(note, uploaded: uploaded)
-	}
-
-	func Load(database: DatabaseController, network: NetworkController) async throws {
-		self.database = database
-		self.network = network
-
-		try await self.load()
-		Logger.background.info("Notes load complete")
+	func showNotes(
+		mapAnnotations: [NoteMapAnnotation],
+		notes: [UUID: any NoteProtocol],
+		noteOverviews: [NoteOverview]
+	) {
+		self.model.noteOverviews = noteOverviews
+		self.model.notes = notes
+		self.model.noteOverviews = noteOverviews
 	}
 
 	// MARK - private functions
@@ -185,25 +42,7 @@ class NotesController {
 		let asStrings: [String] = model.filterInstances.map { $1.toString() }
 		UserDefaults.standard.set(asStrings, forKey: "filters")
 		Logger.foreground.info("Saved filters \(asStrings)")
-		calculateNotesToShow()
-	}
-
-	private func calculateNotesToShow() {
-		guard let database else {
-			Logger.background.error("Database not ready yet")
-			return
-		}
-		Task {
-			do {
-				let notes = try database.service.notesByRegion(self.region)
-				model.mapAnnotations = notes.map { $0.value.mapAnnotation }
-				model.notes = notes
-				model.noteOverviews = notes.map { $0.value.overview }
-			}
-			catch {
-				Logger.background.error("Failed to calculate notes: \(error)")
-			}
-		}
+		//calculateNotesToShow()
 	}
 
 	private func loadFilters() {
@@ -240,45 +79,6 @@ class NotesController {
 			return false
 		}
 		return true
-	}
-
-	/* private */
-	func startNoteUpload(_ note: NidusNote? = nil) {
-		Task {
-			do {
-				guard let network = network else {
-					Logger.background.error(
-						"Background network manager is null when doing note download"
-					)
-					return
-				}
-				guard let database = self.database
-				else {
-					Logger.background.error(
-						"Background network manager is null when doing image upload"
-					)
-					return
-				}
-				Logger.background.info(
-					"Should be uploading notes here, but I'm not yet."
-				)
-				/*let toUpload: [NidusNote] =
-					note != nil
-					? [note!] : try database.service.notesThatNeedUpload()
-				// Upload notes first so that the back office gets them fastest
-				for note in toUpload {
-					try await network.uploadNote(note)
-					note.uploaded = Date.now
-					try database.service.noteUpdate(note)
-					Logger.background.info(
-						"Updated note \(note.id) to uploaded"
-					)
-				}*/
-			}
-			catch {
-				doError(error)
-			}
-		}
 	}
 }
 

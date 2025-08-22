@@ -20,12 +20,28 @@ class RootController {
 	var settings = SettingsController()
 	var toast = ToastController()
 
+	private func calculateNotesToShow(_ region: MKCoordinateRegion) {
+		Task {
+			do {
+				let notes = try database.service.notesByRegion(region)
+				self.notes.showNotes(
+					mapAnnotations: notes.map { $0.value.mapAnnotation },
+					notes: notes,
+					noteOverviews: notes.map { $0.value.overview }
+				)
+			}
+			catch {
+				Logger.background.error("Failed to calculate notes: \(error)")
+			}
+		}
+	}
+
 	// MARK - public interface
 	func onAppear() {
 		audioRecording.onRecordingSave { recording in
 			Task {
 				do {
-					try await self.notes.saveAudioNote(recording)
+					try self.database.service.insertAudioNote(recording)
 					Logger.background.info(
 						"Saved recording \(recording.id) to database"
 					)
@@ -46,7 +62,21 @@ class RootController {
 				Logger.background.info(
 					"Saving picture with location \(String(location ?? 0, radix: 16))"
 				)
-				let note = try self.notes.savePictureNote(picture, location)
+				let uuid = UUID()
+				let url = try! FileManager.default.url(
+					for: .applicationSupportDirectory,
+					in: .userDomainMask,
+					appropriateFor: nil,
+					create: true
+				).appendingPathComponent("\(uuid).photo")
+				try picture.data.write(to: url)
+				let note = PictureNote(
+					id: uuid,
+					cell: location,
+					created: Date.now
+				)
+				try self.database.service.insertPictureNote(note)
+				Logger.foreground.info("Saved picture \(uuid)")
 				Task {
 					do {
 						try await self.network.uploadNotePicture(note)
@@ -72,33 +102,56 @@ class RootController {
 
 	func onInit() {
 		do {
-			throw DatabaseError.notConnected
+			try database.connect()
+			settings.onChanged { update in
+				self.network.onSettingsChanged(update)
+			}
+			settings.load()
+			network.onInit()
+			region.current = settings.model.region
+			startBackgroundTasks()
 		}
 		catch {
 			SentrySDK.capture(error: error)
+			Logger.foreground.error("Failed to initialize the app: \(error)")
 		}
-		settings.onChanged { update in
-			self.network.onSettingsChanged(update)
-		}
-		settings.load()
-		region.current = settings.model.region
-		network.notes = notes
-		Task {
-			do {
-				try await notes.Load(database: database, network: network)
-				await network.Load()
-			}
-			catch {
-				Logger.background.error("Faild in root controller onInit: \(error)")
-			}
-		}
+	}
+
+	func savePictureNote(_ picture: Photo, _ location: H3Cell?) throws -> PictureNote {
+		let uuid = UUID()
+		let url = try! FileManager.default.url(
+			for: .applicationSupportDirectory,
+			in: .userDomainMask,
+			appropriateFor: nil,
+			create: true
+		).appendingPathComponent("\(uuid).photo")
+		try picture.data.write(to: url)
+		let note = PictureNote(
+			id: uuid,
+			cell: location,
+			created: Date.now
+		)
+		try database.service.insertPictureNote(note)
+		Logger.foreground.info("Saved picture \(uuid)")
+		return note
 	}
 
 	func onRegionChange(r: MKCoordinateRegion) {
-		notes.onRegionChange(r)
+		calculateNotesToShow(r)
+
 		settings.saveCurrentRegion(r)
 	}
 
+	// MARK - private functions
+
+	/// Kick off the different background tasks we should be doing
+	private func startBackgroundTasks() {
+		Task {
+			await network.downloadNotes(database)
+			await network.uploadAudioNotes(database)
+			await network.uploadPictureNotes(database)
+		}
+	}
 }
 
 class RootControllerPreview: RootController {
