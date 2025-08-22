@@ -12,6 +12,7 @@
 		532F3AEB2DEB68C7006E0E40 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AEA2DEB68C7006E0E40 /* SQLite */; };
 		532F3AF52DECAE26006E0E40 /* ClusterMap in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AF42DECAE26006E0E40 /* ClusterMap */; };
 		532F3AF72DECAE26006E0E40 /* ClusterMapSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */; };
+		533B86FB2E58F7A300362B49 /* SentrySwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 533B86FA2E58F7A300362B49 /* SentrySwiftUI */; };
 		538BFA8D2E3A3C0A0064A6A5 /* H3 in Frameworks */ = {isa = PBXBuildFile; productRef = 538BFA8C2E3A3C0A0064A6A5 /* H3 */; };
 		538BFD182E42BD0C0064A6A5 /* MijickCamera in Frameworks */ = {isa = PBXBuildFile; productRef = 538BFD172E42BD0C0064A6A5 /* MijickCamera */; };
 		53E1F2FF2E05E3FA00A6D888 /* SQLiteMigrationManager in Frameworks */ = {isa = PBXBuildFile; productRef = 53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */; };
@@ -55,6 +56,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				532F3AEB2DEB68C7006E0E40 /* SQLite in Frameworks */,
+				533B86FB2E58F7A300362B49 /* SentrySwiftUI in Frameworks */,
 				532F3AF72DECAE26006E0E40 /* ClusterMapSwiftUI in Frameworks */,
 				538BFA8D2E3A3C0A0064A6A5 /* H3 in Frameworks */,
 				532F3AE82DEB6765006E0E40 /* AutomergeRepo in Frameworks */,
@@ -129,6 +131,7 @@
 				53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */,
 				538BFA8C2E3A3C0A0064A6A5 /* H3 */,
 				538BFD172E42BD0C0064A6A5 /* MijickCamera */,
+				533B86FA2E58F7A300362B49 /* SentrySwiftUI */,
 			);
 			productName = Nidus;
 			productReference = 53D57B4A2D79E2A20094740D /* Nidus Notes.app */;
@@ -214,6 +217,7 @@
 				53E1F2FD2E05E3FA00A6D888 /* XCRemoteSwiftPackageReference "SQLiteMigrationManager.swift" */,
 				538BFA8B2E3A3C0A0064A6A5 /* XCLocalSwiftPackageReference "../swift-h3" */,
 				538BFD142E4295AA0064A6A5 /* XCLocalSwiftPackageReference "../MijickCamera" */,
+				533B86F32E58F7A300362B49 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 53D57B4B2D79E2A20094740D /* Products */;
@@ -674,6 +678,14 @@
 				minimumVersion = 2.1.1;
 			};
 		};
+		533B86F32E58F7A300362B49 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.55.0;
+			};
+		};
 		53E1F2FD2E05E3FA00A6D888 /* XCRemoteSwiftPackageReference "SQLiteMigrationManager.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/garriguv/SQLiteMigrationManager.swift.git";
@@ -709,6 +721,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */;
 			productName = ClusterMapSwiftUI;
+		};
+		533B86FA2E58F7A300362B49 /* SentrySwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 533B86F32E58F7A300362B49 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = SentrySwiftUI;
 		};
 		538BFA8C2E3A3C0A0064A6A5 /* H3 */ = {
 			isa = XCSwiftPackageProductDependency;
