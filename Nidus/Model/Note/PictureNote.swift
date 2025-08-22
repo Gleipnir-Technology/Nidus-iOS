@@ -3,16 +3,36 @@ import H3
 import MapKit
 import OSLog
 
-struct PictureNote: NoteProtocol {
+class PictureNote: NoteProtocol, Codable {
+	enum CodingKeys: CodingKey {
+		case id
+		case cell
+		case created
+	}
 	let id: UUID
-	var location: H3Cell
-	var timestamp: Date
+	var cell: H3Cell
+	var created: Date
+
+	var location: H3Cell {
+		return cell
+	}
+	var timestamp: Date {
+		return created
+	}
 
 	init(id: UUID, location: H3Cell?, timestamp: Date) {
 		self.id = id
-		self.location = location ?? 0
+		self.cell = location ?? 0
 		self.named = nil
-		self.timestamp = timestamp
+		self.created = timestamp
+	}
+
+	required init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		id = try container.decode(UUID.self, forKey: .id)
+		cell = try container.decode(H3Cell.self, forKey: .cell)
+		created = try container.decode(Date.self, forKey: .created)
+		named = nil
 	}
 
 	// Strictly for previews
@@ -20,8 +40,8 @@ struct PictureNote: NoteProtocol {
 	init(named: String, location: H3Cell?) {
 		self.id = UUID()
 		self.named = named
-		self.location = location ?? 0
-		self.timestamp = Date.now
+		self.cell = location ?? 0
+		self.created = Date.now
 	}
 
 	static func forPreview(location: H3Cell) -> PictureNote {
@@ -32,9 +52,23 @@ struct PictureNote: NoteProtocol {
 	var category: NoteType {
 		return .picture
 	}
+
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(id, forKey: .id)
+		try container.encode(cell, forKey: .cell)
+		try container.encode(created, forKey: .created)
+	}
+
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(id)
+		hasher.combine(cell)
+		hasher.combine(created)
+	}
+
 	var mapAnnotation: NoteMapAnnotation {
 		do {
-			let coordinate = try cellToLatLng(cell: location)
+			let coordinate = try cellToLatLng(cell: cell)
 			return NoteMapAnnotation(
 				coordinate: coordinate,
 				icon: "photo",
@@ -56,8 +90,8 @@ struct PictureNote: NoteProtocol {
 			icon: iconForNoteType(category),
 			icons: [],
 			id: id,
-			location: location,
-			time: timestamp
+			location: cell,
+			time: created
 		)
 	}
 	var uiImage: UIImage {
@@ -84,6 +118,10 @@ struct PictureNote: NoteProtocol {
 			Logger.foreground.error("Failed to read image from \(url): \(error)")
 			return PLACEHOLDER!
 		}
+	}
+
+	static func == (lhs: PictureNote, rhs: PictureNote) -> Bool {
+		return lhs.id == rhs.id && lhs.cell == rhs.cell && lhs.created == rhs.created
 	}
 }
 
