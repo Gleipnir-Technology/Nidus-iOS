@@ -116,6 +116,13 @@ class NetworkController {
 			for note in pictureNotes {
 				do {
 					try await uploadNotePicture(note)
+				}
+				catch {
+					Logger.background.error(
+						"Failed to upload picture note \(note.id): \(error)"
+					)
+				}
+				do {
 					try database.service.updateNotePicture(
 						note,
 						uploaded: Date.now
@@ -123,7 +130,7 @@ class NetworkController {
 				}
 				catch {
 					Logger.background.error(
-						"Failed to upload picture note \(note.id): \(error)"
+						"Failed to save picture note uploaded date \(note.id): \(error)"
 					)
 				}
 			}
