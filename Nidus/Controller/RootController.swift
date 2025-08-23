@@ -58,25 +58,10 @@ class RootController {
 		}
 		camera.onPictureSave { picture in
 			do {
-				let location = self.region.breadcrumb.userCell
-				Logger.background.info(
-					"Saving picture with location \(String(location ?? 0, radix: 16))"
+				let note = try self.savePictureNote(
+					picture,
+					self.region.breadcrumb.userCell
 				)
-				let uuid = UUID()
-				let url = try! FileManager.default.url(
-					for: .applicationSupportDirectory,
-					in: .userDomainMask,
-					appropriateFor: nil,
-					create: true
-				).appendingPathComponent("\(uuid).photo")
-				try picture.data.write(to: url)
-				let note = PictureNote(
-					id: uuid,
-					cell: location,
-					created: Date.now
-				)
-				try self.database.service.insertPictureNote(note)
-				Logger.foreground.info("Saved picture \(uuid)")
 				Task {
 					do {
 						try await self.network.uploadNotePicture(note)
@@ -90,7 +75,9 @@ class RootController {
 				}
 			}
 			catch {
+				SentrySDK.capture(error: error)
 				self.error.message = "Failed to save picture: \(error)"
+				Logger.background.error("Failed to save picture: \(error)")
 			}
 		}
 		region.onAppear()
@@ -119,13 +106,9 @@ class RootController {
 
 	func savePictureNote(_ picture: Photo, _ location: H3Cell?) throws -> PictureNote {
 		let uuid = UUID()
-		let url = try! FileManager.default.url(
-			for: .applicationSupportDirectory,
-			in: .userDomainMask,
-			appropriateFor: nil,
-			create: true
-		).appendingPathComponent("\(uuid).photo")
+		let url = PictureNote.url(uuid)
 		try picture.data.write(to: url)
+		Logger.foreground.info("Saved photo file to \(url)")
 		let note = PictureNote(
 			id: uuid,
 			cell: location,
