@@ -113,6 +113,7 @@
 				53D57B462D79E2A20094740D /* Sources */,
 				53D57B472D79E2A20094740D /* Frameworks */,
 				53D57B482D79E2A20094740D /* Resources */,
+				53A45FB42E593ECF0014DE7F /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -254,6 +255,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		53A45FB42E593ECF0014DE7F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which sentry-cli >/dev/null; then\nexport SENTRY_ORG=gleipnir-llc\nexport SENTRY_PROJECT=1\nexport SENTRY_URL=https://glitchtip.gleipnir.technology/\nexport SENTRY_AUTH_TOKEN=4c7b6c5f03fb24cca489abe73eb7af80e203816312131eeb550f185ff3e15d24\nERROR=$(sentry-cli debug-files upload \\\n--include-sources \\\n\"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"warning: sentry-cli - $ERROR\"\nfi\nelse\necho \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		53D57B462D79E2A20094740D /* Sources */ = {
@@ -418,9 +440,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 19;
 				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"Nidus/Preview Content\"";
 				DEVELOPMENT_TEAM = D392HWX27T;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Nidus-Notes-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
@@ -468,6 +492,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Nidus/Preview Content\"";
 				DEVELOPMENT_TEAM = D392HWX27T;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Nidus-Notes-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "";

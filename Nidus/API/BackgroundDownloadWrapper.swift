@@ -177,7 +177,7 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
 	) {
 		Logger.background.warning("Got auth challenge 2")
-
+		completionHandler(.performDefaultHandling, nil)
 	}
 	func urlSession(_ session: URLSession, taskIsWaitingForConnectivity: URLSessionTask) {
 		Logger.background.warning("Waiting for connectivity")
