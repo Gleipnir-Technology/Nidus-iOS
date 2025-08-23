@@ -196,6 +196,7 @@ actor NetworkService {
 		var request = URLRequest(url: uploadURL)
 		request.httpMethod = "POST"
 		request.setValue("audio/m4a", forHTTPHeaderField: "Content-Type")
+		request.httpBody = try Data(contentsOf: audioURL)
 
 		// Create upload task with file URL
 		try await maybeLogin(settings) {
@@ -225,6 +226,7 @@ actor NetworkService {
 
 		// Create the request
 		var request = URLRequest(url: uploadURL)
+		request.httpBody = try Data(contentsOf: imageURL)
 		request.httpMethod = "POST"
 		request.setValue("image/png", forHTTPHeaderField: "Content-Type")
 
