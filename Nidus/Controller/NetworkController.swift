@@ -145,16 +145,20 @@ class NetworkController {
 	}
 
 	private func handleProgress(_ progress: Double) {
-		self.backgroundNetworkProgress = progress
-		Logger.background.info("Network progress: \(progress)")
+		Task { @MainActor in
+			self.backgroundNetworkProgress = progress
+			Logger.background.info("Network progress: \(progress)")
+		}
 	}
 
 	private func setState(_ state: BackgroundNetworkState, _ progress: Double) {
-		self.backgroundNetworkProgress = progress
-		self.backgroundNetworkState = state
-		Logger.background.info(
-			"Network state set: \(state.hashValue), progress: \(progress)"
-		)
+		Task { @MainActor in
+			self.backgroundNetworkProgress = progress
+			self.backgroundNetworkState = state
+			Logger.background.info(
+				"Network state set: \(String(reflecting: state)), progress: \(progress)"
+			)
+		}
 	}
 }
 
