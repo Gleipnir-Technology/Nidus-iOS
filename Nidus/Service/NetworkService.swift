@@ -49,17 +49,14 @@ actor NetworkService {
 	private var downloadWrapper: BackgroundDownloadWrapper = BackgroundDownloadWrapper()
 	private var settings: SettingsModel? = nil
 	var onError: ((any Error) -> Void)? = nil
-	var onProgress: ((Double) -> Void)? = nil
 
 	var isLoggedIn = false
 
 	// MARK - public interfaces
 	func setCallbacks(
-		onError: @escaping (Error) -> Void,
-		onProgress: @escaping (Double) -> Void
+		onError: @escaping (Error) -> Void
 	) {
 		self.onError = onError
-		self.onProgress = onProgress
 	}
 
 	func connect(_ settings: SettingsModel) async throws {
@@ -72,7 +69,9 @@ actor NetworkService {
 		try await login(settings)
 	}
 
-	func fetchNoteUpdates() async throws -> NotesResponse {
+	func fetchNoteUpdates(_ onProgress: @escaping (Double) -> Void) async throws
+		-> NotesResponse
+	{
 		guard let settings = self.settings else {
 			throw NetworkServiceError.settingsNotSet
 		}
@@ -80,9 +79,6 @@ actor NetworkService {
 		let request = URLRequest(url: url)
 		var response: NotesResponse?
 		let tempURL = try await downloadWrapper.handle(with: request) { progress in
-			guard let onProgress = self.onProgress else {
-				return
-			}
 			onProgress(progress.progress)
 		}
 		response = try parseJSON(tempURL)
@@ -102,11 +98,11 @@ actor NetworkService {
 	{
 		// Upload the data for the note first because the server will validate the UUID
 		try await uploadDataAudio(recording) { progress in
-			progressCallback(progress * 0.5)
+			progressCallback(progress * 0.1)
 		}
 		// Upload the actual audio file
 		try await uploadFileAudio(recording.id) { progress in
-			progressCallback((progress * 0.5) + 0.5)
+			progressCallback((progress * 0.9) + 0.1)
 		}
 	}
 
@@ -116,11 +112,11 @@ actor NetworkService {
 	) async throws {
 		// Upload the data for the note first because the server will validate the UUID
 		try await uploadDataPicture(recording) { progress in
-			progressCallback(progress * 0.5)
+			progressCallback(progress * 0.1)
 		}
 		// Upload the actual picture file
 		try await uploadFilePicture(recording.id) { progress in
-			progressCallback((progress * 0.5) + 0.5)
+			progressCallback((progress * 0.9) + 0.1)
 		}
 	}
 
