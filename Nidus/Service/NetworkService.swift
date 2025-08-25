@@ -79,20 +79,22 @@ actor NetworkService {
 		let url = URL(string: settings.URL + "/api/client/ios")!
 		let request = URLRequest(url: url)
 		var response: NotesResponse?
-		try await maybeLogin(settings) {
-			let tempURL = try await downloadWrapper.handle(with: request) { progress in
-				guard let onProgress = self.onProgress else {
-					return
-				}
-				onProgress(progress.progress)
+		let tempURL = try await downloadWrapper.handle(with: request) { progress in
+			guard let onProgress = self.onProgress else {
+				return
 			}
-			response = try parseJSON(tempURL)
+			onProgress(progress.progress)
 		}
+		response = try parseJSON(tempURL)
 		return response!
 	}
 
 	func handleSettingsChanged(_ newSettings: SettingsModel) {
 		self.settings = newSettings
+		self.downloadWrapper.setAuthentication(
+			password: newSettings.password,
+			username: newSettings.username
+		)
 	}
 
 	func uploadNoteAudio(_ recording: AudioNote, _ progressCallback: @escaping (Double) -> Void)
@@ -140,11 +142,9 @@ actor NetworkService {
 		encoder.dateEncodingStrategy = .iso8601
 		let data = try encoder.encode(recording)
 		request.httpBody = data
-		try await maybeLogin(settings) {
-			Logger.background.info("Begin upload of audio data \(recording.id)")
-			_ = try await downloadWrapper.handle(with: request) { progress in
-				progressCallback(progress.progress)
-			}
+		Logger.background.info("Begin upload of audio data \(recording.id)")
+		_ = try await downloadWrapper.handle(with: request) { progress in
+			progressCallback(progress.progress)
 		}
 		Logger.background.info("Audio data \(recording.id) uploaded successfully")
 	}
@@ -167,11 +167,9 @@ actor NetworkService {
 		encoder.dateEncodingStrategy = .iso8601
 		let data = try encoder.encode(picture)
 		request.httpBody = data
-		try await maybeLogin(settings) {
-			Logger.background.info("Begin upload of picture data \(picture.id)")
-			_ = try await downloadWrapper.handle(with: request) { progress in
-				progressCallback(progress.progress)
-			}
+		Logger.background.info("Begin upload of picture data \(picture.id)")
+		_ = try await downloadWrapper.handle(with: request) { progress in
+			progressCallback(progress.progress)
 		}
 		Logger.background.info("Picture data \(picture.id) uploaded successfully")
 	}
@@ -199,11 +197,9 @@ actor NetworkService {
 		request.httpBody = try Data(contentsOf: audioURL)
 
 		// Create upload task with file URL
-		try await maybeLogin(settings) {
-			Logger.background.info("Begin upload of audio file \(uuid)")
-			_ = try await downloadWrapper.handle(with: request) { progress in
-				progressCallback(progress.progress)
-			}
+		Logger.background.info("Begin upload of audio file \(uuid)")
+		_ = try await downloadWrapper.handle(with: request) { progress in
+			progressCallback(progress.progress)
 		}
 		Logger.background.info("Audio file \(uuid) uploaded successfully")
 	}
@@ -231,11 +227,9 @@ actor NetworkService {
 		request.setValue("image/png", forHTTPHeaderField: "Content-Type")
 
 		// Create upload task with file URL
-		try await maybeLogin(settings) {
-			Logger.background.info("Begin upload of picture file \(uuid)")
-			_ = try await downloadWrapper.handle(with: request) { progress in
-				progressCallback(progress.progress)
-			}
+		Logger.background.info("Begin upload of picture file \(uuid)")
+		_ = try await downloadWrapper.handle(with: request) { progress in
+			progressCallback(progress.progress)
 		}
 	}
 
@@ -259,9 +253,7 @@ actor NetworkService {
 		let data = try encoder.encode(note.toPayload())
 		// Create json data
 		request.httpBody = data
-		try await maybeLogin(settings) {
-			_ = try await downloadWrapper.handle(with: request)
-		}
+		_ = try await downloadWrapper.handle(with: request)
 	}
 
 	private func login(_ settings: SettingsModel) async throws {
@@ -280,35 +272,6 @@ actor NetworkService {
 			"username=\(settings.username.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")&password=\(settings.password.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")"
 		request.httpBody = formData.data(using: .utf8)
 		_ = try await downloadWrapper.handle(with: request)
-	}
-
-	private func maybeLogin(_ settings: SettingsModel, _ block: () async throws -> Void)
-		async throws
-	{
-		do {
-			try await block()
-		}
-		catch {
-			Logger.background.error("Request error: \(error)")
-			guard let urlError = error as? URLError else {
-				throw error
-			}
-			Logger.background.error(
-				"URL error: \(urlError) with code \(urlError.code.rawValue)"
-			)
-			if urlError.code.rawValue == 401 {
-				do {
-					try await connect(settings)
-				}
-				catch {
-					Logger.background.error("Failed to login: \(error)")
-				}
-				try await block()
-			}
-			else {
-				throw error
-			}
-		}
 	}
 
 	private func parseJSON<T: Decodable>(_ tempURL: URL) throws -> T {

@@ -8,9 +8,10 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 {
 	private var backgroundSession: URLSession!
 	private var continuations: [URLSessionTask: CheckedContinuation<URL, Error>] = [:]
-	private var progressHandlers: [URLSessionTask: (any ProgressUpdate) -> Void] = [:]
-
 	private let cookieStorage: HTTPCookieStorage
+	private var password: String = ""
+	private var progressHandlers: [URLSessionTask: (any ProgressUpdate) -> Void] = [:]
+	private var username: String = ""
 
 	override init() {
 		self.cookieStorage = HTTPCookieStorage.shared
@@ -48,15 +49,10 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		}
 	}
 
-	private func permanentURL(for originalURL: URL) -> URL {
-		let documentsPath = FileManager.default.urls(
-			for: .documentDirectory,
-			in: .userDomainMask
-		)[0]
-		let filename = originalURL.lastPathComponent
-		return documentsPath.appendingPathComponent(filename)
+	func setAuthentication(password: String, username: String) {
+		self.password = password
+		self.username = username
 	}
-
 	func urlSession(
 		_ session: URLSession,
 		downloadTask: URLSessionDownloadTask,
@@ -170,14 +166,15 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
 	) {
 		Logger.background.warning("Got auth challenge")
-	}
-	func urlSession(
-		_ session: URLSession,
-		didReceive: URLAuthenticationChallenge,
-		completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
-	) {
-		Logger.background.warning("Got auth challenge 2")
-		completionHandler(.performDefaultHandling, nil)
+		//completionHandler(.performDefaultHandling, nil)
+		completionHandler(
+			.useCredential,
+			URLCredential(
+				user: self.username,
+				password: self.password,
+				persistence: .forSession
+			)
+		)
 	}
 	func urlSession(_ session: URLSession, taskIsWaitingForConnectivity: URLSessionTask) {
 		Logger.background.warning("Waiting for connectivity")
@@ -189,7 +186,9 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		willBeginDelayedRequest: URLRequest,
 		completionHandler: (URLSession.DelayedRequestDisposition, URLRequest?) -> Void
 	) {
-		Logger.background.info("will begin delayed request")
+		Logger.background.info(
+			"Begin task for \(task.originalRequest?.url?.absoluteString ?? "unknown")"
+		)
 		completionHandler(.continueLoading, nil)
 	}
 	func urlSession(
@@ -213,11 +212,15 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		task: URLSessionTask,
 		didFinishCollecting: URLSessionTaskMetrics
 	) {
-		Logger.background.info("got metrics")
+		Logger.background.info(
+			"metrics for \(task.originalRequest?.url?.absoluteString ?? "unknown"): \(didFinishCollecting.taskInterval.duration)"
+		)
 	}
 	func urlSession(_ session: URLSession, didCreateTask: URLSessionTask) {
 
-		Logger.background.info("created task")
+		Logger.background.info(
+			"Created task for \(didCreateTask.originalRequest?.url?.absoluteString ?? "unknown")"
+		)
 	}
 	func urlSession(
 		_ session: URLSession,
@@ -242,6 +245,16 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 	func urlSessionDidFinishEvents(forBackgroundURLSession: URLSession) {
 		Logger.background.info("finished events")
 	}
+
+	private func permanentURL(for originalURL: URL) -> URL {
+		let documentsPath = FileManager.default.urls(
+			for: .documentDirectory,
+			in: .userDomainMask
+		)[0]
+		let filename = originalURL.lastPathComponent
+		return documentsPath.appendingPathComponent(filename)
+	}
+
 }
 
 protocol ProgressUpdate {
