@@ -20,6 +20,7 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 			withIdentifier: "technology.gleipnir.nidus-notes.download-session"
 		)
 		config.timeoutIntervalForRequest = 10
+		config.timeoutIntervalForResource = 120
 		config.isDiscretionary = false
 		config.sessionSendsLaunchEvents = true
 		config.httpCookieStorage = cookieStorage
