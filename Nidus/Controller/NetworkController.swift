@@ -62,12 +62,6 @@ class NetworkController {
 	func onSettingsChanged(_ newSettings: SettingsModel) {
 		Task {
 			await self.service.handleSettingsChanged(newSettings)
-			if newSettings.URL.isEmpty || newSettings.password.isEmpty
-				|| newSettings.username.isEmpty
-			{
-				return
-			}
-
 		}
 	}
 
