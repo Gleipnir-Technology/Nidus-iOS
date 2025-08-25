@@ -29,9 +29,11 @@ struct SettingView: View {
 	private func save() {
 		let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
 
-		UserDefaults.standard.set(password, forKey: "password")
-		UserDefaults.standard.set(url, forKey: "sync-url")
-		UserDefaults.standard.set(trimmedUsername, forKey: "username")
+		controller.saveSettings(
+			password: password,
+			url: url,
+			username: trimmedUsername
+		)
 		alertMessage = "Settings saved successfully!"
 		isShowingAlert = true
 

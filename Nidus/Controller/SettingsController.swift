@@ -9,22 +9,14 @@ class SettingsController {
 
 	// MARK - public interface
 	func load() {
-		withObservationTracking {
-			model.password = UserDefaults.standard.string(forKey: "password") ?? ""
-			model.URL =
-				UserDefaults.standard.string(forKey: "sync-url")
-				?? "https://sync.nidus.cloud"
-			model.username = UserDefaults.standard.string(forKey: "username") ?? ""
+		model.password = UserDefaults.standard.string(forKey: "password") ?? ""
+		model.URL =
+			UserDefaults.standard.string(forKey: "sync-url")
+			?? "https://sync.nidus.cloud"
+		model.username = UserDefaults.standard.string(forKey: "username") ?? ""
 
-			model.region = loadCurrentRegion() ?? Initial.region
-			handleChange()
-		} onChange: {
-			Logger.foreground.info("Got new settings")
-			self.handleChange()
-		}
-	}
-
-	func onAppear() {
+		model.region = loadCurrentRegion() ?? Initial.region
+		handleChange()
 	}
 
 	func onChanged(_ callback: @escaping (SettingsModel) -> Void) {
@@ -43,12 +35,22 @@ class SettingsController {
 		//Logger.background.info("Saved current region: \(regionString)")
 	}
 
+	func saveSync(password: String, url: String, username: String) {
+		model.password = password
+		model.URL = url
+		model.username = username
+		UserDefaults.standard.set(password, forKey: "password")
+		UserDefaults.standard.set(url, forKey: "sync-url")
+		UserDefaults.standard.set(username, forKey: "username")
+	}
+
 	// MARK - private functions
 	private func handleChange() {
 		for callback in callbacks {
 			callback(self.model)
 		}
 	}
+
 	private func loadCurrentRegion() -> MKCoordinateRegion? {
 		guard let regionString = UserDefaults.standard.string(forKey: "currentRegion")
 		else {

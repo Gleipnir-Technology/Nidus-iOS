@@ -90,10 +90,8 @@ class RootController {
 	func onInit() {
 		do {
 			try database.connect()
-			settings.onChanged { update in
-				self.network.onSettingsChanged(update)
-			}
 			settings.load()
+			network.onSettingsChanged(settings.model)
 			network.onInit()
 			region.current = settings.model.region
 			startBackgroundTasks()
@@ -117,6 +115,11 @@ class RootController {
 		try database.service.insertPictureNote(note)
 		Logger.foreground.info("Saved picture \(uuid)")
 		return note
+	}
+
+	func saveSettings(password: String, url: String, username: String) {
+		settings.saveSync(password: password, url: url, username: username)
+		network.onSettingsChanged(settings.model)
 	}
 
 	func onRegionChange(r: MKCoordinateRegion) {
