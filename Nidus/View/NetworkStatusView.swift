@@ -1,11 +1,13 @@
+import OSLog
 import SwiftUI
 
 /// A small overlay view that shows what the network is currently doing, including downloading items
 /// saving items, or waiting for changes.
 struct NetworkStatusView: View {
-	@State var controller: NetworkController
+	var progress: Double
+	var state: BackgroundNetworkState
 	var body: some View {
-		if controller.backgroundNetworkState == .idle {
+		if state == .idle {
 			EmptyView()
 		}
 		else {
@@ -13,16 +15,10 @@ struct NetworkStatusView: View {
 				RoundedRectangle(cornerRadius: 12)
 					.fill(Color.white)
 					.frame(width: 50, height: 50)
-
-				/*
-                 ProgressView(value: controller.backgroundNetworkProgress)
-                 .progressViewStyle(.circular)
-                 .font(.title2)
-                 */
-				switch controller.backgroundNetworkState {
+				switch state {
 				case .downloading:
 					ProgressCircle(
-						progress: controller.backgroundNetworkProgress,
+						progress: progress,
 						color: Color.blue
 					)
 				case .error:
@@ -39,39 +35,40 @@ struct NetworkStatusView: View {
 						.foregroundColor(.gray).font(.title)
 				case .savingData:
 					ProgressCircle(
-						progress: controller.backgroundNetworkProgress,
+						progress: progress,
 						color: Color.green
 					)
 				case .uploadingChanges:
 					ProgressCircle(
-						progress: controller.backgroundNetworkProgress,
+						progress: progress,
 						color: Color.cyan
 					)
 				}
+				//Text("\((progress * 100).rounded(.down))%")
 			}
 		}
 	}
 }
 
 struct ProgressCircle: View {
-	@State var progress: Double = 0
-	@State var color: Color = .black
+	var progress: Double = 0
+	var color: Color = .black
 
 	var body: some View {
-		Circle()
-			.trim(from: 0, to: CGFloat(progress))
-			.stroke(color, lineWidth: 4)
-			.rotationEffect(Angle(degrees: -90))
-			.frame(width: 40, height: 40)
+		ZStack {
+			Circle()
+				.trim(from: 0, to: progress)
+				.stroke(color, lineWidth: 5)
+				.rotationEffect(Angle(degrees: -90))
+				.frame(width: 40, height: 40)
+		}
 	}
 }
 
 private func statusPreview(_ progress: Double, _ state: BackgroundNetworkState) -> some View {
 	NetworkStatusView(
-		controller: NetworkControllerPreview(
-			backgroundNetworkProgress: progress,
-			backgroundNetworkState: state
-		)
+		progress: 0.1,
+		state: state
 	).background(Color.black)
 }
 

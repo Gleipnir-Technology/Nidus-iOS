@@ -198,7 +198,11 @@ struct RootView: View {
 							}
 						}
 					}
-					NetworkStatusView(controller: controller.network).padding()
+					NetworkStatusView(
+						progress: controller.network
+							.backgroundNetworkProgress,
+						state: controller.network.backgroundNetworkState
+					).padding()
 						.position(
 							x: geometry.size.width - 32,
 							y: geometry.size.height - 140
