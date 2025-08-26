@@ -85,7 +85,7 @@ actor NetworkService {
 		return response!
 	}
 
-	func handleSettingsChanged(_ newSettings: SettingsModel) {
+	func onSettingsChanged(_ newSettings: SettingsModel) {
 		self.settings = newSettings
 		self.downloadWrapper.setAuthentication(
 			password: newSettings.password,

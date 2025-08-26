@@ -4,7 +4,6 @@ import SwiftUI
 
 @Observable
 class SettingsController {
-	var callbacks: [(SettingsModel) -> Void] = []
 	var model = SettingsModel()
 
 	// MARK - public interface
@@ -16,11 +15,6 @@ class SettingsController {
 		model.username = UserDefaults.standard.string(forKey: "username") ?? ""
 
 		model.region = loadCurrentRegion() ?? Initial.region
-		handleChange()
-	}
-
-	func onChanged(_ callback: @escaping (SettingsModel) -> Void) {
-		callbacks.append(callback)
 	}
 
 	func saveCurrentRegion(_ region: MKCoordinateRegion) {
@@ -45,12 +39,6 @@ class SettingsController {
 	}
 
 	// MARK - private functions
-	private func handleChange() {
-		for callback in callbacks {
-			callback(self.model)
-		}
-	}
-
 	private func loadCurrentRegion() -> MKCoordinateRegion? {
 		guard let regionString = UserDefaults.standard.string(forKey: "currentRegion")
 		else {

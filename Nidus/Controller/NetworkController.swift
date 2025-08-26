@@ -63,7 +63,7 @@ class NetworkController {
 
 	func onSettingsChanged(_ newSettings: SettingsModel) {
 		Task {
-			await self.service.handleSettingsChanged(newSettings)
+			await self.service.onSettingsChanged(newSettings)
 		}
 	}
 
