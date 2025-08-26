@@ -3,6 +3,21 @@ import OSLog
 import Sentry
 import UIKit
 
+enum AuthError: Error {
+	case invalidCredentials
+	case noCredentials
+
+	static func fromErrorCode(_ code: String) -> AuthError? {
+		switch code {
+		case "no-credentials":
+			return .noCredentials
+		case "invalid-credentials":
+			return .invalidCredentials
+		default: return nil
+		}
+	}
+}
+
 class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadDelegate,
 	URLSessionTaskDelegate, URLSessionDelegate
 {
@@ -100,6 +115,34 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 					Logger.background.error(
 						"Generating a URLError with status code \(statusCode) for URL \(originalURL.path): \(content ?? "")"
 					)
+					if statusCode == 401 {
+						// See if we have a header identifying the specific issue
+						if let authErrorCode = httpResponse.value(
+							forHTTPHeaderField:
+								"WWW-Authenticate-Error"
+						) {
+							Logger.background.error(
+								"Authentication error: \(authErrorCode)"
+							)
+							continuation.resume(
+								throwing: AuthError.fromErrorCode(
+									authErrorCode
+								)
+									?? URLError(
+										URLError.Code(
+											rawValue:
+												statusCode
+										)
+									)
+							)
+							return
+						}
+						else {
+							Logger.background.error(
+								"Server didn't provide a specific authentication error code"
+							)
+						}
+					}
 					continuation.resume(
 						throwing: URLError(
 							URLError.Code(rawValue: statusCode)
@@ -166,8 +209,36 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		didReceive: URLAuthenticationChallenge,
 		completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
 	) {
-		Logger.background.warning("Got auth challenge")
-		//completionHandler(.performDefaultHandling, nil)
+		// If we have some kind of error this isn't actually an auth challenge, but rather
+		// a failure on our configuration
+		guard let response = task.response else {
+			Logger.background.warning(
+				"Unable to get response from task on authentication challenge for \(task.originalRequest?.url?.absoluteString ?? "unknown URL")"
+			)
+			completionHandler(
+				.cancelAuthenticationChallenge,
+				nil
+			)
+			return
+		}
+		if let httpResponse = response as? HTTPURLResponse {
+			// If we can get an error code, then there is definitely something wrong on our side, so cancel the request
+			if let authErrorCode = httpResponse.value(
+				forHTTPHeaderField:
+					"WWW-Authenticate-Error"
+			) {
+				Logger.background.info(
+					"Got auth error '\(authErrorCode)', ending request"
+				)
+				completionHandler(.cancelAuthenticationChallenge, nil)
+				return
+			}
+		}
+		else {
+			Logger.background.info("Unable to coerce to HTTPURLResponse")
+		}
+
+		// Otherwise, keep going and we'll add credential information
 		completionHandler(
 			.useCredential,
 			URLCredential(
@@ -216,6 +287,11 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		Logger.background.info(
 			"metrics for \(task.originalRequest?.url?.absoluteString ?? "unknown"): \(didFinishCollecting.taskInterval.duration)"
 		)
+		/*if let response = task.response as? HTTPURLResponse {
+            for (k, v) in response.allHeaderFields {
+                Logger.background.info("Header: \(String(describing: k))=\(String(describing: v))")
+            }
+        }*/
 	}
 	func urlSession(_ session: URLSession, didCreateTask: URLSessionTask) {
 
@@ -244,7 +320,7 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		Logger.background.info("became invalid")
 	}
 	func urlSessionDidFinishEvents(forBackgroundURLSession: URLSession) {
-		Logger.background.info("finished events")
+		//Logger.background.info("Finished.")
 	}
 
 	private func permanentURL(for originalURL: URL) -> URL {

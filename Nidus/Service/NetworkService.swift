@@ -34,6 +34,7 @@ enum BackgroundNetworkState {
 	case downloading
 	case error
 	case idle
+	case invalidCredentials
 	case loggingIn
 	case uploadingChanges
 	case notConfigured

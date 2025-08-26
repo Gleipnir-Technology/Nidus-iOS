@@ -27,6 +27,8 @@ struct NetworkStatusView: View {
 					)
 				case .idle:
 					EmptyView()
+				case .invalidCredentials:
+					Image(systemName: "lock.slash").foregroundColor(.red)
 				case .loggingIn:
 					Image(systemName: "lock.rotation").foregroundColor(.green)
 						.font(.title)
@@ -78,6 +80,10 @@ private func statusPreview(_ progress: Double, _ state: BackgroundNetworkState) 
 
 #Preview("error") {
 	statusPreview(0.55, .error)
+}
+
+#Preview("invalid-credentials") {
+	statusPreview(0.55, .invalidCredentials)
 }
 
 #Preview("loggingIn") {

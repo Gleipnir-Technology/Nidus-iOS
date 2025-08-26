@@ -39,6 +39,12 @@ class NetworkController {
 			setState(.idle, 0.0)
 			Logger.background.info("Done saving API response")
 		}
+		catch AuthError.invalidCredentials {
+			backgroundNetworkState = .invalidCredentials
+		}
+		catch AuthError.noCredentials {
+			backgroundNetworkState = .loggingIn
+		}
 		catch {
 			SentrySDK.capture(error: error)
 			Logger.background.error("Failed to fetch updates: \(error)")
