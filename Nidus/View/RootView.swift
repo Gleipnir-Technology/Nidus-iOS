@@ -54,6 +54,7 @@ struct RootView: View {
 		path.append("map-settings")
 	}
 	func onMapButtonShort() {
+		activeView = .breadcrumb
 		/*if activeView == .breadcrumb {
 			activeView = .notes
 		}
@@ -67,7 +68,12 @@ struct RootView: View {
 	}
 	func onMicButtonLong() {
 		didSelect.toggle()
-		activeView = .audio
+		if activeView == .audio {
+			activeView = .breadcrumb
+		}
+		else {
+			activeView = .audio
+		}
 	}
 	func onNoteSelected(_ id: UUID) {
 		path.removeLast(path.count - 1)
