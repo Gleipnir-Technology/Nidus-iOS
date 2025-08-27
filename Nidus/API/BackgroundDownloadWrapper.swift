@@ -287,13 +287,15 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		didFinishCollecting: URLSessionTaskMetrics
 	) {
 		Logger.background.info(
-			"metrics for \(task.originalRequest?.url?.absoluteString ?? "unknown"): \(didFinishCollecting.taskInterval.duration)"
+			"metrics for \(task.originalRequest?.url?.absoluteString ?? "unknown"): duration \(didFinishCollecting.taskInterval.duration) seconds"
 		)
 		/*if let response = task.response as? HTTPURLResponse {
-            for (k, v) in response.allHeaderFields {
-                Logger.background.info("Header: \(String(describing: k))=\(String(describing: v))")
-            }
-        }*/
+			for (k, v) in response.allHeaderFields {
+				Logger.background.info(
+					"Header: \(String(describing: k))=\(String(describing: v))"
+				)
+			}
+		}*/
 	}
 	func urlSession(_ session: URLSession, didCreateTask: URLSessionTask) {
 
