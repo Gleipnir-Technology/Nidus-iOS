@@ -49,27 +49,10 @@ actor NetworkService {
 	private var continuations: [URLSessionTask: CheckedContinuation<(), Error>] = [:]
 	private var downloadWrapper: BackgroundDownloadWrapper = BackgroundDownloadWrapper()
 	private var settings: SettingsModel? = nil
-	var onError: ((any Error) -> Void)? = nil
 
 	var isLoggedIn = false
 
 	// MARK - public interfaces
-	func setCallbacks(
-		onError: @escaping (Error) -> Void
-	) {
-		self.onError = onError
-	}
-
-	func connect(_ settings: SettingsModel) async throws {
-		if settings.username == "" || settings.password == "" {
-			Logger.background.info(
-				"Refusing to do download, no username and password"
-			)
-			return
-		}
-		try await login(settings)
-	}
-
 	func fetchNoteUpdates(_ onProgress: @escaping (Double) -> Void) async throws
 		-> NotesResponse
 	{
@@ -86,12 +69,16 @@ actor NetworkService {
 		return response!
 	}
 
-	func onSettingsChanged(_ newSettings: SettingsModel) {
+	func onSettingsChanged(_ newSettings: SettingsModel) async throws {
+		for c in continuations {
+			c.key.cancel()
+		}
 		self.settings = newSettings
-		self.downloadWrapper.setAuthentication(
+		try await login(newSettings)
+		/*self.downloadWrapper.setAuthentication(
 			password: newSettings.password,
 			username: newSettings.username
-		)
+		)*/
 	}
 
 	func uploadNoteAudio(_ recording: AudioNote, _ progressCallback: @escaping (Double) -> Void)

@@ -17,6 +17,9 @@ struct NetworkStatusView: View {
 					.frame(width: 50, height: 50)
 				switch state {
 				case .downloading:
+					Image(systemName: "arrow.down.app.fill").foregroundColor(
+						.blue
+					)
 					ProgressCircle(
 						progress: progress,
 						color: Color.blue
@@ -36,11 +39,16 @@ struct NetworkStatusView: View {
 					Image(systemName: "questionmark.key.filled")
 						.foregroundColor(.gray).font(.title)
 				case .savingData:
+					Image(systemName: "externaldrive.fill").foregroundColor(
+						.green
+					)
 					ProgressCircle(
 						progress: progress,
 						color: Color.green
 					)
 				case .uploadingChanges:
+					Image(systemName: "arrow.up.forward.circle")
+						.foregroundColor(.cyan)
 					ProgressCircle(
 						progress: progress,
 						color: Color.cyan

@@ -91,10 +91,8 @@ class RootController {
 		do {
 			try database.connect()
 			settings.load()
-			network.onSettingsChanged(settings.model)
-			network.onInit()
 			region.current = settings.model.region
-			startBackgroundTasks()
+			network.onSettingsChanged(settings.model, database)
 		}
 		catch {
 			SentrySDK.capture(error: error)
@@ -119,7 +117,7 @@ class RootController {
 
 	func saveSettings(password: String, url: String, username: String) {
 		settings.saveSync(password: password, url: url, username: username)
-		network.onSettingsChanged(settings.model)
+		network.onSettingsChanged(settings.model, database)
 	}
 
 	func onRegionChange(r: MKCoordinateRegion) {
@@ -129,17 +127,6 @@ class RootController {
 	}
 
 	// MARK - private functions
-
-	/// Kick off the different background tasks we should be doing
-	private func startBackgroundTasks() {
-		Task {
-			Logger.background.info("Beginning background network tasks")
-			await network.downloadNotes(database)
-			await network.uploadAudioNotes(database)
-			await network.uploadPictureNotes(database)
-			Logger.background.info("Background network tasks complete")
-		}
-	}
 }
 
 class RootControllerPreview: RootController {
