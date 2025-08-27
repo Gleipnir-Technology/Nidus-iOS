@@ -185,14 +185,6 @@ class NetworkController {
 		let sectionProgress = progressPerSection * p
 		let totalProgress =
 			progressPerSection * Double(progress.currentSection) + sectionProgress
-		if self.backgroundNetworkState != state {
-			Logger.background.info(
-				"Network state set: \(String(reflecting: state)), progress: \(progress)"
-			)
-		}
-		else if progress >= 1.0 {
-			Logger.background.info("Network progress set to \(progress)")
-		}
 		self.setState(backgroundNetworkState, totalProgress)
 	}
 
@@ -203,6 +195,14 @@ class NetworkController {
 
 	private func setState(_ state: BackgroundNetworkState, _ progress: Double) {
 		Task { @MainActor in
+			if self.backgroundNetworkState != state {
+				Logger.background.info(
+					"Network state set: \(String(reflecting: state)), progress: \(progress)"
+				)
+			}
+			else if progress >= 1.0 {
+				Logger.background.info("Network progress set to \(progress)")
+			}
 			self.backgroundNetworkProgress = progress
 			self.backgroundNetworkState = state
 		}
