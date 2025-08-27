@@ -24,28 +24,66 @@ class NetworkController {
 			self.syncTask!.cancel()
 		}
 		self.syncTask = Task {
-			do {
-				setState(.loggingIn, 0.0)
-				try await self.service.onSettingsChanged(newSettings)
+			// Use a loop so that we can try with some backoff
+			while true {
+				do {
+					setState(.loggingIn, 0.0)
+					try await self.service.onSettingsChanged(newSettings)
 
-				try await downloadNotes(database)
-				try await uploadAudioNotes(database)
-				try await uploadPictureNotes(database)
-			}
-			catch AuthError.invalidCredentials {
-				setState(.invalidCredentials, 0.0)
-			}
-			catch AuthError.noCredentials {
-				Logger.background.error(
-					"No credentials reported when we have settings. This implies a bug in Nidus"
-				)
-			}
-			catch {
-				Logger.background.error(
-					"Unhandled error in network controller: \(error)"
-				)
-				SentrySDK.capture(error: error)
-				setState(.error, 0.0)
+					try await downloadNotes(database)
+					try await uploadAudioNotes(database)
+					try await uploadPictureNotes(database)
+					return
+				}
+				catch AuthError.invalidCredentials {
+					Logger.background.info("Credentials are invalid")
+					setState(.invalidCredentials, 0.0)
+					return
+				}
+				catch AuthError.noCredentials {
+					Logger.background.error(
+						"No credentials reported when we have settings. This implies a bug in Nidus"
+					)
+					return
+				}
+				catch URLError.cancelled {
+					Logger.background.info(
+						"Ignoring cancelled task, it means we got new settings"
+					)
+					return
+				}
+				catch URLError.notConnectedToInternet {
+					Logger.background.info(
+						"Not connected to the internet, will retry"
+					)
+					// retry
+				}
+				catch URLError.badURL {
+					Logger.background.info(
+						"URL is bad, credentials are invalid"
+					)
+					setState(.invalidCredentials, 0.0)
+					return
+				}
+				catch URLError.networkConnectionLost {
+					Logger.background.info(
+						"Network connection lost, will retry"
+					)
+					// retry
+				}
+				catch URLError.timedOut {
+					Logger.background.info(
+						"Network connection lost, will retry"
+					)
+					// retry
+				}
+				catch {
+					Logger.background.error(
+						"Unhandled error in network controller: \(error)"
+					)
+					SentrySDK.capture(error: error)
+					setState(.error, 0.0)
+				}
 			}
 		}
 	}
@@ -68,45 +106,30 @@ class NetworkController {
 	// MARK - private functions
 	private func downloadNotes(_ database: DatabaseController) async throws {
 		setState(.downloading, 0.0)
-		do {
-			let response = try await service.fetchNoteUpdates { progress in
-				self.setState(.downloading, progress)
+		let response = try await service.fetchNoteUpdates { progress in
+			self.setState(.downloading, progress)
+		}
+		setState(.savingData, 0.0)
+		let totalRecords =
+			response.requests.count + response.sources.count
+			+ response.traps.count
+		var i = 0
+		for r in response.requests {
+			try database.service.upsertServiceRequest(r)
+			i += 1
+			if i % 100 == 0 {
+				setState(.savingData, Double(i) / Double(totalRecords))
 			}
-			setState(.savingData, 0.0)
-			let totalRecords =
-				response.requests.count + response.sources.count
-				+ response.traps.count
-			var i = 0
-			for r in response.requests {
-				try database.service.upsertServiceRequest(r)
-				i += 1
-				if i % 100 == 0 {
-					setState(.savingData, Double(i) / Double(totalRecords))
-				}
+		}
+		for s in response.sources {
+			try database.service.upsertSource(s)
+			i += 1
+			if i % 100 == 0 {
+				setState(.savingData, Double(i) / Double(totalRecords))
 			}
-			for s in response.sources {
-				try database.service.upsertSource(s)
-				i += 1
-				if i % 100 == 0 {
-					setState(.savingData, Double(i) / Double(totalRecords))
-				}
-			}
-			setState(.idle, 0.0)
-			Logger.background.info("Done saving API response")
 		}
-		catch AuthError.invalidCredentials {
-			setState(.invalidCredentials, 0.0)
-		}
-		catch AuthError.noCredentials {
-			setState(.loggingIn, 0.0)
-		}
-		catch {
-			SentrySDK.capture(error: error)
-			Logger.background.error("Failed to fetch updates: \(error)")
-			setState(.error, 0.0)
-			return
-		}
-
+		setState(.idle, 0.0)
+		Logger.background.info("Done saving API response")
 	}
 	private func handleError(_ error: any Error) {
 		Logger.background.error("Network controller error: \(error)")
@@ -162,6 +185,14 @@ class NetworkController {
 		let sectionProgress = progressPerSection * p
 		let totalProgress =
 			progressPerSection * Double(progress.currentSection) + sectionProgress
+		if self.backgroundNetworkState != state {
+			Logger.background.info(
+				"Network state set: \(String(reflecting: state)), progress: \(progress)"
+			)
+		}
+		else if progress >= 1.0 {
+			Logger.background.info("Network progress set to \(progress)")
+		}
 		self.setState(backgroundNetworkState, totalProgress)
 	}
 
@@ -174,9 +205,6 @@ class NetworkController {
 		Task { @MainActor in
 			self.backgroundNetworkProgress = progress
 			self.backgroundNetworkState = state
-			Logger.background.info(
-				"Network state set: \(String(reflecting: state)), progress: \(progress)"
-			)
 		}
 	}
 
