@@ -212,13 +212,15 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		// If we have some kind of error this isn't actually an auth challenge, but rather
 		// a failure on our configuration
 		guard let response = task.response else {
-			Logger.background.warning(
-				"Unable to get response from task on authentication challenge for \(task.originalRequest?.url?.absoluteString ?? "unknown URL")"
+			Logger.background.info(
+				"Unable to get response from task on authentication challenge for \(task.originalRequest?.url?.absoluteString ?? "unknown URL") so continuing without response to the authentication challenge"
 			)
-			completionHandler(
-				.cancelAuthenticationChallenge,
-				nil
-			)
+			// Here we allow the default handler because we hit this code path in
+			// situations where we send a login POST with no next parameter which yields
+			// a 202 status code. In that case it appears we get this callback to fire
+			// but before we have a response available. If we cancel at that point then we don't actually
+			// store the session cookie and therefore make no more forward progress
+			completionHandler(.performDefaultHandling, nil)
 			return
 		}
 		if let httpResponse = response as? HTTPURLResponse {
