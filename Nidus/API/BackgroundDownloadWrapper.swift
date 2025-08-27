@@ -34,13 +34,15 @@ class BackgroundDownloadWrapper: NSObject, ObservableObject, URLSessionDownloadD
 		let config = URLSessionConfiguration.background(
 			withIdentifier: "technology.gleipnir.nidus-notes.download-session"
 		)
-		config.timeoutIntervalForRequest = 10
-		config.timeoutIntervalForResource = 120
 		config.isDiscretionary = false
-		config.sessionSendsLaunchEvents = true
 		config.httpCookieStorage = cookieStorage
 		config.httpShouldSetCookies = true
 		config.httpCookieAcceptPolicy = .always
+		config.sessionSendsLaunchEvents = true
+		config.timeoutIntervalForRequest = 10
+		// Wait for up to a day for connectivity
+		config.timeoutIntervalForResource = 60 * 60 * 24
+		config.waitsForConnectivity = true
 
 		backgroundSession = URLSession(
 			configuration: config,
