@@ -28,7 +28,8 @@ struct NotesModel {
 						created: Date.now.advanced(by: -30)
 					)
 				],
-				duration: 12
+				duration: 12,
+				version: 1
 			),
 			PictureNote.forPreview(location: 0x8a2_8347_0531_4fff),
 		])

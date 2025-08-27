@@ -220,7 +220,7 @@ class NetworkController {
 				try await internalUploadNoteAudio(note) { progress in
 					self.progressUpdateSection(i, progress)
 				}
-				try database.service.updateNoteAudio(
+				_ = try database.service.noteAudioUploaded(
 					note,
 					uploaded: Date.now
 				)

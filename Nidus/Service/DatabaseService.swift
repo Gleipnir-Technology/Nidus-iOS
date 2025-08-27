@@ -31,7 +31,7 @@ class DatabaseService: CustomStringConvertible {
 	static func migrations() -> [Migration] {
 		return [
 			Migration1(), Migration2(), Migration3(), Migration4(), Migration5(),
-			Migration6(), Migration7(), Migration8(), Migration9(),
+			Migration6(), Migration7(), Migration8(), Migration9(), Migration10(),
 		]
 	}
 
@@ -81,7 +81,7 @@ class DatabaseService: CustomStringConvertible {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		return try AudioNeedingUpload(connection)
+		return try NoteAudioNeedingUpload(connection)
 	}
 
 	func audioUploaded(_ uuid: UUID) throws {
@@ -130,7 +130,7 @@ class DatabaseService: CustomStringConvertible {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		try AudioRecordingInsert(connection, recording)
+		try NoteAudioInsert(connection, recording)
 	}
 
 	func insertPictureNote(_ note: PictureNote) throws {
@@ -224,11 +224,17 @@ class DatabaseService: CustomStringConvertible {
 		return try NoteUpdate(connection, n)
 	}
 
-	func updateNoteAudio(_ note: AudioNote, uploaded: Date) throws {
+	func noteAudioUpdate(_ note: AudioNote, transcription: String? = nil) throws {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		return try AudioNoteUpdate(connection, note.id, uploaded: uploaded)
+		return try NoteAudioUpdate(connection, note.id, transcription: transcription)
+	}
+	func noteAudioUploaded(_ note: AudioNote, uploaded: Date = Date.now) throws -> Int {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		return try NoteAudioUploaded(connection, note.id, uploaded: uploaded)
 	}
 
 	func updateNotePicture(_ note: PictureNote, uploaded: Date) throws {

@@ -20,22 +20,14 @@ class RootController {
 	var settings = SettingsController()
 	var toast = ToastController()
 
-	private func calculateNotesToShow(_ region: MKCoordinateRegion) {
-		Task {
-			do {
-				let notes = try database.service.notesByRegion(region)
-				self.notes.showNotes(
-					mapAnnotations: notes.map { $0.value.mapAnnotation },
-					notes: notes,
-					noteOverviews: notes.map { $0.value.overview }
-				)
-			}
-			catch {
-				Logger.background.error("Failed to calculate notes: \(error)")
-			}
+	func noteAudioUpdate(_ note: AudioNote, transcription: String) {
+		do {
+			try database.service.noteAudioUpdate(note, transcription: transcription)
+		}
+		catch {
+			self.error.onError(error)
 		}
 	}
-
 	// MARK - public interface
 	func onAppear() {
 		audioRecording.onRecordingSave { recording in
@@ -127,6 +119,22 @@ class RootController {
 	}
 
 	// MARK - private functions
+	private func calculateNotesToShow(_ region: MKCoordinateRegion) {
+		Task {
+			do {
+				let notes = try database.service.notesByRegion(region)
+				self.notes.showNotes(
+					mapAnnotations: notes.map { $0.value.mapAnnotation },
+					notes: notes,
+					noteOverviews: notes.map { $0.value.overview }
+				)
+			}
+			catch {
+				Logger.background.error("Failed to calculate notes: \(error)")
+			}
+		}
+	}
+
 }
 
 class RootControllerPreview: RootController {

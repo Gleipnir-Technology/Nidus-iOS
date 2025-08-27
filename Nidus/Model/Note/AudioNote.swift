@@ -12,6 +12,8 @@ class AudioNote: NoteProtocol, Codable {
 		case breadcrumbs
 		case tags
 		case transcription
+		case transcriptionUserEdited
+		case version
 	}
 
 	let id: UUID
@@ -20,6 +22,8 @@ class AudioNote: NoteProtocol, Codable {
 	let duration: TimeInterval
 	var tags: [AudioTagMatch]
 	var transcription: String?
+	var transcriptionUserEdited: Bool
+	let version: Int
 
 	var timestamp: Date {
 		return created
@@ -33,7 +37,9 @@ class AudioNote: NoteProtocol, Codable {
 		breadcrumbs: [AudioNoteBreadcrumb],
 		created: Date = Date(),
 		duration: TimeInterval,
-		transcription: String? = nil
+		transcription: String? = nil,
+		transcriptionUserEdited: Bool = false,
+		version: Int
 	) {
 		self.id = id
 		self.breadcrumbs = breadcrumbs
@@ -41,6 +47,8 @@ class AudioNote: NoteProtocol, Codable {
 		self.duration = duration
 		self.tags = transcription == nil ? [] : AudioTagIdentifier.parseTags(transcription!)
 		self.transcription = transcription
+		self.transcriptionUserEdited = transcriptionUserEdited
+		self.version = version
 	}
 
 	required init(from decoder: Decoder) throws {
@@ -54,6 +62,11 @@ class AudioNote: NoteProtocol, Codable {
 				forKey: .breadcrumbs
 			) ?? []
 		transcription = try container.decode(String.self, forKey: .transcription)
+		transcriptionUserEdited = try container.decode(
+			Bool.self,
+			forKey: .transcriptionUserEdited
+		)
+		version = try container.decode(Int.self, forKey: .version)
 
 		tags = AudioTagIdentifier.parseTags(transcription ?? "")
 	}
@@ -104,6 +117,8 @@ class AudioNote: NoteProtocol, Codable {
 		try container.encode(breadcrumbs, forKey: .breadcrumbs)
 		//try container.encode(tags, forKey: .tags)
 		try container.encode(transcription, forKey: .transcription)
+		try container.encode(transcriptionUserEdited, forKey: .transcriptionUserEdited)
+		try container.encode(version, forKey: .version)
 	}
 
 	func hash(into hasher: inout Hasher) {
@@ -112,6 +127,8 @@ class AudioNote: NoteProtocol, Codable {
 		hasher.combine(created)
 		hasher.combine(tags)
 		hasher.combine(transcription)
+		hasher.combine(transcriptionUserEdited)
+		hasher.combine(version)
 	}
 
 	static func == (lhs: AudioNote, rhs: AudioNote) -> Bool {
@@ -139,7 +156,8 @@ class AudioNote: NoteProtocol, Codable {
 				)
 			],
 			duration: 12,
-			transcription: "This is something I said"
+			transcription: "This is something I said",
+			version: 1
 		)
 	}
 }

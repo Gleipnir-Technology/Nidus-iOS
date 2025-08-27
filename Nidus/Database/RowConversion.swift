@@ -9,7 +9,9 @@ func AudioNoteFromRow(connection: Connection, query: QueryType) throws -> [Audio
 			breadcrumbs: [],
 			created: row[schema.audioRecording.created],
 			duration: row[schema.audioRecording.duration],
-			transcription: row[schema.audioRecording.transcription]
+			transcription: row[schema.audioRecording.transcription],
+			transcriptionUserEdited: row[schema.audioRecording.transcriptionUserEdited],
+			version: row[schema.audioRecording.version]
 		)
 	}
 	let uuids = results.map { note in

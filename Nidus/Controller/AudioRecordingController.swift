@@ -49,7 +49,9 @@ class AudioRecordingController {
 				breadcrumbs: model.locationWhileRecording,
 				created: Date.now,
 				duration: model.recordingDuration,
-				transcription: model.transcription
+				transcription: model.transcription,
+				transcriptionUserEdited: false,
+				version: 1
 			)
 			handleRecordingSave(note)
 		}

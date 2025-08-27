@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AudioDetailView: View {
+struct AudioRecordingDetailView: View {
 	let controller: AudioRecordingController
 
 	private func timeString(_ timeInterval: TimeInterval) -> String {
@@ -63,9 +63,9 @@ struct AudioDetailView: View {
 }
 struct AudioDetailView_Previews: PreviewProvider {
 	static var previews: some View {
-		AudioDetailView(controller: AudioRecordingControllerPreview())
+		AudioRecordingDetailView(controller: AudioRecordingControllerPreview())
 			.previewDisplayName("Not recording")
-		AudioDetailView(
+		AudioRecordingDetailView(
 			controller: AudioRecordingControllerPreview(
 				model: AudioModel(
 					isRecording: true,
@@ -78,7 +78,7 @@ struct AudioDetailView_Previews: PreviewProvider {
 
 		VStack {
 			Spacer().background(.blue)
-			AudioDetailView(
+			AudioRecordingDetailView(
 				controller: AudioRecordingControllerPreview(
 					hasPermissionTranscription: true,
 					model: AudioModel(
@@ -94,7 +94,7 @@ struct AudioDetailView_Previews: PreviewProvider {
 
 		VStack {
 			Spacer().background(.blue)
-			AudioDetailView(
+			AudioRecordingDetailView(
 				controller: AudioRecordingControllerPreview(
 					hasPermissionTranscription: true,
 					model: AudioModel.fromTranscript(

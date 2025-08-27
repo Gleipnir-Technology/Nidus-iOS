@@ -29,7 +29,7 @@ struct RootView: View {
 
 	// An indication of the scene's operational state.
 	@Environment(\.scenePhase) var scenePhase
-	init(controller: RootController, isShowingAudioDetail: Bool = false) {
+	init(controller: RootController) {
 		self.controller = controller
 		controller.onInit()
 	}
@@ -89,7 +89,7 @@ struct RootView: View {
 					VStack {
 						switch activeView {
 						case .audio:
-							AudioDetailView(
+							AudioRecordingDetailView(
 								controller: controller
 									.audioRecording
 							)
@@ -235,8 +235,7 @@ struct RootView_Previews: PreviewProvider {
 							"This is some words I pretended to say"
 					)
 				)
-			),
-			isShowingAudioDetail: true
+			)
 		).previewDisplayName("recording")
 		RootView(
 			controller: RootControllerPreview(
@@ -244,8 +243,7 @@ struct RootView_Previews: PreviewProvider {
 					backgroundNetworkProgress: 0.33,
 					backgroundNetworkState: .downloading
 				)
-			),
-			isShowingAudioDetail: true
+			)
 		).previewDisplayName("downloading")
 	}
 }

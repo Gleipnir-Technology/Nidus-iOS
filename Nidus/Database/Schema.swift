@@ -1,10 +1,3 @@
-//
-//  Schema.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 6/20/25.
-//
-
 import OSLog
 import SQLite
 import SwiftUI
@@ -28,8 +21,10 @@ class AudioRecordingTable {
 	let deleted = SQLite.Expression<Date?>("deleted")
 	let duration = SQLite.Expression<TimeInterval>("duration")
 	let transcription = SQLite.Expression<String?>("transcription")
+	let transcriptionUserEdited = SQLite.Expression<Bool>("transcription_user_edited")
 	let uploaded = SQLite.Expression<Date?>("uploaded")
 	let uuid = SQLite.Expression<UUID>("uuid")
+	let version = SQLite.Expression<Int>("version")
 }
 
 class AudioRecordingLocationTable {
