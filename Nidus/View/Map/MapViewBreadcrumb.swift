@@ -150,7 +150,7 @@ struct MapViewBreadcrumb: View {
 		//"New region: \(newRegion.span.latitudeDelta) \(newRegion.span.longitudeDelta)"
 		//)
 		if newRegion.span.latitudeDelta < 0.0005 || newRegion.span.longitudeDelta < 0.0005 {
-			Logger.background.info("Forcing resolution 15")
+			//Logger.background.info("Forcing resolution 15")
 			overlayResolution = 15
 			return
 		}
