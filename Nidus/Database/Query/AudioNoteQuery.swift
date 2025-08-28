@@ -20,7 +20,10 @@ func NoteAudioInsert(
 			<- SQLite.Expression<TimeInterval>(value: audioNote.duration),
 		schema.audioRecording.transcription
 			<- SQLite.Expression<String?>(value: audioNote.transcription),
-		schema.audioRecording.uuid <- SQLite.Expression<UUID>(value: audioNote.id)
+		schema.audioRecording.transcriptionUserEdited
+			<- SQLite.Expression<Bool>(value: audioNote.transcriptionUserEdited),
+		schema.audioRecording.uuid <- SQLite.Expression<UUID>(value: audioNote.id),
+		schema.audioRecording.version <- SQLite.Expression<Int>(value: audioNote.version)
 	)
 	try connection.run(insert)
 	for (i, breadcrumb) in audioNote.breadcrumbs.enumerated() {
@@ -41,16 +44,22 @@ func NoteAudioInsert(
 }
 
 func NoteAudioUpdate(_ connection: Connection, _ uuid: UUID, transcription: String? = nil) throws {
-	var setters: [Setter] = []
-	if transcription != nil {
-		setters.append(
-			schema.audioRecording.transcription <- transcription
-		)
-	}
-	let query = schema.audioRecording.table.filter(
-		SQLite.Expression<UUID>(value: uuid) == schema.audioRecording.uuid
-	).update(setters)
-	try connection.run(query)
+	// Get the previous row
+	let previousRowQuery = schema.audioRecording.table.where(
+		schema.audioRecording.uuid == uuid
+	).order(schema.audioRecording.version)
+	let previous = try AudioNoteFromRow(connection: connection, query: previousRowQuery).first!
+
+	let updated = AudioNote(
+		id: previous.id,
+		breadcrumbs: previous.breadcrumbs,
+		created: previous.created,
+		duration: previous.duration,
+		transcription: transcription,
+		transcriptionUserEdited: true,
+		version: previous.version + 1
+	)
+	try NoteAudioInsert(connection, updated)
 }
 
 func NoteAudioUploaded(_ connection: Connection, _ uuid: UUID, uploaded: Date) throws -> Int {

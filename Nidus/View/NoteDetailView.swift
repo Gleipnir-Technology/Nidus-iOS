@@ -17,7 +17,7 @@ struct NoteDetailView: View {
 		}
 		else if let note = note as? AudioNote {
 			AudioNoteDetail(
-				controller: controller.audioPlayback,
+				controller: controller,
 				note: note
 			)
 		}

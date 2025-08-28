@@ -79,8 +79,10 @@ struct AudioPlaybackWidget: View {
 }
 
 struct AudioNoteDetail: View {
-	var controller: AudioPlaybackController
+	var controller: RootController
 	let note: AudioNote
+	@State var isEditingTranscription: Bool = false
+	@State var editedTranscriptionText: String = ""
 
 	private func initialRegion() -> MKCoordinateRegion {
 		var sumLat = 0.0
@@ -126,6 +128,16 @@ struct AudioNoteDetail: View {
 			)
 		)
 	}
+	var breadcrumbMap: MapViewBreadcrumb {
+		MapViewBreadcrumb(
+			breadcrumbCells: note.breadcrumbs.map { b in b.cell },
+			initialRegion: initialRegion(),
+			notes: nil,
+			onSelectCell: { _ in },
+			region: nil,
+			showsGrid: false
+		)
+	}
 
 	var body: some View {
 		VStack {
@@ -133,27 +145,45 @@ struct AudioNoteDetail: View {
 				Text("No location")
 			}
 			else {
-				MapViewBreadcrumb(
-					breadcrumbCells: note.breadcrumbs.map { b in b.cell },
-					initialRegion: initialRegion(),
-					notes: nil,
-					onSelectCell: { _ in },
-					region: nil,
-					showsGrid: false
-				)
+				breadcrumbMap
 			}
 			AudioPlaybackWidget(
-				controller: controller
+				controller: controller.audioPlayback
 			)
-			if note.transcription != nil && !(note.transcription!.isEmpty) {
+			if isEditingTranscription {
+				GeometryReader { geometry in
+					ZStack {
+						TextField(
+							"Edit transcription",
+							text: $editedTranscriptionText
+						).textFieldStyle(RoundedBorderTextFieldStyle())
+							.padding()
+						Image(systemName: "checkmark.circle").onTapGesture {
+							isEditingTranscription = false
+							controller.noteAudioUpdate(
+								note,
+								transcription:
+									editedTranscriptionText
+							)
+						}.padding().position(
+							x: geometry.size.width - 32,
+							y: geometry.size.height - 20
+						)
+					}
+				}
+			}
+			else if note.transcription != nil && !(note.transcription!.isEmpty) {
 				TranscriptionDisplay(
 					tags: note.tags,
 					transcription: note.transcription
-				)
+				).onLongPressGesture {
+					editedTranscriptionText = note.transcription!
+					isEditingTranscription = true
+				}
 			}
 		}
 		.onAppear {
-			controller.loadAudio(note.id)
+			controller.audioPlayback.loadAudio(note.id)
 		}
 	}
 }
@@ -161,7 +191,7 @@ struct AudioNoteDetail: View {
 struct AudioNoteDetail_Previews: PreviewProvider {
 	static var previews: some View {
 		AudioNoteDetail(
-			controller: AudioPlaybackControllerPreview(),
+			controller: RootControllerPreview(),
 			note: AudioNote.Preview.one
 		)
 	}
