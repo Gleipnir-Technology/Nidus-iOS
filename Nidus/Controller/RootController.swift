@@ -25,7 +25,7 @@ class RootController {
 			try database.service.noteAudioUpdate(note, transcription: transcription)
 		}
 		catch {
-			self.error.onError(error)
+			handleError(error)
 		}
 	}
 	// MARK - public interface
@@ -44,11 +44,7 @@ class RootController {
 					try self.database.service.audioUploaded(recording.id)
 				}
 				catch {
-					SentrySDK.capture(error: error)
-					self.error.message = "Failed to save recording: \(error)"
-					Logger.background.error(
-						"Failed to save audio recording: \(error)"
-					)
+					self.handleError(error, "Failed to save audio recording")
 				}
 			}
 		}
@@ -63,17 +59,12 @@ class RootController {
 						try await self.network.uploadNotePicture(note)
 					}
 					catch {
-						SentrySDK.capture(error: error)
-						Logger.background.error(
-							"Failed to upload picture: \(error)"
-						)
+						self.handleError(error, "Failed to upload note")
 					}
 				}
 			}
 			catch {
-				SentrySDK.capture(error: error)
-				self.error.message = "Failed to save picture: \(error)"
-				Logger.background.error("Failed to save picture: \(error)")
+				self.handleError(error, "Failed to save picture note")
 			}
 		}
 		region.onAppear()
@@ -91,8 +82,7 @@ class RootController {
 			network.onSettingsChanged(settings.model, database)
 		}
 		catch {
-			SentrySDK.capture(error: error)
-			Logger.foreground.error("Failed to initialize the app: \(error)")
+			handleError(error, "Failed in onInit")
 		}
 	}
 
@@ -134,9 +124,14 @@ class RootController {
 				)
 			}
 			catch {
-				Logger.background.error("Failed to calculate notes: \(error)")
+				handleError(error, "Failed to calculate notes")
 			}
 		}
+	}
+
+	private func handleError(_ error: Error, _ message: String = "") {
+		SentrySDK.capture(error: error)
+		Logger.background.error("Unhandled error: \(message) \(error)")
 	}
 
 }
