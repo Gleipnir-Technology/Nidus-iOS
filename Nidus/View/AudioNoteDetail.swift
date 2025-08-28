@@ -156,8 +156,11 @@ struct AudioNoteDetail: View {
 						TextField(
 							"Edit transcription",
 							text: $editedTranscriptionText
-						).textFieldStyle(RoundedBorderTextFieldStyle())
-							.padding()
+						).cornerRadius(10).frame(
+							maxWidth: .infinity,
+							minHeight: 80,
+							alignment: .leading
+						)
 						Image(systemName: "checkmark.circle").onTapGesture {
 							isEditingTranscription = false
 							controller.noteAudioUpdate(
