@@ -12,9 +12,8 @@ class NetworkController {
 	private var syncTask: Task<(), Never>? = nil
 
 	// MARK - public interface
-	//func fetchNoteUpdates() async throws -> NotesResponse {
-	//return try await service.fetchNoteUpdates()
-	//}
+
+	/// Test the new settings and save off the credentials if they work, then initiatek
 	func onSettingsChanged(_ newSettings: SettingsModel, _ database: DatabaseController) {
 		if newSettings.username.isEmpty || newSettings.password.isEmpty {
 			setState(.notConfigured, 0.0)
