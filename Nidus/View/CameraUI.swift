@@ -40,7 +40,7 @@ struct CameraUI<CameraModel: Camera>: PlatformView {
 		VStack(spacing: 0) {
 			FeaturesToolbar(camera: camera)
 			Spacer()
-			CaptureModeView(camera: camera, direction: $swipeDirection)
+			//CaptureModeView(camera: camera, direction: $swipeDirection)
 			MainToolbar(camera: camera)
 				.padding(.bottom, bottomPadding)
 		}
