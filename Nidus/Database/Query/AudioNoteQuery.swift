@@ -9,6 +9,15 @@ func NoteAudioNeedingUpload(_ connection: Connection) throws -> [AudioNote] {
 	)
 }
 
+func NoteAudio(
+	_ connection: SQLite.Connection,
+	_ uuid: UUID
+) throws -> AudioNote? {
+	return try noteAudioFromRows(
+		connection: connection,
+		query: schema.audioRecording.table.filter(schema.audioRecording.uuid == uuid)
+	).first
+}
 func NoteAudioInsert(
 	_ connection: SQLite.Connection,
 	_ audioNote: AudioNote

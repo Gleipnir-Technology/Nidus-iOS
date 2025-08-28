@@ -26,6 +26,21 @@ class RootController {
 			// This restores the notes in our collection with the new update
 			// There's definitely a more-efficient way to do this
 			calculateNotesToShow(region.current)
+			Task {
+				guard let newNote = try database.service.noteAudio(note.id) else {
+					Logger.background.info(
+						"Somehow failed to get a note after updating it, there's a logic error here."
+					)
+					return
+				}
+				do {
+					try await network.uploadNoteAudio(newNote)
+					try database.service.audioUploaded(newNote.id)
+				}
+				catch {
+					self.handleError(error, "Upload audio note change")
+				}
+			}
 		}
 		catch {
 			handleError(error)

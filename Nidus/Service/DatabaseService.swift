@@ -100,16 +100,11 @@ class DatabaseService: CustomStringConvertible {
 		return try NoteDelete(connection, note.id)
 	}
 
-	func dropOriginalTables() throws {
+	func noteAudio(_ uuid: UUID) throws -> AudioNote? {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		try connection.transaction {
-			try connection.run("DROP TABLE IF EXISTS inspection")
-			try connection.run("DROP TABLE IF EXISTS treatment")
-			try connection.run("DROP TABLE IF EXISTS mosquito_source")
-			try connection.run("DROP TABLE IF EXISTS service_request")
-		}
+		return try NoteAudio(connection, uuid)
 	}
 
 	func picturesThatNeedUpload() throws -> [PictureNote] {
@@ -145,9 +140,6 @@ class DatabaseService: CustomStringConvertible {
 			throw DatabaseError.notConnected
 		}
 		if !migrationManager.hasMigrationsTable() {
-			// This can be removed after our initial testers (all 4 of them) have
-			// this code run on their device.
-			try dropOriginalTables()
 			try migrationManager.createMigrationsTable()
 		}
 
