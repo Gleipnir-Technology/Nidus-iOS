@@ -273,7 +273,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which sentry-cli >/dev/null; then\nexport SENTRY_ORG=gleipnir-llc\nexport SENTRY_PROJECT=1\nexport SENTRY_URL=https://glitchtip.gleipnir.technology/\nexport SENTRY_LOG_LEVEL=debug\nexport SENTRY_AUTH_TOKEN=4c7b6c5f03fb24cca489abe73eb7af80e203816312131eeb550f185ff3e15d24\nERROR=$(sentry-cli debug-files upload \\\n--include-sources \\\n\"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"warning: sentry-cli - $ERROR\"\nfi\nelse\necho \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
+			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which sentry-cli >/dev/null; then\nexport SENTRY_ORG=gleipnir-llc\nexport SENTRY_PROJECT=nidus-ios\nexport SENTRY_URL=https://glitchtip.gleipnir.technology/\nexport SENTRY_LOG_LEVEL=debug\nexport SENTRY_AUTH_TOKEN=4c7b6c5f03fb24cca489abe73eb7af80e203816312131eeb550f185ff3e15d24\nERROR=$(sentry-cli debug-files upload \\\n--include-sources \\\n\"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"warning: sentry-cli - $ERROR\"\nfi\nelse\necho \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
