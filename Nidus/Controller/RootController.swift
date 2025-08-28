@@ -44,7 +44,11 @@ class RootController {
 					try self.database.service.audioUploaded(recording.id)
 				}
 				catch {
+					SentrySDK.capture(error: error)
 					self.error.message = "Failed to save recording: \(error)"
+					Logger.background.error(
+						"Failed to save audio recording: \(error)"
+					)
 				}
 			}
 		}
