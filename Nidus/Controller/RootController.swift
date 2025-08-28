@@ -23,6 +23,9 @@ class RootController {
 	func noteAudioUpdate(_ note: AudioNote, transcription: String) {
 		do {
 			try database.service.noteAudioUpdate(note, transcription: transcription)
+			// This restores the notes in our collection with the new update
+			// There's definitely a more-efficient way to do this
+			calculateNotesToShow(region.current)
 		}
 		catch {
 			handleError(error)
