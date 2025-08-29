@@ -6,19 +6,38 @@ import SwiftUI
 /*
  Root controller for the entire application
  */
-@MainActor
-@Observable
 class RootController {
-	var audioPlayback = AudioPlaybackController()
-	var audioRecording = AudioRecordingController()
-	var database = DatabaseController()
-	var camera = CameraController()
-	var error = ErrorController()
-	var network = NetworkController()
-	var notes = NotesController()
-	var region = RegionController()
-	var settings = SettingsController()
-	var toast = ToastController()
+	let audioPlayback: AudioPlaybackController
+	let audioRecording: AudioRecordingController
+	let database: DatabaseController
+	let camera: CameraController
+	let error: ErrorController
+	let network: NetworkController
+	let notes: NotesController
+	let region: RegionController
+	let settings: SettingsController
+	let toast: ToastController
+
+	let store: RootStore
+	@MainActor
+	init(
+		audioRecording: AudioRecordingController = AudioRecordingController(),
+		network: NetworkController = NetworkController(),
+		notes: NotesController = NotesController(),
+		store: RootStore
+	) {
+		audioPlayback = AudioPlaybackController(store: store.audioPlayback)
+		self.audioRecording = audioRecording
+		database = DatabaseController()
+		camera = CameraController()
+		error = ErrorController()
+		self.network = network
+		self.notes = notes
+		region = RegionController()
+		settings = SettingsController()
+		self.store = store
+		toast = ToastController()
+	}
 
 	func noteAudioUpdate(_ note: AudioNote, transcription: String) {
 		do {
@@ -47,6 +66,8 @@ class RootController {
 		}
 	}
 	// MARK - public interface
+
+	@MainActor
 	func onAppear() {
 		audioRecording.onRecordingSave { recording in
 			Task {
@@ -155,15 +176,19 @@ class RootController {
 }
 
 class RootControllerPreview: RootController {
+	@MainActor
 	init(
 		audioRecording: AudioRecordingControllerPreview = AudioRecordingControllerPreview(),
 		network: NetworkControllerPreview = NetworkControllerPreview(),
 		notes: NotesControllerPreview = NotesControllerPreview()
 	) {
-		super.init()
-		self.audioRecording = audioRecording
-		self.network = network
-		self.notes = notes
+		let store = RootStore()
+		super.init(
+			audioRecording: audioRecording,
+			network: network,
+			notes: notes,
+			store: store
+		)
 	}
 
 	override func onAppear() {

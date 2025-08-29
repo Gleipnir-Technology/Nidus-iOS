@@ -124,9 +124,12 @@ actor NetworkService {
 		request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 		let encoder = JSONEncoder()
 		encoder.dateEncodingStrategy = .iso8601
+		encoder.outputFormatting = .prettyPrinted
 		let data = try encoder.encode(recording)
 		request.httpBody = data
-		Logger.background.info("Begin upload of audio data \(recording.id)")
+		Logger.background.info(
+			"Begin upload of audio data \(recording.id): \n\(String(data: data, encoding: .utf8)!)"
+		)
 		_ = try await downloadWrapper.handle(with: request) { progress in
 			progressCallback(progress.progress)
 		}

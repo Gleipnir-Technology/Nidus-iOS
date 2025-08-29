@@ -7,6 +7,7 @@ import SwiftUI
 /// Simple widget for doing playback with pause/play and skip forward/back and a sweeper
 struct AudioPlaybackWidget: View {
 	var controller: AudioPlaybackController
+	let store: AudioPlaybackStore
 
 	private func timeString(from timeInterval: TimeInterval) -> String {
 		let minutes = Int(timeInterval) / 60
@@ -20,22 +21,22 @@ struct AudioPlaybackWidget: View {
 			VStack(spacing: 4) {
 				Slider(
 					value: Binding(
-						get: { controller.currentTime },
+						get: { store.currentTime },
 						set: { controller.seek(to: $0) }
 					),
-					in: 0...controller.duration
+					in: 0...store.duration
 				)
-				.disabled(!controller.isLoaded)
+				.disabled(!store.isLoaded)
 
 				// Time labels
 				HStack {
-					Text(timeString(from: controller.currentTime))
+					Text(timeString(from: store.currentTime))
 						.font(.caption2)
 						.foregroundColor(.secondary)
 
 					Spacer()
 
-					Text(timeString(from: controller.duration))
+					Text(timeString(from: store.duration))
 						.font(.caption2)
 						.foregroundColor(.secondary)
 				}
@@ -48,24 +49,24 @@ struct AudioPlaybackWidget: View {
 					Image(systemName: "gobackward.15")
 						.font(.title3)
 				}
-				.disabled(!controller.isLoaded)
+				.disabled(!store.isLoaded)
 
 				// Play/Pause button
 				Button(action: controller.togglePlayPause) {
 					Image(
-						systemName: controller.isPlaying
+						systemName: store.isPlaying
 							? "pause.circle.fill" : "play.circle.fill"
 					)
 					.font(.system(size: 40))
 				}
-				.disabled(!controller.isLoaded)
+				.disabled(!store.isLoaded)
 
 				// Skip forward 15 seconds
 				Button(action: { controller.skip(15) }) {
 					Image(systemName: "goforward.15")
 						.font(.title3)
 				}
-				.disabled(!controller.isLoaded)
+				.disabled(!store.isLoaded)
 			}
 		}
 		.padding(.horizontal, 16)
@@ -148,7 +149,8 @@ struct AudioNoteDetail: View {
 				breadcrumbMap
 			}
 			AudioPlaybackWidget(
-				controller: controller.audioPlayback
+				controller: controller.audioPlayback,
+				store: controller.audioPlayback.store
 			)
 			if isEditingTranscription {
 				GeometryReader { geometry in

@@ -2,15 +2,16 @@ import AVFoundation
 import OSLog
 import SwiftUI
 
-@Observable
 class AudioPlaybackController: NSObject, AVAudioPlayerDelegate {
 	private var audioPlayer: AVAudioPlayer?
-	var currentTime: TimeInterval = 0
-	var duration: TimeInterval = 0
-	var isLoaded = false
-	var isPlaying = false
+	internal let store: AudioPlaybackStore
 	private var timer: Timer?
 
+	init(store: AudioPlaybackStore) {
+		self.store = store
+	}
+
+	@MainActor
 	func loadAudio(_ uuid: UUID) {
 		do {
 			audioPlayer = try AVAudioPlayer(
@@ -19,46 +20,51 @@ class AudioPlaybackController: NSObject, AVAudioPlayerDelegate {
 			audioPlayer?.delegate = self
 			audioPlayer?.prepareToPlay()
 
-			duration = audioPlayer?.duration ?? 0
-			isLoaded = true
+			store.duration = audioPlayer?.duration ?? 0
+			store.isLoaded = true
 		}
 		catch {
 			print("Error loading audio: \(error)")
 		}
 	}
 
+	@MainActor
 	func play() {
 		audioPlayer?.play()
-		isPlaying = true
 		startTimer()
+		store.isPlaying = true
 	}
 
+	@MainActor
 	func seek(to time: TimeInterval) {
-		currentTime = time
+		store.currentTime = time
 	}
 
+	@MainActor
 	func skip(_ seconds: TimeInterval) {
 		guard let player = audioPlayer else { return }
-		let newTime = max(0, min(player.currentTime + seconds, duration))
+		let newTime = max(0, min(player.currentTime + seconds, store.duration))
 		seek(to: newTime)
 	}
 
 	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
 		Task { @MainActor in
-			isPlaying = false
-			currentTime = 0
+			store.isPlaying = false
+			store.currentTime = 0
 			stopTimer()
 		}
 	}
 
+	@MainActor
 	func stop() {
 		audioPlayer?.stop()
 		audioPlayer?.currentTime = 0
-		isPlaying = false
-		currentTime = 0
+		store.isPlaying = false
+		store.currentTime = 0
 		stopTimer()
 	}
 
+	@MainActor
 	func togglePlayPause() {
 		if audioPlayer == nil {
 			Logger.foreground.warning(
@@ -67,7 +73,7 @@ class AudioPlaybackController: NSObject, AVAudioPlayerDelegate {
 			return
 		}
 
-		if isPlaying {
+		if store.isPlaying {
 			pause()
 		}
 		else {
@@ -78,7 +84,7 @@ class AudioPlaybackController: NSObject, AVAudioPlayerDelegate {
 	private func startTimer() {
 		timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
 			Task { @MainActor in
-				self.currentTime = self.audioPlayer?.currentTime ?? 0
+				self.store.currentTime = self.audioPlayer?.currentTime ?? 0
 			}
 		}
 	}
@@ -100,10 +106,13 @@ class AudioPlaybackController: NSObject, AVAudioPlayerDelegate {
 }
 
 class AudioPlaybackControllerPreview: AudioPlaybackController {
-	override init() {
-		super.init()
+	@MainActor
+	init() {
+		let store = AudioPlaybackStore()
+		super.init(store: store)
 	}
+	@MainActor
 	override func loadAudio(_ uuid: UUID) {
-		isLoaded = true
+		store.isLoaded = true
 	}
 }

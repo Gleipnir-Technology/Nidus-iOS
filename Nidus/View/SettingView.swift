@@ -187,5 +187,5 @@ struct SettingView: View {
 }
 
 #Preview {
-	SettingView(controller: RootController())
+	SettingView(controller: RootControllerPreview())
 }

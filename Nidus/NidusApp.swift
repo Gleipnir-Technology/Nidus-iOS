@@ -10,7 +10,8 @@ struct NidusApp: App {
 
 	var body: some Scene {
 		WindowGroup {
-			RootView(controller: RootController())
+			let store = RootStore()
+			RootView(controller: RootController(store: store))
 		}
 	}
 }
