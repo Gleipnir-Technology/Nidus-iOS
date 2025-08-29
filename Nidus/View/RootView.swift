@@ -133,8 +133,8 @@ struct RootView: View {
 									? Color.blue : .secondary
 							)
 							ButtonAudioRecord(
-								audio: controller.audioRecording,
-								actionLong: onMicButtonLong
+								actionLong: onMicButtonLong,
+								controller: controller
 							)
 							ButtonWithLongPress(
 								actionLong: onCameraButtonLong,
@@ -227,8 +227,8 @@ struct RootView_Previews: PreviewProvider {
 		RootView(
 			controller: RootControllerPreview(
 				audioRecording: AudioRecordingControllerPreview(
-					hasPermissionTranscription: true,
-					model: AudioModel(
+					AudioRecordingStore(
+						hasPermissionTranscription: true,
 						isRecording: true,
 						recordingDuration: 63,
 						transcription:

@@ -14,13 +14,13 @@ struct AudioRecordingDetailView: View {
 			Text("Recording Details")
 				.font(.headline)
 
-			if controller.model.isRecording {
+			if controller.store.isRecording {
 				// Add your process details here
 				VStack(alignment: .leading, spacing: 10) {
 					Text(
-						"Recording duration: \(timeString(controller.model.recordingDuration))"
+						"Recording duration: \(timeString(controller.store.recordingDuration))"
 					)
-					if controller.hasPermissionTranscription == nil {
+					if controller.store.hasPermissionTranscription == nil {
 						Text("Not sure if we'll get permission or not")
 						HStack {
 							Spacer()
@@ -29,18 +29,18 @@ struct AudioRecordingDetailView: View {
 						}
 					}
 					else {
-						if controller.hasPermissionTranscription! {
-							if controller.model.transcription == nil {
+						if controller.store.hasPermissionTranscription! {
+							if controller.store.transcription == nil {
 								Text("Waiting to transcribe...")
 							}
 							else {
 								TranscriptionDisplay(
-									tags: controller.model.tags,
+									tags: controller.store.tags,
 									transcription: controller
-										.model.transcription
+										.store.transcription
 								)
 								AudioTagDisplay(
-									tags: controller.model.tags
+									tags: controller.store.tags
 								)
 							}
 						}
@@ -63,11 +63,12 @@ struct AudioRecordingDetailView: View {
 }
 struct AudioDetailView_Previews: PreviewProvider {
 	static var previews: some View {
-		AudioRecordingDetailView(controller: AudioRecordingControllerPreview())
+		let store = AudioRecordingStore()
+		AudioRecordingDetailView(controller: AudioRecordingControllerPreview(store))
 			.previewDisplayName("Not recording")
 		AudioRecordingDetailView(
 			controller: AudioRecordingControllerPreview(
-				model: AudioModel(
+				AudioRecordingStore(
 					isRecording: true,
 					recordingDuration: 60 * 2 + 15
 				)
@@ -80,8 +81,8 @@ struct AudioDetailView_Previews: PreviewProvider {
 			Spacer().background(.blue)
 			AudioRecordingDetailView(
 				controller: AudioRecordingControllerPreview(
-					hasPermissionTranscription: true,
-					model: AudioModel(
+					AudioRecordingStore(
+						hasPermissionTranscription: true,
 						isRecording: true,
 						recordingDuration: 60 * 2 + 15,
 						transcription: "This is a test transcription"
@@ -96,9 +97,10 @@ struct AudioDetailView_Previews: PreviewProvider {
 			Spacer().background(.blue)
 			AudioRecordingDetailView(
 				controller: AudioRecordingControllerPreview(
-					hasPermissionTranscription: true,
-					model: AudioModel.fromTranscript(
-						"Checking orchards at Avenue 300 and Road 140. 92 degrees, full sun. Rows five through nine have deep ruts still wet from last week’s flood irrigation. Soil is clay-heavy, tractor ruts holding water. Orchard is mature citrus. Took five dips, each with between twenty and a hundred larvae, mostly third and fourth instar Culex. Treated rut areas with one pound of VectoMax FG. Spoke with Jim, the foreman who manages the site. Told him the ruts are producing mosquitoes — he said he’ll have someone grade them before the next irrigation in two weeks. Gave me his number 559-555-5555 and said to call if anything comes up. Need to check back in two weeks to confirm the issue’s resolved."
+					AudioRecordingStore(
+						hasPermissionTranscription: true,
+						transcription:
+							"Checking orchards at Avenue 300 and Road 140. 92 degrees, full sun. Rows five through nine have deep ruts still wet from last week’s flood irrigation. Soil is clay-heavy, tractor ruts holding water. Orchard is mature citrus. Took five dips, each with between twenty and a hundred larvae, mostly third and fourth instar Culex. Treated rut areas with one pound of VectoMax FG. Spoke with Jim, the foreman who manages the site. Told him the ruts are producing mosquitoes — he said he’ll have someone grade them before the next irrigation in two weeks. Gave me his number 559-555-5555 and said to call if anything comes up. Need to check back in two weeks to confirm the issue’s resolved."
 					)
 				)
 			)

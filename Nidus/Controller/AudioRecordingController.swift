@@ -1,27 +1,29 @@
 import OSLog
+import Sentry
 import SwiftUI
 
-@Observable
 class AudioRecordingController {
-	var errorMessage: String = ""
-	var hasPermissionMicrophone: Bool? = nil
-	var hasPermissionTranscription: Bool? = nil
-	var model: AudioModel = AudioModel()
-	var recordingSaveCallbacks: [(AudioNote) -> Void] = []
-
+	internal let store: AudioRecordingStore
 	private var timer: Timer?
-	private var wrapper: WrapperAudio = WrapperAudio()
+	private var wrapper: WrapperAudio
 
+	init(_ store: AudioRecordingStore) {
+		self.store = store
+		self.timer = nil
+		self.wrapper = WrapperAudio()
+	}
+
+	@MainActor
 	func onLocationUpdated(_ cells: [H3Cell]) {
-		if model.isRecording {
+		if store.isRecording {
 			for cell in cells {
 
-				if model.locationWhileRecording.isEmpty
-					|| model.locationWhileRecording[
-						model.locationWhileRecording.count - 1
+				if store.locationWhileRecording.isEmpty
+					|| store.locationWhileRecording[
+						store.locationWhileRecording.count - 1
 					].cell != cell
 				{
-					model.locationWhileRecording.append(
+					store.locationWhileRecording.append(
 						AudioNoteBreadcrumb(cell: cell, created: Date.now)
 					)
 				}
@@ -29,51 +31,50 @@ class AudioRecordingController {
 		}
 	}
 
-	func onRecordingSave(_ callback: @escaping (AudioNote) -> Void) {
-		recordingSaveCallbacks.append(callback)
-	}
-
 	func playRecording(_ url: URL) {
 
 	}
 
-	func toggleRecording() {
-		if model.isRecording {
-			wrapper.stopRecording()
-			model.isRecording = false
-			timer?.invalidate()
-			timer = nil
-			// save recording
-			let note = AudioNote(
-				id: model.recordingUUID!,
-				breadcrumbs: model.locationWhileRecording,
-				created: Date.now,
-				duration: model.recordingDuration,
-				transcription: model.transcription,
-				transcriptionUserEdited: false,
-				version: 1
-			)
-			handleRecordingSave(note)
-		}
-		else {
-			do {
-				wrapper.onTranscriptionUpdate(onTranscriptionUpdate)
-				model.recordingUUID = UUID()
-				model.locationWhileRecording = []
-				try wrapper.startRecording(model.recordingUUID!)
-				model.recordingDuration = 0
-				model.isRecording = true
-				// Start timer for recording duration
-				timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) {
-					_ in
-					self.model.recordingDuration += 1
+	@MainActor
+	func startRecording() {
+		do {
+			wrapper.onTranscriptionUpdate(onTranscriptionUpdate)
+			store.recordingUUID = UUID()
+			store.locationWhileRecording = []
+			try wrapper.startRecording(store.recordingUUID!)
+			store.recordingDuration = 0
+			store.isRecording = true
+			// Start timer for recording duration
+			timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+				Task { @MainActor in
+					self.store.recordingDuration += 1
 				}
+			}
 
-			}
-			catch {
-				self.errorMessage = error.localizedDescription
-			}
 		}
+		catch {
+			SentrySDK.capture(error: error)
+			Logger.foreground.error("Failed to start recording: \(error)")
+		}
+	}
+
+	@MainActor
+	func stopRecording() -> AudioNote {
+		wrapper.stopRecording()
+		store.isRecording = false
+		timer?.invalidate()
+		timer = nil
+		// save recording
+		let note = AudioNote(
+			id: store.recordingUUID!,
+			breadcrumbs: store.locationWhileRecording,
+			created: Date.now,
+			duration: store.recordingDuration,
+			transcription: store.transcription,
+			transcriptionUserEdited: false,
+			version: 1
+		)
+		return note
 	}
 
 	func withPermission(ok: @escaping () -> Void, cancel: @escaping () -> Void) {
@@ -82,44 +83,37 @@ class AudioRecordingController {
 		}
 		else {
 			wrapper.requestPermissions { hasMic, hasTranscript in
-				self.hasPermissionMicrophone = hasMic
-				self.hasPermissionTranscription = hasTranscript
-				Logger.foreground.info(
-					"Audio permissions: \(hasMic), \(hasTranscript)"
-				)
-				if hasMic {
-					ok()
-				}
-				else {
-					cancel()
+				Task { @MainActor in
+					self.store.hasPermissionMicrophone = hasMic
+					self.store.hasPermissionTranscription = hasTranscript
+					Logger.foreground.info(
+						"Audio permissions: \(hasMic), \(hasTranscript)"
+					)
+					if hasMic {
+						ok()
+					}
+					else {
+						cancel()
+					}
 				}
 			}
 		}
 	}
 
-	private func handleRecordingSave(_ recording: AudioNote) {
-		for callback in recordingSaveCallbacks {
-			callback(recording)
-		}
-	}
+	@MainActor
 	private func onTranscriptionUpdate(_ transcription: String) {
-		self.model.transcription = transcription
-		self.model.tags = AudioTagIdentifier.parseTags(transcription)
+		self.store.transcription = transcription
+		self.store.tags = AudioTagIdentifier.parseTags(transcription)
 	}
 
 }
 
 class AudioRecordingControllerPreview: AudioRecordingController {
-	init(
-		hasPermissionTranscription: Bool? = nil,
-		model: AudioModel = AudioModel()
-	) {
-		super.init()
-		self.hasPermissionTranscription = hasPermissionTranscription
-		self.model = model
+	override func startRecording() {
+		store.isRecording = true
 	}
-	override func toggleRecording() {
-		model.isRecording.toggle()
+	override func stopRecording() -> AudioNote {
+		return AudioNote(breadcrumbs: [], duration: 123, version: 1)
 	}
 	override func withPermission(ok: @escaping () -> Void, cancel: @escaping () -> Void) {
 		ok()

@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct ButtonAudioRecord: View {
-	var audio: AudioRecordingController
 	let actionLong: () -> Void
+	var controller: RootController
 
 	func onMicButtonShort() {
-		audio.withPermission(
+		controller.audioRecording.withPermission(
 			ok: {
-				audio.toggleRecording()
+				controller.toggleAudioRecording()
 			},
 			cancel: {
 				print("Permission not granted")
@@ -18,14 +18,16 @@ struct ButtonAudioRecord: View {
 		ButtonWithLongPress(
 			actionLong: actionLong,
 			actionShort: onMicButtonShort,
-			isAnimated: audio.model.isRecording,
+			isAnimated: controller.audioRecording.store.isRecording,
 			label: {
 				Image(
-					systemName: audio.model.isRecording
+					systemName: controller.audioRecording.store.isRecording
 						? "stop.circle.fill" : "mic"
 				).font(
 					.system(size: 64, weight: .regular)
-				).foregroundColor(audio.model.isRecording ? .red : .gray).padding(
+				).foregroundColor(
+					controller.audioRecording.store.isRecording ? .red : .gray
+				).padding(
 					20
 				)
 			}
@@ -38,6 +40,6 @@ struct ButtonAudioRecord_Previews: PreviewProvider {
 
 	}
 	static var previews: some View {
-		ButtonAudioRecord(audio: AudioRecordingControllerPreview(), actionLong: onLongPress)
+		ButtonAudioRecord(actionLong: onLongPress, controller: RootControllerPreview())
 	}
 }

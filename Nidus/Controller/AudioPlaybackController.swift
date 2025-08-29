@@ -7,7 +7,7 @@ class AudioPlaybackController: NSObject, AVAudioPlayerDelegate {
 	internal let store: AudioPlaybackStore
 	private var timer: Timer?
 
-	init(store: AudioPlaybackStore) {
+	init(_ store: AudioPlaybackStore) {
 		self.store = store
 	}
 
@@ -109,7 +109,7 @@ class AudioPlaybackControllerPreview: AudioPlaybackController {
 	@MainActor
 	init() {
 		let store = AudioPlaybackStore()
-		super.init(store: store)
+		super.init(store)
 	}
 	@MainActor
 	override func loadAudio(_ uuid: UUID) {

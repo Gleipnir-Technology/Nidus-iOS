@@ -21,13 +21,14 @@ class RootController {
 	let store: RootStore
 	@MainActor
 	init(
-		audioRecording: AudioRecordingController = AudioRecordingController(),
+		audioRecording: AudioRecordingController? = nil,
 		network: NetworkController = NetworkController(),
 		notes: NotesController = NotesController(),
 		store: RootStore
 	) {
-		audioPlayback = AudioPlaybackController(store: store.audioPlayback)
-		self.audioRecording = audioRecording
+		audioPlayback = AudioPlaybackController(store.audioPlayback)
+		self.audioRecording =
+			audioRecording ?? AudioRecordingController(store.audioRecording)
 		database = DatabaseController()
 		camera = CameraController()
 		error = ErrorController()
@@ -68,8 +69,9 @@ class RootController {
 	// MARK - public interface
 
 	@MainActor
-	func onAppear() {
-		audioRecording.onRecordingSave { recording in
+	func toggleAudioRecording() {
+		if audioRecording.store.isRecording {
+			let recording = audioRecording.stopRecording()
 			Task {
 				do {
 					try self.database.service.insertAudioNote(recording)
@@ -87,6 +89,12 @@ class RootController {
 				}
 			}
 		}
+		else {
+			audioRecording.startRecording()
+		}
+	}
+	@MainActor
+	func onAppear() {
 		camera.onPictureSave { picture in
 			do {
 				let note = try self.savePictureNote(
@@ -178,13 +186,14 @@ class RootController {
 class RootControllerPreview: RootController {
 	@MainActor
 	init(
-		audioRecording: AudioRecordingControllerPreview = AudioRecordingControllerPreview(),
+		audioRecording: AudioRecordingControllerPreview? = nil,
 		network: NetworkControllerPreview = NetworkControllerPreview(),
 		notes: NotesControllerPreview = NotesControllerPreview()
 	) {
 		let store = RootStore()
 		super.init(
-			audioRecording: audioRecording,
+			audioRecording: audioRecording
+				?? AudioRecordingControllerPreview(store.audioRecording),
 			network: network,
 			notes: notes,
 			store: store

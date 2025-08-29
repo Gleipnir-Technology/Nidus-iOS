@@ -7,7 +7,9 @@ import SwiftUI
 @Observable
 class RootStore {
 	let audioPlayback: AudioPlaybackStore
+	let audioRecording: AudioRecordingStore
 	init() {
 		audioPlayback = AudioPlaybackStore()
+		audioRecording = AudioRecordingStore()
 	}
 }
