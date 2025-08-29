@@ -183,51 +183,6 @@ func NotesCount(_ connection: SQLite.Connection) throws -> Int {
 	return result
 }
 
-func NoteDelete(_ connection: SQLite.Connection, _ noteUUID: UUID) throws {
-	let update = schema.note.table.filter(
-		SQLite.Expression<UUID>(value: noteUUID) == schema.note.uuid
-	).update(
-		schema.note.deleted <- SQLite.Expression<Date?>(value: Date.now),
-		schema.note.uploaded <- SQLite.Expression<Date?>(value: nil)
-	)
-	try connection.run(update)
-}
-
-func NoteUpdate(_ connection: Connection, _ n: NidusNote) throws {
-	let update = schema.note.table.filter(
-		SQLite.Expression<UUID>(value: n.id) == schema.note.uuid
-	).update(
-		schema.note.latitude <- n.location.latitude,
-		schema.note.longitude <- n.location.longitude,
-		schema.note.text <- n.text,
-		schema.note.timestamp <- n.timestamp,
-		schema.note.uploaded <- n.uploaded
-	)
-	try connection.run(update)
-}
-
-func NoteUpsert(_ connection: Connection, _ note: NidusNote) throws -> Int64 {
-	//try AudioRecordingDeleteByNote(connection, note.id)
-	let upsert = schema.note.table.upsert(
-		schema.note.latitude
-			<- SQLite.Expression<Double>(
-				value: note.location.latitude
-			),
-		schema.note.longitude
-			<- SQLite.Expression<Double>(
-				value: note.location.longitude
-			),
-		schema.note.text <- SQLite.Expression<String>(note.text),
-		schema.note.timestamp <- SQLite.Expression<Date>(value: note.timestamp),
-		schema.note.uuid <- SQLite.Expression<UUID>(value: note.id),
-		onConflictOf: schema.note.uuid
-	)
-	Logger.foreground.info("Running note upsert \(upsert)")
-	let result = try connection.run(upsert)
-	Logger.foreground.info("Note upsert \(note.id) yielded row id \(result)")
-	return result
-}
-
 func PictureDelete(_ connection: SQLite.Connection, _ uuid: UUID) throws {
 	let delete = schema.picture.table.filter(
 		SQLite.Expression<UUID>(value: uuid) == schema.picture.uuid

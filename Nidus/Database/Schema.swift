@@ -7,7 +7,6 @@ struct DBSchema {
 	let audioRecordingLocation = AudioRecordingLocationTable()
 	let inspection = InspectionTable()
 	let mosquitoSource = MosquitoSourceTable()
-	let note = NoteTable()
 	let picture = PictureTable()
 	let serviceRequest = ServiceRequestTable()
 	let treatment = TreatmentTable()
@@ -67,19 +66,6 @@ class MosquitoSourceTable {
 	let latitude = SQLite.Expression<Double>("latitude")
 	let longitude = SQLite.Expression<Double>("longitude")
 
-}
-
-class NoteTable {
-	let table = Table("note")
-
-	let created = SQLite.Expression<Date>("created")
-	let deleted = SQLite.Expression<Date?>("deleted")
-	let latitude = SQLite.Expression<Double>("latitude")
-	let longitude = SQLite.Expression<Double>("longitude")
-	let text = SQLite.Expression<String>("text")
-	let timestamp = SQLite.Expression<Date>("timestamp")
-	let uploaded = SQLite.Expression<Date?>("uploaded")
-	let uuid = SQLite.Expression<UUID>("uuid")
 }
 
 class PictureTable {

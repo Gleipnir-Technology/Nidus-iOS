@@ -91,15 +91,6 @@ class DatabaseService: CustomStringConvertible {
 		return try AudioUploaded(connection, uuid)
 	}
 
-	func deleteNote(_ note: NidusNote) throws {
-		guard let connection = connection else {
-			throw DatabaseError.notConnected
-		}
-		//try AudioRecordingDeleteByNote(connection, note.id)
-		//try ImageDeleteByNote(connection, note.id)
-		return try NoteDelete(connection, note.id)
-	}
-
 	func noteAudio(_ uuid: UUID) throws -> AudioNote? {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
@@ -209,13 +200,6 @@ class DatabaseService: CustomStringConvertible {
 		}
 	}
 
-	func noteUpdate(_ n: NidusNote) throws {
-		guard let connection = connection else {
-			throw DatabaseError.notConnected
-		}
-		return try NoteUpdate(connection, n)
-	}
-
 	func noteAudioUpdate(_ note: AudioNote, transcription: String? = nil) throws {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
@@ -236,18 +220,13 @@ class DatabaseService: CustomStringConvertible {
 		return try PictureNoteUpdate(connection, note.id, uploaded: uploaded)
 	}
 
-	func upsertNidusNote(_ note: NidusNote) throws -> Int64 {
-		guard let connection = connection else {
-			throw DatabaseError.notConnected
-		}
-		return try NoteUpsert(connection, note)
-	}
 	func upsertServiceRequest(_ serviceRequest: ServiceRequest) throws {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
 		try ServiceRequestUpsert(connection: connection, serviceRequest)
 	}
+
 	func upsertSource(_ source: MosquitoSource) throws {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
