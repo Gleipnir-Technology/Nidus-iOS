@@ -28,6 +28,36 @@ func cellToNeighbors(cell: H3Cell, region: MKCoordinateRegion, screenSize: CGSiz
 	return neighbors
 }
 
+func cellToPolygon(_ cell: H3Cell) -> MKPolygon {
+	do {
+		var coordinates: [CLLocationCoordinate2D] = []
+		let boundary = try cellToBoundary(cell: cell)
+		for b in boundary {
+			coordinates.append(b)
+		}
+		return MKPolygon(coordinates: coordinates, count: coordinates.count)
+	}
+	catch {
+		return MKPolygon()
+	}
+}
+
+func cellToPolyline(_ cellSelection: CellSelection) -> MKPolyline {
+	do {
+		var coordinates: [CLLocationCoordinate2D] = []
+		let boundary = try cellToBoundary(cell: cellSelection.cellID)
+		for b in boundary {
+			coordinates.append(b)
+		}
+		// complete the circuit so a stroke goes all the way around the shape
+		coordinates.append(coordinates[0])
+		return MKPolyline(coordinates: coordinates, count: coordinates.count)
+	}
+	catch {
+		return MKPolyline()
+	}
+}
+
 // Given an H3 cell and a region of a map, determine if all the points of the cell are entirely within the region
 func isCellInRegion(
 	_ cell: H3Cell,
@@ -92,23 +122,34 @@ func maxCellThatFits(_ region: MKCoordinateRegion) throws -> H3Cell {
 	return cell
 }
 
+/// Convert a coordinate region to the set of cells that cover that region with some additional scaling
+func regionToCells(_ region: MKCoordinateRegion, resolution: UInt, scale: Double = 1.0) throws
+	-> Set<H3Cell>
+{
+	let boundary = regionToCoordinates(region, scale: scale)
+	let cells = try polygonToCells(boundary: boundary, resolution: Int(resolution)).compactMap({
+		$0 != 0 ? $0 : nil
+	})
+	return Set(cells)
+}
+
 /*
  Given a region find the lowest resolution that provides at least count cells within the region
  */
-func regionToCellResolution(_ region: MKCoordinateRegion, count: Int = 10) throws -> Int {
-	var resolution: Int = 1
+func regionToCellResolution(_ region: MKCoordinateRegion, maxCount: Int = 100) throws -> UInt {
+	var resolution: UInt = 1
 	let boundary = regionToCoordinates(region)
 	while resolution < 16 {
 		// Find the smallest cell that covers the region.
-		let cells = try polygonToCells(boundary: boundary, resolution: resolution)
+		let cells = try polygonToCells(boundary: boundary, resolution: Int(resolution))
 			.compactMap({ $0 != 0 ? $0 : nil })
-		if cells.count > count {
+		if cells.count > maxCount {
 			//let cellsAsHex = cells.map({ c in String(c, radix: 16) })
 			//print("Cells: \(cellsAsHex))")
 			//Logger.background.info(
 			//"Choosing resolution \(resolution) to get \(cells.count)/\(count) cells"
 			//)
-			return resolution
+			return max(resolution - 1, 0)
 		}
 		resolution += 1
 	}
@@ -118,23 +159,33 @@ func regionToCellResolution(_ region: MKCoordinateRegion, count: Int = 10) throw
 /*
  Convert an MKCoordinateRegion to a square of CLLocationCoordinate2D
  */
-func regionToCoordinates(_ region: MKCoordinateRegion) -> [CLLocationCoordinate2D] {
+func regionToCoordinates(_ region: MKCoordinateRegion, scale: Double = 1.0)
+	-> [CLLocationCoordinate2D]
+{
 	return [
 		CLLocationCoordinate2D(
-			latitude: region.center.latitude - region.span.latitudeDelta / 2,
-			longitude: region.center.longitude - region.span.longitudeDelta / 2
+			latitude: region.center.latitude
+				- (scale * (region.span.latitudeDelta / 2)),
+			longitude: region.center.longitude
+				- (scale * (region.span.longitudeDelta / 2))
 		),
 		CLLocationCoordinate2D(
-			latitude: region.center.latitude + region.span.latitudeDelta / 2,
-			longitude: region.center.longitude - region.span.longitudeDelta / 2
+			latitude: region.center.latitude
+				- (scale * (region.span.latitudeDelta / 2)),
+			longitude: region.center.longitude
+				+ (scale * (region.span.longitudeDelta / 2))
 		),
 		CLLocationCoordinate2D(
-			latitude: region.center.latitude - region.span.latitudeDelta / 2,
-			longitude: region.center.longitude + region.span.longitudeDelta / 2
+			latitude: region.center.latitude
+				+ (scale * (region.span.latitudeDelta / 2)),
+			longitude: region.center.longitude
+				+ (scale * (region.span.longitudeDelta / 2))
 		),
 		CLLocationCoordinate2D(
-			latitude: region.center.latitude + region.span.latitudeDelta / 2,
-			longitude: region.center.longitude + region.span.longitudeDelta / 2
+			latitude: region.center.latitude
+				+ (scale * (region.span.latitudeDelta / 2)),
+			longitude: region.center.longitude
+				- (scale * (region.span.longitudeDelta / 2))
 		),
 	]
 }
@@ -206,13 +257,13 @@ func scaleCell(_ cell: H3Cell, to resolution: Int) throws -> H3Cell {
 }
 
 /// Scale a cell resolution down (size up), if it is at a lower resolution. Make no change it the resolution is already low enough
-func scaleCellLower(_ cell: H3Cell, downTo minResolution: Int) throws -> H3Cell {
+func scaleCellLower(_ cell: H3Cell, downTo minResolution: UInt) throws -> H3Cell {
 	let cellResolution = getResolution(cell: cell)
 	if cellResolution <= minResolution {
 		return cell
 	}
 	let latLng = try cellToLatLng(cell: cell)
-	let scaled = try latLngToCell(latLng: latLng, resolution: minResolution)
+	let scaled = try latLngToCell(latLng: latLng, resolution: Int(minResolution))
 	return scaled
 }
 

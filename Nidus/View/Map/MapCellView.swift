@@ -7,16 +7,14 @@ import MapKit
 import OSLog
 import SwiftUI
 
-/*
- A map which shows an overlay of selected cells.
- */
+/// A map which shows an overlay of selected cells.
 struct MapCellView: View {
 	let cell: H3Cell
 	// The number of hexes we want to display at a minimum in the region. Used to calculate the H3 resolution to use
-	let hexCount: Int = 75
+	let hexCount: Int = 200
 	@State var currentRegion: MKCoordinateRegion = Initial.region
 	// The current H3 resolution we're operating at
-	@State var overlayResolution: Int = 8
+	@State var overlayResolution: UInt = 8
 	@State var screenSize: CGSize = .zero
 	var showsGrid: Bool = false
 
@@ -73,7 +71,7 @@ struct MapCellView: View {
 			do {
 				let resolution = try regionToCellResolution(
 					newRegion,
-					count: hexCount
+					maxCount: hexCount
 				)
 				Task { @MainActor in
 					overlayResolution = resolution

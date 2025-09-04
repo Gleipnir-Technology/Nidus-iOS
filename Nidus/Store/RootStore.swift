@@ -8,8 +8,10 @@ import SwiftUI
 class RootStore {
 	let audioPlayback: AudioPlaybackStore
 	let audioRecording: AudioRecordingStore
+	let region: RegionStore
 	init() {
 		audioPlayback = AudioPlaybackStore()
 		audioRecording = AudioRecordingStore()
+		region = RegionStore()
 	}
 }

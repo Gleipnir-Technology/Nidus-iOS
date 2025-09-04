@@ -7,6 +7,7 @@ struct DBSchema {
 	let audioRecordingLocation = AudioRecordingLocationTable()
 	let inspection = InspectionTable()
 	let mosquitoSource = MosquitoSourceTable()
+	let noteSummaryByHex = NoteSummaryByHex()
 	let picture = PictureTable()
 	let serviceRequest = ServiceRequestTable()
 	let treatment = TreatmentTable()
@@ -66,6 +67,17 @@ class MosquitoSourceTable {
 	let latitude = SQLite.Expression<Double>("latitude")
 	let longitude = SQLite.Expression<Double>("longitude")
 
+}
+
+/// A summary of all of the notes already grouped by cell
+/// This is an optimization to make scrolling on the map view faster
+class NoteSummaryByHex {
+	let table = Table("note_summary_by_hex")
+
+	let cell = SQLite.Expression<UInt64>("cell")
+	let cellResolution = SQLite.Expression<Int>("cell_resolution")
+	let noteCount = SQLite.Expression<Int>("note_count")
+	let noteType = SQLite.Expression<String>("note_type")
 }
 
 class PictureTable {

@@ -133,9 +133,6 @@ struct AudioNoteDetail: View {
 		MapViewBreadcrumb(
 			breadcrumbCells: note.breadcrumbs.map { b in b.cell },
 			initialRegion: initialRegion(),
-			notes: nil,
-			onSelectCell: { _ in },
-			region: nil,
 			showsGrid: false
 		)
 	}

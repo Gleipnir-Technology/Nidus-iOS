@@ -1,3 +1,4 @@
+import H3
 import MapKit
 import OSLog
 import Sentry
@@ -19,6 +20,9 @@ class RootController {
 	let toast: ToastController
 
 	let store: RootStore
+
+	var locationDataManager: LocationDataManager
+
 	@MainActor
 	init(
 		audioRecording: AudioRecordingController? = nil,
@@ -34,18 +38,29 @@ class RootController {
 		error = ErrorController()
 		self.network = network
 		self.notes = notes
-		region = RegionController()
+		region = RegionController(store.region)
 		settings = SettingsController()
 		self.store = store
 		toast = ToastController()
+
+		self.locationDataManager = LocationDataManager()
 	}
 
+	@MainActor
+	func handleRegionChange(_ region: MKCoordinateRegion) {
+		TrackTime("root controller handleRegionChange") {
+			settings.saveCurrentRegion(region)
+			self.region.handleRegionChange(region, database: database)
+		}
+	}
+
+	@MainActor
 	func noteAudioUpdate(_ note: AudioNote, transcription: String) {
 		do {
 			try database.service.noteAudioUpdate(note, transcription: transcription)
 			// This restores the notes in our collection with the new update
 			// There's definitely a more-efficient way to do this
-			calculateNotesToShow(region.current)
+			startCalculateNotesToShow(region.store.current)
 			Task {
 				guard let newNote = try database.service.noteAudio(note.id) else {
 					Logger.background.info(
@@ -99,7 +114,7 @@ class RootController {
 			do {
 				let note = try self.savePictureNote(
 					picture,
-					self.region.breadcrumb.userCell
+					self.region.store.breadcrumb.userCell
 				)
 				Task {
 					do {
@@ -114,18 +129,39 @@ class RootController {
 				self.handleError(error, "Failed to save picture note")
 			}
 		}
-		region.onAppear()
-		region.onLocationUpdated { location in
-			self.audioRecording.onLocationUpdated(location)
-		}
-		region.onRegionChange(onRegionChange)
+		self.locationDataManager.onLocationUpdated(self.handleLocationUpdated)
+		locationDataManager.onLocationUpdated(handleLocationUpdated)
 	}
 
+	@MainActor
+	private func handleLocationUpdated(_ locations: [CLLocation]) {
+		do {
+			let cells = try locations.map { l in
+				let resolution = meterAccuracyToH3Resolution(l.horizontalAccuracy)
+				return try latLngToCell(
+					latLng: l.coordinate,
+					resolution: resolution
+				)
+			}
+			region.store.breadcrumb.userLocation = locations.last!
+			region.store.breadcrumb.userCell = cells.last!
+
+			// Handle location change
+			region.addUserLocation(cells)
+			self.audioRecording.onLocationUpdated(cells)
+			// end handle
+		}
+		catch {
+			Logger.background.error("Failed to calculate location cells: \(error)")
+		}
+	}
+
+	@MainActor
 	func onInit() {
 		do {
 			try database.connect()
 			settings.load()
-			region.current = settings.model.region
+			store.region.current = settings.model.region
 			network.onSettingsChanged(settings.model, database)
 		}
 		catch {
@@ -153,14 +189,8 @@ class RootController {
 		network.onSettingsChanged(settings.model, database)
 	}
 
-	func onRegionChange(r: MKCoordinateRegion) {
-		calculateNotesToShow(r)
-
-		settings.saveCurrentRegion(r)
-	}
-
 	// MARK - private functions
-	private func calculateNotesToShow(_ region: MKCoordinateRegion) {
+	private func startCalculateNotesToShow(_ region: MKCoordinateRegion) {
 		Task {
 			do {
 				let notes = try database.service.notesByRegion(region)
@@ -177,10 +207,8 @@ class RootController {
 	}
 
 	private func handleError(_ error: Error, _ message: String = "") {
-		SentrySDK.capture(error: error)
-		Logger.background.error("Unhandled error: \(message) \(error)")
+		CaptureError(error, message)
 	}
-
 }
 
 class RootControllerPreview: RootController {

@@ -37,11 +37,15 @@ struct CellSelection: Equatable, Hashable, Identifiable {
 	}
 
 	func asMapPolygon() -> MapPolygon {
-		return MapPolygon(cellToPolygon(self))
+		return MapPolygon(cellToPolygon(self.cellID))
 	}
 
 	func asMapPolyline() -> MapPolyline {
 		return MapPolyline(cellToPolyline(self))
+	}
+
+	func asMKPolygon() -> MKPolygon {
+		return cellToPolygon(self.cellID)
 	}
 
 	func foregroundStyle() -> Color {

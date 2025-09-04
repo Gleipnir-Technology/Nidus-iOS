@@ -35,7 +35,7 @@ struct RootView: View {
 	}
 
 	func breadcrumbCells() -> [H3Cell] {
-		let sorted = controller.region.breadcrumb.userPreviousCells.sorted(by: {
+		let sorted = controller.region.store.breadcrumb.userPreviousCells.sorted(by: {
 			$0.value < $1.value
 		})
 		return sorted.map { $0.key }
@@ -63,7 +63,7 @@ struct RootView: View {
 		}*/
 	}
 	func onMapSelectCell(_ cell: H3Cell) {
-		controller.region.breadcrumb.selectedCell = cell
+		controller.region.store.breadcrumb.selectedCell = cell
 		path.append("notes-by-cell/\(cell)")
 	}
 	func onMicButtonLong() {
@@ -94,13 +94,13 @@ struct RootView: View {
 									.audioRecording
 							)
 						case .breadcrumb:
-							MapViewBreadcrumb(
+							RootViewMap(
 								breadcrumbCells: breadcrumbCells(),
+								controller: controller,
 								initialRegion: controller.region
+									.store
 									.current,
-								notes: controller.notes,
 								onSelectCell: onMapSelectCell,
-								region: controller.region,
 								showsGrid: false
 							)
 						case .notes:
@@ -108,6 +108,7 @@ struct RootView: View {
 								cell: 0x88_2834_7053_fffff,
 								controller: controller,
 								userLocation: controller.region
+									.store
 									.breadcrumb
 									.userCell
 							)
@@ -195,7 +196,7 @@ struct RootView: View {
 									cell: cell,
 									controller: controller,
 									userLocation: controller
-										.region
+										.region.store
 										.breadcrumb.userCell
 								)
 							}

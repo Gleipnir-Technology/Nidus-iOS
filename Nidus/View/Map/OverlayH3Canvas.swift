@@ -13,12 +13,12 @@ struct OverlayH3Canvas: View {
 		Color.black
 	)
 	let region: MKCoordinateRegion
-	let resolution: Int
+	let resolution: UInt
 	let screenSize: CGSize
 
 	private func gridToPath(
 		region: MKCoordinateRegion,
-		resolution: Int,
+		resolution: UInt,
 		screenSize: CGSize
 	) -> Path {
 		do {
@@ -26,7 +26,7 @@ struct OverlayH3Canvas: View {
 			let cell = try latLngToCell(
 				latitude: region.center.latitude,
 				longitude: region.center.longitude,
-				resolution: resolution
+				resolution: Int(resolution)
 			)
 			// Determine the number of neighbors we'll need to get outside the region in each direction
 			let extremes: [H3Cell] = [
@@ -36,7 +36,7 @@ struct OverlayH3Canvas: View {
 					longitude: region.center.longitude - region.span
 						.longitudeDelta
 						/ 2,
-					resolution: resolution
+					resolution: Int(resolution)
 				),
 				try latLngToCell(
 					latitude: region.center.latitude - region.span.latitudeDelta
@@ -44,7 +44,7 @@ struct OverlayH3Canvas: View {
 					longitude: region.center.longitude + region.span
 						.longitudeDelta
 						/ 2,
-					resolution: resolution
+					resolution: Int(resolution)
 				),
 				try latLngToCell(
 					latitude: region.center.latitude + region.span.latitudeDelta
@@ -52,7 +52,7 @@ struct OverlayH3Canvas: View {
 					longitude: region.center.longitude - region.span
 						.longitudeDelta
 						/ 2,
-					resolution: resolution
+					resolution: Int(resolution)
 				),
 				try latLngToCell(
 					latitude: region.center.latitude + region.span.latitudeDelta
@@ -60,7 +60,7 @@ struct OverlayH3Canvas: View {
 					longitude: region.center.longitude + region.span
 						.longitudeDelta
 						/ 2,
-					resolution: resolution
+					resolution: Int(resolution)
 				),
 			]
 			var distances: [Int64] = [0, 0, 0, 0]

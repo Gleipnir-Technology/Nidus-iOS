@@ -29,9 +29,10 @@ class NetworkController {
 					setState(.loggingIn, 0.0)
 					try await self.service.onSettingsChanged(newSettings)
 
-					try await downloadNotes(database)
+					//try await downloadNotes(database)
 					try await uploadAudioNotes(database)
 					try await uploadPictureNotes(database)
+					//await database.optimize()
 					return
 				}
 				catch AuthError.invalidCredentials {

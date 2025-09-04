@@ -1,3 +1,4 @@
+import OSLog
 import Sentry
 import SwiftData
 import SwiftUI
@@ -45,5 +46,28 @@ class NidusAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
 		completionHandler: @escaping () -> Void
 	) {
 		backgroundCompletionHandler = completionHandler
+	}
+}
+
+func CaptureError(_ error: Error, _ msg: String = "unknown") {
+	Logger.background.error("Unhandled Nidus error in \(msg): \(error)")
+	SentrySDK.capture(error: error)
+}
+
+func TrackTime(_ label: String, block: () -> Void) {
+	let start = DispatchTime.now()
+	block()
+	let end = DispatchTime.now()
+	let nanoseconds = Double(end.uptimeNanoseconds - start.uptimeNanoseconds)
+	if nanoseconds > 1_000_000_000 {
+		let seconds = nanoseconds / 1_000_000_000
+		Logger.background.debug("\(label): \(seconds) seconds")
+	}
+	else if nanoseconds > 1_000_000 {
+		let milliseconds = nanoseconds / 1_000_000
+		Logger.background.debug("\(label): \(milliseconds) ms")
+	}
+	else {
+		Logger.background.debug("\(label): \(nanoseconds) nanos")
 	}
 }

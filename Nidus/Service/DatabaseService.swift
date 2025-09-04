@@ -32,6 +32,7 @@ class DatabaseService: CustomStringConvertible {
 		return [
 			Migration1(), Migration2(), Migration3(), Migration4(), Migration5(),
 			Migration6(), Migration7(), Migration8(), Migration9(), Migration10(),
+			Migration11(), Migration12(),
 		]
 	}
 
@@ -54,14 +55,14 @@ class DatabaseService: CustomStringConvertible {
 	// MARK - public calculated properties
 	var description: String {
 		/*let store: URL = DatabaseService.storeURL()
-        return ("Database:\n" //"url: \(store.absoluteString)\n"
-            + "migration state:\n"
-            + "  hasMigrationsTable() \(migrationManager.hasMigrationsTable())\n"
-            + "  currentVersion()     \(migrationManager.currentVersion())\n"
-            + "  originVersion()      \(migrationManager.originVersion())\n"
-            + "  appliedVersions()    \(migrationManager.appliedVersions())\n"
-            + "  pendingMigrations()  \(migrationManager.pendingMigrations())\n"
-            + "  needsMigration()     \(migrationManager.needsMigration())")*/
+         return ("Database:\n" //"url: \(store.absoluteString)\n"
+         + "migration state:\n"
+         + "  hasMigrationsTable() \(migrationManager.hasMigrationsTable())\n"
+         + "  currentVersion()     \(migrationManager.currentVersion())\n"
+         + "  originVersion()      \(migrationManager.originVersion())\n"
+         + "  appliedVersions()    \(migrationManager.appliedVersions())\n"
+         + "  pendingMigrations()  \(migrationManager.pendingMigrations())\n"
+         + "  needsMigration()     \(migrationManager.needsMigration())")*/
 		return "lol, fix compiler timeout above"
 	}
 
@@ -89,6 +90,13 @@ class DatabaseService: CustomStringConvertible {
 			throw DatabaseError.notConnected
 		}
 		return try AudioUploaded(connection, uuid)
+	}
+
+	func boundaryForNoteType(_ noteType: NoteType) throws -> Boundary {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		return try BoundaryForNoteType(connection, noteType)
 	}
 
 	func noteAudio(_ uuid: UUID) throws -> AudioNote? {
@@ -144,17 +152,17 @@ class DatabaseService: CustomStringConvertible {
 			throw DatabaseError.notConnected
 		}
 		/*do {
-			let sources = try MosquitoSourceAsNotes(
-				connection
-			)
-			for source in sources {
-				results[source.id] = source
-			}
-		}
-		catch {
-			Logger.background.error("Failed to get source notes: \(error)")
-			throw error
-		}*/
+         let sources = try MosquitoSourceAsNotes(
+         connection
+         )
+         for source in sources {
+         results[source.id] = source
+         }
+         }
+         catch {
+         Logger.background.error("Failed to get source notes: \(error)")
+         throw error
+         }*/
 		do {
 			let requests = try ServiceRequestAsNotes(connection)
 			for request in requests {
@@ -168,6 +176,20 @@ class DatabaseService: CustomStringConvertible {
 		}
 		return results
 	}
+
+	func noteAudioUpdate(_ note: AudioNote, transcription: String? = nil) throws {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		return try NoteAudioUpdate(connection, note.id, transcription: transcription)
+	}
+	func noteAudioUploaded(_ note: AudioNote, uploaded: Date = Date.now) throws -> Int {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		return try NoteAudioUploaded(connection, note.id, uploaded: uploaded)
+	}
+
 	func notesByRegion(_ region: MKCoordinateRegion) throws -> [UUID: any NoteProtocol] {
 		var results: [UUID: any NoteProtocol] = [:]
 		guard let connection = connection else {
@@ -191,6 +213,37 @@ class DatabaseService: CustomStringConvertible {
 		return results
 	}
 
+	func notesAudio() throws -> [AudioNote] {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		return try AudioRecordingAsNotes(connection)
+	}
+
+	func notesMosquitoSource() throws -> [MosquitoSourceNote] {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		return try MosquitoSourceAsNotes(
+			connection,
+			region: MKCoordinateRegion(
+				center: .init(latitude: 0, longitude: 0),
+				span: .init(latitudeDelta: 180, longitudeDelta: 360)
+			)
+		)
+	}
+
+	func notesPicture() throws -> [PictureNote] {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		return try PictureAsNotes(connection)
+	}
+
+	//func notesServiceRequest() throws -> [ServiceRequest] {
+	//let requests = try ServiceRequestAsNotes(connection)
+	//}
+
 	func notesCount() throws -> Int {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
@@ -200,17 +253,29 @@ class DatabaseService: CustomStringConvertible {
 		}
 	}
 
-	func noteAudioUpdate(_ note: AudioNote, transcription: String? = nil) throws {
+	func noteSummaries(_ noteType: NoteType, _ cells: Set<H3Cell>) throws -> [NoteSummary] {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		return try NoteAudioUpdate(connection, note.id, transcription: transcription)
+		return try NoteSummaryByHexAll(connection, cells: cells, noteType: noteType)
 	}
-	func noteAudioUploaded(_ note: AudioNote, uploaded: Date = Date.now) throws -> Int {
+
+	func noteSummaryByHexUpsert(
+		cell: UInt64,
+		cellResolution: Int,
+		count: Int,
+		noteType: NoteType
+	) throws {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		return try NoteAudioUploaded(connection, note.id, uploaded: uploaded)
+		return try NoteSummaryByHexUpsert(
+			connection,
+			cell: cell,
+			cellResolution: cellResolution,
+			noteCount: count,
+			noteType: noteType
+		)
 	}
 
 	func updateNotePicture(_ note: PictureNote, uploaded: Date) throws {

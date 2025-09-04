@@ -8,105 +8,26 @@ import MapKit
 import OSLog
 import SwiftUI
 
-struct AnnotationSummary: Identifiable {
-	var categories: Set<NoteType> = []
-	var cell: H3Cell
-	var coordinate: CLLocationCoordinate2D
-	var count: Int = 0
-	var id: H3Cell {
-		cell
-	}
-	var weight: Double = 0
-}
-/*
- A map which shows an overlay of selected cells.
- */
+/// A map which shows an overlay of selected cells.
 struct MapViewBreadcrumb: View {
 	let breadcrumbCells: [H3Cell]
 	// The number of hexes we want to display at a minimum in the region. Used to calculate the H3 resolution to use
-	let hexCount: Int = 75
+	let hexCount: Int = 200
 	@State var currentRegion: MKCoordinateRegion = Initial.region
 	let initialRegion: MKCoordinateRegion
-	var notes: NotesController?
-	// The callback when a cell is selected
-	var onSelectCell: (H3Cell) -> Void
 	// The current H3 resolution we're operating at
-	@State var overlayResolution: Int = 8
-	var region: RegionController?
+	@State var overlayResolution: UInt = 8
 	@State var screenSize: CGSize = .zero
 	var showsGrid: Bool = false
 
 	init(
 		breadcrumbCells: [H3Cell],
 		initialRegion: MKCoordinateRegion,
-		notes: NotesController?,
-		onSelectCell: @escaping (H3Cell) -> Void,
-		region: RegionController?,
 		showsGrid: Bool = false
 	) {
 		self.breadcrumbCells = breadcrumbCells
 		self.initialRegion = initialRegion
-		self.notes = notes
-		self.onSelectCell = onSelectCell
-		self.region = region
 		self.showsGrid = showsGrid
-	}
-
-	private func noteOverlay(_ categories: Set<NoteType>) -> [AnnotationSummary] {
-		guard let notes = notes?.model.notes else {
-			return []
-		}
-		var results: [H3Cell: AnnotationSummary] = [:]
-
-		for note in notes.values {
-			do {
-				if !categories.contains(note.category) {
-					continue
-				}
-				let cell = try scaleCell(
-					note.cell,
-					to: overlayResolution
-				)
-				guard var summary: AnnotationSummary = results[cell] else {
-					let summary = AnnotationSummary(
-						categories: [note.category],
-						cell: cell,
-						coordinate: try cellToLatLng(cell: cell),
-						count: 1
-					)
-					results[cell] = summary
-					continue
-				}
-				summary.count += 1
-				summary.categories.insert(note.category)
-				results[cell] = summary
-			}
-			catch {
-				Logger.foreground.error(
-					"Failed to convert note location to H3 cell: \(error)"
-				)
-			}
-		}
-		// This is bad...but performant
-		let maxCountByCell =
-			results.max(by: { $0.value.count < $1.value.count })?.value.count ?? 0
-		for cell in results.keys {
-			results[cell]!.weight =
-				Double(results[cell]!.count) / Double(maxCountByCell)
-		}
-		return results.map { $0.value }
-	}
-	/**
-     Get the overlay showing notes data for Nidus notes
-     */
-	private func noteOverlayNidus() -> [AnnotationSummary] {
-		return noteOverlay([.audio, .picture])
-	}
-	/**
-         Get the overlay showing notes data for FieldSeeker notes
-         */
-	private func noteOverlayFS() -> [AnnotationSummary] {
-		return noteOverlay([.mosquitoSource])
 	}
 
 	private func onMapCameraChange(_ geometry: GeometryProxy, _ context: MapCameraUpdateContext)
@@ -114,32 +35,8 @@ struct MapViewBreadcrumb: View {
 		currentRegion = context.region
 		screenSize = geometry.size
 		updateResolution(context.region)
-		guard let region = self.region else {
-			return
-		}
-		region.handleRegionChange(context.region)
 	}
 
-	private func onTapGesture(_ geometry: GeometryProxy, _ screenLocation: CGPoint) {
-		let gpsLocation = screenLocationToLatLng(
-			location: screenLocation,
-			region: currentRegion,
-			screenSize: geometry.size
-		)
-		Logger.foreground.info("Tapped on \(gpsLocation.latitude) \(gpsLocation.longitude)")
-		do {
-			let cell = try latLngToCell(
-				latitude: gpsLocation.latitude,
-				longitude: gpsLocation.longitude,
-				resolution: overlayResolution
-			)
-			Logger.foreground.info("Tapped on cell \(String(cell, radix: 16))")
-			onSelectCell(cell)
-		}
-		catch {
-			print("Failed on tap: \(error)")
-		}
-	}
 	private func previousCellColor(_ index: Int) -> Color {
 		Color.green.opacity(1.0 - Double(index) * 0.1)
 	}
@@ -157,15 +54,10 @@ struct MapViewBreadcrumb: View {
 
 		Task.detached(priority: .background) {
 			do {
-				//let start = Date.now
 				let resolution = try regionToCellResolution(
 					newRegion,
-					count: hexCount
+					maxCount: hexCount
 				)
-				//let end = Date.now
-				//Logger.foreground.info(
-				//"Took \(end.timeIntervalSince(start)) seconds to calculate resolution \(resolution)"
-				//)
 				Task { @MainActor in
 					overlayResolution = resolution
 				}
@@ -204,41 +96,11 @@ struct MapViewBreadcrumb: View {
 					),
 					interactionModes: .all
 				) {
-					ForEach(noteOverlayFS()) { summary in
-						CellSelection(summary.cell).asMapPolygon()
-							.foregroundStyle(
-								Color.red.opacity(
-									max(summary.weight, 0.2)
-								)
-							)
-					}
-					ForEach(noteOverlayNidus()) { summary in
-						CellSelection(summary.cell).asMapPolygon()
-							.foregroundStyle(
-								Color.blue.opacity(
-									max(summary.weight, 0.2)
-								)
-							)
-					}
 					ForEach(userPreviousCellsPolygons()) { cell in
 						cell.asMapPolyline().stroke(
 							cell.color,
 							lineWidth: 2
 						)
-					}
-					if region?.breadcrumb.selectedCell != nil {
-						CellSelection(region!.breadcrumb.selectedCell!)
-							.asMapPolyline().stroke(
-								.red,
-								lineWidth: 3
-							)
-					}
-					if region?.breadcrumb.userCell != nil {
-						CellSelection(region!.breadcrumb.userCell!)
-							.asMapPolyline().stroke(
-								.blue,
-								lineWidth: 2
-							)
 					}
 					UserAnnotation()
 				}
@@ -253,8 +115,6 @@ struct MapViewBreadcrumb: View {
 					)
 				).onMapCameraChange(frequency: .onEnd) { context in
 					onMapCameraChange(geometry, context)
-				}.onTapGesture { screenLocation in
-					onTapGesture(geometry, screenLocation)
 				}
 
 				if showsGrid {
@@ -269,37 +129,6 @@ struct MapViewBreadcrumb: View {
 	}
 }
 
-func cellToPolygon(_ cellSelection: CellSelection) -> MKPolygon {
-	do {
-		var coordinates: [CLLocationCoordinate2D] = []
-		let boundary = try cellToBoundary(cell: cellSelection.cellID)
-		for b in boundary {
-			coordinates.append(b)
-		}
-		//print("polygon \(coordinates)")
-		return MKPolygon(coordinates: coordinates, count: coordinates.count)
-	}
-	catch {
-		return MKPolygon()
-	}
-}
-
-func cellToPolyline(_ cellSelection: CellSelection) -> MKPolyline {
-	do {
-		var coordinates: [CLLocationCoordinate2D] = []
-		let boundary = try cellToBoundary(cell: cellSelection.cellID)
-		for b in boundary {
-			coordinates.append(b)
-		}
-		// complete the circuit so a stroke goes all the way around the shape
-		coordinates.append(coordinates[0])
-		return MKPolyline(coordinates: coordinates, count: coordinates.count)
-	}
-	catch {
-		return MKPolyline()
-	}
-}
-
 struct MapViewBreadcrumb_Previews: PreviewProvider {
 	@State static var notes: NotesController = NotesControllerPreview()
 	@State static var region: RegionController = RegionControllerPreview()
@@ -309,33 +138,7 @@ struct MapViewBreadcrumb_Previews: PreviewProvider {
 	static var previews: some View {
 		MapViewBreadcrumb(
 			breadcrumbCells: [],
-			initialRegion: Initial.region,
-			notes: notes,
-			onSelectCell: onSelectCell,
-			region: region
+			initialRegion: Initial.region
 		).previewDisplayName("current location only")
-		MapViewBreadcrumb(
-			breadcrumbCells: [],
-			initialRegion: Initial.region,
-			notes: notes,
-			onSelectCell: onSelectCell,
-			region: region
-		).onAppear {
-			region.breadcrumb.userPreviousCells =
-				RegionControllerPreview.userPreviousCells
-		}.previewDisplayName("current location and previous")
-		MapViewBreadcrumb(
-			breadcrumbCells: [],
-			initialRegion: Initial.region,
-			notes: notes,
-			onSelectCell: onSelectCell,
-			region: region
-		).onAppear {
-			notes.model = NotesModel.Preview.someNotes
-			region.breadcrumb.selectedCell = RegionControllerPreview.selectedCell
-			region.breadcrumb.userCell = RegionControllerPreview.userCell
-			region.breadcrumb.userPreviousCells =
-				RegionControllerPreview.userPreviousCells
-		}.previewDisplayName("current location, selected location and previous")
 	}
 }

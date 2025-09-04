@@ -1,79 +1,92 @@
-import H3
 import MapKit
 import OSLog
 import SwiftUI
 
+// The number of hexes we want to display at a minimum in the region. Used to calculate the H3 resolution to use
+let MAX_HEX_COUNT: Int = 500
+
 /*
  Controls information about our current region
  */
-@Observable
 class RegionController {
-	// Used for displaying the breadcrumb view
-	var breadcrumb = BreadcrumbModel()
+	var store: RegionStore
 
-	// The callbacks to fire when the current region changes
-	var currentChangeCallbacks: [(MKCoordinateRegion) -> Void] = []
-
-	// The current region the user has selected in the map view
-	var current: MKCoordinateRegion = Initial.region
-
-	// The current H3 resolution we're using
-	var resolution: H3Cell = 15
-
-	// Callbacks to inform whenever we receive location data
-	var locationChangeCallbacks: [([H3Cell]) -> Void] = []
-
-	var locationDataManager: LocationDataManager = LocationDataManager()
-
-	func handleRegionChange(_ region: MKCoordinateRegion) {
-		current = region
-		for c in currentChangeCallbacks {
-			c(region)
-		}
+	init(_ store: RegionStore) {
+		self.store = store
 	}
 
-	func onAppear() {
-		locationChangeCallbacks.append(addUserLocation)
-		locationDataManager.onLocationUpdated(handleLocationUpdated)
-	}
-
-	func onLocationUpdated(_ callback: @escaping (([H3Cell]) -> Void)) {
-		locationChangeCallbacks.append(callback)
-	}
-
-	func onRegionChange(_ callback: @escaping (MKCoordinateRegion) -> Void) {
-		currentChangeCallbacks.append(callback)
-	}
-
-	private func addUserLocation(_ cells: [H3Cell]) {
-		breadcrumb.userPreviousCells = breadcrumb.userPreviousCells.filter { key, val in
+	@MainActor
+	func addUserLocation(_ cells: [H3Cell]) {
+		store.breadcrumb.userPreviousCells = store.breadcrumb.userPreviousCells.filter {
+			key,
+			val in
 			Date.now.timeIntervalSince(val) < HISTORY_ENTRY_MAX_AGE
 		}
 		for c in cells {
-			breadcrumb.userPreviousCells[c] = Date.now
+			store.breadcrumb.userPreviousCells[c] = Date.now
 		}
 	}
 
-	private func handleLocationUpdated(_ locations: [CLLocation]) {
-		do {
-			let cells = try locations.map { l in
-				let resolution = meterAccuracyToH3Resolution(l.horizontalAccuracy)
-				return try latLngToCell(
-					latLng: l.coordinate,
-					resolution: resolution
+	@MainActor
+	func handleRegionChange(_ newRegion: MKCoordinateRegion, database: DatabaseController) {
+		store.current = newRegion
+		Task {
+			let newResolution = try await updateResolution(newRegion)
+			let noteCounts = await loadNoteCounts(
+				database: database,
+				region: newRegion,
+				resolution: newResolution
+			)
+			Task { @MainActor in
+				self.store.overlayResolution = newResolution
+				self.store.noteCountsByType = noteCounts
+			}
+		}
+	}
+
+	private func loadNoteCounts(
+		database: DatabaseController,
+		region: MKCoordinateRegion,
+		resolution: UInt
+	) async
+		-> [NoteType: [H3Cell: UInt]]
+	{
+		var results: [NoteType: [H3Cell: UInt]] = [:]
+		TrackTime("load note counts") {
+			do {
+				let cells: Set<H3Cell> = try regionToCells(
+					region,
+					resolution: resolution,
+					scale: 3.50
 				)
+				for noteType in NoteType.allCases {
+					let summaries = try database.service
+						.noteSummaries(noteType, cells)
+					var cellToCount: [H3Cell: UInt] = [:]
+					for summary in summaries {
+						cellToCount[summary.cell] = summary.count
+					}
+					results[noteType] = cellToCount
+				}
 			}
-			breadcrumb.userLocation = locations.last!
-			breadcrumb.userCell = cells.last!
-			for callback in locationChangeCallbacks {
-				callback(cells)
+			catch {
+				CaptureError(error, "L")
 			}
 		}
-		catch {
-			Logger.background.error("Failed to calculate location cells: \(error)")
-		}
+		return results
 	}
 
+	func updateResolution(_ newRegion: MKCoordinateRegion) async throws -> UInt {
+		//if newRegion.span.latitudeDelta < 0.0005 || newRegion.span.longitudeDelta < 0.0005 {
+		//return 15
+		//}
+		//else {
+		return try regionToCellResolution(
+			newRegion,
+			maxCount: MAX_HEX_COUNT
+		)
+		//}
+	}
 }
 
 class RegionControllerPreview: RegionController {
@@ -89,4 +102,10 @@ class RegionControllerPreview: RegionController {
 		0x8a2_8347_0536_7fff: Date.now,
 		0x8a2_8347_0536_ffff: Date.now,
 	]
+
+	@MainActor
+	init() {
+		let store = RegionStore()
+		super.init(store)
+	}
 }

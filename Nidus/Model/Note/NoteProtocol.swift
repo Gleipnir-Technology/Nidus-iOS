@@ -2,10 +2,34 @@ import Foundation
 import SwiftUI
 import UIKit
 
-enum NoteType {
+enum NoteType: CaseIterable {
 	case audio
 	case mosquitoSource
 	case picture
+
+	func toString() -> String {
+		switch self {
+		case .audio:
+			return "audio"
+		case .mosquitoSource:
+			return "mosquitoSource"
+		case .picture:
+			return "picture"
+		}
+	}
+
+	static func fromString(_ s: String) -> NoteType? {
+		switch s {
+		case "audio":
+			return .audio
+		case "mosquitoSource":
+			return .mosquitoSource
+		case "picture":
+			return .picture
+		default:
+			return nil
+		}
+	}
 }
 
 protocol NoteProtocol: Identifiable<UUID>, Hashable {
