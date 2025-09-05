@@ -32,12 +32,30 @@ final class HexOverlayRenderer: MKOverlayRenderer {
 			case .mosquitoSource:
 				color = UIColor.red
 			}
-			//context.setStrokeColor(UIColor.red.cgColor)
+			let cellsForCurrentType = hexOverlay.cellBucketsByType[cellType] ?? [:]
+			var maxCount: UInt = 0
+			do {
+				maxCount = try cellsForCurrentType.reduce<UInt>(
+					0,
+					{ result, pair in
+						if pair.value.count == 0 {
+							return result
+						}
+						return max(result, UInt(pair.key))
+					}
+				)
+			}
+			catch {
+				Logger.foreground.error(
+					"Failed to calculate max cell count: \(error)"
+				)
+			}
 			context.setLineWidth(lineWidth)
-			for (bucket, cells) in hexOverlay.cellBucketsByType[cellType] ?? [:] {
+			for (bucket, cells) in cellsForCurrentType {
 				context.setFillColor(
-					color.withAlphaComponent(0.07 * CGFloat(bucket) + 0.1)
-						.cgColor
+					color.withAlphaComponent(
+						alphaForBucket(bucket, maxCount)
+					).cgColor
 				)
 				for cell in cells {
 					context.beginPath()
@@ -52,5 +70,12 @@ final class HexOverlayRenderer: MKOverlayRenderer {
 				}
 			}
 		}
+	}
+
+	func alphaForBucket(_ bucket: UInt, _ maxCount: UInt) -> CGFloat {
+		let fractionOfMax = CGFloat(bucket) / CGFloat(maxCount)
+		let maxAlpha: CGFloat = 0.6
+		let floorAlhpa: CGFloat = 0.1
+		return (maxAlpha * fractionOfMax) + floorAlhpa
 	}
 }
