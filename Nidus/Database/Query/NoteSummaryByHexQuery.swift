@@ -30,14 +30,14 @@ func NoteSummaryByHexAll(_ connection: SQLite.Connection, cells: Set<H3Cell>, no
 func NoteSummaryByHexUpsert(
 	_ connection: SQLite.Connection,
 	cell: UInt64,
-	cellResolution: Int,
+	cellResolution: UInt,
 	noteCount: Int,
 	noteType: NoteType
 ) throws {
 	let upsert = schema.noteSummaryByHex.table.upsert(
 		schema.noteSummaryByHex.cell <- SQLite.Expression<UInt64>(value: cell),
 		schema.noteSummaryByHex.cellResolution
-			<- SQLite.Expression<Int>(value: cellResolution),
+			<- SQLite.Expression<Int>(value: Int(cellResolution)),
 		schema.noteSummaryByHex.noteCount <- SQLite.Expression<Int>(value: noteCount),
 		schema.noteSummaryByHex.noteType
 			<- SQLite.Expression<String>(value: noteType.toString()),

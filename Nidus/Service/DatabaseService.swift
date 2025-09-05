@@ -240,11 +240,7 @@ class DatabaseService: CustomStringConvertible {
 		return try PictureAsNotes(connection)
 	}
 
-	//func notesServiceRequest() throws -> [ServiceRequest] {
-	//let requests = try ServiceRequestAsNotes(connection)
-	//}
-
-	func notesCount() throws -> Int {
+	func notesCount() throws -> UInt {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
@@ -262,7 +258,7 @@ class DatabaseService: CustomStringConvertible {
 
 	func noteSummaryByHexUpsert(
 		cell: UInt64,
-		cellResolution: Int,
+		cellResolution: UInt,
 		count: Int,
 		noteType: NoteType
 	) throws {

@@ -32,7 +32,7 @@ class NetworkController {
 					try await downloadNotes(database)
 					try await uploadAudioNotes(database)
 					try await uploadPictureNotes(database)
-					await database.optimize()
+					try await updateRegionSummaries(database)
 					return
 				}
 				catch AuthError.invalidCredentials {
@@ -88,6 +88,14 @@ class NetworkController {
 		}
 	}
 
+	func updateRegionSummaries(_ database: DatabaseController) async throws {
+		setState(.updatingSummaries, 0.0)
+
+		try await database.updateSummaryTables { percentComplete in
+			self.setState(.updatingSummaries, percentComplete)
+		}
+		setState(.idle, 0.0)
+	}
 	func uploadNoteAudio(_ audio: AudioNote) async throws {
 		setState(.uploadingChanges, 0.0)
 		try await internalUploadNoteAudio(audio) { progress in

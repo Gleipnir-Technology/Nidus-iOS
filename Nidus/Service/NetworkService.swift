@@ -39,6 +39,7 @@ enum BackgroundNetworkState {
 	case uploadingChanges
 	case notConfigured
 	case savingData
+	case updatingSummaries
 }
 
 enum NetworkServiceError: Error {

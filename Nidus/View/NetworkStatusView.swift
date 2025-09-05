@@ -46,6 +46,12 @@ struct NetworkStatusView: View {
 						progress: progress,
 						color: Color.green
 					)
+				case .updatingSummaries:
+					Image(systemName: "network").foregroundColor(.yellow)
+					ProgressCircle(
+						progress: progress,
+						color: Color.yellow
+					)
 				case .uploadingChanges:
 					Image(systemName: "arrow.up.forward.circle")
 						.foregroundColor(.cyan)

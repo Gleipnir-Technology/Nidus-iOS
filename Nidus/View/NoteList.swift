@@ -74,7 +74,10 @@ struct NoteList: View {
 			let res = getResolution(cell: o.location)
 			if res > currentResolution {
 				do {
-					let c = try scaleCell(o.location, to: currentResolution)
+					let c = try scaleCell(
+						o.location,
+						to: UInt(currentResolution)
+					)
 					if c == cell {
 						results.append(o)
 					}

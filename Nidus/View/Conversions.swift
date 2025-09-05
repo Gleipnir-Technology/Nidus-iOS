@@ -246,13 +246,13 @@ func meterAccuracyToH3Resolution(_ accuracyInMetersFromPoint: Double) -> Int {
 	}
 }
 /// Given a cell at a smaller resolution remap it to the larger resolution
-func scaleCell(_ cell: H3Cell, to resolution: Int) throws -> H3Cell {
+func scaleCell(_ cell: H3Cell, to resolution: UInt) throws -> H3Cell {
 	let currentResolution = getResolution(cell: cell)
 	if currentResolution == resolution {
 		return cell
 	}
 	let latLng = try cellToLatLng(cell: cell)
-	let scaled = try latLngToCell(latLng: latLng, resolution: resolution)
+	let scaled = try latLngToCell(latLng: latLng, resolution: Int(resolution))
 	return scaled
 }
 

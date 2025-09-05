@@ -178,9 +178,11 @@ func MosquitoSourceUpsert(connection: SQLite.Connection, _ source: MosquitoSourc
 	try connection.run(upsert)
 }
 
-func NotesCount(_ connection: SQLite.Connection) throws -> Int {
-	let result = try connection.scalar(schema.inspection.table.count)
-	return result
+func NotesCount(_ connection: SQLite.Connection) throws -> UInt {
+	let audioCount = try connection.scalar(schema.audioRecording.table.count)
+	let pictureCount = try connection.scalar(schema.picture.table.count)
+	let mosquitoSourceCount = try connection.scalar(schema.mosquitoSource.table.count)
+	return UInt(audioCount + pictureCount + mosquitoSourceCount)
 }
 
 func PictureDelete(_ connection: SQLite.Connection, _ uuid: UUID) throws {
