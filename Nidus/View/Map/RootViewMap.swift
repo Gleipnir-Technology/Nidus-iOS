@@ -60,10 +60,11 @@ struct RootViewMap: View {
 					controller.handleRegionChange(region)
 				},
 				regionStore: controller.region.store,
-				resolution: controller.region.store.overlayResolution
-			).onSelectCell { cell in
-				onSelectCell(cell)
-			}
+				resolution: controller.region.store.overlayResolution,
+				onSelectCell: { cell in
+					onSelectCell(cell)
+				}
+			)
 			/*
 				Map(
 				) {

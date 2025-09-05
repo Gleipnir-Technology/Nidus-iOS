@@ -51,6 +51,7 @@ class RootController {
 		TrackTime("root controller handleRegionChange") {
 			settings.saveCurrentRegion(region)
 			self.region.handleRegionChange(region, database: database)
+			startCalculateNotesToShow(self.region.store.current)
 		}
 	}
 

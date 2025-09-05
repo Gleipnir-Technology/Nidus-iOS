@@ -9,15 +9,66 @@ class MapWrapperViewCoordinator: NSObject, MKMapViewDelegate {
 	var regionStore: RegionStore
 	var resolution: UInt
 
+	var geometryProxy: GeometryProxy?
+	var mapView: MKMapView?
+	var onSelectCell: (H3Cell) -> Void
+	//let region: MKCoordinateRegion
+
 	init(
 		onMapCameraChange: @escaping ((MKCoordinateRegion) -> Void),
 		regionStore: RegionStore,
 		resolution: UInt
 	) {
+		self.geometryProxy = nil
+		self.mapView = nil
+		self.onSelectCell = { _ in }
 		self.onMapCameraChange = onMapCameraChange
 		self.regionStore = regionStore
 		self.resolution = resolution
 	}
+
+	func addHexOverlay(_ mapView: MKMapView) {
+		if regionStore.noteCountsByType == nil {
+			Logger.foreground.info("No note counts, refusing to add hex overlay")
+			return
+		}
+		let overlay = HexOverlay(
+			noteCountsByType: regionStore.noteCountsByType!,
+			region: mapView.region,
+			resolution: resolution
+		)
+		mapView.addOverlay(overlay)
+	}
+
+	@objc
+	func handleTap(_ sender: UITapGestureRecognizer) {
+		if sender.state != .ended { return }
+		guard let geometryProxy = geometryProxy else {
+			Logger.foreground.error("geometryProxy is nil")
+			return
+		}
+
+		let screenLocation = sender.location(in: mapView)
+		let gpsLocation = screenLocationToLatLng(
+			location: screenLocation,
+			region: regionStore.current,
+			screenSize: geometryProxy.size
+		)
+		Logger.foreground.info("Tapped on \(gpsLocation.latitude) \(gpsLocation.longitude)")
+		do {
+			let cell = try latLngToCell(
+				latitude: gpsLocation.latitude,
+				longitude: gpsLocation.longitude,
+				resolution: Int(resolution)
+			)
+			Logger.foreground.info("Tapped on cell \(String(cell, radix: 16))")
+			onSelectCell(cell)
+		}
+		catch {
+			print("Failed on tap: \(error)")
+		}
+	}
+
 	func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay)
 		-> MKOverlayRenderer
 	{
@@ -55,19 +106,42 @@ class MapWrapperViewCoordinator: NSObject, MKMapViewDelegate {
 	func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
 		onMapCameraChange(mapView.region)
 	}
-
-	func addHexOverlay(_ mapView: MKMapView) {
-		if regionStore.noteCountsByType == nil {
-			Logger.foreground.info("No note counts, refusing to add hex overlay")
-			return
-		}
-		let overlay = HexOverlay(
-			noteCountsByType: regionStore.noteCountsByType!,
-			region: mapView.region,
-			resolution: resolution
-		)
-		mapView.addOverlay(overlay)
+	func prepareForTap(
+		geometryProxy: GeometryProxy,
+		mapView: MKMapView,
+		onSelectCell: @escaping (H3Cell) -> Void
+	) {
+		self.geometryProxy = geometryProxy
+		self.mapView = mapView
+		self.onSelectCell = onSelectCell
 	}
+}
+
+class MapViewTapHandler: NSObject {
+	let geometryProxy: GeometryProxy
+	let mapView: MKMapView
+	var onSelectCell: (H3Cell) -> Void
+	let region: MKCoordinateRegion
+	let resolution: UInt
+
+	init(
+		geometryProxy: GeometryProxy,
+		onSelectCell: @escaping (H3Cell) -> Void,
+		mapView: MKMapView,
+		region: MKCoordinateRegion,
+		resolution: UInt
+	) {
+		self.geometryProxy = geometryProxy
+		self.onSelectCell = onSelectCell
+		self.mapView = mapView
+		self.region = region
+		self.resolution = resolution
+	}
+
+	@objc
+	func handleTap(_ sender: UITapGestureRecognizer) {
+	}
+
 }
 
 struct MapWrapperView: UIViewRepresentable {
@@ -88,27 +162,6 @@ struct MapWrapperView: UIViewRepresentable {
 		onMapCameraChange(region)
 	}
 
-	private func onTapGesture(_ geometry: GeometryProxy, _ screenLocation: CGPoint) {
-		let gpsLocation = screenLocationToLatLng(
-			location: screenLocation,
-			region: region,
-			screenSize: geometry.size
-		)
-		Logger.foreground.info("Tapped on \(gpsLocation.latitude) \(gpsLocation.longitude)")
-		do {
-			let cell = try latLngToCell(
-				latitude: gpsLocation.latitude,
-				longitude: gpsLocation.longitude,
-				resolution: Int(resolution)
-			)
-			Logger.foreground.info("Tapped on cell \(String(cell, radix: 16))")
-			onSelectCell(cell)
-		}
-		catch {
-			print("Failed on tap: \(error)")
-		}
-	}
-
 	func makeCoordinator() -> MapWrapperViewCoordinator {
 		return MapWrapperViewCoordinator(
 			onMapCameraChange: handleMapCameraChange,
@@ -116,8 +169,15 @@ struct MapWrapperView: UIViewRepresentable {
 			resolution: resolution
 		)
 	}
+
 	func makeUIView(context: Context) -> MKMapView {
 		let mapView = MKMapView()
+
+		let gestureRecognizer = UITapGestureRecognizer(
+			target: context.coordinator,
+			action: #selector(context.coordinator.handleTap)
+		)
+		mapView.addGestureRecognizer(gestureRecognizer)
 		mapView.delegate = context.coordinator
 		mapView.isUserInteractionEnabled = true
 		mapView.isPitchEnabled = true
@@ -129,6 +189,11 @@ struct MapWrapperView: UIViewRepresentable {
 		mapView.removeAnnotations(mapView.annotations)
 		let fits = mapView.regionThatFits(initialRegion)
 		mapView.region = fits
+		context.coordinator.prepareForTap(
+			geometryProxy: geometry,
+			mapView: mapView,
+			onSelectCell: onSelectCell
+		)
 		return mapView
 	}
 
@@ -154,10 +219,12 @@ struct MapMKH3Overlay: View {
 		initialRegion: MKCoordinateRegion,
 		onMapCameraChange: @escaping MapCameraChangeHandler,
 		regionStore: RegionStore,
-		resolution: UInt
+		resolution: UInt,
+		onSelectCell: @escaping CellSelectionHandler
 	) {
 		self.initialRegion = initialRegion
 		self.handleMapCameraChange = onMapCameraChange
+		self.handleSelectCell = onSelectCell
 		//self.handleMapCameraChange = { _ in }
 		self._region = .init(wrappedValue: initialRegion)
 		self.regionStore = regionStore
