@@ -47,6 +47,14 @@ class NidusAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
 	) {
 		backgroundCompletionHandler = completionHandler
 	}
+
+	func application(
+		_ application: UIApplication,
+		supportedInterfaceOrientationsFor window: UIWindow?
+	) -> UIInterfaceOrientationMask {
+		return .portrait
+	}
+
 }
 
 func CaptureError(_ error: Error, _ msg: String = "unknown") {
