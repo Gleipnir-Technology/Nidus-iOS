@@ -205,6 +205,11 @@ struct RootView: View {
 							}
 						}
 					}
+					MapLayerSelector().padding()
+						.position(
+							x: geometry.size.width - 370,
+							y: geometry.size.height - 140
+						)
 					NetworkStatusView(
 						progress: controller.network
 							.backgroundNetworkProgress,
