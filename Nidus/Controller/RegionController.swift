@@ -76,6 +76,10 @@ class RegionController {
 		return results
 	}
 
+	@MainActor
+	func onOverlaySelectionChanged(active: Set<MapOverlay>) {
+		store.overlays = active
+	}
 	func updateResolution(_ newRegion: MKCoordinateRegion) async throws -> UInt {
 		//if newRegion.span.latitudeDelta < 0.0005 || newRegion.span.longitudeDelta < 0.0005 {
 		//return 15

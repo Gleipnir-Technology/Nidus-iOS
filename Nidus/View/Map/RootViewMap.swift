@@ -9,11 +9,11 @@ import SwiftUI
 /// Also allows the user to override their currently selected location
 struct RootViewMap: View {
 	let breadcrumbCells: [H3Cell]
+	var controller: RootController
 	@State var currentRegion: MKCoordinateRegion = Initial.region
 	let initialRegion: MKCoordinateRegion
 	// The callback when a cell is selected
 	var onSelectCell: (H3Cell) -> Void
-	var controller: RootController
 	var showsGrid: Bool = false
 
 	init(
@@ -24,9 +24,9 @@ struct RootViewMap: View {
 		showsGrid: Bool = false
 	) {
 		self.breadcrumbCells = breadcrumbCells
+		self.controller = controller
 		self.initialRegion = initialRegion
 		self.onSelectCell = onSelectCell
-		self.controller = controller
 		self.showsGrid = showsGrid
 	}
 
@@ -65,46 +65,6 @@ struct RootViewMap: View {
 					onSelectCell(cell)
 				}
 			)
-			/*
-				Map(
-				) {
-					ForEach(userPreviousCellsPolygons()) { cell in
-						cell.asMapPolyline().stroke(
-							cell.color,
-							lineWidth: 2
-						)
-					}
-					if controller.region.store.breadcrumb.selectedCell != nil {
-						CellSelection(
-							controller.region.store.breadcrumb
-								.selectedCell!
-						)
-						.asMapPolyline().stroke(
-							.red,
-							lineWidth: 3
-						)
-					}
-					if controller.region.store.breadcrumb.userCell != nil {
-						CellSelection(
-							controller.region.store.breadcrumb.userCell!
-						)
-						.asMapPolyline().stroke(
-							.blue,
-							lineWidth: 2
-						)
-					}
-				}.onTapGesture { screenLocation in
-					onTapGesture(geometry, screenLocation)
-				}
-
-				if showsGrid {
-					OverlayH3Canvas(
-						region: currentRegion,
-                        resolution: controller.region.store.overlayResolution,
-						screenSize: screenSize
-					)
-				}
-                     */
 		}
 	}
 }

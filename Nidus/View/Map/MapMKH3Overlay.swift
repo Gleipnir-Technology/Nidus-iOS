@@ -4,6 +4,14 @@ import MapKit
 import OSLog
 import SwiftUI
 
+///  The various overlays we can show on the map
+enum MapOverlay {
+	case MosquitoSource
+	case MosquitoTrap
+	case Note
+	case ServiceRequest
+}
+
 class MapWrapperViewCoordinator: NSObject, MKMapViewDelegate {
 	var onMapCameraChange: ((MKCoordinateRegion) -> Void)
 	var regionStore: RegionStore
@@ -35,7 +43,8 @@ class MapWrapperViewCoordinator: NSObject, MKMapViewDelegate {
 		let overlay = HexOverlay(
 			noteCountsByType: regionStore.noteCountsByType!,
 			region: mapView.region,
-			resolution: resolution
+			resolution: resolution,
+			types: regionStore.overlays
 		)
 		mapView.addOverlay(overlay)
 	}
@@ -77,13 +86,11 @@ class MapWrapperViewCoordinator: NSObject, MKMapViewDelegate {
 				Logger.foreground.error("Unable to translate overlay to HexOverlay")
 				return MKMultiPolygonRenderer(overlay: MKMultiPolygon([]))
 			}
-			//let renderer = MKMultiPolygonRenderer(overlay: hexOverlay.polygons)
 			let renderer = HexOverlayRenderer(overlay: hexOverlay)
 			renderer.strokeColor = UIColor.systemRed
 			renderer.fillColor = UIColor.systemCyan.withAlphaComponent(0.3)
 			renderer.lineWidth = 10
 			return renderer
-			//return HexOverlayRenderer(overlay: overlay)
 		}
 		else {
 			print("Using default renderer")
@@ -225,7 +232,6 @@ struct MapMKH3Overlay: View {
 		self.initialRegion = initialRegion
 		self.handleMapCameraChange = onMapCameraChange
 		self.handleSelectCell = onSelectCell
-		//self.handleMapCameraChange = { _ in }
 		self._region = .init(wrappedValue: initialRegion)
 		self.regionStore = regionStore
 		self.resolution = resolution

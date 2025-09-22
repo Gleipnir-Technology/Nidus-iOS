@@ -205,7 +205,10 @@ struct RootView: View {
 							}
 						}
 					}
-					MapLayerSelector().padding()
+					MapLayerSelector(
+						onOverlaySelectionChange: controller.region
+							.onOverlaySelectionChanged
+					).padding()
 						.position(
 							x: geometry.size.width - 370,
 							y: geometry.size.height - 140

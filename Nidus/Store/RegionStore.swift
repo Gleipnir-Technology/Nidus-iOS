@@ -33,4 +33,7 @@ class RegionStore {
 
 	// The current H3 resolution we're operating at
 	var overlayResolution: UInt = 8
+
+	// The current overlays we're showing
+	var overlays: Set<MapOverlay> = []
 }

@@ -2,70 +2,104 @@ import OSLog
 import SwiftUI
 
 struct MapLayerSelector: View {
+	var onOverlaySelectionChange: (Set<MapOverlay>) -> Void
 	// Controls whether the layer icons are visible
 	@State private var showingLayerOptions = false
 
 	// Track which layers are enabled
+	@State private var showNotes = true
 	@State private var showSources = true
-	@State private var showTreatments = true
 	@State private var showTraps = true
 
+	func handleOverlaySelectionChange() {
+		var selectedOverlays: Set<MapOverlay> = []
+		if showNotes {
+			selectedOverlays.insert(.Note)
+		}
+		if showSources {
+			selectedOverlays.insert(.MosquitoSource)
+		}
+		if showTraps {
+			selectedOverlays.insert(.MosquitoTrap)
+		}
+		onOverlaySelectionChange(selectedOverlays)
+	}
+
 	var body: some View {
-		VStack {
-			// Sources layer button (visible when expanded)
+		ZStack(alignment: .bottom) {
+			// Layer buttons container - positioned above the main button
 			if showingLayerOptions {
-				Button(action: {
-					showSources.toggle()
-				}) {
-					ZStack {
-						RoundedRectangle(cornerRadius: 12)
-							.fill(Color.blue)  // Color for sources
-							.frame(width: 50, height: 50)
-							.opacity(showSources ? 1.0 : 0.5)
+				VStack(spacing: 10) {
+					// Mosquito Source layer
+					Button(action: {
+						showSources.toggle()
+						handleOverlaySelectionChange()
+					}) {
+						ZStack {
+							RoundedRectangle(cornerRadius: 12)
+								.fill(
+									showSources
+										? Color.red
+										: Color.secondary
+								)  // Color for traps
+								.frame(width: 50, height: 50)
 
-						Image(systemName: "drop.fill")
+							Image("mosquito.sideview")
+								.foregroundColor(.white)
+								.font(.title2)
+						}
+					}
+
+					// Mosquito Trap Layer
+					Button(action: {
+						showTraps.toggle()
+						handleOverlaySelectionChange()
+					}) {
+						ZStack {
+							RoundedRectangle(cornerRadius: 12)
+								.fill(
+									showTraps
+										? Color.orange
+										: Color.secondary
+								)
+								.frame(width: 50, height: 50)
+
+							Image(
+								systemName:
+									"homepod.mini.arrow.forward"
+							)
 							.foregroundColor(.white)
 							.font(.title2)
+						}
 					}
-				}
-				.transition(.move(edge: .top).combined(with: .opacity))
 
-				// Treatments layer button
-				Button(action: {
-					showTreatments.toggle()
-				}) {
-					ZStack {
-						RoundedRectangle(cornerRadius: 12)
-							.fill(Color.green)  // Color for treatments
-							.frame(width: 50, height: 50)
-							.opacity(showTreatments ? 1.0 : 0.5)
+					// Notes layer
+					Button(action: {
+						showNotes.toggle()
+						handleOverlaySelectionChange()
+					}) {
+						ZStack {
+							RoundedRectangle(cornerRadius: 12)
+								.fill(
+									showNotes
+										? Color.blue
+										: Color.secondary
+								)  // Color for sources
+								.frame(width: 50, height: 50)
 
-						Image(systemName: "spray.fill")
-							.foregroundColor(.white)
-							.font(.title2)
+							Image(systemName: "note.text")
+								.foregroundColor(.white)
+								.font(.title2)
+						}
 					}
-				}
-				.transition(.move(edge: .top).combined(with: .opacity))
 
-				// Traps layer button
-				Button(action: {
-					showTraps.toggle()
-				}) {
-					ZStack {
-						RoundedRectangle(cornerRadius: 12)
-							.fill(Color.red)  // Color for traps
-							.frame(width: 50, height: 50)
-							.opacity(showTraps ? 1.0 : 0.5)
-
-						Image(systemName: "target")
-							.foregroundColor(.white)
-							.font(.title2)
-					}
+					// Spacer to ensure proper positioning above main button
+					Spacer().frame(height: 60)
 				}
-				.transition(.move(edge: .top).combined(with: .opacity))
+				.transition(.opacity)
 			}
 
-			// Main toggle button
+			// Main toggle button - always at the bottom
 			Button(action: {
 				withAnimation(.spring()) {
 					showingLayerOptions.toggle()
@@ -91,7 +125,6 @@ struct MapLayerSelector: View {
 				}
 			}
 		}
-		.padding(8)
 		.background(
 			RoundedRectangle(cornerRadius: 16)
 				.fill(Color.white.opacity(0.8))
@@ -105,7 +138,13 @@ struct MapLayerSelector: View {
 #Preview() {
 	ZStack {
 		Color.gray.opacity(0.3).edgesIgnoringSafeArea(.all)  // Simulate map background
-		MapLayerSelector()
-			.padding()
+		VStack {
+			Spacer()  // Push to bottom
+			HStack {
+				MapLayerSelector(onOverlaySelectionChange: { _ in })
+					.padding()
+				Spacer()  // Push to left
+			}
+		}
 	}
 }

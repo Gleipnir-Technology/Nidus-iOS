@@ -18,18 +18,28 @@ final class HexOverlay: NSObject, MKOverlay {
 	var cells: Set<H3Cell>
 	var coordinate: CLLocationCoordinate2D
 	let resolution: UInt
+	let types: Set<MapOverlay>
 
 	init(
 		noteCountsByType: [NoteType: [H3Cell: UInt]],
 		region: MKCoordinateRegion,
-		resolution: UInt
+		resolution: UInt,
+		types: Set<MapOverlay>
 	) {
 		self.coordinate = region.center
 		self.cells = []
 		self.resolution = resolution
+		self.types = types
 
 		self.cellBucketsByType = [:]
 		for (cellType, sourceCells) in noteCountsByType {
+			switch cellType {
+			case .audio, .picture:
+				if !types.contains(.Note) { continue }
+			case .mosquitoSource:
+				if !types.contains(.MosquitoSource) { continue }
+			}
+
 			self.cellBucketsByType[cellType] = [:]
 			for (cell, count) in sourceCells {
 				let bucket: UInt = min(count, 6)
