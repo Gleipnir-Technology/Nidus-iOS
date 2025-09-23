@@ -193,6 +193,9 @@ struct MapWrapperView: UIViewRepresentable {
 		mapView.showsUserLocation = true
 		mapView.showsUserTrackingButton = true
 		mapView.mapType = .hybrid
+		let config = MKHybridMapConfiguration()
+		config.pointOfInterestFilter = .excludingAll
+		mapView.preferredConfiguration = config
 		mapView.removeAnnotations(mapView.annotations)
 		let fits = mapView.regionThatFits(initialRegion)
 		mapView.region = fits
