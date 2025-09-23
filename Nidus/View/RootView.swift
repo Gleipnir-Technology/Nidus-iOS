@@ -104,7 +104,7 @@ struct RootView: View {
 								showsGrid: false
 							)
 						case .notes:
-							NoteListView(
+							NoteList(
 								cell: 0x88_2834_7053_fffff,
 								controller: controller,
 								userLocation: controller.region

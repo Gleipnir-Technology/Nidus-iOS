@@ -67,7 +67,11 @@ struct NoteList: View {
 		var results: [NoteOverview] = []
 		let currentResolution = getResolution(cell: cell)
 		for o in controller.notes.model.noteOverviews! {
-			if o.location == cell {
+			// No location for this note
+			if o.location == 0 {
+				continue
+			}
+			else if o.location == cell {
 				results.append(o)
 				continue
 			}
@@ -90,10 +94,6 @@ struct NoteList: View {
 			}
 			else if res == currentResolution {
 				// We know from the first check above that they are different cells
-				continue
-			}
-			else if o.location == 0 {
-				// This is a note that has no location at all
 				continue
 			}
 			else {
@@ -277,6 +277,15 @@ struct NoteListRowTextCluster: View {
 
 struct NoteList_Previews: PreviewProvider {
 	static var previews: some View {
+		NoteListView(
+			cell: 0x88_2834_7053f_ffff,
+			controller: RootControllerPreview(
+				notes: NotesControllerPreview(
+					model: NotesModel.Preview.noNotes
+				)
+			),
+			userLocation: RegionControllerPreview.userCell
+		)
 		NoteListView(
 			cell: 0x88_2834_7053f_ffff,
 			controller: RootControllerPreview(

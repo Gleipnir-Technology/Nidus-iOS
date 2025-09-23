@@ -20,6 +20,7 @@ struct NotesModel {
 	}
 
 	struct Preview {
+		static let noNotes: NotesModel = NotesModel.forPreview(notes: [])
 		static let someNotes: NotesModel = NotesModel.forPreview(notes: [
 			AudioNote(
 				breadcrumbs: [
