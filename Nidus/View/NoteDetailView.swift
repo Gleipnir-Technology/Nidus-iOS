@@ -4,12 +4,18 @@ import SwiftUI
 struct NoteDetailView: View {
 	let controller: RootController
 	let noteUUID: UUID
+	let note: (any NoteProtocol)?
 
-	var note: any NoteProtocol {
-		controller.notes.model.notes![noteUUID]!
+	init(controller: RootController, noteUUID: UUID) {
+		self.controller = controller
+		self.noteUUID = noteUUID
+		self.note = controller.notes.model.notes![noteUUID]
 	}
 	var body: some View {
-		if let source = note as? MosquitoSourceNote {
+		if note == nil {
+			Text("Loading...")
+		}
+		else if let source = note as? MosquitoSourceNote {
 			MosquitoSourceDetail(
 				onFilterAdded: { _ in },
 				source: source
