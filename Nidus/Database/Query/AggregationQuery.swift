@@ -39,5 +39,32 @@ func BoundaryForNoteType(_ connection: SQLite.Connection, _ noteType: NoteType) 
 	case .picture:
 		// TODO:eliribble don't punt here
 		return Boundary(minLat: -90, minLng: -180, maxLat: 90, maxLng: 180)
+	case .serviceRequest:
+		let minLat: Double =
+			try connection.scalar(
+				schema.serviceRequest.table.select(
+					schema.serviceRequest.latitude.min
+				)
+			) ?? -90.0
+		let maxLat: Double =
+			try connection.scalar(
+				schema.serviceRequest.table.select(
+					schema.serviceRequest.latitude.max
+				)
+			) ?? 90.0
+		let minLng: Double =
+			try connection.scalar(
+				schema.serviceRequest.table.select(
+					schema.serviceRequest.longitude.min
+				)
+			) ?? -180.0
+		let maxLng: Double =
+			try connection.scalar(
+				schema.serviceRequest.table.select(
+					schema.serviceRequest.longitude.max
+				)
+			) ?? 180.0
+		return Boundary(minLat: minLat, minLng: minLng, maxLat: maxLat, maxLng: maxLng)
+
 	}
 }

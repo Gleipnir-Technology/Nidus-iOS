@@ -73,6 +73,11 @@ class RegionController {
 				CaptureError(error, "L")
 			}
 		}
+		for noteType in NoteType.allCases {
+			Logger.foreground.info(
+				"\(results[noteType]?.count ?? 0) notes of type \(noteType.toString())"
+			)
+		}
 		return results
 	}
 

@@ -35,5 +35,5 @@ class RegionStore {
 	var overlayResolution: UInt = 8
 
 	// The current overlays we're showing
-	var overlays: Set<MapOverlay> = []
+	var overlays: Set<MapOverlay> = [.MosquitoSource, .MosquitoTrap, .Note, .ServiceRequest]
 }

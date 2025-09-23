@@ -38,6 +38,8 @@ final class HexOverlay: NSObject, MKOverlay {
 				if !types.contains(.Note) { continue }
 			case .mosquitoSource:
 				if !types.contains(.MosquitoSource) { continue }
+			case .serviceRequest:
+				if !types.contains(.ServiceRequest) { continue }
 			}
 
 			self.cellBucketsByType[cellType] = [:]

@@ -31,6 +31,8 @@ final class HexOverlayRenderer: MKOverlayRenderer {
 				color = UIColor.blue
 			case .mosquitoSource:
 				color = UIColor.red
+			case .serviceRequest:
+				color = UIColor.green
 			}
 			let cellsForCurrentType = hexOverlay.cellBucketsByType[cellType] ?? [:]
 			var maxCount: UInt = 0

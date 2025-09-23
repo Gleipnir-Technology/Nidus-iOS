@@ -146,36 +146,6 @@ class DatabaseService: CustomStringConvertible {
 			try migrationManager.migrateDatabase()
 		}
 	}
-	func notes() throws -> [UUID: AnyNote] {
-		var results: [UUID: AnyNote] = [:]
-		guard let connection = connection else {
-			throw DatabaseError.notConnected
-		}
-		/*do {
-         let sources = try MosquitoSourceAsNotes(
-         connection
-         )
-         for source in sources {
-         results[source.id] = source
-         }
-         }
-         catch {
-         Logger.background.error("Failed to get source notes: \(error)")
-         throw error
-         }*/
-		do {
-			let requests = try ServiceRequestAsNotes(connection)
-			for request in requests {
-				results[request.id] = request
-			}
-		}
-		catch {
-			Logger.background.error("Failed to get request notes: \(error)")
-			throw error
-
-		}
-		return results
-	}
 
 	func noteAudioUpdate(_ note: AudioNote, transcription: String? = nil) throws {
 		guard let connection = connection else {
@@ -247,6 +217,13 @@ class DatabaseService: CustomStringConvertible {
 		do {
 			return try NotesCount(connection)
 		}
+	}
+
+	func notesServiceRequest() throws -> [ServiceRequestNote] {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		return try ServiceRequestAsNotes(connection)
 	}
 
 	func noteSummaries(_ noteType: NoteType, _ cells: Set<H3Cell>) throws -> [NoteSummary] {

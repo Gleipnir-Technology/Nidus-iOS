@@ -6,6 +6,7 @@ enum NoteType: CaseIterable {
 	case audio
 	case mosquitoSource
 	case picture
+	case serviceRequest
 
 	func toString() -> String {
 		switch self {
@@ -15,6 +16,8 @@ enum NoteType: CaseIterable {
 			return "mosquitoSource"
 		case .picture:
 			return "picture"
+		case .serviceRequest:
+			return "serviceRequest"
 		}
 	}
 
@@ -26,6 +29,8 @@ enum NoteType: CaseIterable {
 			return .mosquitoSource
 		case "picture":
 			return .picture
+		case "serviceRequest":
+			return .serviceRequest
 		default:
 			return nil
 		}
@@ -49,5 +54,7 @@ func iconForNoteType(_ type: NoteType) -> Image {
 		return Image("mosquito.sideview")
 	case .picture:
 		return Image(systemName: "photo")
+	case .serviceRequest:
+		return Image(systemName: "person.wave.2.fill")
 	}
 }

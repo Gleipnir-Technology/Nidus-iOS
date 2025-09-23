@@ -41,6 +41,7 @@ class DatabaseController {
 			updateSummaryAudioNote(partialProgress)
 			updateSummaryMosquitoSource(partialProgress)
 			updateSummaryPictureNote(partialProgress)
+			updateSummaryServiceRequest(partialProgress)
 		}
 	}
 
@@ -128,4 +129,13 @@ class DatabaseController {
 		}
 	}
 
+	private func updateSummaryServiceRequest(_ onProgress: (UInt) -> Void) {
+		do {
+			let allServiceRequests = try service.notesServiceRequest()
+			saveNoteSummary(allServiceRequests, .serviceRequest, onProgress: onProgress)
+		}
+		catch {
+			CaptureError(error, "optimizeServiceRequest")
+		}
+	}
 }

@@ -8,6 +8,7 @@ struct MapLayerSelector: View {
 
 	// Track which layers are enabled
 	@State private var showNotes = true
+	@State private var showServiceRequests = true
 	@State private var showSources = true
 	@State private var showTraps = true
 
@@ -15,6 +16,9 @@ struct MapLayerSelector: View {
 		var selectedOverlays: Set<MapOverlay> = []
 		if showNotes {
 			selectedOverlays.insert(.Note)
+		}
+		if showServiceRequests {
+			selectedOverlays.insert(.ServiceRequest)
 		}
 		if showSources {
 			selectedOverlays.insert(.MosquitoSource)
@@ -88,6 +92,25 @@ struct MapLayerSelector: View {
 								.frame(width: 50, height: 50)
 
 							Image(systemName: "note.text")
+								.foregroundColor(.white)
+								.font(.title2)
+						}
+					}
+
+					Button(action: {
+						showServiceRequests.toggle()
+						handleOverlaySelectionChange()
+					}) {
+						ZStack {
+							RoundedRectangle(cornerRadius: 12)
+								.fill(
+									showNotes
+										? Color.green
+										: Color.secondary
+								)  // Color for sources
+								.frame(width: 50, height: 50)
+
+							Image(systemName: "person.wave.2.fill")
 								.foregroundColor(.white)
 								.font(.title2)
 						}

@@ -182,7 +182,8 @@ func NotesCount(_ connection: SQLite.Connection) throws -> UInt {
 	let audioCount = try connection.scalar(schema.audioRecording.table.count)
 	let pictureCount = try connection.scalar(schema.picture.table.count)
 	let mosquitoSourceCount = try connection.scalar(schema.mosquitoSource.table.count)
-	return UInt(audioCount + pictureCount + mosquitoSourceCount)
+	let serviceRequestCount = try connection.scalar(schema.serviceRequest.table.count)
+	return UInt(audioCount + pictureCount + mosquitoSourceCount + serviceRequestCount)
 }
 
 func PictureDelete(_ connection: SQLite.Connection, _ uuid: UUID) throws {
@@ -253,8 +254,8 @@ func PictureUploaded(_ connection: SQLite.Connection, _ uuid: UUID) throws {
 	try connection.run(update)
 }
 
-func ServiceRequestAsNotes(_ connection: Connection) throws -> [AnyNote] {
-	var results: [AnyNote] = []
+func ServiceRequestAsNotes(_ connection: Connection) throws -> [ServiceRequestNote] {
+	var results: [ServiceRequestNote] = []
 	for row in try connection.prepare(schema.serviceRequest.table) {
 		let created = row[schema.serviceRequest.created]
 		let location = Location(
@@ -262,26 +263,24 @@ func ServiceRequestAsNotes(_ connection: Connection) throws -> [AnyNote] {
 			longitude: row[schema.serviceRequest.longitude]
 		)
 		results.append(
-			AnyNote(
-				ServiceRequest(
-					address: row[schema.serviceRequest.address],
-					assignedTechnician: row[
-						schema.serviceRequest.assignedTechnician
-					],
-					city: row[schema.serviceRequest.city],
-					created: created,
-					hasDog: row[schema.serviceRequest.hasDog],
-					hasSpanishSpeaker: row[
-						schema.serviceRequest.hasSpanishSpeaker
-					],
-					id: row[schema.serviceRequest.id],
-					location: location,
-					priority: row[schema.serviceRequest.priority],
-					source: row[schema.serviceRequest.source],
-					status: row[schema.serviceRequest.status],
-					target: row[schema.serviceRequest.target],
-					zip: row[schema.serviceRequest.zip]
-				)
+			ServiceRequestNote(
+				address: row[schema.serviceRequest.address],
+				assignedTechnician: row[
+					schema.serviceRequest.assignedTechnician
+				],
+				city: row[schema.serviceRequest.city],
+				created: created,
+				hasDog: row[schema.serviceRequest.hasDog],
+				hasSpanishSpeaker: row[
+					schema.serviceRequest.hasSpanishSpeaker
+				],
+				id: row[schema.serviceRequest.id],
+				location: location,
+				priority: row[schema.serviceRequest.priority],
+				source: row[schema.serviceRequest.source],
+				status: row[schema.serviceRequest.status],
+				target: row[schema.serviceRequest.target],
+				zip: row[schema.serviceRequest.zip]
 			)
 		)
 	}
