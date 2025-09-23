@@ -26,6 +26,12 @@ struct NoteDetailView: View {
 				note: note
 			)
 		}
+		else if let note = note as? ServiceRequestNote {
+			ServiceNoteDetail(
+				onFilterAdded: { _ in },
+				request: note
+			)
+		}
 		else {
 			Text("Unknown Note Detail View")
 		}
