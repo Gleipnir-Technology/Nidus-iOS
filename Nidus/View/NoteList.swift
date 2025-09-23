@@ -36,99 +36,92 @@ struct NoteListView: View {
 	}
 }
 
+/// Return the ordered list of overviews that are contained within the current cell
+func overviewsInCellOrdered(cell: H3Cell, controller: RootController, userLocation: H3Cell?)
+	-> [NoteOverview]
+{
+	var results: [NoteOverview] = []
+	let currentResolution = getResolution(cell: cell)
+	for o in controller.notes.model.noteOverviews! {
+		// No location for this note
+		if o.location == 0 {
+			continue
+		}
+		else if o.location == cell {
+			results.append(o)
+			continue
+		}
+		let res = getResolution(cell: o.location)
+		if res > currentResolution {
+			do {
+				let c = try scaleCell(
+					o.location,
+					to: UInt(currentResolution)
+				)
+				if c == cell {
+					results.append(o)
+				}
+			}
+			catch {
+				Logger.foreground.error(
+					"Failed to scale cell: \(o.location) to \(currentResolution): \(error)"
+				)
+			}
+		}
+		else if res == currentResolution {
+			// We know from the first check above that they are different cells
+			continue
+		}
+		else {
+			Logger.foreground.warning(
+				"Got a location cell that is smaller that tapped cell \(String(cell, radix: 16)), not sure what to do with this: \(String(o.location, radix: 16))"
+			)
+		}
+	}
+	// At this point we have a set of results, but they aren't in order
+	if userLocation == nil {
+		return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
+			o1.time > o2.time
+		}
+	}
+	return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
+		do {
+			let d1 = try gridDistance(
+				origin: userLocation!,
+				destination: o1.location
+			)
+			let d2 = try gridDistance(
+				origin: userLocation!,
+				destination: o2.location
+			)
+			if d1 == d2 {
+				return o1.time > o2.time
+			}
+			return d1 > d2
+
+		}
+		catch {
+			// effectively random
+			return o1.time > o2.time
+		}
+	}
+}
+
 struct NoteList: View {
 	let cell: H3Cell
 	var controller: RootController
+	let overviewsOrdered: [NoteOverview]
 	let userLocation: H3Cell?
 
-	func notesByDistance(_ notes: [AnyNote], currentLocation: CLLocation) -> [AnyNote] {
-		var byDistance: [AnyNote] = notes
-		byDistance.sort(by: { (an1: AnyNote, an2: AnyNote) -> Bool in
-			return currentLocation.distance(
-				from: CLLocation(
-					latitude: an1.coordinate.latitude,
-					longitude: an1.coordinate.longitude
-				)
-			)
-				< currentLocation.distance(
-					from: CLLocation(
-						latitude: an2.coordinate.latitude,
-						longitude: an2.coordinate.longitude
-					)
-				)
-		})
-		return byDistance
-	}
-
-	/**
-     Return the ordered list of overviews that are contained within the current cell
-     */
-	func overviewsInCellOrdered() -> [NoteOverview] {
-		var results: [NoteOverview] = []
-		let currentResolution = getResolution(cell: cell)
-		for o in controller.notes.model.noteOverviews! {
-			// No location for this note
-			if o.location == 0 {
-				continue
-			}
-			else if o.location == cell {
-				results.append(o)
-				continue
-			}
-			let res = getResolution(cell: o.location)
-			if res > currentResolution {
-				do {
-					let c = try scaleCell(
-						o.location,
-						to: UInt(currentResolution)
-					)
-					if c == cell {
-						results.append(o)
-					}
-				}
-				catch {
-					Logger.foreground.error(
-						"Failed to scale cell: \(o.location) to \(currentResolution): \(error)"
-					)
-				}
-			}
-			else if res == currentResolution {
-				// We know from the first check above that they are different cells
-				continue
-			}
-			else {
-				Logger.foreground.warning(
-					"Got a location cell that is smaller that tapped cell \(String(cell, radix: 16)), not sure what to do with this: \(String(o.location, radix: 16))"
-				)
-			}
-		}
-		// At this point we have a set of results, but they aren't in order
-		if userLocation == nil {
-			return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
-				o1.time > o2.time
-			}
-		}
-		return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
-			do {
-				let d1 = try gridDistance(
-					origin: userLocation!,
-					destination: o1.location
-				)
-				let d2 = try gridDistance(
-					origin: userLocation!,
-					destination: o2.location
-				)
-				if d1 == d2 {
-					return o1.time > o2.time
-				}
-				return d1 > d2
-
-			}
-			catch {
-				// effectively random
-				return o1.time > o2.time
-			}
-		}
+	init(cell: H3Cell, controller: RootController, userLocation: H3Cell?) {
+		self.cell = cell
+		self.controller = controller
+		self.userLocation = userLocation
+		self.overviewsOrdered = overviewsInCellOrdered(
+			cell: cell,
+			controller: controller,
+			userLocation: userLocation
+		)
 	}
 
 	var body: some View {
@@ -137,12 +130,17 @@ struct NoteList: View {
 		}
 		else {
 			List {
-				ForEach(overviewsInCellOrdered()) { overview in
-					NoteListRow(
-						controller: controller,
-						overview: overview,
-						userLocation: userLocation
-					)
+				if overviewsOrdered.count > 0 {
+					ForEach(overviewsOrdered) { overview in
+						NoteListRow(
+							controller: controller,
+							overview: overview,
+							userLocation: userLocation
+						)
+					}
+				}
+				else {
+					Text("No notes to show")
 				}
 			}
 		}
