@@ -100,12 +100,13 @@ class AudioNote: NoteProtocol, Codable {
 	}
 	var overview: NoteOverview {
 		return NoteOverview(
-			color: .red,
+			color: colorForNoteType(category),
 			icon: iconForNoteType(category),
 			icons: [],
 			id: id,
 			location: cell,
-			time: created
+			time: created,
+			type: category
 		)
 	}
 

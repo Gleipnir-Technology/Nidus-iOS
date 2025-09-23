@@ -287,6 +287,50 @@ func ServiceRequestAsNotes(_ connection: Connection) throws -> [ServiceRequestNo
 	return results
 }
 
+func ServiceRequestsAsNotes(
+	_ connection: SQLite.Connection,
+	region: MKCoordinateRegion
+) throws -> [ServiceRequestNote] {
+	var results: [ServiceRequestNote] = []
+	let query = schema.serviceRequest.table.filter(
+		SQLite.Expression(value: region.maxLatitude) >= schema.serviceRequest.latitude
+	).filter(
+		SQLite.Expression(value: region.minLatitude) <= schema.serviceRequest.latitude
+	).filter(
+		SQLite.Expression(value: region.maxLongitude) >= schema.serviceRequest.longitude
+	).filter(
+		SQLite.Expression(value: region.minLongitude) <= schema.serviceRequest.longitude
+	)
+	for row in try connection.prepare(query) {
+		let location = Location(
+			latitude: row[schema.serviceRequest.latitude],
+			longitude: row[schema.serviceRequest.longitude]
+		)
+		results.append(
+			ServiceRequestNote(
+				address: row[schema.serviceRequest.address],
+				assignedTechnician: row[
+					schema.serviceRequest.assignedTechnician
+				],
+				city: row[schema.serviceRequest.city],
+				created: row[schema.serviceRequest.created],
+				hasDog: row[schema.serviceRequest.hasDog],
+				hasSpanishSpeaker: row[
+					schema.serviceRequest.hasSpanishSpeaker
+				],
+				id: row[schema.serviceRequest.id],
+				location: location,
+				priority: row[schema.serviceRequest.priority],
+				source: row[schema.serviceRequest.source],
+				status: row[schema.serviceRequest.status],
+				target: row[schema.serviceRequest.target],
+				zip: row[schema.serviceRequest.zip]
+			)
+		)
+	}
+	return results
+}
+
 func ServiceRequestUpsert(connection: SQLite.Connection, _ serviceRequest: ServiceRequest) throws {
 	let upsert = schema.serviceRequest.table.upsert(
 		schema.serviceRequest.address <- SQLite.Expression<String>(serviceRequest.address),

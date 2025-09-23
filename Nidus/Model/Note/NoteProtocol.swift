@@ -46,6 +46,17 @@ protocol NoteProtocol: Identifiable<UUID>, Hashable {
 	var created: Date { get }
 }
 
+func colorForNoteType(_ type: NoteType) -> Color {
+	switch type {
+	case .audio, .picture:
+		return .blue
+	case .mosquitoSource:
+		return .red
+	case .serviceRequest:
+		return .green
+	}
+}
+
 func iconForNoteType(_ type: NoteType) -> Image {
 	switch type {
 	case .audio:

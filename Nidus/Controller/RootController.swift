@@ -194,7 +194,10 @@ class RootController {
 	private func startCalculateNotesToShow(_ region: MKCoordinateRegion) {
 		Task {
 			do {
-				let notes = try database.service.notesByRegion(region)
+				let notes = try await database.service.notesByRegion(
+					region,
+					types: self.region.store.overlays
+				)
 				self.notes.showNotes(
 					mapAnnotations: notes.map { $0.value.mapAnnotation },
 					notes: notes,

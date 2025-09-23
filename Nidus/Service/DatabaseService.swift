@@ -160,25 +160,41 @@ class DatabaseService: CustomStringConvertible {
 		return try NoteAudioUploaded(connection, note.id, uploaded: uploaded)
 	}
 
-	func notesByRegion(_ region: MKCoordinateRegion) throws -> [UUID: any NoteProtocol] {
+	func notesByRegion(_ region: MKCoordinateRegion, types: Set<MapOverlay>) throws -> [UUID:
+		any NoteProtocol]
+	{
 		var results: [UUID: any NoteProtocol] = [:]
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
 		}
-		let sources = try MosquitoSourceAsNotes(
-			connection,
-			region: region
-		)
-		for source in sources {
-			results[source.id] = source
+		if types.contains(.MosquitoSource) {
+			let sources = try MosquitoSourceAsNotes(
+				connection,
+				region: region
+			)
+			for source in sources {
+				results[source.id] = source
+			}
 		}
-		let audioRecording = try AudioRecordingAsNotes(connection)
-		for ar in audioRecording {
-			results[ar.id] = ar
+		if types.contains(.Note) {
+			let audioRecording = try AudioRecordingAsNotes(connection)
+			for ar in audioRecording {
+				results[ar.id] = ar
+			}
+			let pictures = try PictureAsNotes(connection)
+			for p in pictures {
+				results[p.id] = p
+			}
 		}
-		let pictures = try PictureAsNotes(connection)
-		for p in pictures {
-			results[p.id] = p
+
+		if types.contains(.ServiceRequest) {
+			let serviceRequests = try ServiceRequestsAsNotes(
+				connection,
+				region: region
+			)
+			for s in serviceRequests {
+				results[s.id] = s
+			}
 		}
 		return results
 	}

@@ -104,7 +104,7 @@ struct MapLayerSelector: View {
 						ZStack {
 							RoundedRectangle(cornerRadius: 12)
 								.fill(
-									showNotes
+									showServiceRequests
 										? Color.green
 										: Color.secondary
 								)  // Color for sources

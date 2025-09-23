@@ -120,12 +120,13 @@ struct MosquitoSourceNote: NoteProtocol {
 	}
 	var overview: NoteOverview {
 		return NoteOverview(
-			color: .red,
+			color: colorForNoteType(category),
 			icon: iconForNoteType(category),
 			icons: icons,
 			id: id,
 			location: cell,
-			time: created
+			time: created,
+			type: category
 		)
 	}
 	var timestamp: Date {

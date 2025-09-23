@@ -78,12 +78,13 @@ struct ServiceRequestNote: NoteProtocol {
 
 	var overview: NoteOverview {
 		return NoteOverview(
-			color: .green,
+			color: colorForNoteType(category),
 			icon: iconForNoteType(category),
 			icons: icons,
 			id: id,
 			location: cell,
-			time: created
+			time: created,
+			type: category
 		)
 	}
 }

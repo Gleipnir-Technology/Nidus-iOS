@@ -9,4 +9,5 @@ struct NoteOverview: Identifiable {
 	var id: UUID
 	var location: H3Cell
 	var time: Date
+	var type: NoteType
 }
