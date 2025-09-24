@@ -74,13 +74,16 @@ struct MosquitoSourceNote: NoteProtocol {
 	var icons: [String] {
 		var results: [String] = []
 		if active != nil && (active!) {
-			results.append("plus.circle.fill")
+			//results.append("plus.circle.fill")
+			results.append("custom.dog.sideview")
 		}
-		if comments.count > 0 {
-			results.append("quote.bubble")
+		if comments != "" {
+			//results.append("quote.bubble")
+			results.append("custom.bargraph.up")
 		}
 		if habitat != "" {
-			results.append("tree.fill")
+			//results.append("tree.fill")
+			results.append("drop.triangle")
 		}
 		if inspections.count > 0 {
 			results.append("list.clipboard")

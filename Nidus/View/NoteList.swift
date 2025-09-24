@@ -193,6 +193,17 @@ struct NoteListRowIconCluster: View {
 		}
 	}
 
+	func toImage(_ name: String) -> some View {
+		if name.starts(with: "custom.") {
+			let range = name.index(name.startIndex, offsetBy: 7)..<name.endIndex
+			let customName = name[range]
+			return Image(String(customName))
+		}
+		else {
+			return Image(systemName: name)
+		}
+	}
+
 	var body: some View {
 		let numIcons = icons.count
 		Grid(horizontalSpacing: 1, verticalSpacing: 1) {
@@ -202,7 +213,7 @@ struct NoteListRowIconCluster: View {
 						let i = index
 						let offset_y: CGFloat = 0  //(row == 0 ? -10 : 10)
 						let offset_x: CGFloat = 0  //CGFloat(-10 * i)
-						Image(systemName: icons[i])
+						toImage(icons[i]).frame(width: 20, height: 20)
 							.offset(x: offset_x, y: offset_y)
 					}
 					else {
@@ -293,5 +304,14 @@ struct NoteList_Previews: PreviewProvider {
 			),
 			userLocation: RegionControllerPreview.userCell
 		).previewDisplayName("base")
+		NoteListView(
+			cell: 0x88_2834_7053f_ffff,
+			controller: RootControllerPreview(
+				notes: NotesControllerPreview(
+					model: NotesModel.Preview.notesWithIcons
+				)
+			),
+			userLocation: RegionControllerPreview.userCell
+		).previewDisplayName("icons")
 	}
 }
