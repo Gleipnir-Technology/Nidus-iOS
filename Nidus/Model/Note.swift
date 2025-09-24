@@ -1,10 +1,3 @@
-import ClusterMap
-//
-//  Task.swift
-//  Nidus
-//
-//  Created by Eli Ribble on 3/10/25.
-//
 import CoreLocation
 import SwiftData
 import SwiftUI
@@ -90,7 +83,7 @@ struct NoteCategory: Hashable, Identifiable {
 	static let all = [mosquitoSource, nidus, serviceRequest, trapData]
 }
 
-protocol Note: Identifiable<UUID>, CoordinateIdentifiable, Hashable {
+protocol Note: Identifiable<UUID>, Hashable {
 	var category: NoteCategory { get }
 	var categoryName: String { get }
 	var color: Color { get }

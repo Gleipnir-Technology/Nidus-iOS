@@ -176,7 +176,7 @@ struct AudioNoteDetail: View {
 			}
 			else if note.transcription != nil && !(note.transcription!.isEmpty) {
 				TranscriptionDisplay(
-					tags: note.tags,
+					knowledgeGraph: nil,
 					transcription: note.transcription
 				).onLongPressGesture {
 					editedTranscriptionText = note.transcription!

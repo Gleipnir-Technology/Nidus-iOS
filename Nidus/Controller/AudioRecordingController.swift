@@ -102,8 +102,8 @@ class AudioRecordingController {
 
 	@MainActor
 	private func onTranscriptionUpdate(_ transcription: String) {
+		self.store.knowledgeGraph = ExtractKnowledge(transcription)
 		self.store.transcription = transcription
-		self.store.tags = AudioTagIdentifier.parseTags(transcription)
 	}
 
 }

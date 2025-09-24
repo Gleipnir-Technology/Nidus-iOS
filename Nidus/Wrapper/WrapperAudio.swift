@@ -159,6 +159,15 @@ class WrapperAudio: NSObject {
 			try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
 
 			recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
+			recognitionRequest!.taskHint = .dictation
+			recognitionRequest!.contextualStrings = [
+				"instar",
+				"larvae",
+				"Culex",
+				"Sumilarv",
+				"WSP",
+				"flood irrigating",
+			]
 			guard let recognitionRequest = recognitionRequest else {
 				print("Unable to create recognition request")
 				return

@@ -130,7 +130,7 @@ struct MapLayerSelector: View {
 			}) {
 				ZStack {
 					RoundedRectangle(cornerRadius: 12)
-						.fill(Color.white)
+						.fill(Color.secondary)
 						.frame(width: 50, height: 50)
 						.shadow(radius: 2)
 

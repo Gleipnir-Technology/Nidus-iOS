@@ -7,18 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		532F3AE52DEB66C5006E0E40 /* Automerge in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AE42DEB66C5006E0E40 /* Automerge */; };
-		532F3AE82DEB6765006E0E40 /* AutomergeRepo in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AE72DEB6765006E0E40 /* AutomergeRepo */; };
 		532F3AEB2DEB68C7006E0E40 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AEA2DEB68C7006E0E40 /* SQLite */; };
-		532F3AF52DECAE26006E0E40 /* ClusterMap in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AF42DECAE26006E0E40 /* ClusterMap */; };
-		532F3AF72DECAE26006E0E40 /* ClusterMapSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */; };
 		533B86FB2E58F7A300362B49 /* SentrySwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 533B86FA2E58F7A300362B49 /* SentrySwiftUI */; };
 		538BFA8D2E3A3C0A0064A6A5 /* H3 in Frameworks */ = {isa = PBXBuildFile; productRef = 538BFA8C2E3A3C0A0064A6A5 /* H3 */; };
-		538BFD182E42BD0C0064A6A5 /* MijickCamera in Frameworks */ = {isa = PBXBuildFile; productRef = 538BFD172E42BD0C0064A6A5 /* MijickCamera */; };
 		53E1F2FF2E05E3FA00A6D888 /* SQLiteMigrationManager in Frameworks */ = {isa = PBXBuildFile; productRef = 53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		53C0FDD12E834DA400E716B8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 53D57B422D79E2A20094740D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 53D57B492D79E2A20094740D;
+			remoteInfo = "Nidus Notes";
+		};
 		53D57B5C2D79E2A30094740D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 53D57B422D79E2A20094740D /* Project object */;
@@ -37,6 +39,7 @@
 
 /* Begin PBXFileReference section */
 		532F3AD82DE76EF8006E0E40 /* Nidus-Notes-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Nidus-Notes-Info.plist"; sourceTree = "<group>"; };
+		53C0FDD02E834DA400E716B8 /* Nidus Notes Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Nidus Notes Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B4A2D79E2A20094740D /* Nidus Notes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Nidus Notes.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B5B2D79E2A30094740D /* Nidus NotesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Nidus NotesTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B652D79E2A30094740D /* Nidus NotesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Nidus NotesUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -51,19 +54,21 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		53C0FDCD2E834DA400E716B8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		53D57B472D79E2A20094740D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				532F3AEB2DEB68C7006E0E40 /* SQLite in Frameworks */,
 				533B86FB2E58F7A300362B49 /* SentrySwiftUI in Frameworks */,
-				532F3AF72DECAE26006E0E40 /* ClusterMapSwiftUI in Frameworks */,
 				538BFA8D2E3A3C0A0064A6A5 /* H3 in Frameworks */,
-				532F3AE82DEB6765006E0E40 /* AutomergeRepo in Frameworks */,
-				538BFD182E42BD0C0064A6A5 /* MijickCamera in Frameworks */,
 				53E1F2FF2E05E3FA00A6D888 /* SQLiteMigrationManager in Frameworks */,
-				532F3AF52DECAE26006E0E40 /* ClusterMap in Frameworks */,
-				532F3AE52DEB66C5006E0E40 /* Automerge in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +104,7 @@
 				53D57B4A2D79E2A20094740D /* Nidus Notes.app */,
 				53D57B5B2D79E2A30094740D /* Nidus NotesTests.xctest */,
 				53D57B652D79E2A30094740D /* Nidus NotesUITests.xctest */,
+				53C0FDD02E834DA400E716B8 /* Nidus Notes Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -106,6 +112,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		53C0FDCF2E834DA400E716B8 /* Nidus Notes Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 53C0FDD32E834DA400E716B8 /* Build configuration list for PBXNativeTarget "Nidus Notes Tests" */;
+			buildPhases = (
+				53C0FDCC2E834DA400E716B8 /* Sources */,
+				53C0FDCD2E834DA400E716B8 /* Frameworks */,
+				53C0FDCE2E834DA400E716B8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				53C0FDD22E834DA400E716B8 /* PBXTargetDependency */,
+			);
+			name = "Nidus Notes Tests";
+			packageProductDependencies = (
+			);
+			productName = "Nidus Notes Tests";
+			productReference = 53C0FDD02E834DA400E716B8 /* Nidus Notes Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		53D57B492D79E2A20094740D /* Nidus Notes */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 53D57B6F2D79E2A30094740D /* Build configuration list for PBXNativeTarget "Nidus Notes" */;
@@ -124,14 +150,9 @@
 			);
 			name = "Nidus Notes";
 			packageProductDependencies = (
-				532F3AE42DEB66C5006E0E40 /* Automerge */,
-				532F3AE72DEB6765006E0E40 /* AutomergeRepo */,
 				532F3AEA2DEB68C7006E0E40 /* SQLite */,
-				532F3AF42DECAE26006E0E40 /* ClusterMap */,
-				532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */,
 				53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */,
 				538BFA8C2E3A3C0A0064A6A5 /* H3 */,
-				538BFD172E42BD0C0064A6A5 /* MijickCamera */,
 				533B86FA2E58F7A300362B49 /* SentrySwiftUI */,
 			);
 			productName = Nidus;
@@ -188,6 +209,10 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					53C0FDCF2E834DA400E716B8 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 53D57B492D79E2A20094740D;
+					};
 					53D57B492D79E2A20094740D = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -211,13 +236,9 @@
 			mainGroup = 53D57B412D79E2A20094740D;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				532F3AE32DEB66C5006E0E40 /* XCRemoteSwiftPackageReference "automerge-swift" */,
-				532F3AE62DEB6765006E0E40 /* XCRemoteSwiftPackageReference "automerge-repo-swift" */,
 				532F3AE92DEB68C7006E0E40 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
-				532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */,
 				53E1F2FD2E05E3FA00A6D888 /* XCRemoteSwiftPackageReference "SQLiteMigrationManager.swift" */,
 				538BFA8B2E3A3C0A0064A6A5 /* XCLocalSwiftPackageReference "../swift-h3" */,
-				538BFD142E4295AA0064A6A5 /* XCLocalSwiftPackageReference "../MijickCamera" */,
 				533B86F32E58F7A300362B49 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -228,11 +249,19 @@
 				53D57B492D79E2A20094740D /* Nidus Notes */,
 				53D57B5A2D79E2A30094740D /* Nidus NotesTests */,
 				53D57B642D79E2A30094740D /* Nidus NotesUITests */,
+				53C0FDCF2E834DA400E716B8 /* Nidus Notes Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		53C0FDCE2E834DA400E716B8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		53D57B482D79E2A20094740D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -279,6 +308,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		53C0FDCC2E834DA400E716B8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		53D57B462D79E2A20094740D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -303,6 +339,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		53C0FDD22E834DA400E716B8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 53D57B492D79E2A20094740D /* Nidus Notes */;
+			targetProxy = 53C0FDD12E834DA400E716B8 /* PBXContainerItemProxy */;
+		};
 		53D57B5D2D79E2A30094740D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 53D57B492D79E2A20094740D /* Nidus Notes */;
@@ -316,6 +357,49 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		53C0FDD42E834DA400E716B8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D392HWX27T;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "technology.gleipnir.Nidus-Notes-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = xros;
+				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nidus Notes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nidus Notes";
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Debug;
+		};
+		53C0FDD52E834DA400E716B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D392HWX27T;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "technology.gleipnir.Nidus-Notes-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = xros;
+				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nidus Notes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nidus Notes";
+				VALIDATE_PRODUCT = YES;
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Release;
+		};
 		53D57B6D2D79E2A30094740D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -536,6 +620,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = D392HWX27T;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
@@ -559,6 +644,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = D392HWX27T;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
@@ -581,6 +667,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = D392HWX27T;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
@@ -603,6 +690,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = D392HWX27T;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
@@ -622,6 +710,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		53C0FDD32E834DA400E716B8 /* Build configuration list for PBXNativeTarget "Nidus Notes Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53C0FDD42E834DA400E716B8 /* Debug */,
+				53C0FDD52E834DA400E716B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		53D57B452D79E2A20094740D /* Build configuration list for PBXProject "Nidus Notes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -665,43 +762,15 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../swift-h3";
 		};
-		538BFD142E4295AA0064A6A5 /* XCLocalSwiftPackageReference "../MijickCamera" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../MijickCamera;
-		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		532F3AE32DEB66C5006E0E40 /* XCRemoteSwiftPackageReference "automerge-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/automerge/automerge-swift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.6.1;
-			};
-		};
-		532F3AE62DEB6765006E0E40 /* XCRemoteSwiftPackageReference "automerge-repo-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/automerge/automerge-repo-swift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.3.2;
-			};
-		};
 		532F3AE92DEB68C7006E0E40 /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/stephencelis/SQLite.swift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.15.3;
-			};
-		};
-		532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/vospennikov/ClusterMap";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.1.1;
 			};
 		};
 		533B86F32E58F7A300362B49 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
@@ -723,30 +792,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		532F3AE42DEB66C5006E0E40 /* Automerge */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 532F3AE32DEB66C5006E0E40 /* XCRemoteSwiftPackageReference "automerge-swift" */;
-			productName = Automerge;
-		};
-		532F3AE72DEB6765006E0E40 /* AutomergeRepo */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 532F3AE62DEB6765006E0E40 /* XCRemoteSwiftPackageReference "automerge-repo-swift" */;
-			productName = AutomergeRepo;
-		};
 		532F3AEA2DEB68C7006E0E40 /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 532F3AE92DEB68C7006E0E40 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
 			productName = SQLite;
-		};
-		532F3AF42DECAE26006E0E40 /* ClusterMap */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */;
-			productName = ClusterMap;
-		};
-		532F3AF62DECAE26006E0E40 /* ClusterMapSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 532F3AF32DECAE26006E0E40 /* XCRemoteSwiftPackageReference "ClusterMap" */;
-			productName = ClusterMapSwiftUI;
 		};
 		533B86FA2E58F7A300362B49 /* SentrySwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -756,10 +805,6 @@
 		538BFA8C2E3A3C0A0064A6A5 /* H3 */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = H3;
-		};
-		538BFD172E42BD0C0064A6A5 /* MijickCamera */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = MijickCamera;
 		};
 		53E1F2FE2E05E3FA00A6D888 /* SQLiteMigrationManager */ = {
 			isa = XCSwiftPackageProductDependency;

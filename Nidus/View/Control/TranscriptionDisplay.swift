@@ -5,18 +5,32 @@ struct TagLabel {
 	let keyword: String
 }
 
+func TranscriptTagTypeToColor(_ type: TranscriptTagType) -> Color {
+	switch type {
+	case .Action:
+		return .red
+	case .Measurement:
+		return .green
+	case .Source:
+		return .purple
+	}
+}
+
 struct TranscriptionDisplay: View {
-	let tags: [AudioTagMatch]
+	let knowledgeGraph: KnowledgeGraph?
 	let transcription: String?
 
-	func attributedString(for text: String, tags: [AudioTagMatch]) -> AttributedString {
+	func attributedString(for text: String, knowledgeGraph: KnowledgeGraph?) -> AttributedString
+	{
 		var attributedString = AttributedString(text)
-		for tag in tags {
+		guard let knowledgeGraph else { return attributedString }
+		for tag in knowledgeGraph.transcriptTags {
 			if let attributedRange = Range(
 				NSRange(tag.range, in: text),
 				in: attributedString
 			) {
-				attributedString[attributedRange].foregroundColor = tag.color()
+				attributedString[attributedRange].foregroundColor =
+					TranscriptTagTypeToColor(tag.type)
 			}
 		}
 		return attributedString
@@ -25,7 +39,16 @@ struct TranscriptionDisplay: View {
 	var body: some View {
 		ScrollViewReader { proxy in
 			ScrollView {
-				Text(attributedString(for: transcription!, tags: tags))
+				if transcription == nil {
+					Text("no transcription").id("transcription")
+				}
+				else {
+					Text(
+						attributedString(
+							for: transcription!,
+							knowledgeGraph: knowledgeGraph
+						)
+					)
 					.frame(
 						maxWidth: .infinity,
 						maxHeight: 200,
@@ -33,6 +56,7 @@ struct TranscriptionDisplay: View {
 					)
 					.font(.caption)
 					.id("transcription")
+				}
 			}.onChange(of: transcription) {
 				withAnimation(
 					.easeInOut(duration: 0.3)
@@ -48,10 +72,16 @@ struct TranscriptionDisplay: View {
 	}
 }
 
+private func previewFromTranscript(_ text: String) -> TranscriptionDisplay {
+	let knowledgeGraph: KnowledgeGraph = ExtractKnowledge(text)
+	return TranscriptionDisplay(
+		knowledgeGraph: knowledgeGraph,
+		transcription: text
+	)
+}
+
 #Preview {
-	TranscriptionDisplay(
-		tags: [],
-		transcription:
-			"This bucket of green water may be a mosquito source. We should check back next week."
+	previewFromTranscript(
+		"This bucket of green water may be a mosquito source. We should check back next week."
 	)
 }
