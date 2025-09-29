@@ -148,8 +148,6 @@ struct NoteList: View {
 }
 
 struct NoteListRow: View {
-	let ROW_HEIGHT: CGFloat = 40.0
-
 	let controller: RootController
 	let overview: NoteOverview
 	let userLocation: H3Cell?
@@ -160,28 +158,37 @@ struct NoteListRow: View {
 				noteUUID: overview.id
 			)
 		) {
-			HStack {
-				overview.icon.font(.system(size: 42.0))
-					.frame(width: 80, height: ROW_HEIGHT)
-				NoteListRowIconCluster(icons: overview.icons)
-					.frame(width: 130, height: ROW_HEIGHT)
-				Spacer()
-				NoteListRowTextCluster(
-					overview: overview,
-					userLocation: userLocation
-				).frame(width: 80, height: ROW_HEIGHT)
-				Rectangle().foregroundStyle(overview.color).cornerRadius(10).frame(
-					width: 10,
-					height: ROW_HEIGHT
-				).padding(.zero).offset(x: 28)
-			}
+			NoteListRowContent(overview: overview, userLocation: userLocation)
+		}
+	}
+}
+struct NoteListRowContent: View {
+	let ROW_HEIGHT: CGFloat = 40.0
+
+	let overview: NoteOverview
+	let userLocation: H3Cell?
+	var body: some View {
+		HStack {
+			overview.icon.font(.system(size: 42.0))
+				.frame(width: 80, height: ROW_HEIGHT)
+			NoteListRowIconCluster(icons: overview.icons)
+				.frame(width: 130, height: ROW_HEIGHT)
+			Spacer()
+			NoteListRowTextCluster(
+				overview: overview,
+				userLocation: userLocation
+			).frame(width: 80, height: ROW_HEIGHT)
+			Rectangle().foregroundStyle(overview.color).cornerRadius(10).frame(
+				width: 10,
+				height: ROW_HEIGHT
+			).padding(.zero).offset(x: 28)
 		}
 	}
 }
 
 struct NoteListRowIconCluster: View {
 	let iconsPerRow = 7
-	let icons: [String]
+	let icons: Set<NoteOverviewIcon>
 
 	func calculateIconsPerRow(_ numIcons: Int) -> (Int, Int) {
 		if numIcons <= 2 { return (numIcons, 0) }
@@ -193,45 +200,134 @@ struct NoteListRowIconCluster: View {
 		}
 	}
 
-	func toImage(_ name: String) -> some View {
-		if name.starts(with: "custom.") {
-			let range = name.index(name.startIndex, offsetBy: 7)..<name.endIndex
-			let customName = name[range]
-			return Image(String(customName))
-		}
-		else {
-			return Image(systemName: name)
+	func toImage(_ icon: NoteOverviewIcon) -> some View {
+		let placeholder = Image(systemName: "photo.fill").foregroundStyle(
+			.primary,
+			.red,
+			.blue
+		)
+		switch icon {
+		case .HasComments:
+			return Image(systemName: "quote.bubble").foregroundStyle(
+				.primary,
+				.red,
+				.blue
+			)
+		case .HasHabitat:
+			return Image(systemName: "tree.fill").foregroundStyle(.primary, .red, .blue)
+		case .HasInspections:
+			return Image(systemName: "pencil.and.list.clipboard").foregroundStyle(
+				.primary,
+				.red,
+				.blue
+			)
+		case .HasNextActionScheduled:
+			return Image(systemName: "calendar.and.person").foregroundStyle(
+				.primary,
+				.red,
+				.blue
+			)
+		case .HasTreatments:
+			return Image(systemName: "pill.circle.fill").foregroundStyle(
+				.primary,
+				.red,
+				.blue
+			)
+		case .HasUseType:
+			return Image(systemName: "house.fill").foregroundStyle(
+				.primary,
+				.red,
+				.blue
+			)
+		case .HasWaterOrigin:
+			return Image(systemName: "water.waves").foregroundStyle(
+				.primary,
+				.red,
+				.blue
+			)
+		case .SourceActive:
+			return Image(systemName: "plus.circle.fill").foregroundStyle(
+				.primary,
+				.red,
+				.blue
+			)
+		case .AbundanceTrendUp:
+			return Image(.bargraphUp).resizable().foregroundStyle(.primary, .red, .blue)
+		case .AbundanceTrendDown:
+			return placeholder
+		case .AggressiveAnimal:
+			return Image(.dogSideview).resizable().foregroundStyle(
+				.primary,
+				.red,
+				.blue
+			)
+		case .CallInAdvance:
+			return Image(systemName: "phone.connection").symbolRenderingMode(
+				.multicolor
+			).foregroundStyle(.primary, .red, .blue)
+		case .CompleteDataIndicator:
+			return placeholder
+		case .ContactInformationAvailable:
+			return Image(systemName: "person.crop.circle").foregroundStyle(
+				.primary,
+				.red,
+				.blue
+			)
+		case .FacilitatorIndicator:
+			return placeholder
+		case .FollowupScheduled:
+			return Image(systemName: "calendar.and.person").symbolRenderingMode(
+				.multicolor
+			).foregroundStyle(.primary, .red, .blue)
+		case .InteractionsNoted:
+			return placeholder
+		case .RootCauseIndicator:
+			return placeholder
+		case .PartOfCluster:
+			return placeholder
+		case .PreviousTreatmentFailure:
+			return placeholder
+		case .ProbabilityDeterminedByObservation:
+			return placeholder
+		case .ProblematicResident:
+			return placeholder
+		case .SpeciesFoundPreviously:
+			return placeholder
+		case .SourceProbabilityIndicator:
+			return placeholder
+		default:
+			return Image("mosquito.sideview").resizable().foregroundStyle(
+				.primary,
+				.red,
+				.blue
+			)
 		}
 	}
 
 	var body: some View {
-		let numIcons = icons.count
-		Grid(horizontalSpacing: 1, verticalSpacing: 1) {
+		Grid(horizontalSpacing: 3, verticalSpacing: 1) {
 			GridRow {
 				ForEach(0..<iconsPerRow, id: \.self) { index in
-					if index < numIcons {
-						let i = index
-						let offset_y: CGFloat = 0  //(row == 0 ? -10 : 10)
-						let offset_x: CGFloat = 0  //CGFloat(-10 * i)
-						toImage(icons[i]).frame(width: 20, height: 20)
-							.offset(x: offset_x, y: offset_y)
+					if icons.contains(NoteOverviewIcon.allCases[index]) {
+						toImage(NoteOverviewIcon.allCases[index]).frame(
+							width: 20,
+							height: 20
+						)
 					}
 					else {
-						Color.white.opacity(0.0)
+						Spacer()
 					}
 				}
 			}
 			GridRow {
 				ForEach(0..<iconsPerRow, id: \.self) { index in
-					if index + iconsPerRow < numIcons {
-						let i = index + iconsPerRow
-						let offset_y: CGFloat = 0  //(row == 0 ? -10 : 10)
-						let offset_x: CGFloat = 10  //CGFloat(-10 * i)
-						Image(systemName: icons[i])
-							.offset(x: offset_x, y: offset_y)
+					if icons.contains(NoteOverviewIcon.allCases[index]) {
+						toImage(NoteOverviewIcon.allCases[index]).frame(
+							width: 20,
+							height: 20
+						)
 					}
 					else {
-						//Color.blue
 						Spacer()
 					}
 				}
@@ -304,14 +400,22 @@ struct NoteList_Previews: PreviewProvider {
 			),
 			userLocation: RegionControllerPreview.userCell
 		).previewDisplayName("base")
-		NoteListView(
-			cell: 0x88_2834_7053f_ffff,
-			controller: RootControllerPreview(
-				notes: NotesControllerPreview(
-					model: NotesModel.Preview.notesWithIcons
-				)
+		NavigationView {
+			NoteListView(
+				cell: 0x88_2834_7053f_ffff,
+				controller: RootControllerPreview(
+					notes: NotesControllerPreview(
+						model: NotesModel.Preview.notesWithIcons
+					)
+				),
+				userLocation: RegionControllerPreview.userCell
+			)
+		}.previewDisplayName("icons")
+		NoteListRowContent(
+			overview: noteOverviewPreview(
+				[.AbundanceTrendUp, .SourceProbabilityIndicator]
 			),
 			userLocation: RegionControllerPreview.userCell
-		).previewDisplayName("icons")
+		).previewDisplayName("just icons")
 	}
 }

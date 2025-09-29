@@ -64,7 +64,7 @@ struct ServiceRequestNote: NoteProtocol {
 		return location.coordinate()
 	}
 
-	var icons: [String] {
+	var icons: Set<NoteOverviewIcon> {
 		return []
 	}
 

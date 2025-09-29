@@ -24,7 +24,7 @@ struct NotesModel {
 		static let notesWithIcons: NotesModel = NotesModel.forPreview(notes: [
 			MosquitoSourceNote(
 				access: "",
-				active: true,
+				active: false,
 				comments: "",
 				created: Date.now.advanced(by: -30 * 60 * 24 * 25),
 				description: "",
@@ -37,7 +37,7 @@ struct NotesModel {
 				nextActionDateScheduled: Date.now.advanced(by: -300),
 				treatments: [],
 				useType: "",
-				waterOrigin: "",
+				waterOrigin: "sure",
 				zone: ""
 			),
 			MosquitoSourceNote(
@@ -60,7 +60,7 @@ struct NotesModel {
 			),
 			MosquitoSourceNote(
 				access: "",
-				active: true,
+				active: false,
 				comments: "yes",
 				created: Date.now.advanced(by: -30 * 60 * 24 * 210),
 				description: "",

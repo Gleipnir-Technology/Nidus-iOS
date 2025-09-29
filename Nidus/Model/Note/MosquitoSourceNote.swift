@@ -12,6 +12,7 @@ struct MosquitoSourceNote: NoteProtocol {
 	var created: Date
 	var description: String
 	var habitat: String
+	// habitat is one of 40 discrete string values like "catch_basin" or "slough" or "watering_bowl"
 	let id: UUID
 	var cell: H3Cell
 	var inspections: [Inspection]
@@ -20,6 +21,7 @@ struct MosquitoSourceNote: NoteProtocol {
 	var nextActionDateScheduled: Date
 	var treatments: [Treatment]
 	var useType: String
+	// useType is one of many  string values like "commercial" or "mixed_use"
 	var waterOrigin: String
 	var zone: String
 
@@ -71,34 +73,37 @@ struct MosquitoSourceNote: NoteProtocol {
 			return CLLocationCoordinate2D(latitude: -180, longitude: 180)
 		}
 	}
-	var icons: [String] {
-		var results: [String] = []
-		if active != nil && (active!) {
-			//results.append("plus.circle.fill")
-			results.append("custom.dog.sideview")
+	var icons: Set<NoteOverviewIcon> {
+		var results: Set<NoteOverviewIcon> = []
+
+		if active != nil && active! {
+			results.insert(.SourceActive)
+		}
+		if access != "" {
+			results.insert(.ContactInformationAvailable)
 		}
 		if comments != "" {
-			//results.append("quote.bubble")
-			results.append("custom.bargraph.up")
+			results.insert(.HasComments)
 		}
+		// TODO eliribble
+		// Parse comments and description for useful information
 		if habitat != "" {
-			//results.append("tree.fill")
-			results.append("drop.triangle")
+			results.insert(.HasHabitat)
 		}
 		if inspections.count > 0 {
-			results.append("list.clipboard")
+			results.insert(.HasInspections)
 		}
 		if nextActionDateScheduled > Date.now {
-			results.append("clock")
+			results.insert(.HasNextActionScheduled)
 		}
 		if treatments.count > 0 {
-			results.append("pill.circle.fill")
-		}
-		if waterOrigin != "" {
-			results.append("water.waves")
+			results.insert(.HasTreatments)
 		}
 		if useType != "" {
-			results.append("house.fill")
+			results.insert(.HasUseType)
+		}
+		if waterOrigin != "" {
+			results.insert(.HasWaterOrigin)
 		}
 		return results
 	}
