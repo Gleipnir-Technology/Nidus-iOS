@@ -37,7 +37,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 	)
 	// Hacky, just for a demo
 	for (i, token) in tokens.enumerated() {
-		if i < 5 { continue }
+		if i < 3 { continue }
 		let tokens: [LexToken] = Array(tokens[i - 2..<i + 1])
 		let words: [String] = tokens.map { t in
 			String(text[t.range]).lowercased()
