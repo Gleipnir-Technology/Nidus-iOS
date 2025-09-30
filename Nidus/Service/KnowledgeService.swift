@@ -36,7 +36,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 		transcriptTags: []
 	)
 	// Hacky, just for a demo
-	for (i, token) in tokens.enumerated() {
+	for (i, _) in tokens.enumerated() {
 		if i < 3 { continue }
 		let tokens: [LexToken] = Array(tokens[i - 2..<i + 1])
 		let words: [String] = tokens.map { t in
@@ -157,7 +157,7 @@ private func extractBreedingGraph(
 	var genus: Genus?
 	var quantity: Int?
 	var stage: LifeStage?
-	var treatment: TreatmentType?
+	let treatment: TreatmentType?
 	for (i, token) in tokens.enumerated() {
 		if token.type == NLTag.noun {
 			let word = text[token.range].lowercased()

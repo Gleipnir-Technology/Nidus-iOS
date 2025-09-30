@@ -295,12 +295,6 @@ struct NoteListRowIconCluster: View {
 			return placeholder
 		case .SourceProbabilityIndicator:
 			return placeholder
-		default:
-			return Image("mosquito.sideview").resizable().foregroundStyle(
-				.primary,
-				.red,
-				.blue
-			)
 		}
 	}
 

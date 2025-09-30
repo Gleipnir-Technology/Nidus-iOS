@@ -25,7 +25,7 @@ final class HexOverlayRenderer: MKOverlayRenderer {
 		}
 
 		for cellType in NoteType.allCases {
-			var color = UIColor(colorForNoteType(cellType))
+			let color = UIColor(colorForNoteType(cellType))
 			let cellsForCurrentType = hexOverlay.cellBucketsByType[cellType] ?? [:]
 			var maxCount: UInt = 0
 			do {
