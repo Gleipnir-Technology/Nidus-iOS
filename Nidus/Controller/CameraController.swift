@@ -183,7 +183,8 @@ final class CameraController: Camera {
 			do {
 				// If currently recording, stop the recording and write the movie to the library.
 				let movie = try await captureService.stopRecording()
-				try await mediaLibrary.save(movie: movie)
+				// Don't save to the photo library
+				//try await mediaLibrary.save(movie: movie)
 			}
 			catch {
 				self.error = error
