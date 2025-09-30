@@ -157,7 +157,6 @@ private func extractBreedingGraph(
 	var genus: Genus?
 	var quantity: Int?
 	var stage: LifeStage?
-	let treatment: TreatmentType?
 	for (i, token) in tokens.enumerated() {
 		if token.type == NLTag.noun {
 			let word = text[token.range].lowercased()
@@ -196,7 +195,7 @@ private func extractBreedingGraph(
 		genus: genus,
 		quantity: quantity,
 		stage: stage,
-		treatment: treatment
+		treatment: nil
 	)
 }
 
