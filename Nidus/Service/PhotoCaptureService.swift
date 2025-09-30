@@ -67,10 +67,13 @@ final class PhotoCapture: OutputService {
 		if let previewPhotoPixelFormatType = photoSettings
 			.availablePreviewPhotoPixelFormatTypes.first
 		{
-			photoSettings.previewPhotoFormat = [
-				kCVPixelBufferPixelFormatTypeKey as String:
-					previewPhotoPixelFormatType
-			]
+			photoSettings.previewPhotoFormat =
+				[
+					kCVPixelBufferPixelFormatTypeKey:
+						previewPhotoPixelFormatType,
+					kCVPixelBufferWidthKey: 512,
+					kCVPixelBufferHeightKey: 512,
+				] as [String: Any]
 		}
 
 		/// Set the largest dimensions that the photo output supports.
