@@ -14,35 +14,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		53C0FDD12E834DA400E716B8 /* PBXContainerItemProxy */ = {
+		53E142032E8C56D400723D0D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 53D57B422D79E2A20094740D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 53D57B492D79E2A20094740D;
 			remoteInfo = "Nidus Notes";
 		};
-		53D57B5C2D79E2A30094740D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 53D57B422D79E2A20094740D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 53D57B492D79E2A20094740D;
-			remoteInfo = Nidus;
-		};
-		53D57B662D79E2A30094740D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 53D57B422D79E2A20094740D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 53D57B492D79E2A20094740D;
-			remoteInfo = Nidus;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		532F3AD82DE76EF8006E0E40 /* Nidus-Notes-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Nidus-Notes-Info.plist"; sourceTree = "<group>"; };
-		53C0FDD02E834DA400E716B8 /* Nidus Notes Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Nidus Notes Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D57B4A2D79E2A20094740D /* Nidus Notes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Nidus Notes.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		53D57B5B2D79E2A30094740D /* Nidus NotesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Nidus NotesTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		53D57B652D79E2A30094740D /* Nidus NotesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Nidus NotesUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		53E141FF2E8C56D400723D0D /* Nidus Notes Unit Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Nidus Notes Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -51,16 +35,14 @@
 			path = Nidus;
 			sourceTree = "<group>";
 		};
+		53E142002E8C56D400723D0D /* Nidus Notes Unit Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Nidus Notes Unit Tests";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		53C0FDCD2E834DA400E716B8 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		53D57B472D79E2A20094740D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -72,14 +54,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		53D57B582D79E2A30094740D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		53D57B622D79E2A30094740D /* Frameworks */ = {
+		53E141FC2E8C56D400723D0D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -94,6 +69,7 @@
 			children = (
 				532F3AD82DE76EF8006E0E40 /* Nidus-Notes-Info.plist */,
 				538BFC6E2E3C36650064A6A5 /* Nidus */,
+				53E142002E8C56D400723D0D /* Nidus Notes Unit Tests */,
 				53D57B4B2D79E2A20094740D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -102,9 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				53D57B4A2D79E2A20094740D /* Nidus Notes.app */,
-				53D57B5B2D79E2A30094740D /* Nidus NotesTests.xctest */,
-				53D57B652D79E2A30094740D /* Nidus NotesUITests.xctest */,
-				53C0FDD02E834DA400E716B8 /* Nidus Notes Tests.xctest */,
+				53E141FF2E8C56D400723D0D /* Nidus Notes Unit Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -112,26 +86,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		53C0FDCF2E834DA400E716B8 /* Nidus Notes Tests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 53C0FDD32E834DA400E716B8 /* Build configuration list for PBXNativeTarget "Nidus Notes Tests" */;
-			buildPhases = (
-				53C0FDCC2E834DA400E716B8 /* Sources */,
-				53C0FDCD2E834DA400E716B8 /* Frameworks */,
-				53C0FDCE2E834DA400E716B8 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				53C0FDD22E834DA400E716B8 /* PBXTargetDependency */,
-			);
-			name = "Nidus Notes Tests";
-			packageProductDependencies = (
-			);
-			productName = "Nidus Notes Tests";
-			productReference = 53C0FDD02E834DA400E716B8 /* Nidus Notes Tests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		53D57B492D79E2A20094740D /* Nidus Notes */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 53D57B6F2D79E2A30094740D /* Build configuration list for PBXNativeTarget "Nidus Notes" */;
@@ -159,45 +113,28 @@
 			productReference = 53D57B4A2D79E2A20094740D /* Nidus Notes.app */;
 			productType = "com.apple.product-type.application";
 		};
-		53D57B5A2D79E2A30094740D /* Nidus NotesTests */ = {
+		53E141FE2E8C56D400723D0D /* Nidus Notes Unit Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 53D57B722D79E2A30094740D /* Build configuration list for PBXNativeTarget "Nidus NotesTests" */;
+			buildConfigurationList = 53E142052E8C56D400723D0D /* Build configuration list for PBXNativeTarget "Nidus Notes Unit Tests" */;
 			buildPhases = (
-				53D57B572D79E2A30094740D /* Sources */,
-				53D57B582D79E2A30094740D /* Frameworks */,
-				53D57B592D79E2A30094740D /* Resources */,
+				53E141FB2E8C56D400723D0D /* Sources */,
+				53E141FC2E8C56D400723D0D /* Frameworks */,
+				53E141FD2E8C56D400723D0D /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				53D57B5D2D79E2A30094740D /* PBXTargetDependency */,
+				53E142042E8C56D400723D0D /* PBXTargetDependency */,
 			);
-			name = "Nidus NotesTests";
+			fileSystemSynchronizedGroups = (
+				53E142002E8C56D400723D0D /* Nidus Notes Unit Tests */,
+			);
+			name = "Nidus Notes Unit Tests";
 			packageProductDependencies = (
 			);
-			productName = NidusTests;
-			productReference = 53D57B5B2D79E2A30094740D /* Nidus NotesTests.xctest */;
+			productName = "Nidus Notes Unit Tests";
+			productReference = 53E141FF2E8C56D400723D0D /* Nidus Notes Unit Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		53D57B642D79E2A30094740D /* Nidus NotesUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 53D57B752D79E2A30094740D /* Build configuration list for PBXNativeTarget "Nidus NotesUITests" */;
-			buildPhases = (
-				53D57B612D79E2A30094740D /* Sources */,
-				53D57B622D79E2A30094740D /* Frameworks */,
-				53D57B632D79E2A30094740D /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				53D57B672D79E2A30094740D /* PBXTargetDependency */,
-			);
-			name = "Nidus NotesUITests";
-			packageProductDependencies = (
-			);
-			productName = NidusUITests;
-			productReference = 53D57B652D79E2A30094740D /* Nidus NotesUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
@@ -209,18 +146,10 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
-					53C0FDCF2E834DA400E716B8 = {
-						CreatedOnToolsVersion = 16.2;
-						TestTargetID = 53D57B492D79E2A20094740D;
-					};
 					53D57B492D79E2A20094740D = {
 						CreatedOnToolsVersion = 16.2;
 					};
-					53D57B5A2D79E2A30094740D = {
-						CreatedOnToolsVersion = 16.2;
-						TestTargetID = 53D57B492D79E2A20094740D;
-					};
-					53D57B642D79E2A30094740D = {
+					53E141FE2E8C56D400723D0D = {
 						CreatedOnToolsVersion = 16.2;
 						TestTargetID = 53D57B492D79E2A20094740D;
 					};
@@ -247,21 +176,12 @@
 			projectRoot = "";
 			targets = (
 				53D57B492D79E2A20094740D /* Nidus Notes */,
-				53D57B5A2D79E2A30094740D /* Nidus NotesTests */,
-				53D57B642D79E2A30094740D /* Nidus NotesUITests */,
-				53C0FDCF2E834DA400E716B8 /* Nidus Notes Tests */,
+				53E141FE2E8C56D400723D0D /* Nidus Notes Unit Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		53C0FDCE2E834DA400E716B8 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		53D57B482D79E2A20094740D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -269,14 +189,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		53D57B592D79E2A30094740D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		53D57B632D79E2A30094740D /* Resources */ = {
+		53E141FD2E8C56D400723D0D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -308,13 +221,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		53C0FDCC2E834DA400E716B8 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		53D57B462D79E2A20094740D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -322,14 +228,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		53D57B572D79E2A30094740D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		53D57B612D79E2A30094740D /* Sources */ = {
+		53E141FB2E8C56D400723D0D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -339,67 +238,14 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		53C0FDD22E834DA400E716B8 /* PBXTargetDependency */ = {
+		53E142042E8C56D400723D0D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 53D57B492D79E2A20094740D /* Nidus Notes */;
-			targetProxy = 53C0FDD12E834DA400E716B8 /* PBXContainerItemProxy */;
-		};
-		53D57B5D2D79E2A30094740D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 53D57B492D79E2A20094740D /* Nidus Notes */;
-			targetProxy = 53D57B5C2D79E2A30094740D /* PBXContainerItemProxy */;
-		};
-		53D57B672D79E2A30094740D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 53D57B492D79E2A20094740D /* Nidus Notes */;
-			targetProxy = 53D57B662D79E2A30094740D /* PBXContainerItemProxy */;
+			targetProxy = 53E142032E8C56D400723D0D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		53C0FDD42E834DA400E716B8 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = D392HWX27T;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "technology.gleipnir.Nidus-Notes-Tests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = xros;
-				SUPPORTED_PLATFORMS = "xros xrsimulator";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 7;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nidus Notes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nidus Notes";
-				XROS_DEPLOYMENT_TARGET = 2.2;
-			};
-			name = Debug;
-		};
-		53C0FDD52E834DA400E716B8 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = D392HWX27T;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "technology.gleipnir.Nidus-Notes-Tests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = xros;
-				SUPPORTED_PLATFORMS = "xros xrsimulator";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 7;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nidus Notes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nidus Notes";
-				VALIDATE_PRODUCT = YES;
-				XROS_DEPLOYMENT_TARGET = 2.2;
-			};
-			name = Release;
-		};
 		53D57B6D2D79E2A30094740D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -557,10 +403,11 @@
 				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.apps.nidus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Debug;
@@ -605,120 +452,59 @@
 				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.apps.nidus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Release;
 		};
-		53D57B732D79E2A30094740D /* Debug */ = {
+		53E142062E8C56D400723D0D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = D392HWX27T;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.NidusTests;
+				PRODUCT_BUNDLE_IDENTIFIER = "technology.gleipnir.Nidus-Notes-Unit-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nidus Notes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nidus Notes";
-				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Debug;
 		};
-		53D57B742D79E2A30094740D /* Release */ = {
+		53E142072E8C56D400723D0D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = D392HWX27T;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.NidusTests;
+				PRODUCT_BUNDLE_IDENTIFIER = "technology.gleipnir.Nidus-Notes-Unit-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nidus Notes.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nidus Notes";
-				XROS_DEPLOYMENT_TARGET = 2.2;
-			};
-			name = Release;
-		};
-		53D57B762D79E2A30094740D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = D392HWX27T;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MACOSX_DEPLOYMENT_TARGET = 15.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.NidusUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = Nidus;
-				XROS_DEPLOYMENT_TARGET = 2.2;
-			};
-			name = Debug;
-		};
-		53D57B772D79E2A30094740D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = D392HWX27T;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MACOSX_DEPLOYMENT_TARGET = 15.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = technology.gleipnir.NidusUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = Nidus;
-				XROS_DEPLOYMENT_TARGET = 2.2;
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		53C0FDD32E834DA400E716B8 /* Build configuration list for PBXNativeTarget "Nidus Notes Tests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				53C0FDD42E834DA400E716B8 /* Debug */,
-				53C0FDD52E834DA400E716B8 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		53D57B452D79E2A20094740D /* Build configuration list for PBXProject "Nidus Notes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -737,20 +523,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		53D57B722D79E2A30094740D /* Build configuration list for PBXNativeTarget "Nidus NotesTests" */ = {
+		53E142052E8C56D400723D0D /* Build configuration list for PBXNativeTarget "Nidus Notes Unit Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				53D57B732D79E2A30094740D /* Debug */,
-				53D57B742D79E2A30094740D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		53D57B752D79E2A30094740D /* Build configuration list for PBXNativeTarget "Nidus NotesUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				53D57B762D79E2A30094740D /* Debug */,
-				53D57B772D79E2A30094740D /* Release */,
+				53E142062E8C56D400723D0D /* Debug */,
+				53E142072E8C56D400723D0D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

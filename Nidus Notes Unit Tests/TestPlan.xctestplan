@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "9D0330DB-6590-4C89-B7B2-8D1CAFD18A5E",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Nidus Notes.xcodeproj",
+        "identifier" : "53E141FE2E8C56D400723D0D",
+        "name" : "Nidus Notes Unit Tests"
+      }
+    }
+  ],
+  "version" : 1
+}
