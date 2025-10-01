@@ -126,7 +126,7 @@ final class CameraController: Camera {
 				qualityPrioritization: qualityPrioritization
 			)
 			let photo = try await captureService.capturePhoto(with: photoFeatures)
-			try await mediaLibrary.save(photo: photo)
+			//try await mediaLibrary.save(photo: photo)
 			handlePictureSave(photo)
 		}
 		catch {
