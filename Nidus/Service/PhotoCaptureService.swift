@@ -7,9 +7,13 @@
 
 import AVFoundation
 import CoreImage
+import UIKit
+
+//import VideoToolbox
 
 enum PhotoCaptureError: Error {
 	case noPhotoData
+	case noPreviewData
 }
 
 /// An object that manages a photo capture output to perform take photographs.
@@ -171,6 +175,7 @@ private class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate {
 	private var isProxyPhoto = false
 
 	private var photoData: Data?
+	private var previewData: Data?
 	private var livePhotoMovieURL: URL?
 
 	/// A stream of capture activity values that indicate the current state of progress.
@@ -257,6 +262,11 @@ private class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate {
 			return
 		}
 		photoData = photo.fileDataRepresentation()
+		guard let previewPixelBuffer = photo.previewPixelBuffer else { return }
+		//VTCreateCGImageFromCVPixelBuffer(previewPixelBuffer, options: nil, imageOut
+		let ciImage = CIImage(cvPixelBuffer: previewPixelBuffer)
+		let uiImage = UIImage(ciImage: ciImage)
+		previewData = uiImage.pngData()
 	}
 
 	func photoOutput(
@@ -282,9 +292,15 @@ private class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate {
 			return
 		}
 
+		guard let previewData else {
+			continuation.resume(throwing: PhotoCaptureError.noPreviewData)
+			return
+		}
+
 		/// Create a photo object to save to the `MediaLibrary`.
 		let photo = Photo(
 			data: photoData,
+			dataPreview: previewData,
 			isProxy: isProxyPhoto,
 			livePhotoMovieURL: livePhotoMovieURL
 		)

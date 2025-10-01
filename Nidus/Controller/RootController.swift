@@ -175,6 +175,9 @@ class RootController {
 		let url = PictureNote.url(uuid)
 		try picture.data.write(to: url)
 		Logger.foreground.info("Saved photo file to \(url)")
+		let urlPreview = PictureNote.url(uuid)
+		try picture.dataPreview.write(to: urlPreview)
+		Logger.foreground.info("Saved photo preview to \(url)")
 		let note = PictureNote(
 			id: uuid,
 			cell: location,

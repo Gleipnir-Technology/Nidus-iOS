@@ -146,6 +146,7 @@ enum CaptureMode: String, Identifiable, CaseIterable, Codable {
 /// A structure that represents a captured photo.
 struct Photo: Sendable {
 	let data: Data
+	let dataPreview: Data
 	let isProxy: Bool
 	let livePhotoMovieURL: URL?
 }

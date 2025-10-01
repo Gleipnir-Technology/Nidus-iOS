@@ -2,6 +2,7 @@ import Foundation
 import H3
 import MapKit
 import OSLog
+import SwiftUI
 
 class PictureNote: NoteProtocol, Codable {
 	enum CodingKeys: CodingKey {
@@ -53,14 +54,24 @@ class PictureNote: NoteProtocol, Codable {
 		return .picture
 	}
 
-	static func url(_ uuid: UUID) -> URL {
+	static func url(_ uuid: UUID, ext: String = "photo") -> URL {
 		let supportURL = try! FileManager.default.url(
 			for: .applicationSupportDirectory,
 			in: .userDomainMask,
 			appropriateFor: nil,
 			create: true
 		)
-		return supportURL.appendingPathComponent("\(uuid).png")
+		return supportURL.appendingPathComponent("\(uuid).\(ext)")
+	}
+
+	static func urlForPreview(_ uuid: UUID) -> URL {
+		let supportURL = try! FileManager.default.url(
+			for: .applicationSupportDirectory,
+			in: .userDomainMask,
+			appropriateFor: nil,
+			create: true
+		)
+		return supportURL.appendingPathComponent("\(uuid)-preview.png")
 	}
 
 	func encode(to encoder: Encoder) throws {
@@ -97,7 +108,7 @@ class PictureNote: NoteProtocol, Codable {
 	var overview: NoteOverview {
 		return NoteOverview(
 			color: colorForNoteType(category),
-			icon: iconForNoteType(category),
+			icon: thumbnail,
 			icons: [],
 			id: id,
 			location: cell,
@@ -105,28 +116,75 @@ class PictureNote: NoteProtocol, Codable {
 			type: category
 		)
 	}
+	var thumbnail: Image {
+		let url = PictureNote.urlForPreview(id)
+		do {
+			let data = try Data(contentsOf: url)
+			guard let image = UIImage(data: data) else {
+				return Image(uiImage: PLACEHOLDER!)
+			}
+			return Image(uiImage: image).resizable()
+		}
+		catch {
+			Logger.foreground.error(
+				"Failed to read thumbnail image from \(url): \(error)"
+			)
+			guard let generated = generateThumbnailOrPlaceholder() else {
+				return Image(uiImage: PLACEHOLDER!).resizable()
+			}
+			return Image(uiImage: generated).resizable()
+		}
+	}
+
+	func generateThumbnailOrPlaceholder() -> UIImage? {
+		do {
+			let image = try loadImage()
+			let size = CGSize(width: 128, height: 128)
+			UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+			image.draw(in: CGRect(origin: CGPoint.zero, size: size))
+			let thumbnailImage = UIGraphicsGetImageFromCurrentImageContext()
+			UIGraphicsEndImageContext()
+			return thumbnailImage
+		}
+		catch {
+			Logger.foreground.error(
+				"Failed to load image: \(error). Can't generate thumbnail"
+			)
+			return nil
+		}
+	}
+
+	func loadImage() throws -> UIImage {
+		let url = PictureNote.url(id)
+		let imagedata = try Data(contentsOf: url)
+		guard let image = UIImage(data: imagedata) else {
+			Logger.foreground.error(
+				"Failed to load image from \(url), trying alternate"
+			)
+			// If we get here, try a different extension in case its an older image
+			let urlAlt = PictureNote.url(id, ext: "png")
+			let imageDataAlt = try Data(contentsOf: urlAlt)
+			guard let imageAlt = UIImage(data: imageDataAlt) else {
+				Logger.foreground.error(
+					"Failed to load image from \(urlAlt), giving up"
+				)
+				return PLACEHOLDER!
+			}
+			return imageAlt
+		}
+		return image
+	}
+
 	var uiImage: UIImage {
 		// For previews!
 		if self.named != nil {
 			return UIImage(named: self.named!) ?? PLACEHOLDER!
 		}
-
-		let url = try! FileManager.default.url(
-			for: .applicationSupportDirectory,
-			in: .userDomainMask,
-			appropriateFor: nil,
-			create: true
-		).appendingPathComponent("\(id).photo")
 		do {
-			let imagedata = try Data(contentsOf: url)
-			guard let image = UIImage(data: imagedata) else {
-				Logger.foreground.error("Failed to load image from \(url)")
-				return PLACEHOLDER!
-			}
-			return image
+			return try loadImage()
 		}
 		catch {
-			Logger.foreground.error("Failed to read image from \(url): \(error)")
+			Logger.foreground.error("Failed to load image, using placeholder")
 			return PLACEHOLDER!
 		}
 	}
