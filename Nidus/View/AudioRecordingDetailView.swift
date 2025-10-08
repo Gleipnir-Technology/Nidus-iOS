@@ -64,70 +64,63 @@ struct AudioRecordingDetailView: View {
 
 struct AudioRecordingDetailViewPreview: View {
 	var transcription: String
+	var isRecording: Bool
+	var recordingDuration: TimeInterval
 
-	init(_ transcription: String) {
+	init(_ transcription: String, isRecording: Bool = true, recordingDuration: TimeInterval = 0)
+	{
 		self.transcription = transcription
+		self.isRecording = isRecording
+		self.recordingDuration = recordingDuration
 	}
+
 	var body: some View {
-		AudioRecordingDetailView(
-			controller: AudioRecordingControllerPreview(
-				AudioRecordingStore(
-					hasPermissionTranscription: true,
-					isRecording: true,
-					knowledgeGraph: nil,
-					transcription: transcription
-				)
-			)
-		)
+		// This is duplicated from RootView to ensure the previews are nested correctly
+		NavigationStack {
+			GeometryReader { geometry in
+				VStack {
+					AudioRecordingDetailView(
+						controller: AudioRecordingControllerPreview(
+							AudioRecordingStore(
+								hasPermissionTranscription: true,
+								isRecording: isRecording,
+								knowledgeGraph: nil,
+								transcription: transcription
+							)
+						)
+					)
+				}
+			}
+		}
 	}
 }
 
 struct AudioDetailView_Previews: PreviewProvider {
 	static var previews: some View {
-		let store = AudioRecordingStore()
-		AudioRecordingDetailView(controller: AudioRecordingControllerPreview(store))
+		AudioRecordingDetailViewPreview("", isRecording: false)
 			.previewDisplayName("Not recording")
-		AudioRecordingDetailView(
-			controller: AudioRecordingControllerPreview(
-				AudioRecordingStore(
-					isRecording: true,
-					recordingDuration: 60 * 2 + 15
-				)
-			)
+
+		AudioRecordingDetailViewPreview(
+			"",
+			isRecording: true,
+			recordingDuration: 60 * 2 + 15
+		)
+		.previewDisplayName("recording")
+
+		AudioRecordingDetailViewPreview(
+			"This is a test transcription",
+			isRecording: true,
+			recordingDuration: 60 * 2 + 15
+		).previewDisplayName("with transcription")
+
+		AudioRecordingDetailViewPreview(
+			"Checking orchards at Avenue 300 and Road 140. 92 degrees, full sun. Rows five through nine have deep ruts still wet from last week’s flood irrigation. Soil is clay-heavy, tractor ruts holding water. Orchard is mature citrus. Took five dips, each with between twenty and a hundred larvae, mostly third and fourth instar Culex. Treated rut areas with one pound of VectoMax FG. Spoke with Jim, the foreman who manages the site. Told him the ruts are producing mosquitoes — he said he’ll have someone grade them before the next irrigation in two weeks. Gave me his number 559-555-5555 and said to call if anything comes up. Need to check back in two weeks to confirm the issue’s resolved."
 		).previewDisplayName(
-			"recording"
-		)
-
-		VStack {
-			Spacer().background(.blue)
-			AudioRecordingDetailView(
-				controller: AudioRecordingControllerPreview(
-					AudioRecordingStore(
-						hasPermissionTranscription: true,
-						isRecording: true,
-						recordingDuration: 60 * 2 + 15,
-						transcription: "This is a test transcription"
-					)
-				)
-			)
-		}.previewDisplayName(
-			"with transcription"
-		)
-
-		VStack {
-			Spacer()
-			AudioRecordingDetailViewPreview(
-				"Checking orchards at Avenue 300 and Road 140. 92 degrees, full sun. Rows five through nine have deep ruts still wet from last week’s flood irrigation. Soil is clay-heavy, tractor ruts holding water. Orchard is mature citrus. Took five dips, each with between twenty and a hundred larvae, mostly third and fourth instar Culex. Treated rut areas with one pound of VectoMax FG. Spoke with Jim, the foreman who manages the site. Told him the ruts are producing mosquitoes — he said he’ll have someone grade them before the next irrigation in two weeks. Gave me his number 559-555-5555 and said to call if anything comes up. Need to check back in two weeks to confirm the issue’s resolved."
-			)
-		}.previewDisplayName(
 			"with transcription with tags"
 		)
 
-		VStack {
-			Spacer()
-			AudioRecordingDetailViewPreview(
-				"I am at 123 Main Street. I see a flooded gutter."
-			)
-		}.previewDisplayName("demo script 1")
+		AudioRecordingDetailViewPreview(
+			"I am at 123 Main Street. I see a flooded gutter."
+		).previewDisplayName("demo script 1")
 	}
 }
