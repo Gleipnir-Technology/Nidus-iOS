@@ -18,7 +18,7 @@ struct RootView: View {
 
 	// Stuff I'm not sure about yet
 	@State var didSelect: Bool = false
-	@State var activeView: ActiveView = .breadcrumb
+	@State var activeView: ActiveView
 	@FocusState var isTextFieldFocused: Bool
 	@State var location: CLLocation = Initial.location
 	@State private var path = NavigationPath()
@@ -29,7 +29,8 @@ struct RootView: View {
 
 	// An indication of the scene's operational state.
 	@Environment(\.scenePhase) var scenePhase
-	init(controller: RootController) {
+	init(activeView: ActiveView = .breadcrumb, controller: RootController) {
+		self.activeView = activeView
 		self.controller = controller
 		controller.onInit()
 	}
@@ -249,6 +250,21 @@ struct RootView_Previews: PreviewProvider {
 			)
 		).previewDisplayName("recording")
 		RootView(
+			activeView: .audio,
+			controller: RootControllerPreview(
+				audioRecording: AudioRecordingControllerPreview(
+					AudioRecordingStore(
+						hasPermissionTranscription: true,
+						isRecording: true,
+						recordingDuration: 63,
+						transcription:
+							"This is some words I pretended to say"
+					)
+				)
+			)
+		).previewDisplayName("recording detail view")
+		RootView(
+
 			controller: RootControllerPreview(
 				network: NetworkControllerPreview(
 					backgroundNetworkProgress: 0.33,
