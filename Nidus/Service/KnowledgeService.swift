@@ -60,7 +60,19 @@ private func extractCount(
 }
 private func tokensToWords(_ tokens: [LexToken], _ text: String) -> [String] {
 	return tokens.map { t in
-		String(text[t.range].lowercased())
+		var range = t.range
+		let lastCharIndex = t.range.upperBound
+		if lastCharIndex > range.lowerBound,
+			let prevIndex = text.index(
+				t.range.upperBound,
+				offsetBy: -1,
+				limitedBy: text.startIndex
+			),
+			text[prevIndex] == "."
+		{
+			range = range.lowerBound..<prevIndex
+		}
+		return String(text[range])
 	}
 }
 
