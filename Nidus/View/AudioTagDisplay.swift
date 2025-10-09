@@ -127,7 +127,7 @@ struct AudioTagFieldseekerMosquitoSource: View {
 					prompt: "species",
 					promptChoices: ["Aedes", "Culex"],
 					isDone: knowledge.hasSpecies,
-					value: knowledge.breeding.species
+					value: knowledge.breeding.genus
 				)
 				AudioTagFieldseekerReportField(
 					name: "Conditions",
