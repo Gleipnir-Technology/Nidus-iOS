@@ -45,17 +45,15 @@ private func createGramToken(_ tokens: [LexToken], number: Int = 3, offset: Int)
 private func extractCount(
 	count: inout Int?,
 	transcript: inout [TranscriptTag],
-	token: LexToken?,
+	tokens: [LexToken?],
 	word: String
 ) {
-	guard let token = token else {
-		Logger.foreground.error("Got a nil token, this is a programmer error.")
-		return
-	}
-	addTranscriptionTag(&transcript, token, .Measurement)
+	guard let firstToken = tokens[0] else { return }
+	addTranscriptionTag(&transcript, firstToken, .Measurement)
 	count = extractInt(word)
 	if count != nil {
-		addTranscriptionTag(&transcript, token, .Measurement)
+		guard let secondToken = tokens[1] else { return }
+		addTranscriptionTag(&transcript, secondToken, .Measurement)
 	}
 }
 private func tokensToWords(_ tokens: [LexToken], _ text: String) -> [String] {
@@ -105,7 +103,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			extractCount(
 				count: &result.breeding.eggQuantity,
 				transcript: &result.transcriptTags,
-				token: threetok[1],
+				tokens: threetok,
 				word: threegram[1]
 			)
 		}
@@ -113,7 +111,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			extractCount(
 				count: &result.breeding.larvaeQuantity,
 				transcript: &result.transcriptTags,
-				token: threetok[1],
+				tokens: threetok,
 				word: threegram[1]
 			)
 		}
@@ -121,7 +119,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			extractCount(
 				count: &result.fieldseeker.dipCount,
 				transcript: &result.transcriptTags,
-				token: threetok[1],
+				tokens: threetok,
 				word: threegram[1]
 			)
 		}
@@ -129,7 +127,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			extractCount(
 				count: &result.breeding.pupaeQuantity,
 				transcript: &result.transcriptTags,
-				token: threetok[1],
+				tokens: threetok,
 				word: threegram[1]
 			)
 		}
