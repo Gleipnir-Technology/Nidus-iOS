@@ -43,7 +43,7 @@ struct AudioTagFieldseekerReportType: View {
 
 	var body: some View {
 		if isComplete {
-			Text("FS: \(name)").font(.system(size: 10)).frame(
+			Text("FS: \(name)").font(.system(size: 12)).frame(
 				height: 15
 			).padding(5).background(
 				RoundedRectangle(cornerRadius: 30, style: .continuous).fill(
@@ -52,7 +52,7 @@ struct AudioTagFieldseekerReportType: View {
 			)
 		}
 		else {
-			Text("FS: \(name)").font(.system(size: 10)).frame(
+			Text("FS: \(name)").font(.system(size: 12)).frame(
 				height: 15
 			).padding(5).background(
 				RoundedRectangle(cornerRadius: 30, style: .continuous).fill(
@@ -70,7 +70,7 @@ struct AudioTagFieldseekerReportField<T: CustomStringConvertible>: View {
 	let isDone: Bool
 	let value: T?
 
-	var font: Font { .system(size: 8) }
+	var font: Font { .system(size: 13) }
 	var body: some View {
 		GridRow {
 			if isDone {
