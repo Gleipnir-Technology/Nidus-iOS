@@ -53,7 +53,10 @@ struct AudioRecordingDetailView: View {
 				.padding()
 			}
 			else {
-				Text("Not recording")
+				Text("Press the record button below to begin recording").frame(
+					maxWidth: .infinity,
+					alignment: .center
+				)
 			}
 		}.navigationTitle("Recording Details").navigationBarTitleDisplayMode(.inline)
 	}
