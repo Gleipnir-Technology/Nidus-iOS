@@ -5,17 +5,40 @@ struct AdultProductionKnowledgeGraph {
 	var landingCounts: String?
 }
 
-enum LifeStage {
+enum LifeStage: CustomStringConvertible {
 	case FirstInstar
 	case SecondInstar
 	case ThirdInstar
+
+	var description: String {
+		switch self {
+		case .FirstInstar:
+			"First instar"
+		case .SecondInstar:
+			"Second instar"
+		case .ThirdInstar:
+			"Third instar"
+		}
+	}
 }
 
-enum Genus {
+enum Genus: CustomStringConvertible {
 	case Aedes
 	case Aegypti
 	case Culex
 	case Quinks
+	var description: String {
+		switch self {
+		case .Aedes:
+			"Aedes"
+		case .Aegypti:
+			"Aegypti"
+		case .Culex:
+			"Culex"
+		case .Quinks:
+			"Quinks"
+		}
+	}
 }
 
 enum TreatmentType {
@@ -23,6 +46,7 @@ enum TreatmentType {
 }
 
 struct BreedingKnowledgeGraph {
+	var eggQuantity: Int?
 	var genus: Genus?
 	var larvaeQuantity: Int?
 	var pupaeQuantity: Int?
@@ -83,11 +107,17 @@ struct KnowledgeGraph {
 		return breeding.genus != nil || breeding.stage != nil
 			|| breeding.treatment != nil
 	}
+	var hasConditions: Bool {
+		return rootCause.conditions != nil
+	}
 	var hasDipCount: Bool {
 		return fieldseeker.dipCount != nil
 	}
 	var hasDriver: Bool {
 		return driver.behaviorModification != nil || driver.contact != nil
+	}
+	var hasEggCount: Bool {
+		return breeding.eggQuantity != nil
 	}
 	var hasFacilitator: Bool {
 		return facilitator.blocking != nil || facilitator.pathToRootCause != nil
@@ -106,8 +136,15 @@ struct KnowledgeGraph {
 	var hasPupaeCount: Bool {
 		return breeding.pupaeQuantity != nil
 	}
+	var hasSpecies: Bool {
+		// Say it with me kids, "genus isn't species Fieldseeker"
+		return breeding.genus != nil
+	}
 	var hasSource: Bool {
 		return source.type != nil || source.volume != nil
+	}
+	var hasStage: Bool {
+		return breeding.stage != nil
 	}
 	var impliesAdultProduction: Bool {
 		return hasAdultProduction || hasBreeding

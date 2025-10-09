@@ -41,7 +41,14 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 		if i < 3 { continue }
 		let tokens: [LexToken] = Array(tokens[i - 2..<i + 1])
 		let words: [String] = tokens.map { t in
-			String(text[t.range]).lowercased()
+			if text[t.range.upperBound] == "." {
+				//let newRange = text.range
+				//String(text[t.range.lowerBound...t.range.upperBound-1]).lowercased()
+				String(text[t.range].lowercased())
+			}
+			else {
+				String(text[t.range].lowercased())
+			}
 		}
 		if words[1] == "flooded" && words[2] == "gutter" {
 			result.source.type = .Flood
@@ -84,6 +91,13 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			addTranscriptionTag(&result, tokens[0], .Measurement)
 			addTranscriptionTag(&result, tokens[1], .Measurement)
 		}
+		else if words[2] == "egg" || words[2] == "eggs" {
+			addTranscriptionTag(&result, tokens[2], .Measurement)
+			result.breeding.eggQuantity = extractInt(words[1])
+			if result.breeding.eggQuantity != nil {
+				addTranscriptionTag(&result, tokens[1], .Measurement)
+			}
+		}
 		else if words[2] == "larvae" {
 			addTranscriptionTag(&result, tokens[2], .Measurement)
 			result.breeding.larvaeQuantity = extractInt(words[1])
@@ -92,7 +106,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			}
 		}
 		else if words[2] == "dip" || words[2] == "dips" {
-			addTranscriptionTag(&result, tokens[2], .Source)
+			addTranscriptionTag(&result, tokens[2], .Measurement)
 			result.fieldseeker.dipCount = extractInt(words[1])
 			if result.fieldseeker.dipCount != nil {
 				addTranscriptionTag(&result, tokens[1], .Measurement)
