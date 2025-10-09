@@ -9,25 +9,38 @@ let data = SFCustomLanguageModelData(
 ) {
 	SFCustomLanguageModelData.CustomPronunciation(
 		grapheme: "Aedes",
-		// IPA phonemes: ["/ˈiːdiːz/","/eɪdz/"]
-		phonemes: ["/ejdz/", "/\"i:diz/", "/\"eIdi:z/"]
+		phonemes: ["\" i: d i: z"]  // British
+	)
+	SFCustomLanguageModelData.CustomPronunciation(
+		grapheme: "Aedes",
+		phonemes: ["e I d z"]  // US short
+	)
+	SFCustomLanguageModelData.CustomPronunciation(
+		grapheme: "Aedes",
+		phonemes: ["\" e I d i: z"]  // US full
 	)
 
 	SFCustomLanguageModelData.CustomPronunciation(
 		grapheme: "Aegypti",
-		phonemes: ["/ei\"dZIp.ti/"]
+		phonemes: ["i\"@ dZ @p taI"]  // US
 	)
+
+	SFCustomLanguageModelData.CustomPronunciation(
+		grapheme: "Aegypti",
+		phonemes: ["i:\" dZ I p taI"]  // British
+	)
+
 	SFCustomLanguageModelData.PhraseCount(
 		phrase: "The species is Aedes Aegypti",
-		count: 10
+		count: 5_000
 	)
 	SFCustomLanguageModelData.PhraseCount(
 		phrase: "The species appears to be Aedes Aegypti",
-		count: 10
+		count: 5_000
 	)
 	SFCustomLanguageModelData.PhraseCount(
-		phrase: "The species appears seems to be Aedes Aegypti",
-		count: 10
+		phrase: "The species seems to be Aedes Aegypti",
+		count: 5_000
 	)
 }
 
