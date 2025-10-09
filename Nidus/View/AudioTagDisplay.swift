@@ -15,11 +15,45 @@ struct AudioTagDisplay: View {
 			EmptyView()
 		}
 		else {
-			AudioTagNidusFlow(knowledge: knowledge!)
+			if knowledge!.hasFieldseekerReport {
+				AudioTagFieldseeker(knowledge: knowledge!)
+			}
+			else {
+				AudioTagNidusFlow(knowledge: knowledge!)
+			}
 		}
 	}
 }
 
+struct AudioTagFieldseeker: View {
+	let knowledge: KnowledgeGraph
+
+	var body: some View {
+		switch knowledge.fieldseeker.reportType {
+		case nil:
+			Text("Don't try to render AudioTagFieldseeker with nil reportType")
+		case .MosquitoSource:
+			AudioTagFieldseekerMosquitoSource(knowledge: knowledge)
+		}
+	}
+}
+struct AudioTagFieldseekerMosquitoSource: View {
+	let knowledge: KnowledgeGraph
+
+	var body: some View {
+		VStack {
+			HStack {
+				Text("FS: Mosquito Source").font(.system(size: 10)).frame(
+					height: 10
+				).padding(3).background(
+					RoundedRectangle(cornerRadius: 30, style: .continuous).fill(
+						PALETTE_LIGHT.A
+					)
+				)
+			}
+		}
+	}
+}
 struct AudioTagNidusFlow: View {
 	let knowledge: KnowledgeGraph
 

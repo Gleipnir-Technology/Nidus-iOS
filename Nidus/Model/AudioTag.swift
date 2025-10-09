@@ -242,22 +242,21 @@ struct AudioTagMatch: Hashable {
 	let range: Range<String.Index>
 	let text: String
 
-	// Color palette generated from https://coolors.co/c4a69d-98a886-465c69-363457-735290
 	func color() -> Color {
 		switch category {
 		case .landCategory, .habitat:
-			return Color.cyan
+			return PALETTE_LIGHT.B
 		case .arbovirus:
-			return Color.purple
+			return PALETTE_LIGHT.C
 		case .genus, .mosquitoSex, .mosquitoStage, .mosquitoTrap, .mosquitoTrapStatus,
 			.species:
-			return Color.red
+			return PALETTE_LIGHT.A
 		case .waterOrigin, .waterUse:
-			return Color.blue
+			return PALETTE_LIGHT.D
 		case .product:
-			return Color.green
+			return PALETTE_LIGHT.E
 		case .contactInfo, .dataType, .priority, .trapSite:
-			return Color.gray
+			return PALETTE_LIGHT.E
 		}
 	}
 

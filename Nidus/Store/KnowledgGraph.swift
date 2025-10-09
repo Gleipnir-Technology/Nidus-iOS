@@ -89,7 +89,7 @@ struct KnowledgeGraph {
 			|| facilitator.pathToSource != nil
 	}
 	var hasFieldseekerReport: Bool {
-		return true
+		return fieldseeker.reportType != nil
 	}
 	var hasRootCause: Bool {
 		return rootCause.conditions != nil || rootCause.fix != nil
