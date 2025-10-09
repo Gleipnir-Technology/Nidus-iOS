@@ -113,10 +113,10 @@ struct AudioTagBreedingRow: View {
 	var body: some View {
 		if knowledge.impliesDriver {
 			GridRow {
-				AudioTagIcon(
+				/*AudioTagIcon(
 					"number",
 					color: knowledge.breeding.quantity != nil ? color : .gray
-				)
+				)*/
 				AudioTagIcon(
 					"squares.leading.rectangle",
 					color: knowledge.breeding.stage != nil ? color : .gray

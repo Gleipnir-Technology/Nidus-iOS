@@ -24,7 +24,8 @@ enum TreatmentType {
 
 struct BreedingKnowledgeGraph {
 	var genus: Genus?
-	var quantity: Int?
+	var larvaeQuantity: Int?
+	var pupaeQuantity: Int?
 	var stage: LifeStage?
 	var treatment: TreatmentType?
 }
@@ -78,7 +79,7 @@ struct KnowledgeGraph {
 			|| adultProduction.landingCounts != nil
 	}
 	var hasBreeding: Bool {
-		return breeding.genus != nil || breeding.quantity != nil || breeding.stage != nil
+		return breeding.genus != nil || breeding.stage != nil
 			|| breeding.treatment != nil
 	}
 	var hasDriver: Bool {
@@ -94,6 +95,12 @@ struct KnowledgeGraph {
 	var hasRootCause: Bool {
 		return rootCause.conditions != nil || rootCause.fix != nil
 			|| rootCause.legalAbatement != nil
+	}
+	var hasLarvaeCount: Bool {
+		return breeding.larvaeQuantity != nil
+	}
+	var hasPupaeCount: Bool {
+		return breeding.pupaeQuantity != nil
 	}
 	var hasSource: Bool {
 		return source.type != nil || source.volume != nil
@@ -151,7 +158,6 @@ func knowledgeForPreview(source: SourceKnowledgeGraph? = nil) -> KnowledgeGraph 
 		adultProduction: AdultProductionKnowledgeGraph(),
 		breeding: BreedingKnowledgeGraph(
 			genus: nil,
-			quantity: nil,
 			stage: nil,
 			treatment: nil
 		),
