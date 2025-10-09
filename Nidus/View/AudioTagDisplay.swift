@@ -37,23 +37,58 @@ struct AudioTagFieldseeker: View {
 		}
 	}
 }
+struct AudioTagFieldseekerReportType: View {
+	let name: String
+	var body: some View {
+		Text("FS: \(name)").font(.system(size: 10)).frame(
+			height: 15
+		).padding(5).background(
+			RoundedRectangle(cornerRadius: 30, style: .continuous).fill(
+				PALETTE_LIGHT.A
+			)
+		)
+	}
+
+}
+
+struct AudioTagFieldseekerReportField: View {
+	let name: String
+	let isDone: Bool
+	var body: some View {
+		GridRow {
+			if isDone {
+				Image(systemName: "checkmark.square")
+				Text(name).font(.system(size: 8)).foregroundStyle(
+					Color.primary.opacity(0.7)
+				)
+			}
+			else {
+				Image(systemName: "square")
+				Text(name).font(.system(size: 10)).foregroundStyle(Color.primary)
+			}
+		}
+	}
+}
+
 struct AudioTagFieldseekerMosquitoSource: View {
 	let knowledge: KnowledgeGraph
 
 	var body: some View {
 		VStack {
-			HStack {
-				Text("FS: Mosquito Source").font(.system(size: 10)).frame(
-					height: 10
-				).padding(3).background(
-					RoundedRectangle(cornerRadius: 30, style: .continuous).fill(
-						PALETTE_LIGHT.A
-					)
-				)
+			AudioTagFieldseekerReportType(name: "Mosquito Source")
+			Grid {
+				AudioTagFieldseekerReportField(name: "# of dips", isDone: true)
+				AudioTagFieldseekerReportField(name: "Total larvae", isDone: false)
+				AudioTagFieldseekerReportField(name: "Total pupae", isDone: false)
+				AudioTagFieldseekerReportField(name: "Total eggs", isDone: false)
+				AudioTagFieldseekerReportField(name: "Larval stage", isDone: false)
+				AudioTagFieldseekerReportField(name: "Species", isDone: false)
+				AudioTagFieldseekerReportField(name: "Conditions", isDone: false)
 			}
 		}
 	}
 }
+
 struct AudioTagNidusFlow: View {
 	let knowledge: KnowledgeGraph
 

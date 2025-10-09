@@ -90,9 +90,12 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			addTranscriptionTag(&result, tokens[1], .Source)
 			addTranscriptionTag(&result, tokens[2], .Source)
 		}
-		else if words[2] == "dip" {
-			result.breeding.quantity = Int(words[1])
+		else if words[2] == "dip" || words[2] == "dips" {
 			addTranscriptionTag(&result, tokens[2], .Source)
+			result.breeding.quantity = extractInt(words[1])
+			if result.breeding.quantity != nil {
+				addTranscriptionTag(&result, tokens[1], .Measurement)
+			}
 		}
 		else if words[2] == "culex" {
 			result.breeding.genus = .Culex
@@ -230,6 +233,39 @@ private func extractFacilitator(
 		pathToRootCause: nil,
 		pathToSource: nil
 	)
+}
+
+private func extractInt(
+	_ text: String
+) -> Int? {
+	let result = Int(text)
+	if result != nil {
+		return result
+	}
+	switch text {
+	case "one":
+		return 1
+	case "two":
+		return 2
+	case "three":
+		return 3
+	case "four":
+		return 4
+	case "five":
+		return 5
+	case "six":
+		return 6
+	case "seven":
+		return 7
+	case "eight":
+		return 8
+	case "nine":
+		return 9
+	case "ten":
+		return 10
+	default:
+		return nil
+	}
 }
 
 private func extractRootCause(

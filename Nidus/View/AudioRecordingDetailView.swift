@@ -128,7 +128,7 @@ struct AudioDetailView_Previews: PreviewProvider {
 		)
 
 		AudioRecordingDetailViewPreview(
-			"Checking on a mosquito source at 123 Main Street. "
+			"Checking on a mosquito source at 123 Main Street. 10 dips."
 		).previewDisplayName("transcription FS source")
 	}
 }
