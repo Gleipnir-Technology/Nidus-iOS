@@ -50,11 +50,12 @@ struct AudioTagFieldseekerReportType: View {
 	}
 
 }
-struct AudioTagFieldseekerReportField: View {
+struct AudioTagFieldseekerReportField<T: CustomStringConvertible>: View {
 	let name: String
 	let prompt: String
 	var promptChoices: [String] = []
 	let isDone: Bool
+	let value: T?
 
 	var font: Font { .system(size: 8) }
 	var body: some View {
@@ -65,6 +66,9 @@ struct AudioTagFieldseekerReportField: View {
 					.foregroundStyle(
 						Color.primary.opacity(0.5)
 					)
+				Text(value?.description ?? "nil").font(font).gridColumnAlignment(
+					.leading
+				).foregroundStyle(Color.primary.opacity(0.7))
 			}
 			else {
 				Image(systemName: "square")
@@ -91,33 +95,39 @@ struct AudioTagFieldseekerMosquitoSource: View {
 				AudioTagFieldseekerReportField(
 					name: "Dip",
 					prompt: "# dips",
-					isDone: knowledge.hasDipCount
+					isDone: knowledge.hasDipCount,
+					value: knowledge.fieldseeker.dipCount
 				)
 				AudioTagFieldseekerReportField(
 					name: "Larvae",
 					prompt: "# larvae",
-					isDone: false
+					isDone: knowledge.hasLarvaeCount,
+					value: knowledge.breeding.larvaeQuantity
 				)
 				AudioTagFieldseekerReportField(
 					name: "Pupae",
 					prompt: "# pupae",
-					isDone: false
+					isDone: knowledge.hasPupaeCount,
+					value: knowledge.breeding.pupaeQuantity
 				)
 				AudioTagFieldseekerReportField(
 					name: "Eggs",
 					prompt: "# eggs",
-					isDone: false
+					isDone: knowledge.hasEggCount,
+					value: knowledge.breeding.eggQuantity
 				)
 				AudioTagFieldseekerReportField(
 					name: "Stage",
 					prompt: "# Instar, adult",
-					isDone: false
+					isDone: knowledge.hasStage,
+					value: knowledge.breeding.stage
 				)
 				AudioTagFieldseekerReportField(
 					name: "Species",
 					prompt: "species",
 					promptChoices: ["Aedes", "Culex"],
-					isDone: false
+					isDone: knowledge.hasSpecies,
+					value: knowledge.breeding.species
 				)
 				AudioTagFieldseekerReportField(
 					name: "Conditions",
@@ -129,7 +139,8 @@ struct AudioTagFieldseekerMosquitoSource: View {
 						"appears vacant", "entry denied", "pool removed",
 						"false pool",
 					],
-					isDone: false
+					isDone: knowledge.hasConditions,
+					value: knowledge.rootCause.conditions
 				)
 			}
 		}
