@@ -298,12 +298,13 @@ struct AudioTagIconMajor: View {
 	}
 }
 
+/*
 struct AudioTagDisplay_Previews: PreviewProvider {
 	static var previews: some View {
 		AudioTagDisplay(knowledge: nil).previewDisplayName("no knowledge")
 		//AudioTagDisplay(knowledge: knowledgeForPreview()).previewDisplayName("empty knowledge")
-		/*AudioTagDisplay(knowledge: knowledgeForPreview(
+		AudioTagDisplay(knowledge: knowledgeForPreview(
             source: SourceKnowledgeGraph(preemptiveTreatment: nil, productionCapacity: nil, sourceElimination: nil, type: .Flood, volume: nil)
-        )).previewDisplayName("source")*/
+        )).previewDisplayName("source")
 	}
-}
+}*/
