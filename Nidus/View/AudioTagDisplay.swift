@@ -72,7 +72,7 @@ struct AudioTagFieldseekerReportField<T: CustomStringConvertible>: View {
 
 	var font: Font { .system(size: 13) }
 	var body: some View {
-		GridRow {
+		GridRow(alignment: .top) {
 			if isDone {
 				Image(systemName: "checkmark.square")
 				Text(name).font(font).gridColumnAlignment(.leading)
@@ -89,9 +89,17 @@ struct AudioTagFieldseekerReportField<T: CustomStringConvertible>: View {
 					.foregroundStyle(Color.primary)
 				Text("\"\(prompt)\"").font(font).gridColumnAlignment(.leading)
 				if !promptChoices.isEmpty {
-					List(promptChoices, id: \.self) { promptChoice in
-						Text(promptChoice).font(font)
-					}.listStyle(.plain).gridColumnAlignment(.leading)
+					ScrollView {
+						VStack {
+							ForEach(promptChoices, id: \.self) {
+								promptChoice in
+								Text(promptChoice).font(font).frame(
+									maxWidth: 200,
+									alignment: .leading
+								)
+							}
+						}
+					}
 				}
 			}
 		}
