@@ -95,7 +95,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 		transcriptTags: []
 	)
 	let words: [String] = tokensToWords(tokens, text)
-
+	var hasConditions: Bool = false
 	for (i, _) in tokens.enumerated() {
 		let threegram = createGramString(words, number: 3, offset: i)
 		let threetok = createGramToken(tokens, number: 3, offset: i)
@@ -114,6 +114,9 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 				tokens: threetok,
 				word: threegram[1]
 			)
+		}
+		else if threegram[0] == "conditions" {
+			hasConditions = true
 		}
 		else if threegram[0] == "dip" || threegram[0] == "dips" {
 			extractCount(
@@ -170,9 +173,37 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			result.breeding.genus = .Quinks
 			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
 		}
+		else if hasConditions {
+			maybeFindConditions(&result, threegram, threetok)
+		}
 	}
-
 	return result
+}
+
+private func maybeFindConditions(
+	_ result: inout KnowledgeGraph,
+	_ threegram: [String],
+	_ threetok: [LexToken?]
+) {
+	for condition in BreedingConditions.all {
+		let description = condition.description
+		let words = description.components(separatedBy: .whitespaces).map { w in
+			w.lowercased()
+		}
+		// this only works because we know no conditions are 3 words long
+		if words.count == 1 && words[0] == threegram[0] {
+			result.breeding.conditions = condition
+			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
+		}
+		else if words.count == 2 && words[0] == threegram[1] && words[1] == threegram[0] {
+			result.breeding.conditions = condition
+			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
+			addTranscriptionTag(&result.transcriptTags, threetok[1]!, .Source)
+		}
+		else if words.count > 2 {
+			Logger.foreground.error("Update this logic here to be more generic")
+		}
+	}
 }
 
 private func addTranscriptionTag(
@@ -314,7 +345,6 @@ private func extractRootCause(
 		}
 	}
 	return RootCauseKnowledgeGraph(
-		conditions: nil,
 		fix: fix,
 		legalAbatement: nil
 	)

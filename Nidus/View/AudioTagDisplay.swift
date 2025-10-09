@@ -39,14 +39,27 @@ struct AudioTagFieldseeker: View {
 }
 struct AudioTagFieldseekerReportType: View {
 	let name: String
+	let isComplete: Bool
+
 	var body: some View {
-		Text("FS: \(name)").font(.system(size: 10)).frame(
-			height: 15
-		).padding(5).background(
-			RoundedRectangle(cornerRadius: 30, style: .continuous).fill(
-				PALETTE_LIGHT.A
+		if isComplete {
+			Text("FS: \(name)").font(.system(size: 10)).frame(
+				height: 15
+			).padding(5).background(
+				RoundedRectangle(cornerRadius: 30, style: .continuous).fill(
+					PALETTE_LIGHT.B
+				)
 			)
-		)
+		}
+		else {
+			Text("FS: \(name)").font(.system(size: 10)).frame(
+				height: 15
+			).padding(5).background(
+				RoundedRectangle(cornerRadius: 30, style: .continuous).fill(
+					PALETTE_LIGHT.A
+				)
+			)
+		}
 	}
 
 }
@@ -90,58 +103,57 @@ struct AudioTagFieldseekerMosquitoSource: View {
 
 	var body: some View {
 		VStack {
-			AudioTagFieldseekerReportType(name: "Mosquito Source")
-			Grid {
-				AudioTagFieldseekerReportField(
-					name: "Dip",
-					prompt: "# dips",
-					isDone: knowledge.hasDipCount,
-					value: knowledge.fieldseeker.dipCount
-				)
-				AudioTagFieldseekerReportField(
-					name: "Larvae",
-					prompt: "# larvae",
-					isDone: knowledge.hasLarvaeCount,
-					value: knowledge.breeding.larvaeQuantity
-				)
-				AudioTagFieldseekerReportField(
-					name: "Pupae",
-					prompt: "# pupae",
-					isDone: knowledge.hasPupaeCount,
-					value: knowledge.breeding.pupaeQuantity
-				)
-				AudioTagFieldseekerReportField(
-					name: "Eggs",
-					prompt: "# eggs",
-					isDone: knowledge.hasEggCount,
-					value: knowledge.breeding.eggQuantity
-				)
-				AudioTagFieldseekerReportField(
-					name: "Stage",
-					prompt: "# Instar, adult",
-					isDone: knowledge.hasStage,
-					value: knowledge.breeding.stage
-				)
-				AudioTagFieldseekerReportField(
-					name: "Species",
-					prompt: "species",
-					promptChoices: ["Aedes", "Culex"],
-					isDone: knowledge.hasSpecies,
-					value: knowledge.breeding.genus
-				)
-				AudioTagFieldseekerReportField(
-					name: "Conditions",
-					prompt: "conditions",
-					promptChoices: [
-						"dry", "flowing", "maintained pool",
-						"unmaintained pool", "high organic", "unknown",
-						"stagnant", "needs monitoring", "drying out",
-						"appears vacant", "entry denied", "pool removed",
-						"false pool",
-					],
-					isDone: knowledge.hasConditions,
-					value: knowledge.rootCause.conditions
-				)
+			AudioTagFieldseekerReportType(
+				name: "Mosquito Source",
+				isComplete: knowledge.isFieldseekerReportComplete
+			)
+			if !knowledge.isFieldseekerReportComplete {
+				Grid {
+					AudioTagFieldseekerReportField(
+						name: "Dip",
+						prompt: "# dips",
+						isDone: knowledge.hasDipCount,
+						value: knowledge.fieldseeker.dipCount
+					)
+					AudioTagFieldseekerReportField(
+						name: "Larvae",
+						prompt: "# larvae",
+						isDone: knowledge.hasLarvaeCount,
+						value: knowledge.breeding.larvaeQuantity
+					)
+					AudioTagFieldseekerReportField(
+						name: "Pupae",
+						prompt: "# pupae",
+						isDone: knowledge.hasPupaeCount,
+						value: knowledge.breeding.pupaeQuantity
+					)
+					AudioTagFieldseekerReportField(
+						name: "Eggs",
+						prompt: "# eggs",
+						isDone: knowledge.hasEggCount,
+						value: knowledge.breeding.eggQuantity
+					)
+					AudioTagFieldseekerReportField(
+						name: "Stage",
+						prompt: "# Instar, adult",
+						isDone: knowledge.hasStage,
+						value: knowledge.breeding.stage
+					)
+					AudioTagFieldseekerReportField(
+						name: "Species",
+						prompt: "species",
+						promptChoices: ["Aedes", "Culex"],
+						isDone: knowledge.hasSpecies,
+						value: knowledge.breeding.genus
+					)
+					AudioTagFieldseekerReportField(
+						name: "Conditions",
+						prompt: "conditions",
+						promptChoices: BreedingConditions.prompts,
+						isDone: knowledge.hasConditions,
+						value: knowledge.breeding.conditions
+					)
+				}
 			}
 		}
 	}
@@ -259,10 +271,6 @@ struct AudioTagRootRow: View {
 	var body: some View {
 		if knowledge.impliesRootCause {
 			GridRow {
-				AudioTagIcon(
-					"cloud",
-					color: knowledge.rootCause.conditions != nil ? color : .gray
-				)
 				AudioTagIcon(
 					"squareroot",
 					color: knowledge.rootCause.fix != nil ? color : .gray

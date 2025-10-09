@@ -5,6 +5,50 @@ struct AdultProductionKnowledgeGraph {
 	var landingCounts: String?
 }
 
+enum BreedingConditions: CustomStringConvertible {
+	case AppearsVacant
+	case Dry
+	case DryingOut
+	case EntryDenied
+	case Flowing
+	case HighOrganic
+	case NeedsMonitoring
+	case PoolFalse
+	case PoolMaintained
+	case PoolRemoved
+	case PoolUnmaintained
+	case Stagnant
+	case Unknown
+
+	static var all: [BreedingConditions] {
+		return [
+			.AppearsVacant, .Dry, .DryingOut, .EntryDenied, .Flowing, .HighOrganic,
+			.NeedsMonitoring, .PoolFalse, .PoolMaintained, .PoolRemoved,
+			.PoolUnmaintained, .Stagnant, .Unknown,
+		]
+	}
+	var description: String {
+		switch self {
+		case .AppearsVacant: "Appears vacant"
+		case .Dry: "Dry"
+		case .DryingOut: "Drying out"
+		case .EntryDenied: "Entry denied"
+		case .Flowing: "Flowing"
+		case .HighOrganic: "High organic"
+		case .NeedsMonitoring: "Needs monitoring"
+		case .PoolFalse: "Pool false"
+		case .PoolMaintained: "Pool maintained"
+		case .PoolRemoved: "Pool removed"
+		case .PoolUnmaintained: "Pool unmaintained"
+		case .Stagnant: "Stagnant"
+		case .Unknown: "Unknown"
+		}
+	}
+	static var prompts: [String] {
+		return BreedingConditions.all.map { $0.description }
+	}
+}
+
 enum LifeStage: CustomStringConvertible {
 	case FirstInstar
 	case SecondInstar
@@ -49,6 +93,7 @@ enum TreatmentType {
 }
 
 struct BreedingKnowledgeGraph {
+	var conditions: BreedingConditions?
 	var eggQuantity: Int?
 	var genus: Genus?
 	var larvaeQuantity: Int?
@@ -75,7 +120,6 @@ struct FieldseekerReportGraph {
 	var reportType: FieldseekerReportType?
 }
 struct RootCauseKnowledgeGraph {
-	var conditions: String?
 	var fix: String?
 	var legalAbatement: String?
 }
@@ -111,7 +155,7 @@ struct KnowledgeGraph {
 			|| breeding.treatment != nil
 	}
 	var hasConditions: Bool {
-		return rootCause.conditions != nil
+		return breeding.conditions != nil
 	}
 	var hasDipCount: Bool {
 		return fieldseeker.dipCount != nil
@@ -130,7 +174,7 @@ struct KnowledgeGraph {
 		return fieldseeker.reportType != nil
 	}
 	var hasRootCause: Bool {
-		return rootCause.conditions != nil || rootCause.fix != nil
+		return rootCause.fix != nil
 			|| rootCause.legalAbatement != nil
 	}
 	var hasLarvaeCount: Bool {
@@ -167,6 +211,12 @@ struct KnowledgeGraph {
 	var impliesSource: Bool {
 		return hasSource || hasFacilitator || hasBreeding
 	}
+	var isFieldseekerReportComplete: Bool {
+		return fieldseeker.dipCount != nil && breeding.larvaeQuantity != nil
+			&& breeding.pupaeQuantity != nil && breeding.eggQuantity != nil
+			&& breeding.stage != nil && breeding.genus != nil
+			&& breeding.conditions != nil
+	}
 }
 
 enum TranscriptTagType {
@@ -201,6 +251,7 @@ func knowledgeForPreview(source: SourceKnowledgeGraph? = nil) -> KnowledgeGraph 
 	return KnowledgeGraph(
 		adultProduction: AdultProductionKnowledgeGraph(),
 		breeding: BreedingKnowledgeGraph(
+			conditions: nil,
 			genus: nil,
 			stage: nil,
 			treatment: nil
@@ -218,7 +269,6 @@ func knowledgeForPreview(source: SourceKnowledgeGraph? = nil) -> KnowledgeGraph 
 			reportType: nil
 		),
 		rootCause: RootCauseKnowledgeGraph(
-			conditions: nil,
 			fix: nil,
 			legalAbatement: nil
 		),

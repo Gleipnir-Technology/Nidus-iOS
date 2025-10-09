@@ -68,4 +68,20 @@ struct Nidus_Notes_Unit_Tests {
 		}
 		#expect(genus == .Culex)
 	}
+
+	@Test func mosquitoSourceConditions() async throws {
+		let text =
+			"Checking on a mosquito source at 123 Main Street. Conditions are dry"
+		let knowledge = ExtractKnowledge(text)
+		#expect(knowledge.fieldseeker.reportType != nil)
+		guard let reportType = knowledge.fieldseeker.reportType else {
+			Issue.record("No report type found")
+			return
+		}
+		guard let conditions = knowledge.breeding.conditions else {
+			Issue.record("No conditions found")
+			return
+		}
+		#expect(conditions == .Dry)
+	}
 }
