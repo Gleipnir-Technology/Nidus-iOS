@@ -10,10 +10,7 @@ struct AudioRecordingDetailView: View {
 	}
 
 	var body: some View {
-		VStack(spacing: 20) {
-			Text("Recording Details")
-				.font(.headline)
-
+		VStack(alignment: .center, spacing: 20) {
 			if controller.store.isRecording {
 				VStack(alignment: .leading, spacing: 10) {
 					Text(
@@ -58,7 +55,7 @@ struct AudioRecordingDetailView: View {
 			else {
 				Text("Not recording")
 			}
-		}
+		}.navigationTitle("Recording Details").navigationBarTitleDisplayMode(.inline)
 	}
 }
 
