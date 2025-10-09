@@ -171,6 +171,20 @@ class WrapperAudio: NSObject {
 				"WSP",
 				"flood irrigating",
 			]
+			if let languageModelUrl = Bundle.main.url(
+				forResource: "NidusSpeechModel",
+				withExtension: "bin"
+			) {
+				let lmConfiguration: SFSpeechLanguageModel.Configuration =
+					SFSpeechLanguageModel.Configuration(
+						languageModel: languageModelUrl
+					)
+				recognitionRequest!.customizedLanguageModel = lmConfiguration
+				Logger.foreground.info("Loaded custom speech module")
+			}
+			else {
+				Logger.foreground.warning("Failed to load custom speech model")
+			}
 			guard let recognitionRequest = recognitionRequest else {
 				print("Unable to create recognition request")
 				return
