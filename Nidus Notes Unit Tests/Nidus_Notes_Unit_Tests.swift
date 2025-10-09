@@ -11,10 +11,15 @@ import Testing
 
 struct Nidus_Notes_Unit_Tests {
 
-	@Test func example() async throws {
-		let text = "I see a flooded gutter."
+	@Test func mosquitoSource() async throws {
+		let text = "Checking on a mosquito source"
 		let knowledge = ExtractKnowledge(text)
-		#expect(knowledge.source.type == .Flood)
+		#expect(knowledge.fieldseeker.reportType != nil)
+		guard let reportType = knowledge.fieldseeker.reportType else {
+			Issue.record("No report type found")
+			return
+		}
+		#expect(reportType == FieldseekerReportType.MosquitoSource)
 	}
 
 }

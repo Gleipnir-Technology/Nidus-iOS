@@ -16,6 +16,54 @@ private let FACILITATOR_ROOT_CAUSE_VERBS: [String] = ["blocking"]
 private let FACILITATOR_ACTION_VERBS: [String] = ["removed"]
 private let ROOT_CAUSE_ADJ: [String] = ["root"]
 
+private func createGramString(_ words: [String], number: Int = 3, offset: Int) -> [String] {
+	var result: [String] = []
+	for i in stride(from: offset, to: offset - number, by: -1) {
+		if i < 0 {
+			result.append("")
+		}
+		else {
+			result.append(words[i])
+		}
+	}
+	return result
+}
+
+private func createGramToken(_ tokens: [LexToken], number: Int = 3, offset: Int) -> [LexToken?] {
+	var result: [LexToken?] = []
+	for i in stride(from: offset, to: offset - number, by: -1) {
+		if i < 0 {
+			result.append(nil)
+		}
+		else {
+			result.append(tokens[i])
+		}
+	}
+	return result
+}
+
+private func extractCount(
+	count: inout Int?,
+	transcript: inout [TranscriptTag],
+	token: LexToken?,
+	word: String
+) {
+	guard let token = token else {
+		Logger.foreground.error("Got a nil token, this is a programmer error.")
+		return
+	}
+	addTranscriptionTag(&transcript, token, .Measurement)
+	count = extractInt(word)
+	if count != nil {
+		addTranscriptionTag(&transcript, token, .Measurement)
+	}
+}
+private func tokensToWords(_ tokens: [LexToken], _ text: String) -> [String] {
+	return tokens.map { t in
+		String(text[t.range].lowercased())
+	}
+}
+
 func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 	let tokens = LexTranscript(text)
 
@@ -36,134 +84,59 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 		source: SourceKnowledgeGraph(),
 		transcriptTags: []
 	)
-	// Hacky, just for a demo
-	for (i, _) in tokens.enumerated() {
-		if i < 3 { continue }
-		let tokens: [LexToken] = Array(tokens[i - 2..<i + 1])
-		let words: [String] = tokens.map { t in
-			if text[t.range.upperBound] == "." {
-				//let newRange = text.range
-				//String(text[t.range.lowerBound...t.range.upperBound-1]).lowercased()
-				String(text[t.range].lowercased())
-			}
-			else {
-				String(text[t.range].lowercased())
-			}
-		}
-		if words[1] == "flooded" && words[2] == "gutter" {
-			result.source.type = .Flood
-			addTranscriptionTag(&result, tokens[1], .Source)
-			addTranscriptionTag(&result, tokens[2], .Source)
-		}
-		else if words[2] == "wide" {
-			result.source.volume =
-				result.source.volume
-				?? Volume(
-					depth: nil,
-					length: nil,
-					width: nil
-				)
-			result.source.volume!.width = getMeasurement(words[0], words[1])
-			addTranscriptionTag(&result, tokens[0], .Measurement)
-			addTranscriptionTag(&result, tokens[1], .Measurement)
-		}
-		else if words[2] == "long" {
-			result.source.volume =
-				result.source.volume
-				?? Volume(
-					depth: nil,
-					length: nil,
-					width: nil
-				)
-			result.source.volume!.length = getMeasurement(words[0], words[1])
-			addTranscriptionTag(&result, tokens[0], .Measurement)
-			addTranscriptionTag(&result, tokens[1], .Measurement)
-		}
-		else if words[2] == "deep" {
-			result.source.volume =
-				result.source.volume
-				?? Volume(
-					depth: nil,
-					length: nil,
-					width: nil
-				)
-			result.source.volume!.depth = getMeasurement(words[0], words[1])
-			addTranscriptionTag(&result, tokens[0], .Measurement)
-			addTranscriptionTag(&result, tokens[1], .Measurement)
-		}
-		else if words[2] == "egg" || words[2] == "eggs" {
-			addTranscriptionTag(&result, tokens[2], .Measurement)
-			result.breeding.eggQuantity = extractInt(words[1])
-			if result.breeding.eggQuantity != nil {
-				addTranscriptionTag(&result, tokens[1], .Measurement)
-			}
-		}
-		else if words[2] == "larvae" {
-			addTranscriptionTag(&result, tokens[2], .Measurement)
-			result.breeding.larvaeQuantity = extractInt(words[1])
-			if result.breeding.larvaeQuantity != nil {
-				addTranscriptionTag(&result, tokens[1], .Measurement)
-			}
-		}
-		else if words[2] == "dip" || words[2] == "dips" {
-			addTranscriptionTag(&result, tokens[2], .Measurement)
-			result.fieldseeker.dipCount = extractInt(words[1])
-			if result.fieldseeker.dipCount != nil {
-				addTranscriptionTag(&result, tokens[1], .Measurement)
-			}
-		}
-		else if words[2] == "pupae" {
-			addTranscriptionTag(&result, tokens[2], .Measurement)
-			result.breeding.pupaeQuantity = extractInt(words[1])
-			if result.breeding.pupaeQuantity != nil {
-				addTranscriptionTag(&result, tokens[1], .Measurement)
-			}
-		}
-		else if words[2] == "culex" {
-			result.breeding.genus = .Culex
-			addTranscriptionTag(&result, tokens[2], .Source)
-		}
-		else if words[2] == "blocking" {
-			result.facilitator.blocking = words[2]
-			addTranscriptionTag(&result, tokens[2], .Source)
-		}
-		else if words[2] == "drain" {
-			result.facilitator.pathToRootCause = words[2]
-			addTranscriptionTag(&result, tokens[2], .Source)
-		}
-		else if words[2] == "removed" {
-			result.facilitator.pathToSource = words[2]
-			addTranscriptionTag(&result, tokens[2], .Action)
-		}
-		else if words[2] == "treated" {
-			result.breeding.treatment = .SumilarvWSP
-			addTranscriptionTag(&result, tokens[2], .Action)
-		}
-		else if words[2] == "wsp" {
-			addTranscriptionTag(&result, tokens[1], .Action)
-			addTranscriptionTag(&result, tokens[2], .Action)
-		}
-		else if words[2] == "cause" {
-			result.rootCause.legalAbatement = words[2]
-			addTranscriptionTag(&result, tokens[2], .Source)
-		}
-		else if words[2] == "source" && words[1] == "mosquito" {
-			result.fieldseeker.reportType = .MosquitoSource
-			addTranscriptionTag(&result, tokens[1], .Source)
-			addTranscriptionTag(&result, tokens[2], .Source)
-		}
+	let words: [String] = tokensToWords(tokens, text)
 
+	for (i, _) in tokens.enumerated() {
+		let threegram = createGramString(words, number: 3, offset: i)
+		let threetok = createGramToken(tokens, number: 3, offset: i)
+		if threegram[0] == "egg" || threegram[0] == "eggs" {
+			extractCount(
+				count: &result.breeding.eggQuantity,
+				transcript: &result.transcriptTags,
+				token: threetok[1],
+				word: threegram[1]
+			)
+		}
+		else if threegram[0] == "larvae" {
+			extractCount(
+				count: &result.breeding.larvaeQuantity,
+				transcript: &result.transcriptTags,
+				token: threetok[1],
+				word: threegram[1]
+			)
+		}
+		else if threegram[0] == "dip" || threegram[0] == "dips" {
+			extractCount(
+				count: &result.fieldseeker.dipCount,
+				transcript: &result.transcriptTags,
+				token: threetok[1],
+				word: threegram[1]
+			)
+		}
+		else if threegram[0] == "pupae" {
+			extractCount(
+				count: &result.breeding.pupaeQuantity,
+				transcript: &result.transcriptTags,
+				token: threetok[1],
+				word: threegram[1]
+			)
+		}
+		else if threegram[0] == "source" && threegram[1] == "mosquito" {
+			result.fieldseeker.reportType = FieldseekerReportType.MosquitoSource
+			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
+			addTranscriptionTag(&result.transcriptTags, threetok[1]!, .Source)
+		}
 	}
 
 	return result
 }
 
 private func addTranscriptionTag(
-	_ result: inout KnowledgeGraph,
+	_ transcript: inout [TranscriptTag],
 	_ token: LexToken,
 	_ type: TranscriptTagType
 ) {
-	result.transcriptTags.append(TranscriptTag(range: token.range, type: type))
+	transcript.append(TranscriptTag(range: token.range, type: type))
 }
 
 private func getMeasurement(_ valueString: String, _ unitString: String) -> Measurement<UnitLength>?
