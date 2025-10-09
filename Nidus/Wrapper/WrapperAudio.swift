@@ -161,9 +161,12 @@ class WrapperAudio: NSObject {
 			recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
 			recognitionRequest!.taskHint = .dictation
 			recognitionRequest!.contextualStrings = [
+				"Aedes",
+				"Aegypti",
 				"instar",
 				"larvae",
 				"Culex",
+				"Quinks",
 				"Sumilarv",
 				"WSP",
 				"flood irrigating",

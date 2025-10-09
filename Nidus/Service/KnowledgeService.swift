@@ -70,7 +70,7 @@ private func tokensToWords(_ tokens: [LexToken], _ text: String) -> [String] {
 		{
 			range = range.lowerBound..<prevIndex
 		}
-		return String(text[range])
+		return String(text[range]).lowercased()
 	}
 }
 
@@ -123,6 +123,24 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 				word: threegram[1]
 			)
 		}
+		else if threegram[0] == "instar" {
+			var stage: LifeStage
+			switch threegram[1] {
+			case "first", "1st":
+				stage = .FirstInstar
+			case "second", "2nd":
+				stage = .SecondInstar
+			case "third", "3rd":
+				stage = .ThirdInstar
+			case "fourth", "4th":
+				stage = .FourthInstar
+			default:
+				continue
+			}
+			result.breeding.stage = stage
+			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
+			addTranscriptionTag(&result.transcriptTags, threetok[1]!, .Source)
+		}
 		else if threegram[0] == "pupae" {
 			extractCount(
 				count: &result.breeding.pupaeQuantity,
@@ -135,6 +153,22 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			result.fieldseeker.reportType = FieldseekerReportType.MosquitoSource
 			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
 			addTranscriptionTag(&result.transcriptTags, threetok[1]!, .Source)
+		}
+		else if threegram[0] == "aedes" {
+			result.breeding.genus = .Aedes
+			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
+		}
+		else if threegram[0] == "aegypti" {
+			result.breeding.genus = .Aegypti
+			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
+		}
+		else if threegram[0] == "culex" {
+			result.breeding.genus = .Culex
+			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
+		}
+		else if threegram[0] == "quinks" {
+			result.breeding.genus = .Quinks
+			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
 		}
 	}
 

@@ -9,6 +9,7 @@ enum LifeStage: CustomStringConvertible {
 	case FirstInstar
 	case SecondInstar
 	case ThirdInstar
+	case FourthInstar
 
 	var description: String {
 		switch self {
@@ -18,6 +19,8 @@ enum LifeStage: CustomStringConvertible {
 			"Second instar"
 		case .ThirdInstar:
 			"Third instar"
+		case .FourthInstar:
+			"Fourth instar"
 		}
 	}
 }
