@@ -50,23 +50,32 @@ struct AudioTagFieldseekerReportType: View {
 	}
 
 }
-
 struct AudioTagFieldseekerReportField: View {
 	let name: String
+	let prompt: String
+	var promptChoices: [String] = []
 	let isDone: Bool
+
+	var font: Font { .system(size: 8) }
 	var body: some View {
 		GridRow {
 			if isDone {
 				Image(systemName: "checkmark.square")
-				Text(name).font(.system(size: 8)).gridColumnAlignment(.leading)
+				Text(name).font(font).gridColumnAlignment(.leading)
 					.foregroundStyle(
-						Color.primary.opacity(0.7)
+						Color.primary.opacity(0.5)
 					)
 			}
 			else {
 				Image(systemName: "square")
-				Text(name).font(.system(size: 10)).gridColumnAlignment(.leading)
+				Text(name).font(font).gridColumnAlignment(.leading)
 					.foregroundStyle(Color.primary)
+				Text("\"\(prompt)\"").font(font).gridColumnAlignment(.leading)
+				if !promptChoices.isEmpty {
+					List(promptChoices, id: \.self) { promptChoice in
+						Text(promptChoice).font(font)
+					}.listStyle(.plain).gridColumnAlignment(.leading)
+				}
 			}
 		}
 	}
@@ -79,13 +88,49 @@ struct AudioTagFieldseekerMosquitoSource: View {
 		VStack {
 			AudioTagFieldseekerReportType(name: "Mosquito Source")
 			Grid {
-				AudioTagFieldseekerReportField(name: "# of dips", isDone: true)
-				AudioTagFieldseekerReportField(name: "Total larvae", isDone: false)
-				AudioTagFieldseekerReportField(name: "Total pupae", isDone: false)
-				AudioTagFieldseekerReportField(name: "Total eggs", isDone: false)
-				AudioTagFieldseekerReportField(name: "Larval stage", isDone: false)
-				AudioTagFieldseekerReportField(name: "Species", isDone: false)
-				AudioTagFieldseekerReportField(name: "Conditions", isDone: false)
+				AudioTagFieldseekerReportField(
+					name: "Dip",
+					prompt: "# dips",
+					isDone: knowledge.hasDipCount
+				)
+				AudioTagFieldseekerReportField(
+					name: "Larvae",
+					prompt: "# larvae",
+					isDone: false
+				)
+				AudioTagFieldseekerReportField(
+					name: "Pupae",
+					prompt: "# pupae",
+					isDone: false
+				)
+				AudioTagFieldseekerReportField(
+					name: "Eggs",
+					prompt: "# eggs",
+					isDone: false
+				)
+				AudioTagFieldseekerReportField(
+					name: "Stage",
+					prompt: "# Instar, adult",
+					isDone: false
+				)
+				AudioTagFieldseekerReportField(
+					name: "Species",
+					prompt: "species",
+					promptChoices: ["Aedes", "Culex"],
+					isDone: false
+				)
+				AudioTagFieldseekerReportField(
+					name: "Conditions",
+					prompt: "conditions",
+					promptChoices: [
+						"dry", "flowing", "maintained pool",
+						"unmaintained pool", "high organic", "unknown",
+						"stagnant", "needs monitoring", "drying out",
+						"appears vacant", "entry denied", "pool removed",
+						"false pool",
+					],
+					isDone: false
+				)
 			}
 		}
 	}

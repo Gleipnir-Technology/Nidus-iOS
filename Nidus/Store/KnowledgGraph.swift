@@ -44,6 +44,7 @@ enum FieldseekerReportType {
 	case MosquitoSource
 }
 struct FieldseekerReportGraph {
+	var dipCount: Int?
 	var reportType: FieldseekerReportType?
 }
 struct RootCauseKnowledgeGraph {
@@ -81,6 +82,9 @@ struct KnowledgeGraph {
 	var hasBreeding: Bool {
 		return breeding.genus != nil || breeding.stage != nil
 			|| breeding.treatment != nil
+	}
+	var hasDipCount: Bool {
+		return fieldseeker.dipCount != nil
 	}
 	var hasDriver: Bool {
 		return driver.behaviorModification != nil || driver.contact != nil

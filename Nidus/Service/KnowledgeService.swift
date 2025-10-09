@@ -85,15 +85,23 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			addTranscriptionTag(&result, tokens[1], .Measurement)
 		}
 		else if words[2] == "larvae" {
-			result.breeding.stage = .ThirdInstar
-			addTranscriptionTag(&result, tokens[0], .Source)
-			addTranscriptionTag(&result, tokens[1], .Source)
-			addTranscriptionTag(&result, tokens[2], .Source)
+			addTranscriptionTag(&result, tokens[2], .Measurement)
+			result.breeding.larvaeQuantity = extractInt(words[1])
+			if result.breeding.larvaeQuantity != nil {
+				addTranscriptionTag(&result, tokens[1], .Measurement)
+			}
 		}
 		else if words[2] == "dip" || words[2] == "dips" {
 			addTranscriptionTag(&result, tokens[2], .Source)
-			result.breeding.quantity = extractInt(words[1])
-			if result.breeding.quantity != nil {
+			result.fieldseeker.dipCount = extractInt(words[1])
+			if result.fieldseeker.dipCount != nil {
+				addTranscriptionTag(&result, tokens[1], .Measurement)
+			}
+		}
+		else if words[2] == "pupae" {
+			addTranscriptionTag(&result, tokens[2], .Measurement)
+			result.breeding.pupaeQuantity = extractInt(words[1])
+			if result.breeding.pupaeQuantity != nil {
 				addTranscriptionTag(&result, tokens[1], .Measurement)
 			}
 		}
@@ -165,7 +173,6 @@ private func extractBreedingGraph(
 	-> BreedingKnowledgeGraph
 {
 	var genus: Genus?
-	var quantity: Int?
 	var stage: LifeStage?
 	for (i, token) in tokens.enumerated() {
 		if token.type == NLTag.noun {
@@ -185,17 +192,6 @@ private func extractBreedingGraph(
 					}
 				}
 			}
-			if word == "dip" {
-				quantity = extractDipCount(
-					index: i,
-					text: text,
-					tokens: tokens,
-					transcriptTags: &transcriptTags
-				)
-				transcriptTags.append(
-					TranscriptTag(range: token.range, type: .Source)
-				)
-			}
 			if genus == nil {
 				genus = GENUS_NOUNS[word]
 			}
@@ -203,7 +199,6 @@ private func extractBreedingGraph(
 	}
 	return BreedingKnowledgeGraph(
 		genus: genus,
-		quantity: quantity,
 		stage: stage,
 		treatment: nil
 	)
