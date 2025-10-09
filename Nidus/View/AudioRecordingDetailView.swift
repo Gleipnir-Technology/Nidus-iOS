@@ -13,9 +13,6 @@ struct AudioRecordingDetailView: View {
 		VStack(alignment: .center, spacing: 20) {
 			if controller.store.isRecording {
 				VStack(alignment: .leading, spacing: 10) {
-					Text(
-						"Recording duration: \(timeString(controller.store.recordingDuration))"
-					)
 					if controller.store.hasPermissionTranscription == nil {
 						Text("Not sure if we'll get permission or not")
 						HStack {
@@ -58,7 +55,14 @@ struct AudioRecordingDetailView: View {
 					alignment: .center
 				)
 			}
-		}.navigationTitle("Recording Details").navigationBarTitleDisplayMode(.inline)
+		}.navigationTitle(navigationTitle).navigationBarTitleDisplayMode(.inline)
+	}
+
+	var navigationTitle: String {
+		if controller.store.isRecording {
+			return "Recording - \(timeString(controller.store.recordingDuration))"
+		}
+		return "Not Recording"
 	}
 }
 
@@ -85,6 +89,8 @@ struct AudioRecordingDetailViewPreview: View {
 								hasPermissionTranscription: true,
 								isRecording: isRecording,
 								knowledgeGraph: nil,
+								recordingDuration:
+									recordingDuration,
 								transcription: transcription
 							)
 						)
