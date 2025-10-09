@@ -58,13 +58,15 @@ struct AudioTagFieldseekerReportField: View {
 		GridRow {
 			if isDone {
 				Image(systemName: "checkmark.square")
-				Text(name).font(.system(size: 8)).foregroundStyle(
-					Color.primary.opacity(0.7)
-				)
+				Text(name).font(.system(size: 8)).gridColumnAlignment(.leading)
+					.foregroundStyle(
+						Color.primary.opacity(0.7)
+					)
 			}
 			else {
 				Image(systemName: "square")
-				Text(name).font(.system(size: 10)).foregroundStyle(Color.primary)
+				Text(name).font(.system(size: 10)).gridColumnAlignment(.leading)
+					.foregroundStyle(Color.primary)
 			}
 		}
 	}
