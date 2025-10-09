@@ -38,6 +38,13 @@ struct FacilitatorKnowledgeGraph {
 	var pathToRootCause: String?
 	var pathToSource: String?
 }
+
+enum FieldseekerReportType {
+	case MosquitoSource
+}
+struct FieldseekerReportGraph {
+	var reportType: FieldseekerReportType?
+}
 struct RootCauseKnowledgeGraph {
 	var conditions: String?
 	var fix: String?
@@ -61,6 +68,7 @@ struct KnowledgeGraph {
 	var breeding: BreedingKnowledgeGraph
 	var driver: DriverKnowledgeGraph
 	var facilitator: FacilitatorKnowledgeGraph
+	var fieldseeker: FieldseekerReportGraph
 	var rootCause: RootCauseKnowledgeGraph
 	var source: SourceKnowledgeGraph
 	var transcriptTags: [TranscriptTag]
@@ -79,6 +87,9 @@ struct KnowledgeGraph {
 	var hasFacilitator: Bool {
 		return facilitator.blocking != nil || facilitator.pathToRootCause != nil
 			|| facilitator.pathToSource != nil
+	}
+	var hasFieldseekerReport: Bool {
+		return true
 	}
 	var hasRootCause: Bool {
 		return rootCause.conditions != nil || rootCause.fix != nil
@@ -152,6 +163,9 @@ func knowledgeForPreview(source: SourceKnowledgeGraph? = nil) -> KnowledgeGraph 
 			blocking: nil,
 			pathToRootCause: nil,
 			pathToSource: nil
+		),
+		fieldseeker: FieldseekerReportGraph(
+			reportType: nil
 		),
 		rootCause: RootCauseKnowledgeGraph(
 			conditions: nil,

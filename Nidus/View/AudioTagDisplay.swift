@@ -15,14 +15,23 @@ struct AudioTagDisplay: View {
 			EmptyView()
 		}
 		else {
-			Grid(horizontalSpacing: 1, verticalSpacing: 1) {
-				AudioTagDriverRow(color: .brown, knowledge: knowledge!)
-				AudioTagRootRow(color: .purple, knowledge: knowledge!)
-				AudioTagFacilitatorRow(color: .blue, knowledge: knowledge!)
-				AudioTagSourceRow(color: .red, knowledge: knowledge!)
-				AudioTagBreedingRow(color: .orange, knowledge: knowledge!)
-			}
+			AudioTagNidusFlow(knowledge: knowledge!)
 		}
+	}
+}
+
+struct AudioTagNidusFlow: View {
+	let knowledge: KnowledgeGraph
+
+	var body: some View {
+		Grid(horizontalSpacing: 1, verticalSpacing: 1) {
+			AudioTagDriverRow(color: .brown, knowledge: knowledge)
+			AudioTagRootRow(color: .purple, knowledge: knowledge)
+			AudioTagFacilitatorRow(color: .blue, knowledge: knowledge)
+			AudioTagSourceRow(color: .red, knowledge: knowledge)
+			AudioTagBreedingRow(color: .orange, knowledge: knowledge)
+		}
+
 	}
 }
 

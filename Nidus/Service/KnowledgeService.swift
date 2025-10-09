@@ -31,6 +31,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 		breeding: BreedingKnowledgeGraph(),
 		driver: DriverKnowledgeGraph(),
 		facilitator: FacilitatorKnowledgeGraph(),
+		fieldseeker: FieldseekerReportGraph(),
 		rootCause: RootCauseKnowledgeGraph(),
 		source: SourceKnowledgeGraph(),
 		transcriptTags: []
@@ -90,7 +91,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			addTranscriptionTag(&result, tokens[2], .Source)
 		}
 		else if words[2] == "dip" {
-			result.breeding.quantity = Int(words[0])
+			result.breeding.quantity = Int(words[1])
 			addTranscriptionTag(&result, tokens[2], .Source)
 		}
 		else if words[2] == "culex" {
@@ -121,6 +122,12 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			result.rootCause.legalAbatement = words[2]
 			addTranscriptionTag(&result, tokens[2], .Source)
 		}
+		else if words[2] == "source" && words[1] == "mosquito" {
+			result.fieldseeker.reportType = .MosquitoSource
+			addTranscriptionTag(&result, tokens[1], .Source)
+			addTranscriptionTag(&result, tokens[2], .Source)
+		}
+
 	}
 
 	return result
