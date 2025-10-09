@@ -69,12 +69,14 @@ struct AudioRecordingDetailView: View {
 struct AudioRecordingDetailViewPreview: View {
 	var transcription: String
 	var isRecording: Bool
+	var knowledgeGraph: KnowledgeGraph?
 	var recordingDuration: TimeInterval
 
 	init(_ transcription: String, isRecording: Bool = true, recordingDuration: TimeInterval = 0)
 	{
 		self.transcription = transcription
 		self.isRecording = isRecording
+		self.knowledgeGraph = ExtractKnowledge(transcription)
 		self.recordingDuration = recordingDuration
 	}
 
@@ -88,7 +90,7 @@ struct AudioRecordingDetailViewPreview: View {
 							AudioRecordingStore(
 								hasPermissionTranscription: true,
 								isRecording: isRecording,
-								knowledgeGraph: nil,
+								knowledgeGraph: knowledgeGraph,
 								recordingDuration:
 									recordingDuration,
 								transcription: transcription
