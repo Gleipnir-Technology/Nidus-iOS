@@ -26,18 +26,64 @@ let data = SFCustomLanguageModelData(
 		]
 	)
 
-	/*
-    SFCustomLanguageModelData.PhraseCountsFromTemplates(classes: [
-        "genus": ["Aedes", "Culex"],
-        "species": ["Aegypti", "pipiens"],
-        "verb": ["found", "seems", "is", "be"]
-    ]) {
-        SFCustomLanguageModelData.TemplatePhraseCountGenerator.Template(
-            "<verb> <genus> <species>",
-            count: 10_000
-        )
-    }
-    */
+	SFCustomLanguageModelData.CustomPronunciation(
+		grapheme: "larva",
+		// IPA: /ˈlɑːr.və/
+		// X-SAMPA: /"lA:.v@/
+		phonemes: [
+			"l A . v @"
+		]
+	)
+
+	SFCustomLanguageModelData.CustomPronunciation(
+		grapheme: "larvae",
+		// IPA: lärʹvē
+		// X-SAMPA: l{r've:
+		phonemes: [
+			"l { r ' v e"
+		]
+	)
+
+	SFCustomLanguageModelData.CustomPronunciation(
+		grapheme: "pupa",
+		// IPA: /ˈpjuː.pə/
+		// X-SAMPA: /"pju:p@/
+		phonemes: [
+			"p j u p a"
+		]
+	)
+
+	SFCustomLanguageModelData.CustomPronunciation(
+		grapheme: "pupae",
+		// IPA: /ˈpjuː.piː/
+		// X-SAMPA: /"pju:pi:/
+		phonemes: [
+			"p j u p i"
+		]
+	)
+
+	SFCustomLanguageModelData.PhraseCountsFromTemplates(classes: [
+		"thing": ["pupa", "pupae", "larva", "larvae", "dip", "dips"],
+		"number": [
+			"one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+			"ten",
+		],
+	]) {
+		SFCustomLanguageModelData.TemplatePhraseCountGenerator.Template(
+			"<number> <thing>",
+			count: 1_000
+		)
+	}
+
+	SFCustomLanguageModelData.PhraseCountsFromTemplates(classes: [
+		"thing": ["pupa", "pupae", "larva", "larvae", "dip", "dips"],
+		"number": Array(10...100).map({ String($0) }),
+	]) {
+		SFCustomLanguageModelData.TemplatePhraseCountGenerator.Template(
+			"<number> <thing>",
+			count: 1_000
+		)
+	}
 
 	SFCustomLanguageModelData.PhraseCount(phrase: "The species is Aedes Aegypti", count: 1000)
 	SFCustomLanguageModelData.PhraseCount(phrase: "The genus is Aedes", count: 1000)
