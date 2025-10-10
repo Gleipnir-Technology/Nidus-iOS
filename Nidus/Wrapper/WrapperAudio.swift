@@ -7,21 +7,27 @@ enum AudioError: Error {
 	case noSpeechPermission
 }
 
+let PAUSE_THRESHOLD_SECONDS: Double = 1.75
+
 class WrapperAudio: NSObject {
 	var hasMicrophonePermission = false
 	var hasTranscriptionPermission = false
 
+	private var audioEngine = AVAudioEngine()
 	private var audioRecorder: AVAudioRecorder?
 	private var audioPlayer: AVAudioPlayer?
+	private var clock: ContinuousClock
+	private var hasSpeechPermission = false
+	private var lastTranscriptionUpdateTime: ContinuousClock.Instant
 	private var onTranscriptionCallbacks: [(String) -> Void] = []
-	private var speechRecognizer: SFSpeechRecognizer
 	private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
 	private var recognitionTask: SFSpeechRecognitionTask?
-	private var audioEngine = AVAudioEngine()
-	private var hasSpeechPermission = false
-	private var transcriptions: [[String]] = []
+	private var speechRecognizer: SFSpeechRecognizer
+	private var transcriptions: [SFTranscription] = []
 
 	override init() {
+		self.clock = ContinuousClock()
+		self.lastTranscriptionUpdateTime = self.clock.now
 		self.speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))!
 		super.init()
 	}
@@ -144,32 +150,44 @@ class WrapperAudio: NSObject {
 		}
 	}
 
-	private func handleTranscriptionUpdate(_ newTranscription: String) {
-		let words = newTranscription.components(separatedBy: .whitespaces)
-		// Whenever we have a long pause we'll get a new transcription that's
-		// much shorter. We keep track of it and assemble the full utterance at the end.
-		let currentTranscription = transcriptions.last ?? []
-		if transcriptions.count == 0 {
-			transcriptions = [words]
+	private func handleTranscriptionUpdate(_ newTranscription: SFTranscription) {
+		//let words = newTranscription.formattedString.components(separatedBy: .whitespaces)
+		let utterances = newTranscription.segments.map { segment in
+			"\(segment.substring) (\(segment.confidence))"
+		}.joined(separator: " ")
+		let elapsed = self.lastTranscriptionUpdateTime.duration(to: clock.now)
+		let elapsedSeconds: Double =
+			Double(elapsed.components.seconds)
+			+ (Double(elapsed.components.attoseconds) / 1_000_000_000_000_000_000)
+		//let hasConfidence = newTranscription.segments.contains(where: { $0.confidence > 0.01 })
+		Logger.foreground.info(
+			"Speech: \(elapsedSeconds) - \(utterances)"
+		)
+
+		self.lastTranscriptionUpdateTime = clock.now
+		// If we have no transcriptions at all, just take whatever they give you
+		if transcriptions.last == nil {
+			transcriptions = [newTranscription]
 		}
-		else if words.count < currentTranscription.count - 1 {
-			transcriptions.append(words)
-			Logger.foreground.info(
-				"Started new utterance transcription with '\(words)' "
-			)
+		// If we have transcriptions, but the latest one has no confidence, replace it
+		else if transcriptions.last!.segments.reduce(0.0, { $0 + $1.confidence }) == 0.0 {
+			transcriptions[transcriptions.count - 1] = newTranscription
+			// If our last transcription has confidence, add a new transcription
 		}
 		else {
-			transcriptions[transcriptions.count - 1] = words
+			transcriptions.append(newTranscription)
+			Logger.foreground.info(
+				"Started new utterance since our last is confident"
+			)
 		}
-		let joinedTranscript: [String] = transcriptions.reduce([]) { current, new in
-			if current.count > 0 {
-				current + [". "] + new
+		let transcript: String = transcriptions.reduce("") { collector, current in
+			if collector.isEmpty {
+				return current.formattedString
 			}
 			else {
-				new
+				return collector + ". " + current.formattedString
 			}
 		}
-		let transcript = joinedTranscript.joined(separator: " ")
 		for c in onTranscriptionCallbacks {
 			c(transcript)
 		}
@@ -222,6 +240,7 @@ class WrapperAudio: NSObject {
 			)
 			try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
 
+			self.lastTranscriptionUpdateTime = self.clock.now
 			self.transcriptions = []
 			recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
 			guard let recognitionRequest = recognitionRequest else {
@@ -256,13 +275,8 @@ class WrapperAudio: NSObject {
 								"Speech recognition complete"
 							)
 						}
-						else {
-							Logger.foreground.info(
-								"Speech: \(result.bestTranscription.formattedString)"
-							)
-						}
 						self.handleTranscriptionUpdate(
-							result.bestTranscription.formattedString
+							result.bestTranscription
 						)
 					}
 
