@@ -19,6 +19,7 @@ class WrapperAudio: NSObject {
 	private var recognitionTask: SFSpeechRecognitionTask?
 	private var audioEngine = AVAudioEngine()
 	private var hasSpeechPermission = false
+	private var transcriptions: [[String]] = []
 
 	override init() {
 		self.speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))!
@@ -143,9 +144,34 @@ class WrapperAudio: NSObject {
 		}
 	}
 
-	private func handleTranscriptionUpdate(_ transcription: String) {
+	private func handleTranscriptionUpdate(_ newTranscription: String) {
+		let words = newTranscription.components(separatedBy: .whitespaces)
+		// Whenever we have a long pause we'll get a new transcription that's
+		// much shorter. We keep track of it and assemble the full utterance at the end.
+		let currentTranscription = transcriptions.last ?? []
+		if transcriptions.count == 0 {
+			transcriptions = [words]
+		}
+		else if words.count < currentTranscription.count - 1 {
+			transcriptions.append(words)
+			Logger.foreground.info(
+				"Started new utterance transcription with '\(words)' "
+			)
+		}
+		else {
+			transcriptions[transcriptions.count - 1] = words
+		}
+		let joinedTranscript: [String] = transcriptions.reduce([]) { current, new in
+			if current.count > 0 {
+				current + [". "] + new
+			}
+			else {
+				new
+			}
+		}
+		let transcript = joinedTranscript.joined(separator: " ")
 		for c in onTranscriptionCallbacks {
-			c(transcription)
+			c(transcript)
 		}
 	}
 
@@ -181,7 +207,6 @@ class WrapperAudio: NSObject {
 			Logger.foreground.info("Speech recognizer not available")
 			return
 		}
-		handleTranscriptionUpdate("")
 
 		// Cancel any previous task
 		recognitionTask?.cancel()
@@ -197,6 +222,7 @@ class WrapperAudio: NSObject {
 			)
 			try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
 
+			self.transcriptions = []
 			recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
 			guard let recognitionRequest = recognitionRequest else {
 				fatalError(
@@ -225,6 +251,16 @@ class WrapperAudio: NSObject {
 			{ result, error in
 				DispatchQueue.main.async {
 					if let result = result {
+						if result.isFinal {
+							Logger.foreground.info(
+								"Speech recognition complete"
+							)
+						}
+						else {
+							Logger.foreground.info(
+								"Speech: \(result.bestTranscription.formattedString)"
+							)
+						}
 						self.handleTranscriptionUpdate(
 							result.bestTranscription.formattedString
 						)
