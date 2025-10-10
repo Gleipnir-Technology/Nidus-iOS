@@ -78,11 +78,13 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 	let tokens = LexTranscript(text)
 
 	// For debugging
-	for token in tokens {
+	/*
+     for token in tokens {
 		Logger.foreground.info(
 			"\(text[token.range]) | \(tagTypeToString(token.type))"
 		)
 	}
+     */
 
 	var result = KnowledgeGraph(
 		adultProduction: AdultProductionKnowledgeGraph(),
