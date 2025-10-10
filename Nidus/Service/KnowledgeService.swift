@@ -109,7 +109,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 				word: threegram[1]
 			)
 		}
-		else if threegram[0] == "larvae" {
+		else if threegram[0] == "larvae" || threegram[0] == "larva" {
 			extractCount(
 				count: &result.breeding.larvaeQuantity,
 				transcript: &result.transcriptTags,
@@ -146,7 +146,7 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
 			addTranscriptionTag(&result.transcriptTags, threetok[1]!, .Source)
 		}
-		else if threegram[0] == "pupae" {
+		else if threegram[0] == "pupae" || threegram[0] == "pupa" {
 			extractCount(
 				count: &result.breeding.pupaeQuantity,
 				transcript: &result.transcriptTags,
