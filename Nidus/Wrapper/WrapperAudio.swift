@@ -14,15 +14,54 @@ class WrapperAudio: NSObject {
 	private var audioRecorder: AVAudioRecorder?
 	private var audioPlayer: AVAudioPlayer?
 	private var onTranscriptionCallbacks: [(String) -> Void] = []
-	private var speechRecognizer: SFSpeechRecognizer?
+	private var speechRecognizer: SFSpeechRecognizer
 	private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
 	private var recognitionTask: SFSpeechRecognitionTask?
 	private var audioEngine = AVAudioEngine()
 	private var hasSpeechPermission = false
 
 	override init() {
+		self.speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))!
 		super.init()
-		speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
+	}
+
+	func onAppear() {
+		Task.detached {
+			do {
+				if let languageModelUrl = Bundle.main.url(
+					forResource: "NidusSpeechModel",
+					withExtension: "bin"
+				) {
+					try await SFSpeechLanguageModel.prepareCustomLanguageModel(
+						for: languageModelUrl,
+						clientIdentifier: "technology.gleipnir.apps.nidus",
+						configuration: self.lmConfiguration
+					)
+					Logger.background.info("Loaded custom speech module")
+				}
+				else {
+					Logger.background.warning(
+						"Failed to load custom speech model"
+					)
+				}
+			}
+			catch {
+				Logger.background.warning(
+					"Failed to prepare custom LM: \(error.localizedDescription)"
+				)
+			}
+		}
+	}
+
+	private var lmConfiguration: SFSpeechLanguageModel.Configuration {
+		let outputDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)
+			.first!
+		let dynamicLanguageModel = outputDir.appendingPathComponent("LM")
+		let dynamicVocabulary = outputDir.appendingPathComponent("Vocab")
+		return SFSpeechLanguageModel.Configuration(
+			languageModel: dynamicLanguageModel,
+			vocabulary: dynamicVocabulary
+		)
 	}
 
 	func onTranscriptionUpdate(_ callback: @escaping (String) -> Void) {
@@ -138,7 +177,7 @@ class WrapperAudio: NSObject {
 
 	private func startSpeechRecognition() {
 		Logger.foreground.info("Starting speech recognition")
-		guard let speechRecognizer = speechRecognizer, speechRecognizer.isAvailable else {
+		if !speechRecognizer.isAvailable {
 			Logger.foreground.info("Speech recognizer not available")
 			return
 		}
@@ -159,8 +198,17 @@ class WrapperAudio: NSObject {
 			try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
 
 			recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
-			recognitionRequest!.taskHint = .dictation
-			recognitionRequest!.contextualStrings = [
+			guard let recognitionRequest = recognitionRequest else {
+				fatalError(
+					"Unable to created a SFSpeechAudioBufferRecognitionRequest object"
+				)
+			}
+			recognitionRequest.shouldReportPartialResults = true
+			recognitionRequest.requiresOnDeviceRecognition = true
+			recognitionRequest.customizedLanguageModel = self.lmConfiguration
+
+			recognitionRequest.taskHint = .dictation
+			recognitionRequest.contextualStrings = [
 				"Aedes",
 				"Aegypti",
 				"instar",
@@ -171,27 +219,6 @@ class WrapperAudio: NSObject {
 				"WSP",
 				"flood irrigating",
 			]
-			if let languageModelUrl = Bundle.main.url(
-				forResource: "NidusSpeechModel",
-				withExtension: "bin"
-			) {
-				let lmConfiguration: SFSpeechLanguageModel.Configuration =
-					SFSpeechLanguageModel.Configuration(
-						languageModel: languageModelUrl
-					)
-				recognitionRequest!.customizedLanguageModel = lmConfiguration
-				Logger.foreground.info("Loaded custom speech module")
-			}
-			else {
-				Logger.foreground.warning("Failed to load custom speech model")
-			}
-			guard let recognitionRequest = recognitionRequest else {
-				print("Unable to create recognition request")
-				return
-			}
-
-			recognitionRequest.shouldReportPartialResults = true
-
 			let inputNode = audioEngine.inputNode
 
 			recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest)

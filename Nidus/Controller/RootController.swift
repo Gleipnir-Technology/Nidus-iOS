@@ -132,6 +132,7 @@ class RootController {
 		}
 		self.locationDataManager.onLocationUpdated(self.handleLocationUpdated)
 		locationDataManager.onLocationUpdated(handleLocationUpdated)
+		audioRecording.onAppear()
 	}
 
 	@MainActor

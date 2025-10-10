@@ -13,6 +13,10 @@ class AudioRecordingController {
 		self.wrapper = WrapperAudio()
 	}
 
+	func onAppear() {
+		wrapper.onAppear()
+	}
+
 	@MainActor
 	func onLocationUpdated(_ cells: [H3Cell]) {
 		if store.isRecording {
