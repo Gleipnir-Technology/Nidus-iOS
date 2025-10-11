@@ -302,6 +302,8 @@ private func extractInt(
 		return result
 	}
 	switch text {
+	case "no", "nil", "zero", "zilch":
+		return 0
 	case "one":
 		return 1
 	case "two":

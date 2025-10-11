@@ -65,7 +65,8 @@ let data = SFCustomLanguageModelData(
 	SFCustomLanguageModelData.PhraseCountsFromTemplates(classes: [
 		"thing": ["pupa", "pupae", "larva", "larvae", "dip", "dips"],
 		"number": [
-			"one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+			"no", "zero", "one", "two", "three", "four", "five", "six", "seven",
+			"eight", "nine",
 			"ten",
 		],
 	]) {
