@@ -7,7 +7,6 @@ import SwiftUI
 enum ActiveView {
 	case audio
 	case breadcrumb
-	case notes
 }
 /*
  The root view of the app
@@ -56,7 +55,7 @@ struct RootView: View {
 	}
 	func onMapButtonShort() {
 		if activeView == .breadcrumb {
-			activeView = .notes
+			path.append("notes-by-area")
 		}
 		else {
 			activeView = .breadcrumb
@@ -102,17 +101,6 @@ struct RootView: View {
 									.current,
 								onSelectCell: onMapSelectCell,
 								showsGrid: false
-							)
-						case .notes:
-							NoteListView(
-								controller: controller,
-								selectedCell: controller.region
-									.store.breadcrumb
-									.selectedCell,
-								userLocation: controller.region
-									.store
-									.breadcrumb
-									.userCell
 							)
 						}
 						Spacer()
@@ -186,7 +174,21 @@ struct RootView: View {
 						case "map-settings":
 							SettingView(controller: controller)
 						default:
-							if p.starts(with: "notes-by-cell/") {
+							if p.starts(with: "notes-by-area") {
+								NoteListView(
+									controller: controller,
+									selectedCell: controller
+										.region
+										.store.breadcrumb
+										.selectedCell,
+									userLocation: controller
+										.region
+										.store
+										.breadcrumb
+										.userCell
+								)
+							}
+							else if p.starts(with: "notes-by-cell/") {
 								let cellString: String = String(
 									p.split(separator: "/")
 										.last!
