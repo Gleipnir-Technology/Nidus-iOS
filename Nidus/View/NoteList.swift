@@ -6,8 +6,8 @@ import SwiftUI
 
 /// A view of the various notes in the current area
 struct NoteListView: View {
-	let cell: H3Cell
 	var controller: RootController
+	let selectedCell: H3Cell?
 	let userLocation: H3Cell?
 
 	@State var searchText: String = ""
@@ -25,8 +25,8 @@ struct NoteListView: View {
 				}
 				else {
 					NoteList(
-						cell: cell,
 						controller: controller,
+						selectedCell: selectedCell,
 						userLocation: userLocation
 					)
 				}
@@ -37,17 +37,21 @@ struct NoteListView: View {
 }
 
 /// Return the ordered list of overviews that are contained within the current cell
-func overviewsInCellOrdered(cell: H3Cell, controller: RootController, userLocation: H3Cell?)
+func overviewsInCellOrdered(
+	controller: RootController,
+	selectedCell: H3Cell?,
+	userLocation: H3Cell?
+)
 	-> [NoteOverview]
 {
 	var results: [NoteOverview] = []
-	let currentResolution = getResolution(cell: cell)
+	let currentResolution = 13  //getResolution(cell: cell)
 	for o in controller.notes.model.noteOverviews! {
 		// No location for this note
 		if o.location == 0 {
 			continue
 		}
-		else if o.location == cell {
+		else if o.location == selectedCell {
 			results.append(o)
 			continue
 		}
@@ -58,7 +62,7 @@ func overviewsInCellOrdered(cell: H3Cell, controller: RootController, userLocati
 					o.location,
 					to: UInt(currentResolution)
 				)
-				if c == cell {
+				if c == selectedCell {
 					results.append(o)
 				}
 			}
@@ -74,7 +78,7 @@ func overviewsInCellOrdered(cell: H3Cell, controller: RootController, userLocati
 		}
 		else {
 			Logger.foreground.warning(
-				"Got a location cell that is smaller that tapped cell \(String(cell, radix: 16)), not sure what to do with this: \(String(o.location, radix: 16))"
+				"Got a location cell that is smaller that tapped cell \(String(selectedCell ?? 0, radix: 16)), not sure what to do with this: \(String(o.location, radix: 16))"
 			)
 		}
 	}
@@ -108,20 +112,20 @@ func overviewsInCellOrdered(cell: H3Cell, controller: RootController, userLocati
 }
 
 struct NoteList: View {
-	let cell: H3Cell
 	var controller: RootController
 	let overviewsOrdered: [NoteOverview]
+	let selectedCell: H3Cell?
 	let userLocation: H3Cell?
 
-	init(cell: H3Cell, controller: RootController, userLocation: H3Cell?) {
-		self.cell = cell
+	init(controller: RootController, selectedCell: H3Cell?, userLocation: H3Cell?) {
 		self.controller = controller
-		self.userLocation = userLocation
+		self.selectedCell = selectedCell
 		self.overviewsOrdered = overviewsInCellOrdered(
-			cell: cell,
 			controller: controller,
+			selectedCell: selectedCell,
 			userLocation: userLocation
 		)
+		self.userLocation = userLocation
 	}
 
 	var body: some View {
@@ -377,31 +381,31 @@ struct NoteListRowTextCluster: View {
 struct NoteList_Previews: PreviewProvider {
 	static var previews: some View {
 		NoteListView(
-			cell: 0x88_2834_7053f_ffff,
 			controller: RootControllerPreview(
 				notes: NotesControllerPreview(
 					model: NotesModel.Preview.noNotes
 				)
 			),
+			selectedCell: 0x88_2834_7053f_ffff,
 			userLocation: RegionControllerPreview.userCell
 		)
 		NoteListView(
-			cell: 0x88_2834_7053f_ffff,
 			controller: RootControllerPreview(
 				notes: NotesControllerPreview(
 					model: NotesModel.Preview.someNotes
 				)
 			),
+			selectedCell: 0x88_2834_7053f_ffff,
 			userLocation: RegionControllerPreview.userCell
 		).previewDisplayName("base")
 		NavigationView {
 			NoteListView(
-				cell: 0x88_2834_7053f_ffff,
 				controller: RootControllerPreview(
 					notes: NotesControllerPreview(
 						model: NotesModel.Preview.notesWithIcons
 					)
 				),
+				selectedCell: 0x88_2834_7053f_ffff,
 				userLocation: RegionControllerPreview.userCell
 			)
 		}.previewDisplayName("icons")
