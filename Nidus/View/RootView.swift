@@ -55,13 +55,12 @@ struct RootView: View {
 		path.append("map-settings")
 	}
 	func onMapButtonShort() {
-		activeView = .breadcrumb
-		/*if activeView == .breadcrumb {
+		if activeView == .breadcrumb {
 			activeView = .notes
 		}
 		else {
 			activeView = .breadcrumb
-		}*/
+		}
 	}
 	func onMapSelectCell(_ cell: H3Cell) {
 		controller.region.store.breadcrumb.selectedCell = cell
