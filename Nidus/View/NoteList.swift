@@ -14,7 +14,7 @@ struct NoteListView: View {
 
 	var body: some View {
 		VStack {
-			//NoteSearchBar(searchText: $searchText)
+			NoteSearchBar(searchText: $searchText)
 
 			if controller.notes.model.noteOverviews == nil {
 				Text("Loading")
@@ -32,6 +32,14 @@ struct NoteListView: View {
 				}
 			}
 			Spacer()
+		}.toolbar {
+			ToolbarItem(placement: .navigationBarTrailing) {
+				NavigationLink {
+					SortSelectionView()
+				} label: {
+					Text("Sort")
+				}
+			}
 		}
 	}
 }
@@ -427,25 +435,29 @@ private struct NoteListRowTextCluster: View {
 
 struct NoteList_Previews: PreviewProvider {
 	static var previews: some View {
-		NoteListView(
-			controller: RootControllerPreview(
-				notes: NotesControllerPreview(
-					model: NotesModel.Preview.noNotes
-				)
-			),
-			selectedCell: 0x88_2834_7053f_ffff,
-			userLocation: RegionControllerPreview.userCell
-		)
-		NoteListView(
-			controller: RootControllerPreview(
-				notes: NotesControllerPreview(
-					model: NotesModel.Preview.someNotes
-				)
-			),
-			selectedCell: 0x88_2834_7053f_ffff,
-			userLocation: RegionControllerPreview.userCell
-		).previewDisplayName("base")
-		NavigationView {
+		NavigationStack {
+			NoteListView(
+				controller: RootControllerPreview(
+					notes: NotesControllerPreview(
+						model: NotesModel.Preview.noNotes
+					)
+				),
+				selectedCell: 0x88_2834_7053f_ffff,
+				userLocation: RegionControllerPreview.userCell
+			)
+		}.previewDisplayName("no notes")
+		NavigationStack {
+			NoteListView(
+				controller: RootControllerPreview(
+					notes: NotesControllerPreview(
+						model: NotesModel.Preview.someNotes
+					)
+				),
+				selectedCell: nil,
+				userLocation: RegionControllerPreview.userCell
+			)
+		}.previewDisplayName("base")
+		NavigationStack {
 			NoteListView(
 				controller: RootControllerPreview(
 					notes: NotesControllerPreview(
@@ -456,11 +468,13 @@ struct NoteList_Previews: PreviewProvider {
 				userLocation: RegionControllerPreview.userCell
 			)
 		}.previewDisplayName("icons")
-		NoteListRowContent(
-			overview: noteOverviewPreview(
-				[.AbundanceTrendUp, .SourceProbabilityIndicator]
-			),
-			userLocation: RegionControllerPreview.userCell
-		).previewDisplayName("just icons")
+		NavigationStack {
+			NoteListRowContent(
+				overview: noteOverviewPreview(
+					[.AbundanceTrendUp, .SourceProbabilityIndicator]
+				),
+				userLocation: RegionControllerPreview.userCell
+			)
+		}.previewDisplayName("just icons")
 	}
 }
