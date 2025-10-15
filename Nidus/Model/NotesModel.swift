@@ -1,5 +1,52 @@
 import MapKit
 
+enum InvalidEnumValue: Error {
+	case runtimeError(String)
+}
+
+enum NoteListSort: CustomStringConvertible {
+	var description: String {
+		switch self {
+		case .Age:
+			return "Age"
+		case .DistanceFromSelection:
+			return "Distance from selection"
+		case .DistanceFromUser:
+			return "Distance from you"
+		}
+	}
+
+	case Age
+	case DistanceFromSelection
+	case DistanceFromUser
+
+	static func allCases() -> [NoteListSort] {
+		[.Age, .DistanceFromSelection, .DistanceFromUser]
+	}
+	static func FromInt(_ i: Int) throws -> NoteListSort {
+		switch i {
+		case 0:
+			return .Age
+		case 1:
+			return .DistanceFromSelection
+		case 2:
+			return .DistanceFromUser
+		default:
+			throw InvalidEnumValue.runtimeError("nope")
+		}
+	}
+	func ToInt() -> Int {
+		switch self {
+		case .Age:
+			return 0
+		case .DistanceFromSelection:
+			return 1
+		case .DistanceFromUser:
+			return 2
+		}
+	}
+}
+
 struct NotesModel {
 	var currentRegion: MKCoordinateRegion = Initial.region
 	var errorMessage: String? = nil
@@ -8,6 +55,8 @@ struct NotesModel {
 	var notes: [UUID: any NoteProtocol]? = nil
 	var noteOverviews: [NoteOverview]? = []
 	var searchText: String = ""
+	var sort: NoteListSort = .Age
+	var sortAscending: Bool = true
 
 	static func forPreview(notes: [any NoteProtocol]) -> NotesModel {
 		var model = NotesModel()

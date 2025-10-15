@@ -1,27 +1,37 @@
 import OSLog
 import SwiftUI
 
-enum NoteListSort {
-	case Age
-	case DistanceFromSelection
-	case DistanceFromUser
-}
-
 struct SortSelectionView: View {
-	@State var selection: Int = 0
 	@State var ascending: Bool = true
+	var controller: NotesController
+	@Environment(\.dismiss) private var dismiss
+	@State var selection: Int = 0
+
 	func apply() {
-		Logger.foreground.info("Apply sort")
+		do {
+			let sort: NoteListSort = try NoteListSort.FromInt(selection)
+			controller.Sort(sort, ascending)
+		}
+		catch {
+			Logger.background.error(
+				"Failed to parse sort selection from \(selection). This is a programmer error"
+			)
+		}
 	}
+
 	var body: some View {
 		Form {
 			Picker(
 				selection: $selection,
 				label: Text("Sort notes by"),
 				content: {
-					Text("Note age").tag(0)
-					Text("Distance from selected location").tag(1)
-					Text("Distance from user location").tag(2)
+					Text("Note age").tag(NoteListSort.Age.ToInt())
+					Text("Distance from selected location").tag(
+						NoteListSort.DistanceFromSelection.ToInt()
+					)
+					Text("Distance from user location").tag(
+						NoteListSort.DistanceFromUser.ToInt()
+					)
 				}
 			)
 			Picker(
@@ -36,14 +46,18 @@ struct SortSelectionView: View {
 			ToolbarItem(placement: .navigationBarTrailing) {
 				Button("Apply") {
 					apply()
+					dismiss()
 				}
 			}
+		}.onAppear {
+			self.ascending = controller.model.sortAscending
+			self.selection = controller.model.sort.ToInt()
 		}
 	}
 }
 
 #Preview {
 	NavigationStack {
-		SortSelectionView()
+		SortSelectionView(controller: NotesController())
 	}
 }

@@ -28,6 +28,14 @@ class NotesController {
 		self.model.noteOverviews = noteOverviews
 	}
 
+	func Sort(
+		_ sort: NoteListSort,
+		_ isAscending: Bool
+	) {
+		model.sort = sort
+		model.sortAscending = isAscending
+	}
+
 	// MARK - private functions
 	private func doError(_ message: String) {
 		// TODO - raise this error properly to the UI layer

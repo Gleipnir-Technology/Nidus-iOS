@@ -12,6 +12,9 @@ struct NoteListView: View {
 
 	@State var searchText: String = ""
 
+	func applySort(_ sort: NoteListSort, _ isAscending: Bool) {
+
+	}
 	var body: some View {
 		VStack {
 			NoteSearchBar(searchText: $searchText)
@@ -35,7 +38,9 @@ struct NoteListView: View {
 		}.toolbar {
 			ToolbarItem(placement: .navigationBarTrailing) {
 				NavigationLink {
-					SortSelectionView()
+					SortSelectionView(
+						controller: controller.notes
+					)
 				} label: {
 					Text("Sort")
 				}
@@ -46,43 +51,92 @@ struct NoteListView: View {
 
 /// Return the ordered list of overviews
 func overviewsInAreaOrdered(
-	controller: RootController,
+	isAscending: Bool,
+	overviews: [NoteOverview],
+	selectedLocation: H3Cell?,
+	sort: NoteListSort,
 	userLocation: H3Cell?
 ) -> [NoteOverview] {
-	guard let noteOverviews = controller.notes.model.noteOverviews else {
-		Logger.foreground.warning("Attempting to show overviews when they aren't loaded.")
-		return []
+	Logger.foreground.info("Sorting overviews with \(sort) and ascending \(isAscending)")
+	switch sort {
+	case .Age:
+		return sortByAge(
+			isAscending: isAscending,
+			overviews: overviews
+		)
+	case .DistanceFromSelection:
+		guard let selectedLocation else {
+			guard let userLocation else {
+				return sortByAge(isAscending: isAscending, overviews: overviews)
+			}
+			return sortByDistance(
+				isAscending: isAscending,
+				location: userLocation,
+				overviews: overviews.filter({ $0.location != 0 })
+			) + overviews.filter({ $0.location == 0 })
+		}
+		return sortByDistance(
+			isAscending: isAscending,
+			location: selectedLocation,
+			overviews: overviews.filter({ $0.location != 0 })
+		) + overviews.filter({ $0.location == 0 })
+	case .DistanceFromUser:
+		guard let userLocation = userLocation else {
+			guard let selectedLocation else {
+				return sortByAge(isAscending: isAscending, overviews: overviews)
+			}
+			return sortByDistance(
+				isAscending: isAscending,
+				location: selectedLocation,
+				overviews: overviews.filter({ $0.location != 0 })
+			) + overviews.filter({ $0.location == 0 })
+		}
+		return sortByDistance(
+			isAscending: isAscending,
+			location: userLocation,
+			overviews: overviews.filter({ $0.location != 0 })
+		) + overviews.filter({ $0.location == 0 })
 	}
-	let results: [NoteOverview] = noteOverviews.filter { $0.location != 0 }
-	// If we don't have a user location we can't sort any further
-	if userLocation == nil {
-		return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
-			o1.time > o2.time
-		} + noteOverviews.filter { $0.location == 0 }
+}
+private func sortByAge(isAscending: Bool, overviews: [NoteOverview]) -> [NoteOverview] {
+	let result = overviews.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
+		return o1.time > o2.time
 	}
-	return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
+	if !isAscending {
+		return result.reversed()
+	}
+	return result
+}
+
+private func sortByDistance(isAscending: Bool, location: H3Cell, overviews: [NoteOverview])
+	-> [NoteOverview]
+{
+	let result = overviews.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
 		do {
 			let d1 = try gridDistance(
-				origin: userLocation!,
+				origin: location,
 				destination: o1.location
 			)
 			let d2 = try gridDistance(
-				origin: userLocation!,
+				origin: location,
 				destination: o2.location
 			)
 			if d1 == d2 {
 				return o1.time > o2.time
 			}
 			return d1 > d2
-
 		}
 		catch {
 			// effectively random
 			return o1.time > o2.time
 		}
 	}
-
+	if !isAscending {
+		return result.reversed()
+	}
+	return result
 }
+
 /// Return the ordered list of overviews that are contained within the selected cell
 func overviewsInCellOrdered(
 	controller: RootController,
@@ -91,7 +145,7 @@ func overviewsInCellOrdered(
 )
 	-> [NoteOverview]
 {
-	var results: [NoteOverview] = []
+	var overviewsInCell: [NoteOverview] = []
 	let currentResolution = getResolution(cell: selectedCell)
 	for o in controller.notes.model.noteOverviews! {
 		// No location for this note
@@ -99,7 +153,7 @@ func overviewsInCellOrdered(
 			continue
 		}
 		else if o.location == selectedCell {
-			results.append(o)
+			overviewsInCell.append(o)
 			continue
 		}
 		let res = getResolution(cell: o.location)
@@ -110,7 +164,7 @@ func overviewsInCellOrdered(
 					to: UInt(currentResolution)
 				)
 				if c == selectedCell {
-					results.append(o)
+					overviewsInCell.append(o)
 				}
 			}
 			catch {
@@ -124,38 +178,18 @@ func overviewsInCellOrdered(
 			continue
 		}
 		else {
-			Logger.foreground.warning(
-				"Got a location cell that is smaller that tapped cell \(String(selectedCell ?? 0, radix: 16)), not sure what to do with this: \(String(o.location, radix: 16))"
-			)
+			// We know here that the note's location is a larger cell than the one we selected
+			// we are therefore going to exclude it
+			continue
 		}
 	}
-	// At this point we have a set of results, but they aren't in order
-	if userLocation == nil {
-		return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
-			o1.time > o2.time
-		}
-	}
-	return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
-		do {
-			let d1 = try gridDistance(
-				origin: userLocation!,
-				destination: o1.location
-			)
-			let d2 = try gridDistance(
-				origin: userLocation!,
-				destination: o2.location
-			)
-			if d1 == d2 {
-				return o1.time > o2.time
-			}
-			return d1 > d2
-
-		}
-		catch {
-			// effectively random
-			return o1.time > o2.time
-		}
-	}
+	return overviewsInAreaOrdered(
+		isAscending: controller.notes.model.sortAscending,
+		overviews: overviewsInCell,
+		selectedLocation: selectedCell,
+		sort: controller.notes.model.sort,
+		userLocation: userLocation
+	)
 }
 
 private struct NoteList: View {
@@ -169,7 +203,10 @@ private struct NoteList: View {
 		self.selectedCell = selectedCell
 		if selectedCell == nil {
 			self.overviewsOrdered = overviewsInAreaOrdered(
-				controller: controller,
+				isAscending: controller.notes.model.sortAscending,
+				overviews: controller.notes.model.noteOverviews!,
+				selectedLocation: selectedCell,
+				sort: controller.notes.model.sort,
 				userLocation: userLocation
 			)
 		}
