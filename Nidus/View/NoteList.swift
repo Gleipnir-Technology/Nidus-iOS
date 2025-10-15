@@ -36,16 +36,55 @@ struct NoteListView: View {
 	}
 }
 
-/// Return the ordered list of overviews that are contained within the current cell
+/// Return the ordered list of overviews
+func overviewsInAreaOrdered(
+	controller: RootController,
+	userLocation: H3Cell?
+) -> [NoteOverview] {
+	guard let noteOverviews = controller.notes.model.noteOverviews else {
+		Logger.foreground.warning("Attempting to show overviews when they aren't loaded.")
+		return []
+	}
+	let results: [NoteOverview] = noteOverviews.filter { $0.location != 0 }
+	// If we don't have a user location we can't sort any further
+	if userLocation == nil {
+		return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
+			o1.time > o2.time
+		} + noteOverviews.filter { $0.location == 0 }
+	}
+	return results.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
+		do {
+			let d1 = try gridDistance(
+				origin: userLocation!,
+				destination: o1.location
+			)
+			let d2 = try gridDistance(
+				origin: userLocation!,
+				destination: o2.location
+			)
+			if d1 == d2 {
+				return o1.time > o2.time
+			}
+			return d1 > d2
+
+		}
+		catch {
+			// effectively random
+			return o1.time > o2.time
+		}
+	}
+
+}
+/// Return the ordered list of overviews that are contained within the selected cell
 func overviewsInCellOrdered(
 	controller: RootController,
-	selectedCell: H3Cell?,
+	selectedCell: H3Cell,
 	userLocation: H3Cell?
 )
 	-> [NoteOverview]
 {
 	var results: [NoteOverview] = []
-	let currentResolution = 13  //getResolution(cell: cell)
+	let currentResolution = getResolution(cell: selectedCell)
 	for o in controller.notes.model.noteOverviews! {
 		// No location for this note
 		if o.location == 0 {
@@ -120,11 +159,19 @@ private struct NoteList: View {
 	init(controller: RootController, selectedCell: H3Cell?, userLocation: H3Cell?) {
 		self.controller = controller
 		self.selectedCell = selectedCell
-		self.overviewsOrdered = overviewsInCellOrdered(
-			controller: controller,
-			selectedCell: selectedCell,
-			userLocation: userLocation
-		)
+		if selectedCell == nil {
+			self.overviewsOrdered = overviewsInAreaOrdered(
+				controller: controller,
+				userLocation: userLocation
+			)
+		}
+		else {
+			self.overviewsOrdered = overviewsInCellOrdered(
+				controller: controller,
+				selectedCell: selectedCell!,
+				userLocation: userLocation
+			)
+		}
 		self.userLocation = userLocation
 	}
 
