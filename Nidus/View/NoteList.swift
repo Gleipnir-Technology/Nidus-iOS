@@ -111,7 +111,7 @@ func overviewsInCellOrdered(
 	}
 }
 
-struct NoteList: View {
+private struct NoteList: View {
 	var controller: RootController
 	let overviewsOrdered: [NoteOverview]
 	let selectedCell: H3Cell?
@@ -151,7 +151,7 @@ struct NoteList: View {
 	}
 }
 
-struct NoteListRow: View {
+private struct NoteListRow: View {
 	let controller: RootController
 	let overview: NoteOverview
 	let userLocation: H3Cell?
@@ -166,7 +166,7 @@ struct NoteListRow: View {
 		}
 	}
 }
-struct NoteListRowContent: View {
+private struct NoteListRowContent: View {
 	let ROW_HEIGHT: CGFloat = 40.0
 
 	let overview: NoteOverview
@@ -190,7 +190,7 @@ struct NoteListRowContent: View {
 	}
 }
 
-struct NoteListRowIconCluster: View {
+private struct NoteListRowIconCluster: View {
 	let iconsPerRow = 7
 	let icons: Set<NoteOverviewIcon>
 
@@ -334,7 +334,7 @@ struct NoteListRowIconCluster: View {
 	}
 }
 
-struct NoteListRowTextCluster: View {
+private struct NoteListRowTextCluster: View {
 	@Environment(\.locale) var locale
 	let overview: NoteOverview
 	let userLocation: H3Cell?
