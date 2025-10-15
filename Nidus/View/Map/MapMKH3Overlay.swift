@@ -47,6 +47,18 @@ class MapWrapperViewCoordinator: NSObject, MKMapViewDelegate {
 			types: regionStore.overlays
 		)
 		mapView.addOverlay(overlay)
+
+		if regionStore.breadcrumb.selectedCell != nil {
+			let selectedOverlay = H3Overlay([
+				H3OverlayElement(
+					cell: regionStore.breadcrumb.selectedCell!,
+					fillColor: UIColor.yellow.withAlphaComponent(0.5),
+					lineWidth: 10.0,
+					outlineColor: UIColor.yellow
+				)
+			])
+			mapView.addOverlay(selectedOverlay)
+		}
 	}
 
 	@objc
@@ -91,6 +103,13 @@ class MapWrapperViewCoordinator: NSObject, MKMapViewDelegate {
 			renderer.fillColor = UIColor.systemCyan.withAlphaComponent(0.3)
 			renderer.lineWidth = 10
 			return renderer
+		}
+		else if overlay is H3Overlay {
+			guard let h3Overlay = overlay as? H3Overlay else {
+				Logger.foreground.error("Unable to translate overlay to H3Overlay")
+				return MKMultiPolygonRenderer(overlay: MKMultiPolygon([]))
+			}
+			return H3OverlayRenderer(overlay: h3Overlay)
 		}
 		else {
 			print("Using default renderer")

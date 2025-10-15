@@ -63,7 +63,7 @@ struct RootView: View {
 	}
 	func onMapSelectCell(_ cell: H3Cell) {
 		controller.region.store.breadcrumb.selectedCell = cell
-		path.append("notes-by-cell/\(cell)")
+		//path.append("notes-by-cell/\(cell)")
 	}
 	func onMicButtonLong() {
 		didSelect.toggle()

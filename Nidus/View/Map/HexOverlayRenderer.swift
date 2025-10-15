@@ -2,6 +2,13 @@ import MapKit
 import OSLog
 import SwiftUI
 
+struct H3OverlayElement {
+	let cell: H3Cell
+	let fillColor: UIColor?
+	let lineWidth: CGFloat
+	var outlineColor: UIColor
+}
+
 final class HexOverlayRenderer: MKOverlayRenderer {
 	var fillColor: UIColor
 	var lineWidth: CGFloat
