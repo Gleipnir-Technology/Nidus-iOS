@@ -19,11 +19,11 @@ struct NoteListView: View {
 		VStack {
 			NoteSearchBar(searchText: $searchText)
 
-			if controller.notes.model.noteOverviews == nil {
+			if controller.notes.store.noteOverviews == nil {
 				Text("Loading")
 			}
 			else {
-				if controller.notes.model.noteOverviews!.count == 0 {
+				if controller.notes.store.noteOverviews!.count == 0 {
 					Text("No notes")
 				}
 				else {
@@ -147,7 +147,7 @@ func overviewsInCellOrdered(
 {
 	var overviewsInCell: [NoteOverview] = []
 	let currentResolution = getResolution(cell: selectedCell)
-	for o in controller.notes.model.noteOverviews! {
+	for o in controller.notes.store.noteOverviews! {
 		// No location for this note
 		if o.location == 0 {
 			continue
@@ -184,10 +184,10 @@ func overviewsInCellOrdered(
 		}
 	}
 	return overviewsInAreaOrdered(
-		isAscending: controller.notes.model.sortAscending,
+		isAscending: controller.notes.store.sortAscending,
 		overviews: overviewsInCell,
 		selectedLocation: selectedCell,
-		sort: controller.notes.model.sort,
+		sort: controller.notes.store.sort,
 		userLocation: userLocation
 	)
 }
@@ -203,10 +203,10 @@ private struct NoteList: View {
 		self.selectedCell = selectedCell
 		if selectedCell == nil {
 			self.overviewsOrdered = overviewsInAreaOrdered(
-				isAscending: controller.notes.model.sortAscending,
-				overviews: controller.notes.model.noteOverviews!,
+				isAscending: controller.notes.store.sortAscending,
+				overviews: controller.notes.store.noteOverviews!,
 				selectedLocation: selectedCell,
-				sort: controller.notes.model.sort,
+				sort: controller.notes.store.sort,
 				userLocation: userLocation
 			)
 		}
@@ -221,7 +221,7 @@ private struct NoteList: View {
 	}
 
 	var body: some View {
-		if controller.notes.model.noteOverviews == nil {
+		if controller.notes.store.noteOverviews == nil {
 			ProgressView()
 		}
 		else {
@@ -476,7 +476,7 @@ struct NoteList_Previews: PreviewProvider {
 			NoteListView(
 				controller: RootControllerPreview(
 					notes: NotesControllerPreview(
-						model: NotesModel.Preview.noNotes
+						model: NotesStore.Preview.noNotes
 					)
 				),
 				selectedCell: 0x88_2834_7053f_ffff,
@@ -487,7 +487,7 @@ struct NoteList_Previews: PreviewProvider {
 			NoteListView(
 				controller: RootControllerPreview(
 					notes: NotesControllerPreview(
-						model: NotesModel.Preview.someNotes
+						model: NotesStore.Preview.someNotes
 					)
 				),
 				selectedCell: nil,
@@ -498,7 +498,7 @@ struct NoteList_Previews: PreviewProvider {
 			NoteListView(
 				controller: RootControllerPreview(
 					notes: NotesControllerPreview(
-						model: NotesModel.Preview.notesWithIcons
+						model: NotesStore.Preview.notesWithIcons
 					)
 				),
 				selectedCell: 0x88_2834_7053f_ffff,

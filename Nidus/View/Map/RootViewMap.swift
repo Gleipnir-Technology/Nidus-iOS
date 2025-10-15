@@ -97,7 +97,7 @@ struct RootViewMap_Previews: PreviewProvider {
 			initialRegion: Initial.region,
 			onSelectCell: onSelectCell
 		).onAppear {
-			notes.model = NotesModel.Preview.someNotes
+			notes.store = NotesStore.Preview.someNotes
 			controller.region.store.breadcrumb.selectedCell =
 				RegionControllerPreview.selectedCell
 			controller.region.store.breadcrumb.userCell =

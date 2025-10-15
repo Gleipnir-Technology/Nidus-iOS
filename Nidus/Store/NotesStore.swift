@@ -47,7 +47,7 @@ enum NoteListSort: CustomStringConvertible {
 	}
 }
 
-struct NotesModel {
+struct NotesStore {
 	var currentRegion: MKCoordinateRegion = Initial.region
 	var errorMessage: String? = nil
 	var filterInstances: [String: FilterInstance] = [:]
@@ -58,8 +58,8 @@ struct NotesModel {
 	var sort: NoteListSort = .Age
 	var sortAscending: Bool = true
 
-	static func forPreview(notes: [any NoteProtocol]) -> NotesModel {
-		var model = NotesModel()
+	static func forPreview(notes: [any NoteProtocol]) -> NotesStore {
+		var model = NotesStore()
 		model.notes = notes.reduce(into: [:]) { result, note in
 			result[note.id] = note
 		}
@@ -69,8 +69,8 @@ struct NotesModel {
 	}
 
 	struct Preview {
-		static let noNotes: NotesModel = NotesModel.forPreview(notes: [])
-		static let notesWithIcons: NotesModel = NotesModel.forPreview(notes: [
+		static let noNotes: NotesStore = NotesStore.forPreview(notes: [])
+		static let notesWithIcons: NotesStore = NotesStore.forPreview(notes: [
 			MosquitoSourceNote(
 				access: "",
 				active: false,
@@ -126,7 +126,7 @@ struct NotesModel {
 				zone: ""
 			),
 		])
-		static let someNotes: NotesModel = NotesModel.forPreview(notes: [
+		static let someNotes: NotesStore = NotesStore.forPreview(notes: [
 			AudioNote(
 				breadcrumbs: [
 					AudioNoteBreadcrumb(

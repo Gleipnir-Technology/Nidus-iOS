@@ -50,8 +50,8 @@ struct SortSelectionView: View {
 				}
 			}
 		}.onAppear {
-			self.ascending = controller.model.sortAscending
-			self.selection = controller.model.sort.ToInt()
+			self.ascending = controller.store.sortAscending
+			self.selection = controller.store.sort.ToInt()
 		}
 	}
 }

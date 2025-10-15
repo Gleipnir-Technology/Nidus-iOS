@@ -9,7 +9,7 @@ struct NoteDetailView: View {
 	init(controller: RootController, noteUUID: UUID) {
 		self.controller = controller
 		self.noteUUID = noteUUID
-		self.note = controller.notes.model.notes![noteUUID]
+		self.note = controller.notes.store.notes![noteUUID]
 	}
 	var body: some View {
 		if note == nil {

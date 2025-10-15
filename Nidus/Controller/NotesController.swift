@@ -7,10 +7,10 @@ import SwiftUI
  */
 @Observable
 class NotesController {
-	var model = NotesModel()
+	var store = NotesStore()
 
 	func filterAdd(_ instance: FilterInstance) {
-		model.filterInstances[instance.Name()] = instance
+		store.filterInstances[instance.Name()] = instance
 		onFilterChange()
 	}
 
@@ -23,17 +23,17 @@ class NotesController {
 		notes: [UUID: any NoteProtocol],
 		noteOverviews: [NoteOverview]
 	) {
-		self.model.noteOverviews = noteOverviews
-		self.model.notes = notes
-		self.model.noteOverviews = noteOverviews
+		self.store.noteOverviews = noteOverviews
+		self.store.notes = notes
+		self.store.noteOverviews = noteOverviews
 	}
 
 	func Sort(
 		_ sort: NoteListSort,
 		_ isAscending: Bool
 	) {
-		model.sort = sort
-		model.sortAscending = isAscending
+		store.sort = sort
+		store.sortAscending = isAscending
 	}
 
 	// MARK - private functions
@@ -47,7 +47,7 @@ class NotesController {
 	}
 
 	private func onFilterChange() {
-		let asStrings: [String] = model.filterInstances.map { $1.toString() }
+		let asStrings: [String] = store.filterInstances.map { $1.toString() }
 		UserDefaults.standard.set(asStrings, forKey: "filters")
 		Logger.foreground.info("Saved filters \(asStrings)")
 		//calculateNotesToShow()
@@ -60,7 +60,7 @@ class NotesController {
 				Logger.background.error("Failed to parse filter string: \(f)")
 				continue
 			}
-			self.model.filterInstances[filter.Name()] = filter
+			self.store.filterInstances[filter.Name()] = filter
 		}
 	}
 	func handleNoteUpdates(_ response: NotesResponse) async {
@@ -74,15 +74,15 @@ class NotesController {
 	}
 
 	private func shouldShow(_ note: AnyNote) -> Bool {
-		for filter in model.filterInstances.values {
+		for filter in store.filterInstances.values {
 			if !filter.AllowsNote(note) {
 				return false
 			}
 		}
-		if note.coordinate.latitude < model.currentRegion.minLatitude
-			|| note.coordinate.longitude < model.currentRegion.minLongitude
-			|| note.coordinate.latitude > model.currentRegion.maxLatitude
-			|| note.coordinate.longitude > model.currentRegion.maxLongitude
+		if note.coordinate.latitude < store.currentRegion.minLatitude
+			|| note.coordinate.longitude < store.currentRegion.minLongitude
+			|| note.coordinate.latitude > store.currentRegion.maxLatitude
+			|| note.coordinate.longitude > store.currentRegion.maxLongitude
 		{
 			return false
 		}
@@ -91,8 +91,8 @@ class NotesController {
 }
 
 class NotesControllerPreview: NotesController {
-	init(model: NotesModel = NotesModel()) {
+	init(model: NotesStore = NotesStore()) {
 		super.init()
-		self.model = model
+		self.store = model
 	}
 }
