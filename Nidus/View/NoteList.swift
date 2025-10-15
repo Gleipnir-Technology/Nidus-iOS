@@ -12,9 +12,6 @@ struct NoteListView: View {
 
 	@State var searchText: String = ""
 
-	func applySort(_ sort: NoteListSort, _ isAscending: Bool) {
-
-	}
 	var body: some View {
 		VStack {
 			NoteSearchBar(searchText: $searchText)
@@ -29,6 +26,7 @@ struct NoteListView: View {
 				else {
 					NoteList(
 						controller: controller,
+						filterText: searchText,
 						selectedCell: selectedCell,
 						userLocation: userLocation
 					)
@@ -140,6 +138,7 @@ private func sortByDistance(isAscending: Bool, location: H3Cell, overviews: [Not
 /// Return the ordered list of overviews that are contained within the selected cell
 func overviewsInCellOrdered(
 	controller: RootController,
+	overviews: [NoteOverview],
 	selectedCell: H3Cell,
 	userLocation: H3Cell?
 )
@@ -147,7 +146,7 @@ func overviewsInCellOrdered(
 {
 	var overviewsInCell: [NoteOverview] = []
 	let currentResolution = getResolution(cell: selectedCell)
-	for o in controller.notes.store.noteOverviews! {
+	for o in overviews {
 		// No location for this note
 		if o.location == 0 {
 			continue
@@ -198,13 +197,32 @@ private struct NoteList: View {
 	let selectedCell: H3Cell?
 	let userLocation: H3Cell?
 
-	init(controller: RootController, selectedCell: H3Cell?, userLocation: H3Cell?) {
+	init(
+		controller: RootController,
+		filterText: String,
+		selectedCell: H3Cell?,
+		userLocation: H3Cell?
+	) {
 		self.controller = controller
 		self.selectedCell = selectedCell
+		self.userLocation = userLocation
+		guard let overviews = controller.notes.store.noteOverviews else {
+			Logger.foreground.warning(
+				"Got null noteOverviews in NoteList. This is programmer error."
+			)
+			self.overviewsOrdered = []
+			return
+		}
+		let filteredOverviews = overviews.filter { overview in
+			if filterText.isEmpty {
+				return true
+			}
+			return overview.MatchesFilterText(filterText)
+		}
 		if selectedCell == nil {
 			self.overviewsOrdered = overviewsInAreaOrdered(
 				isAscending: controller.notes.store.sortAscending,
-				overviews: controller.notes.store.noteOverviews!,
+				overviews: filteredOverviews,
 				selectedLocation: selectedCell,
 				sort: controller.notes.store.sort,
 				userLocation: userLocation
@@ -213,11 +231,11 @@ private struct NoteList: View {
 		else {
 			self.overviewsOrdered = overviewsInCellOrdered(
 				controller: controller,
+				overviews: filteredOverviews,
 				selectedCell: selectedCell!,
 				userLocation: userLocation
 			)
 		}
-		self.userLocation = userLocation
 	}
 
 	var body: some View {

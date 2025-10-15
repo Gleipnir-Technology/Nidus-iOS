@@ -133,6 +133,7 @@ struct MosquitoSourceNote: NoteProtocol {
 			icons: icons,
 			id: id,
 			location: cell,
+			text: "",
 			time: created,
 			type: category
 		)

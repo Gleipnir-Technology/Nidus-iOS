@@ -83,6 +83,7 @@ struct ServiceRequestNote: NoteProtocol {
 			icons: icons,
 			id: id,
 			location: cell,
+			text: "",
 			time: created,
 			type: category
 		)

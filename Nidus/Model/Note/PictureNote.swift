@@ -112,6 +112,7 @@ class PictureNote: NoteProtocol, Codable {
 			icons: [],
 			id: id,
 			location: cell,
+			text: "",
 			time: created,
 			type: category
 		)

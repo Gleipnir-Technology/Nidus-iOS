@@ -105,6 +105,7 @@ class AudioNote: NoteProtocol, Codable {
 			icons: [],
 			id: id,
 			location: cell,
+			text: transcription ?? "",
 			time: created,
 			type: category
 		)

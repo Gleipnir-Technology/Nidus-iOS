@@ -68,8 +68,17 @@ struct NoteOverview: Identifiable {
 	var icons: Set<NoteOverviewIcon>
 	var id: UUID
 	var location: H3Cell
+	var text: String
 	var time: Date
 	var type: NoteType
+
+	/// Return true if the given filter text would include the note
+	func MatchesFilterText(_ text: String) -> Bool {
+		if text.isEmpty {
+			return false
+		}
+		return self.text.lowercased().contains(text.lowercased())
+	}
 }
 
 func noteOverviewPreview(_ icons: Set<NoteOverviewIcon>) -> NoteOverview {
@@ -79,6 +88,7 @@ func noteOverviewPreview(_ icons: Set<NoteOverviewIcon>) -> NoteOverview {
 		icons: icons,
 		id: UUID(),
 		location: RegionControllerPreview.userCell,
+		text: "",
 		time: Date.now,
 		type: .mosquitoSource
 	)
