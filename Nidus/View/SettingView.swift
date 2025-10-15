@@ -20,6 +20,18 @@ struct SettingView: View {
 			&& !password.isEmpty
 	}
 
+	private var lastSyncDisplay: String {
+		guard let lastSync = controller.settings.store.lastSync else {
+			return "Never"
+		}
+		let formatter = RelativeDateTimeFormatter()
+		formatter.unitsStyle = .full
+		let relativeDateString = formatter.localizedString(
+			for: lastSync,
+			relativeTo: Date.now
+		)
+		return "\(relativeDateString) (\(lastSync))"
+	}
 	private func loadCurrentSettings() {
 		password = UserDefaults.standard.string(forKey: "password") ?? ""
 		url = UserDefaults.standard.string(forKey: "sync-url") ?? "https://sync.nidus.cloud"
@@ -110,6 +122,7 @@ struct SettingView: View {
 								.textInputAutocapitalization(.never)
 							#endif
 					}
+					Text("Last sync: \(lastSyncDisplay)")
 				} header: {
 					Text("Sync Server")
 				}

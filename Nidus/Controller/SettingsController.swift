@@ -4,20 +4,21 @@ import SwiftUI
 
 @Observable
 class SettingsController {
-	var model = SettingsModel()
+	var store = SettingsStore()
 
 	// MARK - public interface
-	func load() {
-		model.password = UserDefaults.standard.string(forKey: "password") ?? ""
-		model.URL =
+	func Load() {
+		store.lastSync = loadLastSync()
+		store.password = UserDefaults.standard.string(forKey: "password") ?? ""
+		store.URL =
 			UserDefaults.standard.string(forKey: "sync-url")
 			?? "https://sync.nidus.cloud"
-		model.username = UserDefaults.standard.string(forKey: "username") ?? ""
+		store.username = UserDefaults.standard.string(forKey: "username") ?? ""
 
-		model.region = loadCurrentRegion() ?? Initial.region
+		store.region = loadCurrentRegion() ?? Initial.region
 	}
 
-	func saveCurrentRegion(_ region: MKCoordinateRegion) {
+	func SaveCurrentRegion(_ region: MKCoordinateRegion) {
 		let regionString = String(
 			format: "%f,%f,%f,%f",
 			region.center.latitude,
@@ -29,10 +30,16 @@ class SettingsController {
 		//Logger.background.info("Saved current region: \(regionString)")
 	}
 
-	func saveSync(password: String, url: String, username: String) {
-		model.password = password
-		model.URL = url
-		model.username = username
+	func SaveLastSync(_ date: Date) {
+		store.lastSync = date
+		UserDefaults.standard.set(date, forKey: "lastSync")
+		Logger.background.info("Save last completed sync: \(date)")
+	}
+
+	func SaveSync(password: String, url: String, username: String) {
+		store.password = password
+		store.URL = url
+		store.username = username
 		UserDefaults.standard.set(password, forKey: "password")
 		UserDefaults.standard.set(url, forKey: "sync-url")
 		UserDefaults.standard.set(username, forKey: "username")
@@ -74,4 +81,7 @@ class SettingsController {
 		return region
 	}
 
+	private func loadLastSync() -> Date? {
+		UserDefaults.standard.object(forKey: "lastSync") as? Date
+	}
 }

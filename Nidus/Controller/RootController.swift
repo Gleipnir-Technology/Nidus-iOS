@@ -49,7 +49,7 @@ class RootController {
 	@MainActor
 	func handleRegionChange(_ region: MKCoordinateRegion) {
 		TrackTime("root controller handleRegionChange") {
-			settings.saveCurrentRegion(region)
+			settings.SaveCurrentRegion(region)
 			self.region.handleRegionChange(region, database: database)
 			startCalculateNotesToShow(self.region.store.current)
 		}
@@ -162,9 +162,12 @@ class RootController {
 	func onInit() {
 		do {
 			try database.connect()
-			settings.load()
-			store.region.current = settings.model.region
-			network.onSettingsChanged(settings.model, database)
+			settings.Load()
+			store.region.current = settings.store.region
+			network.OnSyncCompleted {
+				self.settings.SaveLastSync(Date.now)
+			}
+			network.Sync(settings.store, database)
 		}
 		catch {
 			handleError(error, "Failed in onInit")
@@ -190,8 +193,8 @@ class RootController {
 	}
 
 	func saveSettings(password: String, url: String, username: String) {
-		settings.saveSync(password: password, url: url, username: username)
-		network.onSettingsChanged(settings.model, database)
+		settings.SaveSync(password: password, url: url, username: username)
+		network.Sync(settings.store, database)
 	}
 
 	// MARK - private functions

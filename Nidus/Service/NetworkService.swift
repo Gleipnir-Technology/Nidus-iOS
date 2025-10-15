@@ -49,7 +49,7 @@ enum NetworkServiceError: Error {
 actor NetworkService {
 	private var continuations: [URLSessionTask: CheckedContinuation<(), Error>] = [:]
 	private var downloadWrapper: BackgroundDownloadWrapper = BackgroundDownloadWrapper()
-	private var settings: SettingsModel? = nil
+	private var settings: SettingsStore? = nil
 
 	var isLoggedIn = false
 
@@ -70,7 +70,7 @@ actor NetworkService {
 		return response!
 	}
 
-	func onSettingsChanged(_ newSettings: SettingsModel) async throws {
+	func onSettingsChanged(_ newSettings: SettingsStore) async throws {
 		for c in continuations {
 			c.key.cancel()
 		}
@@ -244,7 +244,7 @@ actor NetworkService {
 		_ = try await downloadWrapper.handle(with: request)
 	}
 
-	private func login(_ settings: SettingsModel) async throws {
+	private func login(_ settings: SettingsStore) async throws {
 		let loginURL: URL = URL(string: settings.URL + "/login")!
 
 		// Create form-encoded POST request

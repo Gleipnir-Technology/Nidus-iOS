@@ -1,6 +1,7 @@
 import MapKit
 
-struct SettingsModel {
+struct SettingsStore {
+	var lastSync: Date? = nil
 	var password: String = ""
 	var region: MKCoordinateRegion = Initial.region
 	var URL: String = ""

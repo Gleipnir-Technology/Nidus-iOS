@@ -7,14 +7,19 @@ class NetworkController {
 	var backgroundNetworkProgress: Double = 0.0
 	var backgroundNetworkState: BackgroundNetworkState = .idle
 
+	private var onSyncCompletedCallbacks: [() -> Void] = []
 	private var progress: Progressor? = nil
 	private var service: NetworkService = NetworkService()
 	private var syncTask: Task<(), Never>? = nil
 
 	// MARK - public interface
 
+	func OnSyncCompleted(_ callback: @escaping () -> Void) {
+		onSyncCompletedCallbacks.append(callback)
+	}
+
 	/// Test the new settings and save off the credentials if they work, then initiatek
-	func onSettingsChanged(_ newSettings: SettingsModel, _ database: DatabaseController) {
+	func Sync(_ newSettings: SettingsStore, _ database: DatabaseController) {
 		if newSettings.username.isEmpty || newSettings.password.isEmpty {
 			setState(.notConfigured, 0.0)
 			return
@@ -33,6 +38,9 @@ class NetworkController {
 					try await uploadAudioNotes(database)
 					try await uploadPictureNotes(database)
 					try await updateRegionSummaries(database)
+					for callback in onSyncCompletedCallbacks {
+						callback()
+					}
 					return
 				}
 				catch AuthError.invalidCredentials {
