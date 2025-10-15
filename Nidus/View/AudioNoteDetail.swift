@@ -160,17 +160,28 @@ struct AudioNoteDetail: View {
 							minHeight: 80,
 							alignment: .leading
 						)
-						Image(systemName: "checkmark.circle").onTapGesture {
-							isEditingTranscription = false
-							controller.noteAudioUpdate(
-								note,
-								transcription:
-									editedTranscriptionText
-							)
-						}.padding().position(
-							x: geometry.size.width - 32,
-							y: geometry.size.height - 20
-						)
+						HStack {
+							Image(systemName: "x.circle.fill")
+								.onTapGesture {
+									isEditingTranscription =
+										false
+								}.frame(width: 30, height: 30)
+								.padding().font(.system(size: 20))
+								.position(x: 20, y: 20)
+							Spacer()
+							Image(systemName: "checkmark.circle")
+								.onTapGesture {
+									isEditingTranscription =
+										false
+									controller.noteAudioUpdate(
+										note,
+										transcription:
+											editedTranscriptionText
+									)
+								}.frame(width: 30, height: 30)
+								.padding().font(.system(size: 20))
+								.position(x: 180, y: 20)
+						}
 					}
 				}
 			}
