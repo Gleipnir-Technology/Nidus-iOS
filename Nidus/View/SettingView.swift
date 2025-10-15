@@ -30,7 +30,7 @@ struct SettingView: View {
 			for: lastSync,
 			relativeTo: Date.now
 		)
-		return "\(relativeDateString) (\(lastSync))"
+		return "\(relativeDateString)\n(\(lastSync))"
 	}
 	private func loadCurrentSettings() {
 		password = UserDefaults.standard.string(forKey: "password") ?? ""
