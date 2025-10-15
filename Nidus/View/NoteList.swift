@@ -113,18 +113,18 @@ private func sortByDistance(isAscending: Bool, location: H3Cell, overviews: [Not
 {
 	let result = overviews.sorted { (o1: NoteOverview, o2: NoteOverview) -> Bool in
 		do {
-			let d1 = try gridDistance(
-				origin: location,
-				destination: o1.location
+			let o1LatLng = try cellToLatLng(cell: o1.location)
+			let o2LatLng = try cellToLatLng(cell: o2.location)
+			let locationLatLng = try cellToLatLng(cell: location)
+			let o1Distance = Measurement(
+				value: locationLatLng.distance(from: o1LatLng),
+				unit: UnitLength.meters
 			)
-			let d2 = try gridDistance(
-				origin: location,
-				destination: o2.location
+			let o2Distance = Measurement(
+				value: locationLatLng.distance(from: o2LatLng),
+				unit: UnitLength.meters
 			)
-			if d1 == d2 {
-				return o1.time > o2.time
-			}
-			return d1 > d2
+			return o1Distance < o2Distance
 		}
 		catch {
 			// effectively random
