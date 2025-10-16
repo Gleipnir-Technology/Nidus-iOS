@@ -193,6 +193,7 @@ func overviewsInCellOrdered(
 
 private struct NoteList: View {
 	var controller: RootController
+	let filterText: String
 	let overviewsOrdered: [NoteOverview]
 	let selectedCell: H3Cell?
 	let userLocation: H3Cell?
@@ -204,6 +205,7 @@ private struct NoteList: View {
 		userLocation: H3Cell?
 	) {
 		self.controller = controller
+		self.filterText = filterText
 		self.selectedCell = selectedCell
 		self.userLocation = userLocation
 		guard let overviews = controller.notes.store.noteOverviews else {
@@ -248,6 +250,7 @@ private struct NoteList: View {
 					ForEach(overviewsOrdered) { overview in
 						NoteListRow(
 							controller: controller,
+							filterText: filterText,
 							overview: overview,
 							userLocation: userLocation
 						)
@@ -263,6 +266,7 @@ private struct NoteList: View {
 
 private struct NoteListRow: View {
 	let controller: RootController
+	let filterText: String
 	let overview: NoteOverview
 	let userLocation: H3Cell?
 	var body: some View {
@@ -272,21 +276,31 @@ private struct NoteListRow: View {
 				noteUUID: overview.id
 			)
 		) {
-			NoteListRowContent(overview: overview, userLocation: userLocation)
+			NoteListRowContent(
+				filterText: filterText,
+				overview: overview,
+				userLocation: userLocation
+			)
 		}
 	}
 }
 private struct NoteListRowContent: View {
 	let ROW_HEIGHT: CGFloat = 40.0
 
+	let filterText: String
 	let overview: NoteOverview
 	let userLocation: H3Cell?
 	var body: some View {
 		HStack {
 			overview.icon.font(.system(size: 42.0))
 				.frame(width: 80, height: ROW_HEIGHT)
-			NoteListRowIconCluster(icons: overview.icons)
-				.frame(width: 130, height: ROW_HEIGHT)
+			if filterText.isEmpty {
+				NoteListRowIconCluster(icons: overview.icons)
+					.frame(width: 130, height: ROW_HEIGHT)
+			}
+			else {
+				Text(overview.FilterContext(filterText))
+			}
 			Spacer()
 			NoteListRowTextCluster(
 				overview: overview,
@@ -525,6 +539,7 @@ struct NoteList_Previews: PreviewProvider {
 		}.previewDisplayName("icons")
 		NavigationStack {
 			NoteListRowContent(
+				filterText: "",
 				overview: noteOverviewPreview(
 					[.AbundanceTrendUp, .SourceProbabilityIndicator]
 				),
