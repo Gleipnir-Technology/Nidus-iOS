@@ -62,12 +62,7 @@ struct RootView: View {
 		}
 	}
 	func onMapSelectCell(_ cell: H3Cell) {
-		if controller.region.store.breadcrumb.selectedCell == cell {
-			controller.region.store.breadcrumb.selectedCell = nil
-		}
-		else {
-			controller.region.store.breadcrumb.selectedCell = cell
-		}
+		controller.ToggleMapCell(cell)
 	}
 	func onMicButtonLong() {
 		didSelect.toggle()

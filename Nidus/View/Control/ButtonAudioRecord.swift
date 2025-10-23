@@ -7,7 +7,7 @@ struct ButtonAudioRecord: View {
 	func onMicButtonShort() {
 		controller.audioRecording.withPermission(
 			ok: {
-				controller.toggleAudioRecording()
+				controller.ToggleAudioRecording()
 			},
 			cancel: {
 				print("Permission not granted")

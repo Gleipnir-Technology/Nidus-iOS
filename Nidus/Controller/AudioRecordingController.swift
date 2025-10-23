@@ -28,7 +28,11 @@ class AudioRecordingController {
 					].cell != cell
 				{
 					store.locationWhileRecording.append(
-						AudioNoteBreadcrumb(cell: cell, created: Date.now)
+						AudioNoteBreadcrumb(
+							cell: cell,
+							created: Date.now,
+							manuallySelected: false
+						)
 					)
 				}
 			}
@@ -40,11 +44,20 @@ class AudioRecordingController {
 	}
 
 	@MainActor
-	func startRecording() {
+	func StartRecording(_ selectedLocation: H3Cell?) {
 		do {
 			wrapper.onTranscriptionUpdate(onTranscriptionUpdate)
 			store.recordingUUID = UUID()
 			store.locationWhileRecording = []
+			if selectedLocation != nil {
+				store.locationWhileRecording.append(
+					AudioNoteBreadcrumb(
+						cell: selectedLocation!,
+						created: Date.now,
+						manuallySelected: true
+					)
+				)
+			}
 			try wrapper.startRecording(store.recordingUUID!)
 			store.recordingDuration = 0
 			store.isRecording = true
@@ -113,7 +126,7 @@ class AudioRecordingController {
 }
 
 class AudioRecordingControllerPreview: AudioRecordingController {
-	override func startRecording() {
+	override func StartRecording(_ selectedCell: H3Cell?) {
 		store.isRecording = true
 	}
 	override func stopRecording() -> AudioNote {

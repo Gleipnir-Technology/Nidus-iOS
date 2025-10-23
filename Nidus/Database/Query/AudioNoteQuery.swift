@@ -73,7 +73,10 @@ func AudioRecordingLocations(
 		results[row[schema.audioRecordingLocation.audioRecordingUUID], default: []].append(
 			AudioNoteBreadcrumb(
 				cell: row[schema.audioRecordingLocation.cell],
-				created: row[schema.audioRecordingLocation.created]
+				created: row[schema.audioRecordingLocation.created],
+				manuallySelected: row[
+					schema.audioRecordingLocation.manuallySelected
+				]
 			)
 		)
 	}
@@ -137,7 +140,9 @@ private func noteAudioLocationTableInsert(_ connection: SQLite.Connection, _ aud
 				<- SQLite.Expression<UInt64>(value: breadcrumb.cell),
 			schema.audioRecordingLocation.created
 				<- SQLite.Expression<Date>(value: breadcrumb.created),
-			schema.audioRecordingLocation.index <- SQLite.Expression<Int>(value: i)
+			schema.audioRecordingLocation.index <- SQLite.Expression<Int>(value: i),
+			schema.audioRecordingLocation.manuallySelected
+				<- SQLite.Expression<Bool>(value: breadcrumb.manuallySelected)
 		)
 		try connection.run(location_insert)
 	}

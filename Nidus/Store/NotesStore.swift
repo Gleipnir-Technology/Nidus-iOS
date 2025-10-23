@@ -131,7 +131,8 @@ struct NotesStore {
 				breadcrumbs: [
 					AudioNoteBreadcrumb(
 						cell: 0x8a2_8347_0531_7fff,
-						created: Date.now.advanced(by: -30)
+						created: Date.now.advanced(by: -30),
+						manuallySelected: false
 					)
 				],
 				duration: 12,

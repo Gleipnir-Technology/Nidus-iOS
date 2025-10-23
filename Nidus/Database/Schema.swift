@@ -34,6 +34,7 @@ class AudioRecordingLocationTable {
 	let cell = SQLite.Expression<UInt64>("cell")
 	let created = SQLite.Expression<Date>("created")
 	let index = SQLite.Expression<Int>("index")
+	let manuallySelected = SQLite.Expression<Bool>("manually_selected")
 }
 
 class InspectionTable {

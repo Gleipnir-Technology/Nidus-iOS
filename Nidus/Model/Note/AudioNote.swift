@@ -154,7 +154,8 @@ class AudioNote: NoteProtocol, Codable {
 			breadcrumbs: [
 				AudioNoteBreadcrumb(
 					cell: 0x8f4_8eba_314c_0ac5,
-					created: Date.now.advanced(by: -30)
+					created: Date.now.advanced(by: -30),
+					manuallySelected: false
 				)
 			],
 			duration: 12,

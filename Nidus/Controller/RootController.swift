@@ -85,7 +85,7 @@ class RootController {
 	// MARK - public interface
 
 	@MainActor
-	func toggleAudioRecording() {
+	func ToggleAudioRecording() {
 		if audioRecording.store.isRecording {
 			let recording = audioRecording.stopRecording()
 			Task {
@@ -106,9 +106,21 @@ class RootController {
 			}
 		}
 		else {
-			audioRecording.startRecording()
+			audioRecording.StartRecording(region.store.breadcrumb.selectedCell)
 		}
 	}
+
+	/// Indicate that the user has tapped a cell map for either selection or deselection
+	@MainActor
+	func ToggleMapCell(_ cell: H3Cell) {
+		if region.store.breadcrumb.selectedCell == cell {
+			region.store.breadcrumb.selectedCell = nil
+		}
+		else {
+			region.store.breadcrumb.selectedCell = cell
+		}
+	}
+
 	@MainActor
 	func onAppear() {
 		camera.onPictureSave { picture in
