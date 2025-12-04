@@ -192,19 +192,53 @@ class WrapperAudio: NSObject {
 			c(transcript)
 		}
 	}
+	// Helper method to select Bluetooth input device if available
+	private func selectBluetoothInputIfAvailable(_ audioSession: AVAudioSession) throws {
+		// Get available input ports
+		let inputs = audioSession.availableInputs ?? []
+
+		// Look for Bluetooth input ports
+		let bluetoothInputs = inputs.filter {
+			$0.portType == .bluetoothHFP
+				//$0.portType == .bluetoothA2DP ||
+				|| $0.portType == .bluetoothLE
+		}
+
+		if let bluetoothInput = bluetoothInputs.first {
+			// If a Bluetooth input is found, select it
+			Logger.foreground.info(
+				"Using Bluetooth device for audio input: \(bluetoothInput.portName)"
+			)
+			try audioSession.setPreferredInput(bluetoothInput)
+		}
+		else {
+			Logger.foreground.info(
+				"No Bluetooth audio input device found, using built-in microphone"
+			)
+		}
+	}
 
 	private func startAudioRecording(_ uuid: UUID) {
 		let audioSession = AVAudioSession.sharedInstance()
 
 		do {
-			try audioSession.setCategory(.record, mode: .default)
+			try audioSession.setCategory(
+				.record,
+				mode: .default,
+				options: [.allowBluetoothHFP]
+			)
+			// Try to use bluetooth input if available
+			try selectBluetoothInputIfAvailable(audioSession)
+
 			try audioSession.setActive(true)
 
 			let audioFilename = AudioNote.url(uuid)
 
+			//let currentInputSampleRate = audioSession.inputDataSource.
+
 			let settings = [
 				AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-				AVSampleRateKey: 12000,
+				//AVSampleRateKey: currentInputSampleRate,
 				AVNumberOfChannelsKey: 1,
 				AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
 			]
@@ -236,8 +270,9 @@ class WrapperAudio: NSObject {
 			try audioSession.setCategory(
 				.record,
 				mode: .measurement,
-				options: .duckOthers
+				options: [.duckOthers, .allowBluetoothHFP]
 			)
+			try selectBluetoothInputIfAvailable(audioSession)
 			try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
 
 			self.lastTranscriptionUpdateTime = self.clock.now
@@ -266,6 +301,10 @@ class WrapperAudio: NSObject {
 			]
 			let inputNode = audioEngine.inputNode
 
+			// Get the actual hardware format directly from the input node
+			let inputFormat = inputNode.inputFormat(forBus: 0)
+			Logger.foreground.info("Using input format: \(inputFormat.sampleRate) Hz")
+
 			recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest)
 			{ result, error in
 				DispatchQueue.main.async {
@@ -289,8 +328,8 @@ class WrapperAudio: NSObject {
 				}
 			}
 
-			let recordingFormat = inputNode.outputFormat(forBus: 0)
-			inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) {
+			//let recordingFormat = inputNode.outputFormat(forBus: 0)
+			inputNode.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) {
 				buffer,
 				_ in
 				self.recognitionRequest?.append(buffer)
