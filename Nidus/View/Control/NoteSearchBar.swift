@@ -19,7 +19,7 @@ struct NoteSearchBar: View {
 							active = editing
 						}
 					}
-				).focused($isSearchFieldFocused)
+				).foregroundColor(.primary).focused($isSearchFieldFocused)
 			}
 			.padding(7)
 			.background(Color(white: 0.9))
