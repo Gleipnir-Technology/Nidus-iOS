@@ -101,45 +101,62 @@ struct Nidus_Notes_Unit_Tests {
 		let text =
 			"Begin inspection. I'm at a swimming pool that is green and has high organic content. It is breeding heavily. I did 10 dips and found about 100 larvae stage one and stage four and 20 pupae. No fish present. The pool dimensions are 15 by 30 by 5 feet."
 		let knowledge = ExtractKnowledge(text)
-		#expect(knowledge.fieldseeker.reportType != nil)
-		guard let reportType = knowledge.fieldseeker.reportType else {
-			Issue.record("No report type found")
-			return
-		}
-		#expect(reportType == .Inspection)
-		guard let conditions = knowledge.breeding.conditions else {
-			Issue.record("No conditions found")
-			return
-		}
-		#expect(conditions == .PoolGreen)
-		guard let isBreeding = knowledge.breeding.isBreeding else {
-			Issue.record("No isBreeding found")
-			return
-		}
-		#expect(isBreeding)
-		#expect(knowledge.fieldseeker.dipCount == 10)
-		#expect(knowledge.breeding.larvaeQuantity == 100)
-		#expect(knowledge.breeding.pupaeQuantity == 20)
-		#expect(knowledge.breeding.stage == .FourthInstar)
-		guard let hasFish = knowledge.source.hasFish else {
-			Issue.record("No hasFish found")
-			return
-		}
-		#expect(!hasFish)
-		guard let length = knowledge.source.volume.length else {
-			Issue.record("No length found")
-			return
-		}
-		#expect(length == Measurement(value: 15, unit: .feet))
-		guard let width = knowledge.source.volume.width else {
-			Issue.record("No width found")
-			return
-		}
-		#expect(width == Measurement(value: 30, unit: .feet))
-		guard let depth = knowledge.source.volume.depth else {
-			Issue.record("No depth found")
-			return
-		}
-		#expect(depth == Measurement(value: 5, unit: .feet))
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolGreen,
+			dipCount: 10,
+			fishPresence: false,
+			larvaeQuantity: 100,
+			pupaeQuantity: 20,
+			reportType: FieldseekerReportType.Inspection,
+			stage: LifeStage.FourthInstar,
+			volume: Volume(
+				depth: Measurement(value: 5, unit: .feet),
+				length: Measurement(value: 15, unit: .feet),
+				width: Measurement(value: 30, unit: .feet),
+			)
+		)
 	}
+
+	@Test func inspectionTest2() async throws {
+		let text =
+			"Begin inspection. Checked the backyard pool. It is maintained, clear, and blue. I took 10 dips all around the steps and deep end. No larvae and no pupae found. No fish seen. The pool is 20 feet wide by 40 feet long by 8 feet deep."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolMaintained,
+			dipCount: 10,
+			fishPresence: false,
+			larvaeQuantity: 0,
+			pupaeQuantity: 0,
+			reportType: FieldseekerReportType.Inspection,
+			stage: nil,
+			volume: Volume(
+				depth: Measurement(value: 8, unit: .feet),
+				length: Measurement(value: 40, unit: .feet),
+				width: Measurement(value: 20, unit: .feet),
+			)
+		)
+	}
+}
+
+func expectInspectionReport(
+	_ knowledge: KnowledgeGraph,
+	conditions: BreedingConditions,
+	dipCount: Int,
+	fishPresence: Bool?,
+	larvaeQuantity: Int?,
+	pupaeQuantity: Int?,
+	reportType: FieldseekerReportType,
+	stage: LifeStage?,
+	volume: Volume?
+) {
+	#expect(knowledge.breeding.conditions == conditions)
+	#expect(knowledge.fieldseeker.dipCount == dipCount)
+	#expect(knowledge.source.hasFish == fishPresence)
+	#expect(knowledge.breeding.larvaeQuantity == larvaeQuantity)
+	#expect(knowledge.breeding.pupaeQuantity == pupaeQuantity)
+	#expect(knowledge.fieldseeker.reportType == reportType)
+	#expect(knowledge.breeding.stage == stage)
+	#expect(knowledge.source.volume == volume)
 }

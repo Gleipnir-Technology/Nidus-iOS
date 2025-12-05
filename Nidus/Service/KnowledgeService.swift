@@ -69,6 +69,14 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 	return result
 }
 
+private func addTranscriptionTag(
+	_ transcript: inout [TranscriptTag],
+	_ word: Word,
+	_ type: TranscriptTagType
+) {
+	transcript.append(TranscriptTag(range: word.range, type: type))
+}
+
 private func debugLogWord(_ word: Word, _ i: Int) {
 	Logger.foreground.info(
 		"\(i): \(word.text) | \(word.lem) | \(tagTypeToString(word.lex))"
@@ -97,11 +105,6 @@ private func extractViaGrams(
 ) {
 	for (i, _) in words.enumerated() {
 		let gram = Gram(offset: i, words: words)
-		debugLogWord(gram.At(-2), -2)
-		debugLogWord(gram.At(-1), -1)
-		debugLogWord(gram.At(0), 0)
-		debugLogWord(gram.At(1), 1)
-		debugLogWord(gram.At(2), 2)
 		switch gram.At(0).lem {
 		case "aedes", "aegypti", "culex", "quinks":
 			guard let genus = Genus.fromString(gram.At(0).text) else {
@@ -111,6 +114,9 @@ private func extractViaGrams(
 				continue
 			}
 			result.breeding.genus = genus
+			addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
+		case "blue", "maintain":
+			result.breeding.conditions = .PoolMaintained
 			addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
 		case "breed":
 			setWithMaybeNegate(
@@ -169,6 +175,19 @@ private func extractViaGrams(
 				gram: gram,
 				transcript: &result.transcriptTags,
 			)
+		case "pool":
+			if gram.At(1).lem == "be" {
+				guard
+					let dimensions = maybeExtractVolume(
+						&result.transcriptTags,
+						gram,
+						2
+					)
+				else {
+					continue
+				}
+				result.source.volume = dimensions
+			}
 		case "pupa":
 			extractCount(
 				count: &result.breeding.pupaeQuantity,
@@ -213,25 +232,6 @@ private func setWithMaybeNegate(gram: Gram, tags: inout [TranscriptTag], val: in
 	}
 	addTranscriptionTag(&tags, gram.At(0), .Source)
 }
-/*
- private func tokensToWords(_ tokens: [LexToken], _ text: String) -> [Word] {
- return tokens.map { t in
- var range = t.range
- let lastCharIndex = t.range.upperBound
- if lastCharIndex > range.lowerBound,
- let prevIndex = text.index(
- t.range.upperBound,
- offsetBy: -1,
- limitedBy: text.startIndex
- ),
- text[prevIndex] == "."
- {
- range = range.lowerBound..<prevIndex
- }
- return String(text[range]).lowercased()
- }
- }
- */
 
 private func textToWords(_ text: String) -> [Word] {
 	let lexTokens = LexTranscript(text)
@@ -242,7 +242,7 @@ private func textToWords(_ text: String) -> [Word] {
 			lem: lem.value,
 			lex: t.type,
 			range: t.range,
-			text: String(text[t.range]),
+			text: String(text[t.range].lowercased()),
 		)
 	}
 }
@@ -289,14 +289,6 @@ private func maybeMarkCondition(
 		addTranscriptionTag(&result.transcriptTags, gram.At(offset + i), .Source)
 	}
 	return true
-}
-
-private func addTranscriptionTag(
-	_ transcript: inout [TranscriptTag],
-	_ word: Word,
-	_ type: TranscriptTagType
-) {
-	transcript.append(TranscriptTag(range: word.range, type: type))
 }
 
 private func extractBreedingGraph(
@@ -547,29 +539,50 @@ private func extractSourceType(
 	return nil
 }
 
+/// Extract a pattern that defines volume from the transcript by gram. There are several patterns supported:
+/// *  L by W by D units
+/// *  L unit dimension by W unit dimension by D unit dimension
 private func maybeExtractVolume(_ transcript: inout [TranscriptTag], _ gram: Gram, _ offset: Int)
 	-> Volume?
 {
-	if !(gram.At(offset).lex == .number && gram.At(offset + 1).lem == "by"
-		&& gram.At(offset + 2).lex == .number && gram.At(offset + 3).lem == "by"
-		&& gram.At(offset + 4).lex == .number)
-	{
+	for i in 0..<10 {
+		debugLogWord(gram.At(i), i)
+	}
+	guard let dim1 = maybeExtractVolumeMeasurement(&transcript, gram, offset) else {
 		return nil
 	}
-	guard let length = fromCardinal(gram.At(offset).text) else {
+	var maybeBy = gram.At(offset + dim1.used)
+	if maybeBy.lem != "by" {
 		return nil
 	}
-	guard let width = fromCardinal(gram.At(offset + 2).text) else {
+	guard let dim2 = maybeExtractVolumeMeasurement(&transcript, gram, offset + dim1.used + 1)
+	else {
 		return nil
 	}
-	guard let depth = fromCardinal(gram.At(offset + 4).text) else {
+	maybeBy = gram.At(offset + dim1.used + 1 + dim2.used)
+	if maybeBy.lem != "by" {
 		return nil
 	}
-	addTranscriptionTag(&transcript, gram.At(0), .Measurement)
-	addTranscriptionTag(&transcript, gram.At(1), .Measurement)
-	addTranscriptionTag(&transcript, gram.At(2), .Measurement)
-	addTranscriptionTag(&transcript, gram.At(3), .Measurement)
-	addTranscriptionTag(&transcript, gram.At(4), .Measurement)
+	guard
+		let dim3 = maybeExtractVolumeMeasurement(
+			&transcript,
+			gram,
+			offset + dim1.used + 1 + dim2.used + 1
+		)
+	else {
+		return nil
+	}
+	for i in 0..<(dim1.used + dim2.used + dim3.used + 3) {
+		addTranscriptionTag(&transcript, gram.At(offset + i), .Measurement)
+	}
+	do {
+		return try volumeFromMeasurements([dim1, dim2, dim3])
+	}
+	catch {
+		Logger.foreground.info("Ignoring malformed volume: \(error))")
+		return nil
+	}
+	/*
 	var unit = parseUnitLength(gram.At(offset + 5).text)
 	if unit != nil {
 		addTranscriptionTag(&transcript, gram.At(5), .Measurement)
@@ -581,8 +594,104 @@ private func maybeExtractVolume(_ transcript: inout [TranscriptTag], _ gram: Gra
 	let w: Measurement<UnitLength> = .init(value: Double(width), unit: unit!)
 	let d: Measurement<UnitLength> = .init(value: Double(depth), unit: unit!)
 	return Volume(depth: d, length: l, width: w)
+     */
 }
 
+enum MeasurementError: Error {
+	case notEnoughDimensions
+	case unableToSort
+}
+
+private func volumeFromMeasurements(_ measurements: [ExtractedMeasurement]) throws -> Volume {
+	if measurements.count < 3 {
+		throw MeasurementError.notEnoughDimensions
+	}
+	var depthMeasurement: ExtractedMeasurement? = measurements.first(where: {
+		$0.dimension == .Depth
+	})
+	var lengthMeasurement: ExtractedMeasurement? = measurements.first(where: {
+		$0.dimension == .Length
+	})
+	var widthMeasurement: ExtractedMeasurement? = measurements.first(where: {
+		$0.dimension == .Width
+	})
+
+	var unclaimedMeasurements: [ExtractedMeasurement] = measurements.filter {
+		$0.dimension == nil
+	}
+	depthMeasurement = depthMeasurement ?? unclaimedMeasurements.popLast()
+	widthMeasurement = widthMeasurement ?? unclaimedMeasurements.popLast()
+	lengthMeasurement = lengthMeasurement ?? unclaimedMeasurements.popLast()
+
+	if (depthMeasurement == nil || widthMeasurement == nil || lengthMeasurement == nil)
+		|| !unclaimedMeasurements.isEmpty
+	{
+		throw MeasurementError.unableToSort
+	}
+
+	// If we don't have units on anything, assume feet (yay, America.)
+	let unit: UnitLength =
+		measurements[0].unit ?? measurements[1].unit ?? measurements[2].unit ?? .feet
+
+	var depth: Measurement<UnitLength> = depthMeasurement!.toMeasurementLength(fallback: unit)
+	var length: Measurement<UnitLength> = lengthMeasurement!.toMeasurementLength(fallback: unit)
+	var width: Measurement<UnitLength> = widthMeasurement!.toMeasurementLength(fallback: unit)
+
+	return Volume(depth: depth, length: length, width: width)
+}
+enum DimensionVolume {
+	case Depth
+	case Length
+	case Width
+
+	static func fromString(_ s: String) -> DimensionVolume? {
+		switch s {
+		case "depth", "deep":
+			return .Depth
+		case "length", "long":
+			return .Length
+		case "width", "wide":
+			return .Width
+		default:
+			return nil
+		}
+	}
+}
+struct ExtractedMeasurement {
+	var dimension: DimensionVolume?
+	var unit: UnitLength?
+	var used: Int
+	var value: Double
+
+	func toMeasurementLength(fallback: UnitLength) -> Measurement<UnitLength> {
+		let unit = (self.unit ?? fallback)
+		return Measurement(value: self.value, unit: unit)
+	}
+}
+private func maybeExtractVolumeMeasurement(
+	_ transcript: inout [TranscriptTag],
+	_ gram: Gram,
+	_ offset: Int
+) -> ExtractedMeasurement? {
+	guard let value = fromCardinal(gram.At(offset).text) else {
+		return nil
+	}
+	var used = 1
+	let unit = parseUnitLength(gram.At(offset + 1).text)
+	if unit != nil {
+		used = 2
+	}
+	let dimension = DimensionVolume.fromString(gram.At(offset + used).text)
+	if dimension != nil {
+		used = 3
+	}
+	return ExtractedMeasurement(
+		dimension: dimension,
+		unit: unit,
+		used: used,
+		value: Double(value),
+	)
+}
 private func parseUnitLength(_ unitString: String) -> UnitLength? {
 	switch unitString {
 	case "feet":
