@@ -16,75 +16,41 @@ private let FACILITATOR_ROOT_CAUSE_VERBS: [String] = ["blocking"]
 private let FACILITATOR_ACTION_VERBS: [String] = ["removed"]
 private let ROOT_CAUSE_ADJ: [String] = ["root"]
 
-private func createGramString(_ words: [String], number: Int = 3, offset: Int) -> [String] {
-	var result: [String] = []
-	for i in stride(from: offset, to: offset - number, by: -1) {
-		if i < 0 {
-			result.append("")
-		}
-		else {
-			result.append(words[i])
-		}
-	}
-	return result
+private let EMPTY_LEM: LemToken = LemToken(range: EMPTY_RANGE, value: "")
+private let EMPTY_RANGE: Range<String.Index> = "".startIndex..<"".endIndex
+private let EMPTY_WORD: Word = Word(lem: "", lex: .other, range: EMPTY_RANGE, text: "")
+
+struct Word {
+	let lem: String
+	let lex: NLTag
+	let range: Range<String.Index>
+	let text: String
 }
 
-private func createGramToken(_ tokens: [LexToken], number: Int = 3, offset: Int) -> [LexToken?] {
-	var result: [LexToken?] = []
-	for i in stride(from: offset, to: offset - number, by: -1) {
-		if i < 0 {
-			result.append(nil)
-		}
-		else {
-			result.append(tokens[i])
-		}
-	}
-	return result
-}
+struct Gram {
+	let offset: Int
+	let words: [Word]
 
-private func extractCount(
-	count: inout Int?,
-	transcript: inout [TranscriptTag],
-	tokens: [LexToken?],
-	word: String
-) {
-	guard let firstToken = tokens[0] else { return }
-	addTranscriptionTag(&transcript, firstToken, .Measurement)
-	count = extractInt(word)
-	if count != nil {
-		guard let secondToken = tokens[1] else { return }
-		addTranscriptionTag(&transcript, secondToken, .Measurement)
-	}
-}
-private func tokensToWords(_ tokens: [LexToken], _ text: String) -> [String] {
-	return tokens.map { t in
-		var range = t.range
-		let lastCharIndex = t.range.upperBound
-		if lastCharIndex > range.lowerBound,
-			let prevIndex = text.index(
-				t.range.upperBound,
-				offsetBy: -1,
-				limitedBy: text.startIndex
-			),
-			text[prevIndex] == "."
-		{
-			range = range.lowerBound..<prevIndex
+	func At(_ relative: Int) -> Word {
+		let index: Int = offset + relative
+		if index < 0 || index >= words.count {
+			return EMPTY_WORD
 		}
-		return String(text[range]).lowercased()
+		return words[index]
 	}
 }
 
 func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
-	let tokens = LexTranscript(text)
 
 	// For debugging
 	/*
-     for token in tokens {
-		Logger.foreground.info(
-			"\(text[token.range]) | \(tagTypeToString(token.type))"
-		)
-	}
-     */
+	 Logger.foreground.info("Lex tokens")
+	 for token in lexTokens {
+	 Logger.foreground.info(
+	 "\(text[token.range]) | \(tagTypeToString(token.type))"
+	 )
+	 }
+	 */
 
 	var result = KnowledgeGraph(
 		adultProduction: AdultProductionKnowledgeGraph(),
@@ -93,140 +59,244 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 		facilitator: FacilitatorKnowledgeGraph(),
 		fieldseeker: FieldseekerReportGraph(),
 		rootCause: RootCauseKnowledgeGraph(),
-		source: SourceKnowledgeGraph(),
+		source: SourceKnowledgeGraph(volume: Volume()),
 		transcriptTags: []
 	)
-	let words: [String] = tokensToWords(tokens, text)
-	var hasConditions: Bool = false
-	for (i, _) in tokens.enumerated() {
-		let threegram = createGramString(words, number: 3, offset: i)
-		let threetok = createGramToken(tokens, number: 3, offset: i)
-		if threegram[0] == "egg" || threegram[0] == "eggs" {
-			extractCount(
-				count: &result.breeding.eggQuantity,
-				transcript: &result.transcriptTags,
-				tokens: threetok,
-				word: threegram[1]
+	let words: [Word] = textToWords(text)
+	debugLogWords(words)
+	extractViaGrams(&result, words)
+	extractViaPatterns(&result, words)
+	return result
+}
+
+private func debugLogWord(_ word: Word, _ i: Int) {
+	Logger.foreground.info(
+		"\(i): \(word.text) | \(word.lem) | \(tagTypeToString(word.lex))"
+	)
+}
+private func debugLogWords(_ words: [Word]) {
+	for (i, word) in words.enumerated() {
+		debugLogWord(word, i)
+	}
+}
+private func extractCount(
+	count: inout Int?,
+	gram: Gram,
+	transcript: inout [TranscriptTag],
+) {
+	addTranscriptionTag(&transcript, gram.At(0), .Measurement)
+	count = fromNumber(gram.At(-1).text)
+	if count != nil {
+		addTranscriptionTag(&transcript, gram.At(-1), .Measurement)
+	}
+}
+
+private func extractViaGrams(
+	_ result: inout KnowledgeGraph,
+	_ words: [Word]
+) {
+	for (i, _) in words.enumerated() {
+		let gram = Gram(offset: i, words: words)
+		debugLogWord(gram.At(-2), -2)
+		debugLogWord(gram.At(-1), -1)
+		debugLogWord(gram.At(0), 0)
+		debugLogWord(gram.At(1), 1)
+		debugLogWord(gram.At(2), 2)
+		switch gram.At(0).lem {
+		case "aedes", "aegypti", "culex", "quinks":
+			guard let genus = Genus.fromString(gram.At(0).text) else {
+				Logger.foreground.info(
+					"Mismatch in recognized genus. This indicates either the Genus.fromString function is broken, or the grams switch is malformed."
+				)
+				continue
+			}
+			result.breeding.genus = genus
+			addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
+		case "breed":
+			setWithMaybeNegate(
+				gram: gram,
+				tags: &result.transcriptTags,
+				val: &result.breeding.isBreeding,
 			)
-		}
-		else if threegram[0] == "larvae" || threegram[0] == "larva" {
-			extractCount(
-				count: &result.breeding.larvaeQuantity,
-				transcript: &result.transcriptTags,
-				tokens: threetok,
-				word: threegram[1]
-			)
-		}
-		else if threegram[0] == "conditions" {
-			hasConditions = true
-		}
-		else if threegram[0] == "dip" || threegram[0] == "dips" {
+		case "conditions":
+			maybeFindConditions(&result, gram)
+		case "dip":
 			extractCount(
 				count: &result.fieldseeker.dipCount,
+				gram: gram,
 				transcript: &result.transcriptTags,
-				tokens: threetok,
-				word: threegram[1]
 			)
-		}
-		else if threegram[0] == "instar" {
-			var stage: LifeStage
-			switch threegram[1] {
-			case "first", "1st":
-				stage = .FirstInstar
-			case "second", "2nd":
-				stage = .SecondInstar
-			case "third", "3rd":
-				stage = .ThirdInstar
-			case "fourth", "4th":
-				stage = .FourthInstar
-			default:
+		case "dimension":
+			if gram.At(1).lem != "be" {
+				continue
+			}
+			guard let dimensions = maybeExtractVolume(&result.transcriptTags, gram, 2)
+			else {
+				continue
+			}
+			result.source.volume = dimensions
+		case "egg":
+			extractCount(
+				count: &result.breeding.eggQuantity,
+				gram: gram,
+				transcript: &result.transcriptTags,
+			)
+		case "fish":
+			setWithMaybeNegate(
+				gram: gram,
+				tags: &result.transcriptTags,
+				val: &result.source.hasFish,
+			)
+		case "green":
+			result.breeding.conditions = .PoolGreen
+			addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
+		case "inspection":
+			result.fieldseeker.reportType = .Inspection
+			addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
+		case "instar":
+			guard let o = fromOrdinal(gram.At(-1).text) else {
+				continue
+			}
+			guard let stage = LifeStage.fromInt(o) else {
 				continue
 			}
 			result.breeding.stage = stage
-			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
-			addTranscriptionTag(&result.transcriptTags, threetok[1]!, .Source)
-		}
-		else if threegram[0] == "pupae" || threegram[0] == "pupa" {
+			addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
+			addTranscriptionTag(&result.transcriptTags, gram.At(1), .Source)
+		case "larva":
+			extractCount(
+				count: &result.breeding.larvaeQuantity,
+				gram: gram,
+				transcript: &result.transcriptTags,
+			)
+		case "pupa":
 			extractCount(
 				count: &result.breeding.pupaeQuantity,
+				gram: gram,
 				transcript: &result.transcriptTags,
-				tokens: threetok,
-				word: threegram[1]
 			)
-		}
-		else if threegram[0] == "source" && threegram[1] == "mosquito" {
+		case "source":
+			if result.fieldseeker.reportType != nil {
+				Logger.foreground.info("Ignoring later report type tag 'source'")
+				continue
+			}
 			result.fieldseeker.reportType = FieldseekerReportType.MosquitoSource
-			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
-			addTranscriptionTag(&result.transcriptTags, threetok[1]!, .Source)
-		}
-		else if threegram[0] == "aedes" {
-			result.breeding.genus = .Aedes
-			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
-		}
-		else if threegram[0] == "aegypti" {
-			result.breeding.genus = .Aegypti
-			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
-		}
-		else if threegram[0] == "culex" {
-			result.breeding.genus = .Culex
-			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
-		}
-		else if threegram[0] == "quinks" {
-			result.breeding.genus = .Quinks
-			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
-		}
-		else if hasConditions {
-			maybeFindConditions(&result, threegram, threetok)
+			addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
+		case "stage":
+			guard let val = fromNumber(gram.At(1).text) else {
+				continue
+			}
+			if let stage = LifeStage.fromInt(val) {
+				result.breeding.stage = stage
+				addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
+				addTranscriptionTag(&result.transcriptTags, gram.At(1), .Source)
+			}
+		default:
+			continue
 		}
 	}
-	return result
+}
+
+func extractViaPatterns(
+	_ result: inout KnowledgeGraph,
+	_ words: [Word]
+) {
+}
+
+private func setWithMaybeNegate(gram: Gram, tags: inout [TranscriptTag], val: inout Bool?) {
+	if gram.At(-1).lem == "no" {
+		val = false
+		addTranscriptionTag(&tags, gram.At(-1), .Source)
+	}
+	else {
+		val = true
+	}
+	addTranscriptionTag(&tags, gram.At(0), .Source)
+}
+/*
+ private func tokensToWords(_ tokens: [LexToken], _ text: String) -> [Word] {
+ return tokens.map { t in
+ var range = t.range
+ let lastCharIndex = t.range.upperBound
+ if lastCharIndex > range.lowerBound,
+ let prevIndex = text.index(
+ t.range.upperBound,
+ offsetBy: -1,
+ limitedBy: text.startIndex
+ ),
+ text[prevIndex] == "."
+ {
+ range = range.lowerBound..<prevIndex
+ }
+ return String(text[range]).lowercased()
+ }
+ }
+ */
+
+private func textToWords(_ text: String) -> [Word] {
+	let lexTokens = LexTranscript(text)
+	let lemTokens = LemTranscript(text)
+	return lexTokens.map { t in
+		let lem = findMatchingLem(lemTokens, t.range)
+		return Word(
+			lem: lem.value,
+			lex: t.type,
+			range: t.range,
+			text: String(text[t.range]),
+		)
+	}
+}
+private func isOrdinal(_ w: Word) -> Bool {
+	let o = fromOrdinal(w.text)
+	if o == nil {
+		return false
+	}
+	return true
 }
 
 private func maybeFindConditions(
 	_ result: inout KnowledgeGraph,
-	_ threegram: [String],
-	_ threetok: [LexToken?]
+	_ gram: Gram,
 ) {
-	for condition in BreedingConditions.all {
-		let description = condition.description
-		let words = description.components(separatedBy: .whitespaces).map { w in
-			w.lowercased()
-		}
-		// this only works because we know no conditions are 3 words long
-		if words.count == 1 && words[0] == threegram[0] {
-			result.breeding.conditions = condition
-			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
-		}
-		else if words.count == 2 && words[0] == threegram[1] && words[1] == threegram[0] {
-			result.breeding.conditions = condition
-			addTranscriptionTag(&result.transcriptTags, threetok[0]!, .Source)
-			addTranscriptionTag(&result.transcriptTags, threetok[1]!, .Source)
-		}
-		else if words.count > 2 {
-			Logger.foreground.error("Update this logic here to be more generic")
+	for offset in -5...5 {
+		for condition in BreedingConditions.all {
+			if maybeMarkCondition(&result, gram, offset, condition) {
+				return
+			}
+
 		}
 	}
+}
+
+private func maybeMarkCondition(
+	_ result: inout KnowledgeGraph,
+	_ gram: Gram,
+	_ offset: Int,
+	_ condition: BreedingConditions
+) -> Bool {
+	let description = condition.description
+	let words = description.components(separatedBy: .whitespaces).map { w in
+		w.lowercased()
+	}
+	for (i, w) in words.enumerated() {
+		if gram.At(offset + i).text != w {
+			return false
+		}
+
+	}
+	result.breeding.conditions = condition
+	for (i, _) in words.enumerated() {
+		addTranscriptionTag(&result.transcriptTags, gram.At(offset + i), .Source)
+	}
+	return true
 }
 
 private func addTranscriptionTag(
 	_ transcript: inout [TranscriptTag],
-	_ token: LexToken,
+	_ word: Word,
 	_ type: TranscriptTagType
 ) {
-	transcript.append(TranscriptTag(range: token.range, type: type))
-}
-
-private func getMeasurement(_ valueString: String, _ unitString: String) -> Measurement<UnitLength>?
-{
-	guard let value = parseMeasurementValue(valueString) else {
-		Logger.foreground.info("Couldn't parse \(valueString) as a Double")
-		return nil
-	}
-	guard let unitLength = parseUnitLength(unitString) else {
-		Logger.foreground.info("Couldn't parse \(unitString) as a UnitLength")
-		return nil
-	}
-	return Measurement(value: value, unit: unitLength)
+	transcript.append(TranscriptTag(range: word.range, type: type))
 }
 
 private func extractBreedingGraph(
@@ -294,41 +364,6 @@ private func extractFacilitator(
 	)
 }
 
-private func extractInt(
-	_ text: String
-) -> Int? {
-	let result = Int(text)
-	if result != nil {
-		return result
-	}
-	switch text {
-	case "no", "nil", "zero", "zilch":
-		return 0
-	case "one":
-		return 1
-	case "two":
-		return 2
-	case "three":
-		return 3
-	case "four":
-		return 4
-	case "five":
-		return 5
-	case "six":
-		return 6
-	case "seven":
-		return 7
-	case "eight":
-		return 8
-	case "nine":
-		return 9
-	case "ten":
-		return 10
-	default:
-		return nil
-	}
-}
-
 private func extractRootCause(
 	_ text: String,
 	_ tokens: [LexToken],
@@ -352,6 +387,103 @@ private func extractRootCause(
 		fix: fix,
 		legalAbatement: nil
 	)
+}
+
+private func findMatchingLem(_ lemTokens: [LemToken], _ range: Range<String.Index>) -> LemToken {
+	for token in lemTokens {
+		if token.range.lowerBound >= range.lowerBound,
+			token.range.upperBound <= range.upperBound
+		{
+			return token
+		}
+	}
+	return EMPTY_LEM
+}
+
+private func fromCardinal(
+	_ s: String
+) -> Int? {
+	let result = Int(s)
+	if result != nil {
+		return result
+	}
+	switch s {
+	case "no", "nil", "zero", "zilch":
+		return 0
+	case "one":
+		return 1
+	case "two":
+		return 2
+	case "three":
+		return 3
+	case "four":
+		return 4
+	case "five":
+		return 5
+	case "six":
+		return 6
+	case "seven":
+		return 7
+	case "eight":
+		return 8
+	case "nine":
+		return 9
+	case "ten":
+		return 10
+	case "twenty":
+		return 20
+	case "thirty":
+		return 30
+	case "forty":
+		return 40
+	case "fifty":
+		return 50
+	case "sixty":
+		return 60
+	case "seventy":
+		return 70
+	case "eighty":
+		return 80
+	case "ninety":
+		return 90
+	default:
+		return nil
+	}
+}
+func fromNumber(_ s: String) -> Int? {
+	if let result = fromCardinal(s) {
+		return result
+	}
+	if let result = fromOrdinal(s) {
+		return result
+	}
+	return nil
+}
+func fromOrdinal(_ s: String) -> Int? {
+	let lowercased = s.lowercased()
+	let ORDINAL_TO_VALUE: [String: Int] = [
+		"1st": 1,
+		"first": 1,
+		"2nd": 2,
+		"second": 2,
+		"3rd": 3,
+		"third": 3,
+		"4th": 4,
+		"fourth": 4,
+		"5th": 5,
+		"fifth": 5,
+		"6th": 6,
+		"sixth": 6,
+		"7th": 7,
+		"seventh": 7,
+		"8th": 8,
+		"eighth": 8,
+		"9th": 9,
+		"ninth": 9,
+		"10th": 10,
+		"tenth": 10,
+	]
+	return ORDINAL_TO_VALUE[lowercased] ?? nil
 }
 
 private func parseLifeStage(_ adjective: String) -> LifeStage? {
@@ -393,79 +525,6 @@ private func extractDipCount(
 	return nil
 }
 
-private func extractSourceGraph(
-	_ text: String,
-	_ tokens: [LexToken],
-	_ transcriptTags: inout [TranscriptTag]
-)
-	-> SourceKnowledgeGraph
-{
-	// get the source
-	let sourceType: SourceType? = extractSourceType(
-		text: text,
-		tokens: tokens,
-		transcriptTags: &transcriptTags
-	)
-	// Check for measurements
-	let length = extractMeasurement(
-		text: text,
-		tokens: tokens,
-		transcriptTags: &transcriptTags,
-		adjectives: LENGTH_ADJ
-	)
-	let depth = extractMeasurement(
-		text: text,
-		tokens: tokens,
-		transcriptTags: &transcriptTags,
-		adjectives: HEIGHT_ADJ
-	)
-	let width = extractMeasurement(
-		text: text,
-		tokens: tokens,
-		transcriptTags: &transcriptTags,
-		adjectives: WIDTH_ADJ
-	)
-
-	var volume: Volume?
-	if length != nil && depth != nil && width != nil {
-		volume = Volume(depth: depth!, length: length!, width: width!)
-	}
-	return SourceKnowledgeGraph(
-		preemptiveTreatment: nil,
-		productionCapacity: nil,
-		sourceElimination: nil,
-		type: sourceType,
-		volume: volume
-	)
-}
-
-private func extractMeasurement(
-	text: String,
-	tokens: [LexToken],
-	transcriptTags: inout [TranscriptTag],
-	adjectives: [String]
-) -> Measurement<UnitLength>? {
-	for (i, token) in tokens.enumerated() {
-		if token.type == NLTag.adjective || token.type == NLTag.adverb {
-			let word = text[token.range]
-			for adj in adjectives {
-				if word == adj {
-					Logger.foreground.info(
-						"Looking back measurement for \(word)"
-					)
-					return lookbackMeasurement(
-						i: i,
-						tokens: tokens,
-						text: text,
-						transcriptTags: &transcriptTags
-					)
-				}
-			}
-		}
-	}
-	return nil
-}
-
 private func extractSourceType(
 	text: String,
 	tokens: [LexToken],
@@ -488,84 +547,42 @@ private func extractSourceType(
 	return nil
 }
 
-private func lookbackMeasurement(
-	i: Int,
-	tokens: [LexToken],
-	text: String,
-	transcriptTags: inout [TranscriptTag]
-) -> Measurement<UnitLength>? {
-	Logger.foreground.info("Getting lookback measurement")
-	guard i - 2 > 0 else {
-		Logger.foreground.info("bailing, too few tokens")
+private func maybeExtractVolume(_ transcript: inout [TranscriptTag], _ gram: Gram, _ offset: Int)
+	-> Volume?
+{
+	if !(gram.At(offset).lex == .number && gram.At(offset + 1).lem == "by"
+		&& gram.At(offset + 2).lex == .number && gram.At(offset + 3).lem == "by"
+		&& gram.At(offset + 4).lex == .number)
+	{
 		return nil
 	}
-	let valueToken = tokens[i - 2]
-	guard valueToken.type == NLTag.number else {
-		Logger.foreground.info("bailing, value token is not a number")
+	guard let length = fromCardinal(gram.At(offset).text) else {
 		return nil
 	}
-	let unitToken = tokens[i - 1]
-	guard unitToken.type == NLTag.noun else {
-		Logger.foreground.info("bailing, unit token is not a noun")
+	guard let width = fromCardinal(gram.At(offset + 2).text) else {
 		return nil
 	}
-	let valueString = text[valueToken.range]
-	let unitString = text[unitToken.range]
-	guard let value = parseMeasurementValue(String(valueString)) else {
-		Logger.background.info("Couldn't parse \(valueString) as a Double")
+	guard let depth = fromCardinal(gram.At(offset + 4).text) else {
 		return nil
 	}
-	guard let unitLength = parseUnitLength(String(unitString)) else {
-		Logger.background.info("Couldn't parse \(unitString) as a UnitLength")
-		return nil
+	addTranscriptionTag(&transcript, gram.At(0), .Measurement)
+	addTranscriptionTag(&transcript, gram.At(1), .Measurement)
+	addTranscriptionTag(&transcript, gram.At(2), .Measurement)
+	addTranscriptionTag(&transcript, gram.At(3), .Measurement)
+	addTranscriptionTag(&transcript, gram.At(4), .Measurement)
+	var unit = parseUnitLength(gram.At(offset + 5).text)
+	if unit != nil {
+		addTranscriptionTag(&transcript, gram.At(5), .Measurement)
 	}
-	let dimensionToken = tokens[i]
-	//var fullRange = valueToken.range.first!...dimensionToken.range.last!
-	transcriptTags.append(
-		TranscriptTag(range: valueToken.range, type: .Measurement)
-	)
-	transcriptTags.append(
-		TranscriptTag(range: unitToken.range, type: .Measurement)
-	)
-	transcriptTags.append(
-		TranscriptTag(range: dimensionToken.range, type: .Measurement)
-	)
-	Logger.foreground.info("Extracted measurement: \(value) \(unitString)")
-	return Measurement(value: value, unit: unitLength)
+	else {
+		unit = UnitLength.feet
+	}
+	let l: Measurement<UnitLength> = .init(value: Double(length), unit: unit!)
+	let w: Measurement<UnitLength> = .init(value: Double(width), unit: unit!)
+	let d: Measurement<UnitLength> = .init(value: Double(depth), unit: unit!)
+	return Volume(depth: d, length: l, width: w)
 }
 
-private func parseMeasurementValue(_ valueString: String) -> Double? {
-	guard let value = Double(valueString) else {
-		switch valueString {
-		case "zero":
-			return 0.0
-		case "one":
-			return 1.0
-		case "two":
-			return 2.0
-		case "three":
-			return 3.0
-		case "four":
-			return 4.0
-		case "five":
-			return 5.0
-		case "six":
-			return 6.0
-		case "seven":
-			return 7.0
-		case "eight":
-			return 8.0
-		case "nine":
-			return 9.0
-		case "ten":
-			return 10.0
-		default:
-			Logger.foreground.info("Failed to parse \(valueString) as a Double")
-			return nil
-		}
-	}
-	return value
-}
 private func parseUnitLength(_ unitString: String) -> UnitLength? {
 	switch unitString {
 	case "feet":

@@ -1,11 +1,36 @@
 import NaturalLanguage
 import OSLog
 
+struct LemToken {
+	let range: Range<String.Index>
+	let value: String
+}
+
 struct LexToken {
 	let range: Range<String.Index>
 	let type: NLTag
 }
 
+func LemTranscript(_ text: String) -> [LemToken] {
+	let tagger = NLTagger(tagSchemes: [.lemma])
+	tagger.string = text
+	let options: NLTagger.Options = [.omitWhitespace]
+	var results = [LemToken]()
+	tagger.enumerateTags(
+		in: text.startIndex..<text.endIndex,
+		unit: .word,
+		scheme: .lemma,
+		options: options
+	) {
+		tag,
+		tokenRange in
+		guard let tag = tag else { return true }
+		results.append(LemToken(range: tokenRange, value: tag.rawValue))
+		return true
+
+	}
+	return results
+}
 func LexTranscript(_ text: String) -> [LexToken] {
 	let dictionary: [String: [String]] = [
 		"Noun": ["300"]
@@ -48,6 +73,10 @@ func tagTypeToString(_ tagType: NLTag) -> String {
 		typeName = "Adverb"
 	case NLTag.classifier:
 		typeName = "Classifier"
+	case NLTag.closeParenthesis:
+		typeName = "Close Parenthesis"
+	case NLTag.closeQuote:
+		typeName = "Close Quote"
 	case NLTag.conjunction:
 		typeName = "Conjunction"
 	case NLTag.dash:
@@ -58,12 +87,22 @@ func tagTypeToString(_ tagType: NLTag) -> String {
 		typeName = "Idiom"
 	case NLTag.interjection:
 		typeName = "Interjection"
+	case NLTag.openParenthesis:
+		typeName = "Open Parenthesis"
+	case NLTag.openQuote:
+		typeName = "Open Quote"
 	case NLTag.organizationName:
 		typeName = "Organization Name"
+	case NLTag.other:
+		typeName = "Other"
 	case NLTag.otherWord:
 		typeName = "Other Word"
 	case NLTag.otherPunctuation:
 		typeName = "Other Punctuation"
+	case NLTag.otherWhitespace:
+		typeName = "Other Whitespace"
+	case NLTag.paragraphBreak:
+		typeName = "Paragraph Break"
 	case NLTag.particle:
 		typeName = "Particle"
 	case NLTag.personalName:
@@ -74,6 +113,8 @@ func tagTypeToString(_ tagType: NLTag) -> String {
 		typeName = "Preposition"
 	case NLTag.pronoun:
 		typeName = "Pronoun"
+	case NLTag.punctuation:
+		typeName = "Punctuation"
 	case NLTag.noun:
 		typeName = "Noun"
 	case NLTag.number:
@@ -82,6 +123,10 @@ func tagTypeToString(_ tagType: NLTag) -> String {
 		typeName = "Sentence Terminator"
 	case NLTag.verb:
 		typeName = "Verb"
+	case NLTag.whitespace:
+		typeName = "Whitespace"
+	case NLTag.word:
+		typeName = "Word"
 	case NLTag.wordJoiner:
 		typeName = "Word Joiner"
 	default:

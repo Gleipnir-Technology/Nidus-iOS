@@ -14,6 +14,7 @@ enum BreedingConditions: CustomStringConvertible {
 	case HighOrganic
 	case NeedsMonitoring
 	case PoolFalse
+	case PoolGreen
 	case PoolMaintained
 	case PoolRemoved
 	case PoolUnmaintained
@@ -37,6 +38,7 @@ enum BreedingConditions: CustomStringConvertible {
 		case .HighOrganic: "High organic"
 		case .NeedsMonitoring: "Needs monitoring"
 		case .PoolFalse: "Pool false"
+		case .PoolGreen: "Pool green"
 		case .PoolMaintained: "Pool maintained"
 		case .PoolRemoved: "Pool removed"
 		case .PoolUnmaintained: "Pool unmaintained"
@@ -67,8 +69,16 @@ enum LifeStage: CustomStringConvertible {
 			"Fourth instar"
 		}
 	}
+	static func fromInt(_ i: Int) -> LifeStage? {
+		switch i {
+		case 1: return .FirstInstar
+		case 2: return .SecondInstar
+		case 3: return .ThirdInstar
+		case 4: return .FourthInstar
+		default: return nil
+		}
+	}
 }
-
 enum Genus: CustomStringConvertible {
 	case Aedes
 	case Aegypti
@@ -86,6 +96,20 @@ enum Genus: CustomStringConvertible {
 			"Quinks"
 		}
 	}
+	static func fromString(_ s: String) -> Genus? {
+		switch s.lowercased() {
+		case "aedes":
+			return .Aedes
+		case "aegypti":
+			return .Aegypti
+		case "culex":
+			return .Culex
+		case "quinks":
+			return .Quinks
+		default:
+			return nil
+		}
+	}
 }
 
 enum TreatmentType {
@@ -96,6 +120,7 @@ struct BreedingKnowledgeGraph {
 	var conditions: BreedingConditions?
 	var eggQuantity: Int?
 	var genus: Genus?
+	var isBreeding: Bool?
 	var larvaeQuantity: Int?
 	var pupaeQuantity: Int?
 	var stage: LifeStage?
@@ -113,6 +138,7 @@ struct FacilitatorKnowledgeGraph {
 }
 
 enum FieldseekerReportType {
+	case Inspection
 	case MosquitoSource
 }
 struct FieldseekerReportGraph {
@@ -128,12 +154,13 @@ enum SourceType {
 }
 /// A structure representing what we know about a mosquito source
 struct SourceKnowledgeGraph {
+	var hasFish: Bool?
 	var preemptiveTreatment: String?
 	var productionCapacity: String?
 	var sourceElimination: String?
 	// The type of mosquito source, or nil if we have no knowledge yet
 	var type: SourceType?
-	var volume: Volume?
+	var volume: Volume
 }
 
 struct KnowledgeGraph {
@@ -173,6 +200,9 @@ struct KnowledgeGraph {
 	var hasFieldseekerReport: Bool {
 		return fieldseeker.reportType != nil
 	}
+	var hasGenus: Bool {
+		return breeding.genus != nil
+	}
 	var hasRootCause: Bool {
 		return rootCause.fix != nil
 			|| rootCause.legalAbatement != nil
@@ -183,15 +213,18 @@ struct KnowledgeGraph {
 	var hasPupaeCount: Bool {
 		return breeding.pupaeQuantity != nil
 	}
-	var hasSpecies: Bool {
-		// Say it with me kids, "genus isn't species Fieldseeker"
-		return breeding.genus != nil
-	}
 	var hasSource: Bool {
-		return source.type != nil || source.volume != nil
+		return source.type != nil || hasVolume
 	}
 	var hasStage: Bool {
 		return breeding.stage != nil
+	}
+	var hasSurfaceArea: Bool {
+		return source.volume.length != nil && source.volume.width != nil
+	}
+	var hasVolume: Bool {
+		return source.volume.length != nil && source.volume.width != nil
+			&& source.volume.depth != nil
 	}
 	var impliesAdultProduction: Bool {
 		return hasAdultProduction || hasBreeding
@@ -278,7 +311,11 @@ func knowledgeForPreview(source: SourceKnowledgeGraph? = nil) -> KnowledgeGraph 
 				productionCapacity: nil,
 				sourceElimination: nil,
 				type: nil,
-				volume: nil
+				volume: Volume(
+					depth: nil,
+					length: nil,
+					width: nil,
+				)
 			),
 		transcriptTags: []
 	)

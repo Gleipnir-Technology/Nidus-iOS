@@ -34,6 +34,8 @@ struct AudioTagFieldseeker: View {
 			Text("Don't try to render AudioTagFieldseeker with nil reportType")
 		case .MosquitoSource:
 			AudioTagFieldseekerMosquitoSource(knowledge: knowledge)
+		case .Inspection:
+			AudioTagFieldseekerInspection(knowledge: knowledge)
 		}
 	}
 }
@@ -106,6 +108,80 @@ struct AudioTagFieldseekerReportField<T: CustomStringConvertible>: View {
 	}
 }
 
+struct AudioTagFieldseekerInspection: View {
+	let knowledge: KnowledgeGraph
+
+	var body: some View {
+		VStack {
+			AudioTagFieldseekerReportType(
+				name: "Inspection",
+				isComplete: knowledge.isFieldseekerReportComplete
+			)
+			if !knowledge.isFieldseekerReportComplete {
+				Grid {
+					AudioTagFieldseekerReportField(
+						name: "Condition",
+						prompt: "green/blue/murky",
+						promptChoices: [
+							"green", "maintained", "dry", "murky",
+						],
+						isDone: knowledge.hasConditions,
+						value: knowledge.breeding.conditions,
+					)
+					AudioTagFieldseekerReportField(
+						name: "Breeding",
+						prompt: "[not] breeding/larvae present",
+						isDone: knowledge.hasBreeding,
+						value: knowledge.breeding.isBreeding
+					)
+					AudioTagFieldseekerReportField(
+						name: "Dip",
+						prompt: "# dips",
+						isDone: knowledge.hasDipCount,
+						value: knowledge.fieldseeker.dipCount
+					)
+					AudioTagFieldseekerReportField(
+						name: "",
+						prompt: "# pupae",
+						isDone: knowledge.hasPupaeCount,
+						value: knowledge.breeding.pupaeQuantity
+					)
+					AudioTagFieldseekerReportField(
+						name: "Eggs",
+						prompt: "# eggs",
+						isDone: knowledge.hasEggCount,
+						value: knowledge.breeding.eggQuantity
+					)
+					AudioTagFieldseekerReportField(
+						name: "Stage",
+						prompt: "# Instar, adult",
+						isDone: knowledge.hasStage,
+						value: knowledge.breeding.stage
+					)
+					AudioTagFieldseekerReportField(
+						name: "Genus",
+						prompt: "genus",
+						promptChoices: ["Aedes", "Culex"],
+						isDone: knowledge.hasGenus,
+						value: knowledge.breeding.genus
+					)
+					AudioTagFieldseekerReportField(
+						name: "Fish",
+						prompt: "fish [not] present",
+						isDone: knowledge.hasConditions,
+						value: knowledge.breeding.conditions
+					)
+					AudioTagFieldseekerReportField(
+						name: "Dimensions",
+						prompt: "x meters by y meters",
+						isDone: knowledge.hasSurfaceArea,
+						value: knowledge.breeding.conditions
+					)
+				}
+			}
+		}
+	}
+}
 struct AudioTagFieldseekerMosquitoSource: View {
 	let knowledge: KnowledgeGraph
 
@@ -148,10 +224,10 @@ struct AudioTagFieldseekerMosquitoSource: View {
 						value: knowledge.breeding.stage
 					)
 					AudioTagFieldseekerReportField(
-						name: "Species",
-						prompt: "species",
+						name: "Genus",
+						prompt: "genus",
 						promptChoices: ["Aedes", "Culex"],
-						isDone: knowledge.hasSpecies,
+						isDone: knowledge.hasGenus,
 						value: knowledge.breeding.genus
 					)
 					AudioTagFieldseekerReportField(
@@ -314,7 +390,7 @@ struct AudioTagSourceRow: View {
 				)
 				AudioTagIcon(
 					"cube",
-					color: knowledge.source.volume == nil ? .gray : .red
+					color: knowledge.hasVolume ? .gray : .red
 				)
 				AudioTagIconMajor("S", color: knowledge.hasSource ? color : .gray)
 				AudioTagIcon(
