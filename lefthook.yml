@@ -1,6 +1,6 @@
 pre-commit:
   commands:
-    lint:
+    format:
       glob: "*.swift"
-      run: swift-format format --in-place {staged_files}
+      run: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format format --in-place --parallel {staged_files}
       stage_fixed: true
