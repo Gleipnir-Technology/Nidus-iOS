@@ -106,6 +106,7 @@ struct Nidus_Notes_Unit_Tests {
 			conditions: BreedingConditions.PoolGreen,
 			dipCount: 10,
 			fishPresence: false,
+			isBreeding: true,
 			larvaeQuantity: 100,
 			pupaeQuantity: 20,
 			reportType: FieldseekerReportType.Inspection,
@@ -127,6 +128,7 @@ struct Nidus_Notes_Unit_Tests {
 			conditions: BreedingConditions.PoolMaintained,
 			dipCount: 10,
 			fishPresence: false,
+			isBreeding: false,
 			larvaeQuantity: 0,
 			pupaeQuantity: 0,
 			reportType: FieldseekerReportType.Inspection,
@@ -138,6 +140,28 @@ struct Nidus_Notes_Unit_Tests {
 			)
 		)
 	}
+
+	@Test func inspectionTest3() async throws {
+		let text =
+			"Begin inspection. I was able to get a visual from the neighbor's house. The pool is murky with scum on top. I accessed it and found breeding. 5 dips had 10 larvae and 2 tumblers. They look like Aedes aegypti. I verified fish are present but struggling. Dimensions are 12 by 24 by 4 feet."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolGreen,
+			dipCount: 5,
+			fishPresence: true,
+			isBreeding: true,
+			larvaeQuantity: 10,
+			pupaeQuantity: 2,
+			reportType: FieldseekerReportType.Inspection,
+			stage: nil,
+			volume: Volume(
+				depth: Measurement(value: 4, unit: .feet),
+				length: Measurement(value: 12, unit: .feet),
+				width: Measurement(value: 24, unit: .feet),
+			)
+		)
+	}
 }
 
 func expectInspectionReport(
@@ -145,12 +169,14 @@ func expectInspectionReport(
 	conditions: BreedingConditions,
 	dipCount: Int,
 	fishPresence: Bool?,
+	isBreeding: Bool?,
 	larvaeQuantity: Int?,
 	pupaeQuantity: Int?,
 	reportType: FieldseekerReportType,
 	stage: LifeStage?,
 	volume: Volume?
 ) {
+	#expect(knowledge.impliesBreeding == isBreeding)
 	#expect(knowledge.breeding.conditions == conditions)
 	#expect(knowledge.fieldseeker.dipCount == dipCount)
 	#expect(knowledge.source.hasFish == fishPresence)

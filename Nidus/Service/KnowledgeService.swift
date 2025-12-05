@@ -177,18 +177,18 @@ private func extractViaGrams(
 			)
 		case "pool":
 			if gram.At(1).lem == "be" {
-				guard
-					let dimensions = maybeExtractVolume(
-						&result.transcriptTags,
-						gram,
-						2
-					)
-				else {
-					continue
+				if let dimensions = maybeExtractVolume(
+					&result.transcriptTags,
+					gram,
+					2
+				) {
+					result.source.volume = dimensions
 				}
-				result.source.volume = dimensions
+				if let condition = BreedingConditions.fromString(gram.At(2).lem) {
+					result.breeding.conditions = condition
+				}
 			}
-		case "pupa":
+		case "pupa", "tumbler":
 			extractCount(
 				count: &result.breeding.pupaeQuantity,
 				gram: gram,

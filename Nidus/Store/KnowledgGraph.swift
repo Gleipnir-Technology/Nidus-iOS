@@ -46,6 +46,16 @@ enum BreedingConditions: CustomStringConvertible {
 		case .Unknown: "Unknown"
 		}
 	}
+	static func fromString(_ s: String) -> BreedingConditions? {
+		switch s {
+		case "green", "murky":
+			return .PoolGreen
+		case "blue", "clear":
+			return .PoolMaintained
+		default:
+			return nil
+		}
+	}
 	static var prompts: [String] {
 		return BreedingConditions.all.map { $0.description }
 	}
@@ -120,7 +130,6 @@ struct BreedingKnowledgeGraph {
 	var conditions: BreedingConditions?
 	var eggQuantity: Int?
 	var genus: Genus?
-	var isBreeding: Bool?
 	var larvaeQuantity: Int?
 	var pupaeQuantity: Int?
 	var stage: LifeStage?

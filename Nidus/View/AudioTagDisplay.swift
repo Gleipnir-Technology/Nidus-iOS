@@ -131,8 +131,8 @@ struct AudioTagFieldseekerInspection: View {
 					AudioTagFieldseekerReportField(
 						name: "Breeding",
 						prompt: "[not] breeding/larvae present",
-						isDone: knowledge.hasBreeding,
-						value: knowledge.breeding.isBreeding
+						isDone: knowledge.impliesBreeding,
+						value: knowledge.impliesBreeding,
 					)
 					AudioTagFieldseekerReportField(
 						name: "Dip",
