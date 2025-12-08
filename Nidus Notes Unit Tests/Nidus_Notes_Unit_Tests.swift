@@ -388,22 +388,57 @@ struct Nidus_Notes_Unit_Tests {
 			)
 		)
 	}
+	@Test func inspectionTest14() async throws {
+		let text =
+			"Begin inspection. I'm at the property on Main Street. The pool is holding stagnant water. Breeding is present. 5 dips had 20 larvae and 1 pupa. No fish."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.Stagnant,
+			dipCount: 5,
+			eggQuantity: nil,
+			fishPresence: false,
+			genus: nil,
+			isBreeding: true,
+			larvaeQuantity: 20,
+			pupaeQuantity: 1,
+			reportType: FieldseekerReportType.Inspection,
+			species: nil,
+			stage: nil,
+			volume: Volume(
+				depth: nil,
+				length: nil,
+				width: nil,
+			)
+		)
+	}
+	@Test func inspectionTest15() async throws {
+		let text =
+			"Begin inspection. Pool check. It's green. Breeding heavy. Hundreds of them. Treating with BVA oil."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolGreen,
+			isBreeding: true,
+			reportType: FieldseekerReportType.Inspection,
+		)
+	}
 }
 
 func expectInspectionReport(
 	_ knowledge: KnowledgeGraph,
 	conditions: BreedingConditions,
-	dipCount: Int?,
+	dipCount: Int? = nil,
 	eggQuantity: Int? = nil,
-	fishPresence: Bool?,
+	fishPresence: Bool? = nil,
 	genus: Genus? = nil,
-	isBreeding: Bool?,
-	larvaeQuantity: Int?,
-	pupaeQuantity: Int?,
+	isBreeding: Bool? = nil,
+	larvaeQuantity: Int? = nil,
+	pupaeQuantity: Int? = nil,
 	reportType: FieldseekerReportType,
 	species: Species? = nil,
-	stage: LifeStage?,
-	volume: Volume?
+	stage: LifeStage? = nil,
+	volume: Volume? = Volume(depth: nil, length: nil, width: nil),
 ) {
 	#expect(knowledge.hasBreeding == isBreeding)
 	#expect(knowledge.breeding.conditions == conditions)

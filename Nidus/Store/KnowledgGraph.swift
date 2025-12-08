@@ -58,6 +58,8 @@ enum BreedingConditions: CustomStringConvertible {
 			return .PoolGreen
 		case "murky":
 			return .PoolMurky
+		case "stagnant":
+			return .Stagnant
 		default:
 			return nil
 		}
