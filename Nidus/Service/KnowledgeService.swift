@@ -188,9 +188,13 @@ private func extractViaGrams(
 			)
 		case "pool":
 			// Maybe skip over "pool is <...>" or "pool size is <...>"
-			let used = maybeFindIs(gram, 0)
+			var used = maybeFind(gram, "be", 0)
 			if used == -1 {
-				continue
+				// Maybe skip over "measured pool at <...>"
+				used = maybeFind(gram, "at", 0)
+				if used == -1 {
+					continue
+				}
 			}
 			if let dimensions = maybeExtractVolume(
 				&result.transcriptTags,
@@ -200,10 +204,10 @@ private func extractViaGrams(
 				result.source.volume = dimensions
 				continue
 			}
-			// Skip any adverbs
-			for i in 0...3 {
+			// Check any conditions mentioned near "pool"
+			for i in -2...3 {
 				if let condition = BreedingConditions.fromString(
-					gram.At(used + i).lem
+					gram.At(i).lem
 				) {
 					result.breeding.conditions = condition
 					break
@@ -223,10 +227,15 @@ private func extractViaGrams(
 			result.fieldseeker.reportType = FieldseekerReportType.MosquitoSource
 			addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
 		case "stage":
-			guard let val = fromNumber(gram.At(1).text) else {
+			var number: Int? = nil
+			number = fromNumber(gram.At(1).text)
+			if number != nil && gram.At(2).lem == "and" {
+				number = fromNumber(gram.At(3).text) ?? number
+			}
+			guard let n = number else {
 				continue
 			}
-			if let stage = LifeStage.fromInt(val) {
+			if let stage = LifeStage.fromInt(n) {
 				result.breeding.stage = stage
 				addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
 				addTranscriptionTag(&result.transcriptTags, gram.At(1), .Source)
@@ -300,12 +309,13 @@ private func maybeFindConditions(
 	}
 }
 
-private func maybeFindIs(
+private func maybeFind(
 	_ gram: Gram,
+	_ lem: String,
 	_ offset: Int,
 ) -> Int {
 	for i in 0...5 {
-		if gram.At(offset + i).lem == "be" {
+		if gram.At(offset + i).lem == lem {
 			return i + 1
 		}
 	}

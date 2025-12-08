@@ -221,7 +221,7 @@ struct Nidus_Notes_Unit_Tests {
 			reportType: FieldseekerReportType.Inspection,
 			stage: .FourthInstar,
 			volume: Volume(
-				depth: Measurement(value: 5, unit: .feet),
+				depth: Measurement(value: 6, unit: .feet),
 				length: Measurement(value: 16, unit: .feet),
 				width: Measurement(value: 32, unit: .feet),
 			)
