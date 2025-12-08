@@ -159,7 +159,7 @@ private func extractViaGrams(
 			)
 		case "dimension":
 			maybeMarkDimensions(&result, gram)
-		case "egg":
+		case "egg", "eggs":
 			extractCount(
 				count: &result.breeding.eggQuantity,
 				gram: gram,

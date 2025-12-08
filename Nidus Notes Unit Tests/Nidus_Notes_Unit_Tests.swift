@@ -15,78 +15,62 @@ struct Nidus_Notes_Unit_Tests {
 	@Test func mosquitoSource() async throws {
 		let text = "Checking on a mosquito source"
 		let knowledge = ExtractKnowledge(text)
-		#expect(knowledge.fieldseeker.reportType != nil)
-		guard let reportType = knowledge.fieldseeker.reportType else {
-			Issue.record("No report type found")
-			return
-		}
-		#expect(reportType == FieldseekerReportType.MosquitoSource)
+		expectInspectionReport(
+			knowledge,
+			reportType: .MosquitoSource,
+		)
 	}
 
 	@Test func mosquitoSourceCounts() async throws {
 		let text =
 			"Checking on a mosquito source at 123 Main Street. 10 dips. 20 pupae. 30 eggs"
 		let knowledge = ExtractKnowledge(text)
-		#expect(knowledge.fieldseeker.reportType != nil)
-		guard let reportType = knowledge.fieldseeker.reportType else {
-			Issue.record("No report type found")
-			return
-		}
-		#expect(reportType == FieldseekerReportType.MosquitoSource)
-		#expect(knowledge.fieldseeker.dipCount == 10)
-		#expect(knowledge.breeding.eggQuantity == 30)
-		#expect(knowledge.breeding.pupaeQuantity == 20)
+		expectInspectionReport(
+			knowledge,
+			dipCount: 10,
+			eggQuantity: 30,
+			pupaeQuantity: 20,
+			reportType: .MosquitoSource,
+		)
 	}
 
 	@Test func mosquitoSourceStage() async throws {
 		let text =
 			"Checking on a mosquito source at 123 Main Street. 10 dips. 20 pupae. 30 eggs. second instar"
 		let knowledge = ExtractKnowledge(text)
-		#expect(knowledge.fieldseeker.reportType != nil)
-		guard let reportType = knowledge.fieldseeker.reportType else {
-			Issue.record("No report type found")
-			return
-		}
-		#expect(reportType == .MosquitoSource)
-		guard let stage = knowledge.breeding.stage else {
-			Issue.record("No stage found")
-			return
-		}
-		#expect(stage == .SecondInstar)
+		expectInspectionReport(
+			knowledge,
+			dipCount: 10,
+			eggQuantity: 30,
+			pupaeQuantity: 20,
+			reportType: .MosquitoSource,
+			stage: .SecondInstar,
+		)
 	}
 
 	@Test func mosquitoSourceGenus() async throws {
 		let text =
 			"Checking on a mosquito source at 123 Main Street. 10 dips. 20 pupae. 30 eggs. Looks like Culex."
 		let knowledge = ExtractKnowledge(text)
-		#expect(knowledge.fieldseeker.reportType != nil)
-		guard let reportType = knowledge.fieldseeker.reportType else {
-			Issue.record("No report type found")
-			return
-		}
-		#expect(reportType == .MosquitoSource)
-		guard let genus = knowledge.breeding.genus else {
-			Issue.record("No genus found")
-			return
-		}
-		#expect(genus == .Culex)
+		expectInspectionReport(
+			knowledge,
+			dipCount: 10,
+			eggQuantity: 30,
+			genus: .Culex,
+			pupaeQuantity: 20,
+			reportType: .MosquitoSource,
+		)
 	}
 
 	@Test func mosquitoSourceConditions() async throws {
 		let text =
 			"Checking on a mosquito source at 123 Main Street. Conditions are dry"
 		let knowledge = ExtractKnowledge(text)
-		#expect(knowledge.fieldseeker.reportType != nil)
-		guard let reportType = knowledge.fieldseeker.reportType else {
-			Issue.record("No report type found")
-			return
-		}
-		#expect(reportType == .MosquitoSource)
-		guard let conditions = knowledge.breeding.conditions else {
-			Issue.record("No conditions found")
-			return
-		}
-		#expect(conditions == .Dry)
+		expectInspectionReport(
+			knowledge,
+			conditions: .Dry,
+			reportType: .MosquitoSource,
+		)
 	}
 
 	@Test func fromOrdinalToIntConversion() async throws {
@@ -106,7 +90,7 @@ struct Nidus_Notes_Unit_Tests {
 			conditions: BreedingConditions.PoolGreen,
 			dipCount: 10,
 			fishPresence: false,
-			isBreeding: true,
+			isBreedingExplicit: true,
 			larvaeQuantity: 100,
 			pupaeQuantity: 20,
 			reportType: FieldseekerReportType.Inspection,
@@ -128,11 +112,9 @@ struct Nidus_Notes_Unit_Tests {
 			conditions: BreedingConditions.PoolMaintained,
 			dipCount: 10,
 			fishPresence: false,
-			isBreeding: false,
 			larvaeQuantity: 0,
 			pupaeQuantity: 0,
 			reportType: FieldseekerReportType.Inspection,
-			stage: nil,
 			volume: Volume(
 				depth: Measurement(value: 8, unit: .feet),
 				length: Measurement(value: 40, unit: .feet),
@@ -151,12 +133,11 @@ struct Nidus_Notes_Unit_Tests {
 			dipCount: 5,
 			fishPresence: true,
 			genus: .Aedes,
-			isBreeding: true,
+			isBreedingExplicit: true,
 			larvaeQuantity: 10,
 			pupaeQuantity: 2,
 			reportType: FieldseekerReportType.Inspection,
 			species: .Aegypti,
-			stage: nil,
 			volume: Volume(
 				depth: Measurement(value: 4, unit: .feet),
 				length: Measurement(value: 12, unit: .feet),
@@ -172,13 +153,9 @@ struct Nidus_Notes_Unit_Tests {
 		expectInspectionReport(
 			knowledge,
 			conditions: BreedingConditions.Dry,
-			dipCount: nil,
 			fishPresence: false,
-			isBreeding: false,
-			larvaeQuantity: nil,
-			pupaeQuantity: nil,
+			isBreedingExplicit: false,
 			reportType: FieldseekerReportType.Inspection,
-			stage: nil,
 			volume: Volume(
 				depth: Measurement(value: 6, unit: .feet),
 				length: Measurement(value: 18, unit: .feet),
@@ -196,9 +173,8 @@ struct Nidus_Notes_Unit_Tests {
 			conditions: BreedingConditions.PoolGreen,
 			dipCount: 10,
 			fishPresence: true,
-			isBreeding: true,
+			isBreedingExplicit: true,
 			larvaeQuantity: 5,
-			pupaeQuantity: nil,
 			reportType: FieldseekerReportType.Inspection,
 			stage: .SecondInstar,
 			volume: Volume(
@@ -217,7 +193,7 @@ struct Nidus_Notes_Unit_Tests {
 			conditions: BreedingConditions.PoolMurky,
 			dipCount: 10,
 			fishPresence: false,
-			isBreeding: true,
+			isBreedingExplicit: true,
 			larvaeQuantity: 40,
 			pupaeQuantity: 15,
 			reportType: FieldseekerReportType.Inspection,
@@ -238,11 +214,9 @@ struct Nidus_Notes_Unit_Tests {
 			conditions: BreedingConditions.PoolMaintained,
 			dipCount: 5,
 			fishPresence: false,
-			isBreeding: false,
 			larvaeQuantity: 0,
 			pupaeQuantity: 0,
 			reportType: FieldseekerReportType.Inspection,
-			stage: nil,
 			volume: Volume(
 				depth: Measurement(value: 5, unit: .feet),
 				length: Measurement(value: 36, unit: .feet),
@@ -259,11 +233,10 @@ struct Nidus_Notes_Unit_Tests {
 			conditions: BreedingConditions.PoolGreen,
 			dipCount: 10,
 			fishPresence: true,
-			isBreeding: true,
+			isBreedingExplicit: true,
 			larvaeQuantity: 200,
 			pupaeQuantity: 30,
 			reportType: FieldseekerReportType.Inspection,
-			stage: nil,
 			volume: Volume(
 				depth: Measurement(value: 8, unit: .feet),
 				length: Measurement(value: 20, unit: .feet),
@@ -278,18 +251,9 @@ struct Nidus_Notes_Unit_Tests {
 		expectInspectionReport(
 			knowledge,
 			conditions: BreedingConditions.Dry,
-			dipCount: nil,
 			fishPresence: false,
-			isBreeding: false,
-			larvaeQuantity: nil,
-			pupaeQuantity: nil,
+			isBreedingExplicit: false,
 			reportType: FieldseekerReportType.Inspection,
-			stage: nil,
-			volume: Volume(
-				depth: nil,
-				length: nil,
-				width: nil,
-			)
 		)
 	}
 	@Test func inspectionTest10() async throws {
@@ -303,12 +267,10 @@ struct Nidus_Notes_Unit_Tests {
 			eggQuantity: 2,
 			fishPresence: false,
 			genus: .Aedes,
-			isBreeding: true,
+			isBreedingExplicit: true,
 			larvaeQuantity: 50,
-			pupaeQuantity: nil,
 			reportType: FieldseekerReportType.Inspection,
 			species: .Aegypti,
-			stage: nil,
 			volume: Volume(
 				depth: Measurement(value: 1, unit: .feet),
 				length: Measurement(value: 1, unit: .feet),
@@ -324,20 +286,11 @@ struct Nidus_Notes_Unit_Tests {
 			knowledge,
 			conditions: BreedingConditions.PoolGreen,
 			dipCount: 10,
-			eggQuantity: nil,
 			fishPresence: false,
-			genus: nil,
-			isBreeding: true,
+			isBreedingExplicit: true,
 			larvaeQuantity: 100,
-			pupaeQuantity: nil,
 			reportType: FieldseekerReportType.Inspection,
-			species: nil,
 			stage: .FourthInstar,
-			volume: Volume(
-				depth: nil,
-				length: nil,
-				width: nil,
-			)
 		)
 	}
 	@Test func inspectionTest12() async throws {
@@ -347,16 +300,9 @@ struct Nidus_Notes_Unit_Tests {
 		expectInspectionReport(
 			knowledge,
 			conditions: BreedingConditions.PoolMaintained,
-			dipCount: nil,
-			eggQuantity: nil,
 			fishPresence: false,
-			genus: nil,
-			isBreeding: false,
-			larvaeQuantity: nil,
-			pupaeQuantity: nil,
+			isBreedingExplicit: false,
 			reportType: FieldseekerReportType.Inspection,
-			species: nil,
-			stage: nil,
 			volume: Volume(
 				depth: Measurement(value: 5, unit: .feet),
 				length: Measurement(value: 15, unit: .feet),
@@ -372,14 +318,9 @@ struct Nidus_Notes_Unit_Tests {
 			knowledge,
 			conditions: BreedingConditions.PoolMurky,
 			dipCount: 10,
-			eggQuantity: nil,
-			fishPresence: nil,
-			genus: nil,
-			isBreeding: true,
+			isBreedingExplicit: true,
 			larvaeQuantity: 15,
-			pupaeQuantity: nil,
 			reportType: FieldseekerReportType.Inspection,
-			species: nil,
 			stage: .SecondInstar,
 			volume: Volume(
 				depth: Measurement(value: 4, unit: .feet),
@@ -396,20 +337,11 @@ struct Nidus_Notes_Unit_Tests {
 			knowledge,
 			conditions: BreedingConditions.Stagnant,
 			dipCount: 5,
-			eggQuantity: nil,
 			fishPresence: false,
-			genus: nil,
-			isBreeding: true,
+			isBreedingExplicit: true,
 			larvaeQuantity: 20,
 			pupaeQuantity: 1,
 			reportType: FieldseekerReportType.Inspection,
-			species: nil,
-			stage: nil,
-			volume: Volume(
-				depth: nil,
-				length: nil,
-				width: nil,
-			)
 		)
 	}
 	@Test func inspectionTest15() async throws {
@@ -419,7 +351,7 @@ struct Nidus_Notes_Unit_Tests {
 		expectInspectionReport(
 			knowledge,
 			conditions: BreedingConditions.PoolGreen,
-			isBreeding: true,
+			isBreedingExplicit: true,
 			reportType: FieldseekerReportType.Inspection,
 		)
 	}
@@ -427,12 +359,12 @@ struct Nidus_Notes_Unit_Tests {
 
 func expectInspectionReport(
 	_ knowledge: KnowledgeGraph,
-	conditions: BreedingConditions,
+	conditions: BreedingConditions? = nil,
 	dipCount: Int? = nil,
 	eggQuantity: Int? = nil,
 	fishPresence: Bool? = nil,
 	genus: Genus? = nil,
-	isBreeding: Bool? = nil,
+	isBreedingExplicit: Bool? = nil,
 	larvaeQuantity: Int? = nil,
 	pupaeQuantity: Int? = nil,
 	reportType: FieldseekerReportType,
@@ -440,7 +372,7 @@ func expectInspectionReport(
 	stage: LifeStage? = nil,
 	volume: Volume? = Volume(depth: nil, length: nil, width: nil),
 ) {
-	#expect(knowledge.hasBreeding == isBreeding)
+	#expect(knowledge.breeding.isBreedingExplicit == isBreedingExplicit)
 	#expect(knowledge.breeding.conditions == conditions)
 	#expect(knowledge.breeding.genus == genus)
 	#expect(knowledge.breeding.eggQuantity == eggQuantity)
