@@ -120,7 +120,7 @@ private func extractViaGrams(
 ) {
 	for (i, _) in words.enumerated() {
 		let gram = Gram(offset: i, words: words)
-		var word = gram.At(0).LemOrText
+		let word = gram.At(0).LemOrText
 		switch word {
 		case "aedes", "culex", "quinks":
 			guard let genus = Genus.fromString(gram.At(0).text) else {
@@ -677,9 +677,9 @@ private func volumeFromMeasurements(_ measurements: [ExtractedMeasurement]) thro
 	let unit: UnitLength =
 		measurements[0].unit ?? measurements[1].unit ?? measurements[2].unit ?? .feet
 
-	var depth: Measurement<UnitLength> = depthMeasurement!.toMeasurementLength(fallback: unit)
-	var length: Measurement<UnitLength> = lengthMeasurement!.toMeasurementLength(fallback: unit)
-	var width: Measurement<UnitLength> = widthMeasurement!.toMeasurementLength(fallback: unit)
+	let depth: Measurement<UnitLength> = depthMeasurement!.toMeasurementLength(fallback: unit)
+	let length: Measurement<UnitLength> = lengthMeasurement!.toMeasurementLength(fallback: unit)
+	let width: Measurement<UnitLength> = widthMeasurement!.toMeasurementLength(fallback: unit)
 
 	return Volume(depth: depth, length: length, width: width)
 }
