@@ -62,10 +62,12 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 		source: SourceKnowledgeGraph(volume: Volume()),
 		transcriptTags: []
 	)
-	let words: [Word] = textToWords(text)
-	debugLogWords(words)
-	extractViaGrams(&result, words)
-	extractViaPatterns(&result, words)
+	let sentences: [[Word]] = textToSentences(text)
+	debugLogWords(sentences)
+	for sentence in sentences {
+		extractViaGrams(&result, sentence)
+		extractViaPatterns(&result, sentence)
+	}
 	return result
 }
 
@@ -82,9 +84,14 @@ private func debugLogWord(_ word: Word, _ i: Int) {
 		"\(i): \(word.text) | \(word.lem) | \(tagTypeToString(word.lex))"
 	)
 }
-private func debugLogWords(_ words: [Word]) {
-	for (i, word) in words.enumerated() {
-		debugLogWord(word, i)
+private func debugLogWords(_ sentences: [[Word]]) {
+	var i = 0
+	for sentence in sentences {
+		for word in sentence {
+			debugLogWord(word, i)
+			i += 1
+		}
+		Logger.foreground.info("-sentence break-")
 	}
 }
 private func extractCount(
@@ -105,7 +112,11 @@ private func extractViaGrams(
 ) {
 	for (i, _) in words.enumerated() {
 		let gram = Gram(offset: i, words: words)
-		switch gram.At(0).lem {
+		var word = gram.At(0).lem
+		if word.isEmpty {
+			word = gram.At(0).text
+		}
+		switch word {
 		case "aedes", "aegypti", "culex", "quinks":
 			guard let genus = Genus.fromString(gram.At(0).text) else {
 				Logger.foreground.info(
@@ -118,15 +129,15 @@ private func extractViaGrams(
 		case "blue", "maintain":
 			result.breeding.conditions = .PoolMaintained
 			addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
-		case "breed":
+		case "breed", "breeding":
 			setWithMaybeNegate(
 				gram: gram,
 				tags: &result.transcriptTags,
-				val: &result.breeding.isBreeding,
+				val: &result.breeding.isBreedingExplicit,
 			)
-		case "conditions":
+		case "condition":
 			maybeFindConditions(&result, gram)
-		case "dip":
+		case "dip", "dips":
 			extractCount(
 				count: &result.fieldseeker.dipCount,
 				gram: gram,
@@ -183,12 +194,19 @@ private func extractViaGrams(
 					2
 				) {
 					result.source.volume = dimensions
+					continue
 				}
-				if let condition = BreedingConditions.fromString(gram.At(2).lem) {
-					result.breeding.conditions = condition
+				// Skip any adverbs
+				for i in 0...3 {
+					if let condition = BreedingConditions.fromString(
+						gram.At(2 + i).lem
+					) {
+						result.breeding.conditions = condition
+						break
+					}
 				}
 			}
-		case "pupa", "tumbler":
+		case "pupa", "pupae", "tumbler":
 			extractCount(
 				count: &result.breeding.pupaeQuantity,
 				gram: gram,
@@ -233,18 +251,29 @@ private func setWithMaybeNegate(gram: Gram, tags: inout [TranscriptTag], val: in
 	addTranscriptionTag(&tags, gram.At(0), .Source)
 }
 
-private func textToWords(_ text: String) -> [Word] {
-	let lexTokens = LexTranscript(text)
-	let lemTokens = LemTranscript(text)
-	return lexTokens.map { t in
-		let lem = findMatchingLem(lemTokens, t.range)
-		return Word(
-			lem: lem.value,
-			lex: t.type,
-			range: t.range,
-			text: String(text[t.range].lowercased()),
-		)
+private func textToSentences(_ text: String) -> [[Word]] {
+	let sentences: [Range<String.Index>] = text.split(separator: ".").map({
+		$0.startIndex..<$0.endIndex
+	})
+	let lexTokens = LexTranscript(text, sentences)
+	let lemTokens = LemTranscript(text, sentences)
+	var utterances: [[Word]] = []
+	for (i, _) in sentences.enumerated() {
+		let current = lexTokens[i].map { t in
+			let lem = findMatchingLem(lemTokens[i], t.range)
+			// Sometime for certain utterances the NLP module can't tell a period is a sentence terminator
+			// This often happens when the next "sentence" is a fragment.
+			let w = String(text[t.range].lowercased()).replacing(".", with: "")
+			return Word(
+				lem: lem.value,
+				lex: t.type,
+				range: t.range,
+				text: w,
+			)
+		}
+		utterances.append(current)
 	}
+	return utterances
 }
 private func isOrdinal(_ w: Word) -> Bool {
 	let o = fromOrdinal(w.text)
@@ -545,9 +574,9 @@ private func extractSourceType(
 private func maybeExtractVolume(_ transcript: inout [TranscriptTag], _ gram: Gram, _ offset: Int)
 	-> Volume?
 {
-	for i in 0..<10 {
+	/*for i in 0..<10 {
 		debugLogWord(gram.At(i), i)
-	}
+	}*/
 	guard let dim1 = maybeExtractVolumeMeasurement(&transcript, gram, offset) else {
 		return nil
 	}

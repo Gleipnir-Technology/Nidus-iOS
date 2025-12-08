@@ -162,12 +162,34 @@ struct Nidus_Notes_Unit_Tests {
 			)
 		)
 	}
+
+	@Test func inspectionTest4() async throws {
+		let text =
+			"Begin inspection. Swimming pool is completely dry at this time, actually full of grass at the bottom. No breeding and no fish. I’m measuring it for the record pool is 18 feet by 36 feet by 6 feet."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.Dry,
+			dipCount: nil,
+			fishPresence: false,
+			isBreeding: false,
+			larvaeQuantity: nil,
+			pupaeQuantity: nil,
+			reportType: FieldseekerReportType.Inspection,
+			stage: nil,
+			volume: Volume(
+				depth: Measurement(value: 6, unit: .feet),
+				length: Measurement(value: 18, unit: .feet),
+				width: Measurement(value: 36, unit: .feet),
+			)
+		)
+	}
 }
 
 func expectInspectionReport(
 	_ knowledge: KnowledgeGraph,
 	conditions: BreedingConditions,
-	dipCount: Int,
+	dipCount: Int?,
 	fishPresence: Bool?,
 	isBreeding: Bool?,
 	larvaeQuantity: Int?,
@@ -176,7 +198,7 @@ func expectInspectionReport(
 	stage: LifeStage?,
 	volume: Volume?
 ) {
-	#expect(knowledge.impliesBreeding == isBreeding)
+	#expect(knowledge.hasBreeding == isBreeding)
 	#expect(knowledge.breeding.conditions == conditions)
 	#expect(knowledge.fieldseeker.dipCount == dipCount)
 	#expect(knowledge.source.hasFish == fishPresence)

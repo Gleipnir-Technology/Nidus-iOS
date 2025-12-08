@@ -52,6 +52,8 @@ enum BreedingConditions: CustomStringConvertible {
 			return .PoolGreen
 		case "blue", "clear":
 			return .PoolMaintained
+		case "dry":
+			return .Dry
 		default:
 			return nil
 		}
@@ -129,6 +131,7 @@ enum TreatmentType {
 struct BreedingKnowledgeGraph {
 	var conditions: BreedingConditions?
 	var eggQuantity: Int?
+	var isBreedingExplicit: Bool?
 	var genus: Genus?
 	var larvaeQuantity: Int?
 	var pupaeQuantity: Int?
@@ -187,6 +190,9 @@ struct KnowledgeGraph {
 			|| adultProduction.landingCounts != nil
 	}
 	var hasBreeding: Bool {
+		if let breeding = breeding.isBreedingExplicit {
+			return breeding
+		}
 		return breeding.genus != nil || breeding.stage != nil
 			|| breeding.treatment != nil
 	}

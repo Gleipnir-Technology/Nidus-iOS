@@ -11,32 +11,36 @@ struct LexToken {
 	let type: NLTag
 }
 
-func LemTranscript(_ text: String) -> [LemToken] {
+func LemTranscript(_ text: String, _ sentences: [Range<String.Index>]) -> [[LemToken]] {
 	let tagger = NLTagger(tagSchemes: [.lemma])
-	tagger.string = text
 	let options: NLTagger.Options = [.omitWhitespace]
-	var results = [LemToken]()
-	tagger.enumerateTags(
-		in: text.startIndex..<text.endIndex,
-		unit: .word,
-		scheme: .lemma,
-		options: options
-	) {
-		tag,
-		tokenRange in
-		guard let tag = tag else { return true }
-		results.append(LemToken(range: tokenRange, value: tag.rawValue))
-		return true
+	var results = [[LemToken]]()
+	for sentence in sentences {
+		tagger.string = text
+		var current: [LemToken] = []
+		tagger.enumerateTags(
+			in: sentence,
+			unit: .word,
+			scheme: .lemma,
+			options: options
+		) {
+			tag,
+			tokenRange in
+			guard let tag = tag else { return true }
+			current.append(LemToken(range: tokenRange, value: tag.rawValue))
+			return true
 
+		}
+		results.append(current)
 	}
 	return results
 }
-func LexTranscript(_ text: String) -> [LexToken] {
+func LexTranscript(_ text: String, _ sentences: [Range<String.Index>]) -> [[LexToken]] {
+	var results: [[LexToken]] = []
 	let dictionary: [String: [String]] = [
 		"Noun": ["300"]
 	]
 	let tagger = NLTagger(tagSchemes: [.lexicalClass])
-	tagger.string = text
 	let options: NLTagger.Options = [.omitWhitespace]
 	do {
 		let gazetteer = try NLGazetteer(
@@ -48,20 +52,23 @@ func LexTranscript(_ text: String) -> [LexToken] {
 	catch {
 		Logger.foreground.error("Failed to create gazetteer: \(error)")
 	}
-	var results = [LexToken]()
-	tagger.enumerateTags(
-		in: text.startIndex..<text.endIndex,
-		unit: .word,
-		scheme: .lexicalClass,
-		options: options
-	) {
-		tag,
-		tokenRange in
-		guard let tag = tag else { return true }
-		results.append(LexToken(range: tokenRange, type: tag))
-		return true
+	tagger.string = text
+	for sentence in sentences {
+		var current: [LexToken] = []
+		tagger.enumerateTags(
+			in: sentence,
+			unit: .word,
+			scheme: .lexicalClass,
+			options: options
+		) {
+			tag,
+			tokenRange in
+			guard let tag = tag else { return true }
+			current.append(LexToken(range: tokenRange, type: tag))
+			return true
+		}
+		results.append(current)
 	}
-
 	return results
 }
 func tagTypeToString(_ tagType: NLTag) -> String {
