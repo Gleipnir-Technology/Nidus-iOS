@@ -99,7 +99,7 @@ struct Nidus_Notes_Unit_Tests {
 
 	@Test func inspectionTest1() async throws {
 		let text =
-			"Begin inspection. I'm at a swimming pool that is green and has high organic content. It is breeding heavily. I did 10 dips and found about 100 larvae stage one and stage four and 20 pupae. No fish present. The pool dimensions are 15 by 30 by 5 feet."
+			"Begin inspection. I'm at a swimming pool that is green and has high organic content. It is breeding heavily. I did 10 dips and found about 100 larvae stage one and four and 20 pupae. No fish present. The pool dimensions are 15 by 30 by 5 feet."
 		let knowledge = ExtractKnowledge(text)
 		expectInspectionReport(
 			knowledge,
