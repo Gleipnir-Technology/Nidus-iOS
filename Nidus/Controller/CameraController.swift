@@ -179,16 +179,16 @@ final class CameraController: Camera {
 	/// Toggles the state of recording.
 	func toggleRecording() async {
 		switch await captureService.captureActivity {
-		case .movieCapture:
+		/*case .movieCapture:
 			do {
 				// If currently recording, stop the recording and write the movie to the library.
-				let movie = try await captureService.stopRecording()
+				//let movie = try await captureService.stopRecording()
 				// Don't save to the photo library
 				//try await mediaLibrary.save(movie: movie)
 			}
 			catch {
 				self.error = error
-			}
+			}*/
 		default:
 			// In any other case, start recording.
 			await captureService.startRecording()
