@@ -62,6 +62,33 @@ enum BreedingConditions: CustomStringConvertible {
 		return BreedingConditions.all.map { $0.description }
 	}
 }
+enum Genus: CustomStringConvertible {
+	case Aedes
+	case Culex
+	case Quinks
+	var description: String {
+		switch self {
+		case .Aedes:
+			"Aedes"
+		case .Culex:
+			"Culex"
+		case .Quinks:
+			"Quinks"
+		}
+	}
+	static func fromString(_ s: String) -> Genus? {
+		switch s.lowercased() {
+		case "aedes":
+			return .Aedes
+		case "culex":
+			return .Culex
+		case "quinks":
+			return .Quinks
+		default:
+			return nil
+		}
+	}
+}
 
 enum LifeStage: CustomStringConvertible {
 	case FirstInstar
@@ -91,33 +118,18 @@ enum LifeStage: CustomStringConvertible {
 		}
 	}
 }
-enum Genus: CustomStringConvertible {
-	case Aedes
+enum Species: CustomStringConvertible {
 	case Aegypti
-	case Culex
-	case Quinks
 	var description: String {
 		switch self {
-		case .Aedes:
-			"Aedes"
 		case .Aegypti:
 			"Aegypti"
-		case .Culex:
-			"Culex"
-		case .Quinks:
-			"Quinks"
 		}
 	}
-	static func fromString(_ s: String) -> Genus? {
+	static func fromString(_ s: String) -> Species? {
 		switch s.lowercased() {
-		case "aedes":
-			return .Aedes
 		case "aegypti":
 			return .Aegypti
-		case "culex":
-			return .Culex
-		case "quinks":
-			return .Quinks
 		default:
 			return nil
 		}
@@ -135,6 +147,7 @@ struct BreedingKnowledgeGraph {
 	var genus: Genus?
 	var larvaeQuantity: Int?
 	var pupaeQuantity: Int?
+	var species: Species?
 	var stage: LifeStage?
 	var treatment: TreatmentType?
 }

@@ -5,13 +5,6 @@ private let SOURCE_NOUNS: [String: SourceType] = ["gutter": .Flood]
 private let LENGTH_ADJ: [String] = ["long"]
 private let HEIGHT_ADJ: [String] = ["deep", "high"]
 private let WIDTH_ADJ: [String] = ["wide"]
-private let BREEDING_NOUNS: [String] = ["instar"]
-private let GENUS_NOUNS: [String: Genus] = [
-	"aedes": .Aedes,
-	"aegypti": .Aegypti,
-	"culex": .Culex,
-	"quinks": .Quinks,
-]
 private let FACILITATOR_ROOT_CAUSE_VERBS: [String] = ["blocking"]
 private let FACILITATOR_ACTION_VERBS: [String] = ["removed"]
 private let ROOT_CAUSE_ADJ: [String] = ["root"]
@@ -89,6 +82,9 @@ private func addTranscriptionTag(
 }
 
 private func debugLogWord(_ word: Word, _ i: Int) {
+	if word.text.isEmpty {
+		return
+	}
 	Logger.foreground.info(
 		"\(i): \(word.text) | \(word.lem) | \(tagTypeToString(word.lex))"
 	)
@@ -109,9 +105,12 @@ private func extractCount(
 	transcript: inout [TranscriptTag],
 ) {
 	addTranscriptionTag(&transcript, gram.At(0), .Measurement)
-	count = fromNumber(gram.At(-1).text)
-	if count != nil {
-		addTranscriptionTag(&transcript, gram.At(-1), .Measurement)
+	for i in 1...3 {
+		count = fromNumber(gram.At(-1 * i).text)
+		if count != nil {
+			addTranscriptionTag(&transcript, gram.At(-1 * i), .Measurement)
+			return
+		}
 	}
 }
 
@@ -123,7 +122,7 @@ private func extractViaGrams(
 		let gram = Gram(offset: i, words: words)
 		var word = gram.At(0).LemOrText
 		switch word {
-		case "aedes", "aegypti", "culex", "quinks":
+		case "aedes", "culex", "quinks":
 			guard let genus = Genus.fromString(gram.At(0).text) else {
 				Logger.foreground.info(
 					"Mismatch in recognized genus. This indicates either the Genus.fromString function is broken, or the grams switch is malformed."
@@ -131,6 +130,15 @@ private func extractViaGrams(
 				continue
 			}
 			result.breeding.genus = genus
+			addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
+		case "aegypti":
+			guard let species = Species.fromString(gram.At(0).text) else {
+				Logger.foreground.info(
+					"Mismatch in recognized species. This indicates either the Species.fromString function is broken, or the grams switch is malformed."
+				)
+				continue
+			}
+			result.breeding.species = species
 			addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
 		case "blue", "maintain":
 			result.breeding.conditions = .PoolMaintained
@@ -349,13 +357,9 @@ private func maybeMarkDimensions(
 	_ gram: Gram,
 ) {
 	// Maybe skip over "pool is <...>" or "pool size is <...>"
-	var used = maybeFind(gram, "be", 0)
+	let used = maybeFindAny(gram, ["at", "be", "dimension", "pool", "size"], 0)
 	if used == -1 {
-		// Maybe skip over "measured pool at <...>"
-		used = maybeFind(gram, "at", 0)
-		if used == -1 {
-			return
-		}
+		return
 	}
 	if let dimensions = maybeExtractVolume(
 		&result.transcriptTags,
@@ -364,45 +368,6 @@ private func maybeMarkDimensions(
 	) {
 		result.source.volume = dimensions
 	}
-}
-
-private func extractBreedingGraph(
-	_ text: String,
-	_ tokens: [LexToken],
-	_ transcriptTags: inout [TranscriptTag]
-)
-	-> BreedingKnowledgeGraph
-{
-	var genus: Genus?
-	var stage: LifeStage?
-	for (i, token) in tokens.enumerated() {
-		if token.type == NLTag.noun {
-			let word = text[token.range].lowercased()
-			for noun in BREEDING_NOUNS {
-				if noun == word {
-					let adj = tokens[i - 1]
-					let adjWord = text[adj.range]
-					stage = parseLifeStage(String(adjWord))
-					if stage != nil {
-						transcriptTags.append(
-							TranscriptTag(
-								range: token.range,
-								type: .Source
-							)
-						)
-					}
-				}
-			}
-			if genus == nil {
-				genus = GENUS_NOUNS[word]
-			}
-		}
-	}
-	return BreedingKnowledgeGraph(
-		genus: genus,
-		stage: stage,
-		treatment: nil
-	)
 }
 
 private func extractFacilitator(
@@ -626,7 +591,7 @@ private func maybeExtractVolume(_ transcript: inout [TranscriptTag], _ gram: Gra
 	guard let dim1 = maybeExtractVolumeMeasurement(&transcript, gram, offset) else {
 		return nil
 	}
-	let sep1 = maybeFindAny(gram, ["by", ",", "and"], offset + dim1.used)
+	let sep1 = maybeFindAny(gram, [",", "and", "by"], offset + dim1.used)
 	if sep1 == -1 {
 		return nil
 	}
@@ -634,7 +599,7 @@ private func maybeExtractVolume(_ transcript: inout [TranscriptTag], _ gram: Gra
 	else {
 		return nil
 	}
-	let sep2 = maybeFindAny(gram, ["by", ",", "and"], offset + dim1.used + sep1 + dim2.used)
+	let sep2 = maybeFindAny(gram, [",", "and", "by"], offset + dim1.used + sep1 + dim2.used)
 	if sep2 == -1 {
 		return nil
 	}
