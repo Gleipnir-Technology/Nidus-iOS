@@ -187,23 +187,26 @@ private func extractViaGrams(
 				transcript: &result.transcriptTags,
 			)
 		case "pool":
-			if gram.At(1).lem == "be" {
-				if let dimensions = maybeExtractVolume(
-					&result.transcriptTags,
-					gram,
-					2
+			// Maybe skip over "pool is <...>" or "pool size is <...>"
+			let used = maybeFindIs(gram, 0)
+			if used == -1 {
+				continue
+			}
+			if let dimensions = maybeExtractVolume(
+				&result.transcriptTags,
+				gram,
+				used
+			) {
+				result.source.volume = dimensions
+				continue
+			}
+			// Skip any adverbs
+			for i in 0...3 {
+				if let condition = BreedingConditions.fromString(
+					gram.At(used + i).lem
 				) {
-					result.source.volume = dimensions
-					continue
-				}
-				// Skip any adverbs
-				for i in 0...3 {
-					if let condition = BreedingConditions.fromString(
-						gram.At(2 + i).lem
-					) {
-						result.breeding.conditions = condition
-						break
-					}
+					result.breeding.conditions = condition
+					break
 				}
 			}
 		case "pupa", "pupae", "tumbler":
@@ -297,6 +300,17 @@ private func maybeFindConditions(
 	}
 }
 
+private func maybeFindIs(
+	_ gram: Gram,
+	_ offset: Int,
+) -> Int {
+	for i in 0...5 {
+		if gram.At(offset + i).lem == "be" {
+			return i + 1
+		}
+	}
+	return -1
+}
 private func maybeMarkCondition(
 	_ result: inout KnowledgeGraph,
 	_ gram: Gram,

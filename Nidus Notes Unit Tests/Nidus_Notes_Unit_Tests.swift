@@ -184,6 +184,70 @@ struct Nidus_Notes_Unit_Tests {
 			)
 		)
 	}
+
+	@Test func inspectionTest5() async throws {
+		let text =
+			"Begin inspection. This is a green pool. Fish are present and alive. There was still very light breeding so I added more. 10 dips total with 5 larvae stage two. The pool size is 16 by 32 by 5 feet."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolGreen,
+			dipCount: 10,
+			fishPresence: true,
+			isBreeding: true,
+			larvaeQuantity: 5,
+			pupaeQuantity: nil,
+			reportType: FieldseekerReportType.Inspection,
+			stage: .SecondInstar,
+			volume: Volume(
+				depth: Measurement(value: 5, unit: .feet),
+				length: Measurement(value: 16, unit: .feet),
+				width: Measurement(value: 32, unit: .feet),
+			)
+		)
+	}
+	@Test func inspectionTest6() async throws {
+		let text =
+			"Begin inspection. I’m at a murky pool, visibility is low. It is breeding. I did 10 dips and found 40 larvae and 15 Pupae stages three and four. No fish found. I measured the pool at 16 by 32 by 6 feet."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolGreen,
+			dipCount: 10,
+			fishPresence: false,
+			isBreeding: true,
+			larvaeQuantity: 40,
+			pupaeQuantity: 15,
+			reportType: FieldseekerReportType.Inspection,
+			stage: .FourthInstar,
+			volume: Volume(
+				depth: Measurement(value: 5, unit: .feet),
+				length: Measurement(value: 16, unit: .feet),
+				width: Measurement(value: 32, unit: .feet),
+			)
+		)
+	}
+	@Test func inspectionTest7() async throws {
+		let text =
+			"Begin inspection. Backyard pool is maintained, water is crystal clear. I took 5 dips near the skimmer, zero larvae and zero pupae. No fish needed. Dimensions are 18 feet wide, 36 feet long, and 5 feet deep."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolMaintained,
+			dipCount: 10,
+			fishPresence: false,
+			isBreeding: false,
+			larvaeQuantity: 40,
+			pupaeQuantity: 15,
+			reportType: FieldseekerReportType.Inspection,
+			stage: .FourthInstar,
+			volume: Volume(
+				depth: Measurement(value: 5, unit: .feet),
+				length: Measurement(value: 16, unit: .feet),
+				width: Measurement(value: 32, unit: .feet),
+			)
+		)
+	}
 }
 
 func expectInspectionReport(
