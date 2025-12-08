@@ -316,6 +316,54 @@ struct Nidus_Notes_Unit_Tests {
 			)
 		)
 	}
+	@Test func inspectionTest11() async throws {
+		let text =
+			"Begin inspection. I checked the pool and it is green. It is breeding heavy. I did 10 dips and caught 100 larvae all stages. No fish present."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolGreen,
+			dipCount: 10,
+			eggQuantity: nil,
+			fishPresence: false,
+			genus: nil,
+			isBreeding: true,
+			larvaeQuantity: 100,
+			pupaeQuantity: nil,
+			reportType: FieldseekerReportType.Inspection,
+			species: nil,
+			stage: .FourthInstar,
+			volume: Volume(
+				depth: nil,
+				length: nil,
+				width: nil,
+			)
+		)
+	}
+	@Test func inspectionTest12() async throws {
+		let text =
+			"Begin inspection. The pool is maintained and blue. No breeding found today. No fish. The pool is 15 by 30 by 5 feet."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolMaintained,
+			dipCount: nil,
+			eggQuantity: nil,
+			fishPresence: false,
+			genus: nil,
+			isBreeding: false,
+			larvaeQuantity: nil,
+			pupaeQuantity: nil,
+			reportType: FieldseekerReportType.Inspection,
+			species: nil,
+			stage: nil,
+			volume: Volume(
+				depth: Measurement(value: 5, unit: .feet),
+				length: Measurement(value: 15, unit: .feet),
+				width: Measurement(value: 30, unit: .feet),
+			)
+		)
+	}
 }
 
 func expectInspectionReport(

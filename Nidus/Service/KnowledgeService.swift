@@ -223,6 +223,10 @@ private func extractViaGrams(
 			if number != nil && gram.At(2).lem == "and" {
 				number = fromNumber(gram.At(3).text) ?? number
 			}
+			// Take 'all stages' to mean 'the highest stage'
+			if gram.At(-1).lem == "all" {
+				number = 4
+			}
 			guard let n = number else {
 				continue
 			}
