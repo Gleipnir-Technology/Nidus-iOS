@@ -234,17 +234,38 @@ struct Nidus_Notes_Unit_Tests {
 		expectInspectionReport(
 			knowledge,
 			conditions: BreedingConditions.PoolMaintained,
-			dipCount: 10,
+			dipCount: 5,
 			fishPresence: false,
 			isBreeding: false,
-			larvaeQuantity: 40,
-			pupaeQuantity: 15,
+			larvaeQuantity: 0,
+			pupaeQuantity: 0,
+			reportType: FieldseekerReportType.Inspection,
+			stage: nil,
+			volume: Volume(
+				depth: Measurement(value: 5, unit: .feet),
+				length: Measurement(value: 36, unit: .feet),
+				width: Measurement(value: 18, unit: .feet),
+			)
+		)
+	}
+	@Test func inspectionTest8() async throws {
+		let text =
+			"Begin inspection. This pool is green with high organic matter. Breeding is heavy. I took 10 dips getting 200 larvae and 30 tumblers. Fish are established but struggling. The pool is 20 by 40 by 8 feet."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolMaintained,
+			dipCount: 5,
+			fishPresence: false,
+			isBreeding: false,
+			larvaeQuantity: 0,
+			pupaeQuantity: 0,
 			reportType: FieldseekerReportType.Inspection,
 			stage: .FourthInstar,
 			volume: Volume(
 				depth: Measurement(value: 5, unit: .feet),
-				length: Measurement(value: 16, unit: .feet),
-				width: Measurement(value: 32, unit: .feet),
+				length: Measurement(value: 36, unit: .feet),
+				width: Measurement(value: 18, unit: .feet),
 			)
 		)
 	}

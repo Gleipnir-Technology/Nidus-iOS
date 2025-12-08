@@ -25,6 +25,15 @@ struct Word {
 	let lex: NLTag
 	let range: Range<String.Index>
 	let text: String
+
+	var LemOrText: String {
+		if lem.isEmpty {
+			return text
+		}
+		else {
+			return lem
+		}
+	}
 }
 
 struct Gram {
@@ -112,10 +121,7 @@ private func extractViaGrams(
 ) {
 	for (i, _) in words.enumerated() {
 		let gram = Gram(offset: i, words: words)
-		var word = gram.At(0).lem
-		if word.isEmpty {
-			word = gram.At(0).text
-		}
+		var word = gram.At(0).LemOrText
 		switch word {
 		case "aedes", "aegypti", "culex", "quinks":
 			guard let genus = Genus.fromString(gram.At(0).text) else {
@@ -144,14 +150,7 @@ private func extractViaGrams(
 				transcript: &result.transcriptTags,
 			)
 		case "dimension":
-			if gram.At(1).lem != "be" {
-				continue
-			}
-			guard let dimensions = maybeExtractVolume(&result.transcriptTags, gram, 2)
-			else {
-				continue
-			}
-			result.source.volume = dimensions
+			maybeMarkDimensions(&result, gram)
 		case "egg":
 			extractCount(
 				count: &result.breeding.eggQuantity,
@@ -187,23 +186,7 @@ private func extractViaGrams(
 				transcript: &result.transcriptTags,
 			)
 		case "pool":
-			// Maybe skip over "pool is <...>" or "pool size is <...>"
-			var used = maybeFind(gram, "be", 0)
-			if used == -1 {
-				// Maybe skip over "measured pool at <...>"
-				used = maybeFind(gram, "at", 0)
-				if used == -1 {
-					continue
-				}
-			}
-			if let dimensions = maybeExtractVolume(
-				&result.transcriptTags,
-				gram,
-				used
-			) {
-				result.source.volume = dimensions
-				continue
-			}
+			maybeMarkDimensions(&result, gram)
 			// Check any conditions mentioned near "pool"
 			for i in -2...3 {
 				if let condition = BreedingConditions.fromString(
@@ -321,6 +304,23 @@ private func maybeFind(
 	}
 	return -1
 }
+
+private func maybeFindAny(
+	_ gram: Gram,
+	_ lems: [String],
+	_ offset: Int,
+) -> Int {
+	for i in 0...5 {
+		let t = gram.At(offset + i).LemOrText
+		if !lems.contains(t) {
+			if i == 0 {
+				return -1
+			}
+			return i
+		}
+	}
+	return 5
+}
 private func maybeMarkCondition(
 	_ result: inout KnowledgeGraph,
 	_ gram: Gram,
@@ -342,6 +342,28 @@ private func maybeMarkCondition(
 		addTranscriptionTag(&result.transcriptTags, gram.At(offset + i), .Source)
 	}
 	return true
+}
+
+private func maybeMarkDimensions(
+	_ result: inout KnowledgeGraph,
+	_ gram: Gram,
+) {
+	// Maybe skip over "pool is <...>" or "pool size is <...>"
+	var used = maybeFind(gram, "be", 0)
+	if used == -1 {
+		// Maybe skip over "measured pool at <...>"
+		used = maybeFind(gram, "at", 0)
+		if used == -1 {
+			return
+		}
+	}
+	if let dimensions = maybeExtractVolume(
+		&result.transcriptTags,
+		gram,
+		used
+	) {
+		result.source.volume = dimensions
+	}
 }
 
 private func extractBreedingGraph(
@@ -598,29 +620,29 @@ private func extractSourceType(
 private func maybeExtractVolume(_ transcript: inout [TranscriptTag], _ gram: Gram, _ offset: Int)
 	-> Volume?
 {
-	/*for i in 0..<10 {
-		debugLogWord(gram.At(i), i)
-	}*/
+	for i in 0..<10 {
+		debugLogWord(gram.At(i + offset), i + offset)
+	}
 	guard let dim1 = maybeExtractVolumeMeasurement(&transcript, gram, offset) else {
 		return nil
 	}
-	var maybeBy = gram.At(offset + dim1.used)
-	if maybeBy.lem != "by" {
+	let sep1 = maybeFindAny(gram, ["by", ",", "and"], offset + dim1.used)
+	if sep1 == -1 {
 		return nil
 	}
-	guard let dim2 = maybeExtractVolumeMeasurement(&transcript, gram, offset + dim1.used + 1)
+	guard let dim2 = maybeExtractVolumeMeasurement(&transcript, gram, offset + dim1.used + sep1)
 	else {
 		return nil
 	}
-	maybeBy = gram.At(offset + dim1.used + 1 + dim2.used)
-	if maybeBy.lem != "by" {
+	let sep2 = maybeFindAny(gram, ["by", ",", "and"], offset + dim1.used + sep1 + dim2.used)
+	if sep2 == -1 {
 		return nil
 	}
 	guard
 		let dim3 = maybeExtractVolumeMeasurement(
 			&transcript,
 			gram,
-			offset + dim1.used + 1 + dim2.used + 1
+			offset + dim1.used + sep1 + dim2.used + sep2
 		)
 	else {
 		return nil
