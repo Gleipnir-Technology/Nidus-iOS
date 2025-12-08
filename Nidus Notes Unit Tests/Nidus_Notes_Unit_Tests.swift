@@ -147,7 +147,7 @@ struct Nidus_Notes_Unit_Tests {
 		let knowledge = ExtractKnowledge(text)
 		expectInspectionReport(
 			knowledge,
-			conditions: BreedingConditions.PoolGreen,
+			conditions: BreedingConditions.PoolMurky,
 			dipCount: 5,
 			fishPresence: true,
 			genus: .Aedes,
@@ -214,7 +214,7 @@ struct Nidus_Notes_Unit_Tests {
 		let knowledge = ExtractKnowledge(text)
 		expectInspectionReport(
 			knowledge,
-			conditions: BreedingConditions.PoolGreen,
+			conditions: BreedingConditions.PoolMurky,
 			dipCount: 10,
 			fishPresence: false,
 			isBreeding: true,
@@ -361,6 +361,30 @@ struct Nidus_Notes_Unit_Tests {
 				depth: Measurement(value: 5, unit: .feet),
 				length: Measurement(value: 15, unit: .feet),
 				width: Measurement(value: 30, unit: .feet),
+			)
+		)
+	}
+	@Test func inspectionTest13() async throws {
+		let text =
+			"Begin inspection. This is a murky pool behind the vacant house. It is breeding lightly. 10 dips yielded 15 larvae stage two. The pool is 12 by 24 by 4 feet."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolMurky,
+			dipCount: 10,
+			eggQuantity: nil,
+			fishPresence: nil,
+			genus: nil,
+			isBreeding: true,
+			larvaeQuantity: 15,
+			pupaeQuantity: nil,
+			reportType: FieldseekerReportType.Inspection,
+			species: nil,
+			stage: .SecondInstar,
+			volume: Volume(
+				depth: Measurement(value: 4, unit: .feet),
+				length: Measurement(value: 12, unit: .feet),
+				width: Measurement(value: 24, unit: .feet),
 			)
 		)
 	}

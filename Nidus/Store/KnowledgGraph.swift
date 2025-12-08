@@ -16,6 +16,7 @@ enum BreedingConditions: CustomStringConvertible {
 	case PoolFalse
 	case PoolGreen
 	case PoolMaintained
+	case PoolMurky
 	case PoolRemoved
 	case PoolUnmaintained
 	case Stagnant
@@ -24,7 +25,7 @@ enum BreedingConditions: CustomStringConvertible {
 	static var all: [BreedingConditions] {
 		return [
 			.AppearsVacant, .Dry, .DryingOut, .EntryDenied, .Flowing, .HighOrganic,
-			.NeedsMonitoring, .PoolFalse, .PoolMaintained, .PoolRemoved,
+			.NeedsMonitoring, .PoolFalse, .PoolMaintained, .PoolMurky, .PoolRemoved,
 			.PoolUnmaintained, .Stagnant, .Unknown,
 		]
 	}
@@ -40,6 +41,7 @@ enum BreedingConditions: CustomStringConvertible {
 		case .PoolFalse: "Pool false"
 		case .PoolGreen: "Pool green"
 		case .PoolMaintained: "Pool maintained"
+		case .PoolMurky: "Pool murky"
 		case .PoolRemoved: "Pool removed"
 		case .PoolUnmaintained: "Pool unmaintained"
 		case .Stagnant: "Stagnant"
@@ -48,12 +50,14 @@ enum BreedingConditions: CustomStringConvertible {
 	}
 	static func fromString(_ s: String) -> BreedingConditions? {
 		switch s {
-		case "green", "murky":
-			return .PoolGreen
 		case "blue", "clear":
 			return .PoolMaintained
 		case "dry":
 			return .Dry
+		case "green":
+			return .PoolGreen
+		case "murky":
+			return .PoolMurky
 		default:
 			return nil
 		}
