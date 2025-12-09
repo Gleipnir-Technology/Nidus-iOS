@@ -8,13 +8,10 @@ private struct KnowledgeFieldComplete: View {
 	var body: some View {
 		HStack {
 			Image(systemName: "checkmark.square")
-			Text(name).font(font).gridColumnAlignment(.leading)
-				.foregroundStyle(
-					Color.primary.opacity(0.5)
-				)
-			Text(value).font(font).gridColumnAlignment(
-				.leading
-			).foregroundStyle(Color.primary.opacity(0.7))
+			Text(name).font(font).foregroundStyle(
+				Color.primary.opacity(0.5)
+			).frame(width: 100)
+			Text(value).font(font).foregroundStyle(Color.primary.opacity(0.7))
 		}.listRowInsets(.init(top: 0, leading: 8, bottom: 0, trailing: 8))
 	}
 }
@@ -30,7 +27,7 @@ private struct KnowledgeFieldIncomplete: View {
 		HStack {
 			Image(systemName: "square")
 			Text(name).font(font).gridColumnAlignment(.leading)
-				.foregroundStyle(Color.primary)
+				.foregroundStyle(Color.primary).frame(width: 100)
 			if promptChoices.isEmpty {
 				Text("\"\(prompt)\"").font(font).gridColumnAlignment(
 					.leading
@@ -47,7 +44,7 @@ private struct KnowledgeFieldIncomplete: View {
 							)
 						}
 					}
-				}.frame(height: 150).border(Color.gray.opacity(0.3))
+				}
 			}
 		}.listRowInsets(.init(top: 0, leading: 8, bottom: 0, trailing: 8))
 	}

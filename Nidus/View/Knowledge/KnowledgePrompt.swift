@@ -65,8 +65,8 @@ struct KnowledgePromptInspection: View {
 								?? "nil"
 						),
 						KnowledgeField(
-							name: "Eggs",
-							prompt: "# eggs",
+							name: "Larva",
+							prompt: "# larva",
 							isDone: knowledge.hasEggCount,
 							value: knowledge.breeding.eggQuantity?
 								.description
@@ -89,7 +89,7 @@ struct KnowledgePromptInspection: View {
 						),
 						KnowledgeField(
 							name: "Fish",
-							prompt: "fish [not] present",
+							prompt: "[no] fish present",
 							isDone: knowledge.hasConditions,
 							value: knowledge.breeding.conditions?
 								.description
@@ -97,7 +97,7 @@ struct KnowledgePromptInspection: View {
 						),
 						KnowledgeField(
 							name: "Dimensions",
-							prompt: "x meters by y meters",
+							prompt: "x by y by z feet|meters",
 							isDone: knowledge.hasSurfaceArea,
 							value: knowledge.breeding.conditions?
 								.description
@@ -143,10 +143,10 @@ struct KnowledgePromptMosquitoSource: View {
 								?? "nil"
 						),
 						KnowledgeField(
-							name: "Eggs",
-							prompt: "# eggs",
-							isDone: knowledge.hasEggCount,
-							value: knowledge.breeding.eggQuantity?
+							name: "Larva",
+							prompt: "# larva",
+							isDone: knowledge.hasLarvaeCount,
+							value: knowledge.breeding.larvaeQuantity?
 								.description
 								?? "nil"
 						),
@@ -204,8 +204,8 @@ struct KnowledgePrompt_Previews: PreviewProvider {
 		KnowledgePromptPreview(
 			makeKnowledge(
 				breeding: BreedingKnowledgeGraph(
-					conditions: .PoolGreen,
 					genus: .Aedes,
+					stage: .SecondInstar
 				),
 			)
 		).previewDisplayName("partial")

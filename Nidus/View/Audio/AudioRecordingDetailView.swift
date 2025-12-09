@@ -119,21 +119,23 @@ struct AudioDetailView_Previews: PreviewProvider {
 			"This is a test transcription",
 			isRecording: true,
 			recordingDuration: 60 * 2 + 15
-		).previewDisplayName("transcription sans tags")
+		).previewDisplayName("sans knowledge")
 
 		AudioRecordingDetailViewPreview(
 			"Checking orchards at Avenue 300 and Road 140. 92 degrees, full sun. Rows five through nine have deep ruts still wet from last week’s flood irrigation. Soil is clay-heavy, tractor ruts holding water. Orchard is mature citrus. Took five dips, each with between twenty and a hundred larvae, mostly third and fourth instar Culex. Treated rut areas with one pound of VectoMax FG. Spoke with Jim, the foreman who manages the site. Told him the ruts are producing mosquitoes — he said he’ll have someone grade them before the next irrigation in two weeks. Gave me his number 559-555-5555 and said to call if anything comes up. Need to check back in two weeks to confirm the issue’s resolved."
 		).previewDisplayName(
-			"transcription nidus"
+			"nidus knowledge"
 		)
 
 		AudioRecordingDetailViewPreview(
 			"Begin mosquito source report at 123 Main Street",
 			recordingDuration: 60 * 2 + 15
-		).previewDisplayName("transcription FS source empty")
+		).previewDisplayName("source empty")
+
 		AudioRecordingDetailViewPreview(
-			"Checking on a mosquito source at 123 Main Street. 10 dips. 20 pupae. 40 eggs. second instar."
-		).previewDisplayName("transcription FS source incomplete")
+			"Begin inspection report. Checking on 123 Main Street. 10 dips. 20 pupae. 40 eggs. second instar."
+		).previewDisplayName("inspection incomplete")
+
 		AudioRecordingDetailViewPreview(
 			"Checking on a mosquito source at 123 Main Street. 10 dips. 20 pupae. 30 larvae. 40 eggs. second instar. Looks like it may be Culex. Conditions are dry.",
 			recordingDuration: 60 * 2 + 15
