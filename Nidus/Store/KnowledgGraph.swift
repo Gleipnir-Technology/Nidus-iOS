@@ -278,7 +278,7 @@ struct KnowledgeGraph {
 	var impliesSource: Bool {
 		return hasSource || hasFacilitator || hasBreeding
 	}
-	var isFieldseekerReportComplete: Bool {
+	var isReportComplete: Bool {
 		return fieldseeker.dipCount != nil && breeding.larvaeQuantity != nil
 			&& breeding.pupaeQuantity != nil && breeding.eggQuantity != nil
 			&& breeding.stage != nil && breeding.genus != nil
@@ -314,15 +314,20 @@ struct TranscriptTag {
 	let type: TranscriptTagType
 }
 
-func knowledgeForPreview(source: SourceKnowledgeGraph? = nil) -> KnowledgeGraph {
+func knowledgeForPreview(
+	breeding: BreedingKnowledgeGraph? = nil,
+	fieldseeker: FieldseekerReportGraph? = nil,
+	source: SourceKnowledgeGraph? = nil
+) -> KnowledgeGraph {
 	return KnowledgeGraph(
 		adultProduction: AdultProductionKnowledgeGraph(),
-		breeding: BreedingKnowledgeGraph(
-			conditions: nil,
-			genus: nil,
-			stage: nil,
-			treatment: nil
-		),
+		breeding: breeding
+			?? BreedingKnowledgeGraph(
+				conditions: nil,
+				genus: nil,
+				stage: nil,
+				treatment: nil
+			),
 		driver: DriverKnowledgeGraph(
 			behaviorModification: nil,
 			contact: nil
@@ -332,9 +337,10 @@ func knowledgeForPreview(source: SourceKnowledgeGraph? = nil) -> KnowledgeGraph 
 			pathToRootCause: nil,
 			pathToSource: nil
 		),
-		fieldseeker: FieldseekerReportGraph(
-			reportType: nil
-		),
+		fieldseeker: fieldseeker
+			?? FieldseekerReportGraph(
+				reportType: nil
+			),
 		rootCause: RootCauseKnowledgeGraph(
 			fix: nil,
 			legalAbatement: nil

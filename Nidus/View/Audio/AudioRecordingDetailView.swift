@@ -34,7 +34,7 @@ struct AudioRecordingDetailView: View {
 									transcription: controller
 										.store.transcription
 								)
-								AudioTagDisplay(
+								KnowledgePrompt(
 									knowledge: controller.store
 										.knowledgeGraph
 								)
