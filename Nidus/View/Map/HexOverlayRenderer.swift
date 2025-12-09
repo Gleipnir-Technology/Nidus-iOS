@@ -35,22 +35,15 @@ final class HexOverlayRenderer: MKOverlayRenderer {
 			let color = UIColor(colorForNoteType(cellType))
 			let cellsForCurrentType = hexOverlay.cellBucketsByType[cellType] ?? [:]
 			var maxCount: UInt = 0
-			do {
-				maxCount = try cellsForCurrentType.reduce<UInt>(
-					0,
-					{ result, pair in
-						if pair.value.count == 0 {
-							return result
-						}
-						return max(result, UInt(pair.key))
+			maxCount = cellsForCurrentType.reduce(
+				0,
+				{ result, pair in
+					if pair.value.count == 0 {
+						return result
 					}
-				)
-			}
-			catch {
-				Logger.foreground.error(
-					"Failed to calculate max cell count: \(error)"
-				)
-			}
+					return max(result, UInt(pair.key))
+				}
+			)
 			context.setLineWidth(lineWidth)
 			for (bucket, cells) in cellsForCurrentType {
 				context.setFillColor(

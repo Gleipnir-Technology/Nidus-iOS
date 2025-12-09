@@ -128,10 +128,15 @@ struct AudioDetailView_Previews: PreviewProvider {
 		)
 
 		AudioRecordingDetailViewPreview(
-			"Checking on a mosquito source at 123 Main Street. 10 dips. 20 pupae. 30 larvae. 40 eggs. second instar. Looks like it may be Culex. Conditions are dry."
-		).previewDisplayName("transcription FS source complete")
+			"Begin mosquito source report at 123 Main Street",
+			recordingDuration: 60 * 2 + 15
+		).previewDisplayName("transcription FS source empty")
 		AudioRecordingDetailViewPreview(
 			"Checking on a mosquito source at 123 Main Street. 10 dips. 20 pupae. 40 eggs. second instar."
 		).previewDisplayName("transcription FS source incomplete")
+		AudioRecordingDetailViewPreview(
+			"Checking on a mosquito source at 123 Main Street. 10 dips. 20 pupae. 30 larvae. 40 eggs. second instar. Looks like it may be Culex. Conditions are dry.",
+			recordingDuration: 60 * 2 + 15
+		).previewDisplayName("transcription FS source complete")
 	}
 }

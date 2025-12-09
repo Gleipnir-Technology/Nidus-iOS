@@ -86,6 +86,21 @@ let data = SFCustomLanguageModelData(
 		)
 	}
 
+	SFCustomLanguageModelData.PhraseCountsFromTemplates(classes: [
+		"report": [
+			"mosquito",
+			"mosquito source",
+			"breeding",
+			"inspection",
+			"service request",
+		]
+	]) {
+		SFCustomLanguageModelData.TemplatePhraseCountGenerator.Template(
+			"Begin <report> report.",
+			count: 1_000
+		)
+	}
+
 	SFCustomLanguageModelData.PhraseCount(phrase: "The species is Aedes Aegypti", count: 1000)
 	SFCustomLanguageModelData.PhraseCount(phrase: "The genus is Aedes", count: 1000)
 }

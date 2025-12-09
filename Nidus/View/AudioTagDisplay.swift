@@ -33,9 +33,9 @@ struct AudioTagFieldseeker: View {
 		case nil:
 			Text("Don't try to render AudioTagFieldseeker with nil reportType")
 		case .MosquitoSource:
-			AudioTagFieldseekerMosquitoSource(knowledge: knowledge)
+			AudioTagTableFieldseekerMosquitoSource(knowledge: knowledge)
 		case .Inspection:
-			AudioTagFieldseekerInspection(knowledge: knowledge)
+			AudioTagTableFieldseekerInspection(knowledge: knowledge)
 		}
 	}
 }
@@ -65,12 +65,13 @@ struct AudioTagFieldseekerReportType: View {
 	}
 
 }
-struct AudioTagFieldseekerReportField<T: CustomStringConvertible>: View {
+
+struct AudioTagReportField: View {
 	let name: String
 	let prompt: String
 	var promptChoices: [String] = []
 	let isDone: Bool
-	let value: T?
+	let value: String
 
 	var font: Font { .system(size: 13) }
 	var body: some View {
@@ -81,7 +82,7 @@ struct AudioTagFieldseekerReportField<T: CustomStringConvertible>: View {
 					.foregroundStyle(
 						Color.primary.opacity(0.5)
 					)
-				Text(value?.description ?? "nil").font(font).gridColumnAlignment(
+				Text(value).font(font).gridColumnAlignment(
 					.leading
 				).foregroundStyle(Color.primary.opacity(0.7))
 			}
@@ -89,8 +90,12 @@ struct AudioTagFieldseekerReportField<T: CustomStringConvertible>: View {
 				Image(systemName: "square")
 				Text(name).font(font).gridColumnAlignment(.leading)
 					.foregroundStyle(Color.primary)
-				Text("\"\(prompt)\"").font(font).gridColumnAlignment(.leading)
-				if !promptChoices.isEmpty {
+				if promptChoices.isEmpty {
+					Text("\"\(prompt)\"").font(font).gridColumnAlignment(
+						.leading
+					)
+				}
+				else {
 					ScrollView {
 						VStack {
 							ForEach(promptChoices, id: \.self) {
@@ -101,14 +106,46 @@ struct AudioTagFieldseekerReportField<T: CustomStringConvertible>: View {
 								)
 							}
 						}
-					}
+					}.frame(height: 150).border(Color.gray.opacity(0.3))
 				}
 			}
 		}
 	}
 }
 
-struct AudioTagFieldseekerInspection: View {
+struct AudioTagTable: View {
+	var fields: [AudioTagReportField] = []
+
+	var fieldsComplete: [AudioTagReportField] {
+		return fields.filter({ $0.isDone == true })
+	}
+	var fieldsIncomplete: [AudioTagReportField] {
+		return fields.filter({ $0.isDone == false })
+	}
+	var body: some View {
+		VStack {
+			Grid(alignment: .topLeading) {
+				AudioTagTableRows(fields: fieldsIncomplete)
+				Spacer()
+				AudioTagTableRows(fields: fieldsComplete)
+			}
+		}
+	}
+}
+struct AudioTagTableRows: View {
+	let fields: [AudioTagReportField]
+
+	var body: some View {
+		ForEach(Array(fields.enumerated()), id: \.offset) {
+			i,
+			field in
+			GridRow {
+				field
+			}
+		}
+	}
+}
+struct AudioTagTableFieldseekerInspection: View {
 	let knowledge: KnowledgeGraph
 
 	var body: some View {
@@ -118,71 +155,79 @@ struct AudioTagFieldseekerInspection: View {
 				isComplete: knowledge.isFieldseekerReportComplete
 			)
 			if !knowledge.isFieldseekerReportComplete {
-				Grid {
-					AudioTagFieldseekerReportField(
+				AudioTagTable(fields: [
+					AudioTagReportField(
 						name: "Condition",
 						prompt: "green/blue/murky",
 						promptChoices: [
 							"green", "maintained", "dry", "murky",
 						],
 						isDone: knowledge.hasConditions,
-						value: knowledge.breeding.conditions,
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.breeding.conditions?.description
+							?? "nil",
+					),
+					AudioTagReportField(
 						name: "Breeding",
 						prompt: "[not] breeding/larvae present",
 						isDone: knowledge.impliesBreeding,
-						value: knowledge.impliesBreeding,
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.impliesBreeding.description,
+					),
+					AudioTagReportField(
 						name: "Dip",
 						prompt: "# dips",
 						isDone: knowledge.hasDipCount,
-						value: knowledge.fieldseeker.dipCount
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.fieldseeker.dipCount?.description
+							?? "nil"
+					),
+					AudioTagReportField(
 						name: "",
 						prompt: "# pupae",
 						isDone: knowledge.hasPupaeCount,
-						value: knowledge.breeding.pupaeQuantity
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.breeding.pupaeQuantity?.description
+							?? "nil"
+					),
+					AudioTagReportField(
 						name: "Eggs",
 						prompt: "# eggs",
 						isDone: knowledge.hasEggCount,
-						value: knowledge.breeding.eggQuantity
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.breeding.eggQuantity?.description
+							?? "nil"
+					),
+					AudioTagReportField(
 						name: "Stage",
 						prompt: "# Instar, adult",
 						isDone: knowledge.hasStage,
-						value: knowledge.breeding.stage
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.breeding.stage?.description
+							?? "nil"
+					),
+					AudioTagReportField(
 						name: "Genus",
 						prompt: "genus",
 						promptChoices: ["Aedes", "Culex"],
 						isDone: knowledge.hasGenus,
-						value: knowledge.breeding.genus
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.breeding.genus?.description
+							?? "nil"
+					),
+					AudioTagReportField(
 						name: "Fish",
 						prompt: "fish [not] present",
 						isDone: knowledge.hasConditions,
-						value: knowledge.breeding.conditions
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.breeding.conditions?.description
+							?? "nil"
+					),
+					AudioTagReportField(
 						name: "Dimensions",
 						prompt: "x meters by y meters",
 						isDone: knowledge.hasSurfaceArea,
-						value: knowledge.breeding.conditions
-					)
-				}
+						value: knowledge.breeding.conditions?.description
+							?? "nil"
+					),
+				])
 			}
 		}
 	}
 }
-struct AudioTagFieldseekerMosquitoSource: View {
+struct AudioTagTableFieldseekerMosquitoSource: View {
 	let knowledge: KnowledgeGraph
 
 	var body: some View {
@@ -192,52 +237,60 @@ struct AudioTagFieldseekerMosquitoSource: View {
 				isComplete: knowledge.isFieldseekerReportComplete
 			)
 			if !knowledge.isFieldseekerReportComplete {
-				Grid {
-					AudioTagFieldseekerReportField(
+				AudioTagTable(fields: [
+					AudioTagReportField(
 						name: "Dip",
 						prompt: "# dips",
 						isDone: knowledge.hasDipCount,
-						value: knowledge.fieldseeker.dipCount
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.fieldseeker.dipCount?.description
+							?? "nil"
+					),
+
+					AudioTagReportField(
 						name: "Larvae",
 						prompt: "# larvae",
 						isDone: knowledge.hasLarvaeCount,
-						value: knowledge.breeding.larvaeQuantity
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.breeding.larvaeQuantity?
+							.description ?? "nil"
+					),
+					AudioTagReportField(
 						name: "Pupae",
 						prompt: "# pupae",
 						isDone: knowledge.hasPupaeCount,
-						value: knowledge.breeding.pupaeQuantity
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.breeding.pupaeQuantity?.description
+							?? "nil"
+					),
+					AudioTagReportField(
 						name: "Eggs",
 						prompt: "# eggs",
 						isDone: knowledge.hasEggCount,
-						value: knowledge.breeding.eggQuantity
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.breeding.eggQuantity?.description
+							?? "nil"
+					),
+					AudioTagReportField(
 						name: "Stage",
 						prompt: "# Instar, adult",
 						isDone: knowledge.hasStage,
-						value: knowledge.breeding.stage
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.breeding.stage?.description
+							?? "nil"
+					),
+					AudioTagReportField(
 						name: "Genus",
 						prompt: "genus",
 						promptChoices: ["Aedes", "Culex"],
 						isDone: knowledge.hasGenus,
-						value: knowledge.breeding.genus
-					)
-					AudioTagFieldseekerReportField(
+						value: knowledge.breeding.genus?.description
+							?? "nil"
+					),
+					AudioTagReportField(
 						name: "Conditions",
 						prompt: "conditions",
 						promptChoices: BreedingConditions.prompts,
 						isDone: knowledge.hasConditions,
-						value: knowledge.breeding.conditions
-					)
-				}
+						value: knowledge.breeding.conditions?.description
+							?? "nil"
+					),
+				])
 			}
 		}
 	}
