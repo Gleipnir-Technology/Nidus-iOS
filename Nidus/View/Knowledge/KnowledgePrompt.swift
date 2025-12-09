@@ -4,17 +4,29 @@ struct KnowledgePrompt: View {
 	let knowledge: KnowledgeGraph?
 
 	var body: some View {
+
 		if knowledge == nil {
 			EmptyView()
 		}
 		else {
-			switch knowledge!.fieldseeker.reportType {
-			case nil:
-				Text("Don't try to render AudioTagFieldseeker with nil reportType")
-			case .MosquitoSource:
-				KnowledgePromptMosquitoSource(knowledge: knowledge!)
-			case .Inspection:
-				KnowledgePromptInspection(knowledge: knowledge!)
+			VStack {
+				KnowledgeTagDisplay(
+					tags: knowledge!.userTags,
+					tagColors: [
+						"safety": .red,
+						"followup": .blue,
+					]
+				)
+				switch knowledge!.fieldseeker.reportType {
+				case nil:
+					Text(
+						"Don't try to render AudioTagFieldseeker with nil reportType"
+					)
+				case .MosquitoSource:
+					KnowledgePromptMosquitoSource(knowledge: knowledge!)
+				case .Inspection:
+					KnowledgePromptInspection(knowledge: knowledge!)
+				}
 			}
 		}
 	}

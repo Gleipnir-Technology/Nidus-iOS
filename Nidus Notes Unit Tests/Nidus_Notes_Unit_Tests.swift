@@ -355,6 +355,14 @@ struct Nidus_Notes_Unit_Tests {
 			reportType: FieldseekerReportType.Inspection,
 		)
 	}
+	@Test func userTagTest() async throws {
+		let text =
+			"Begin inspection. Pool check. Tag this safety. This thing is on fire. Tag this followup."
+		let knowledge = ExtractKnowledge(text)
+		#expect(knowledge.userTags.count == 2)
+		#expect(knowledge.userTags.contains("followup"))
+		#expect(knowledge.userTags.contains("safety"))
+	}
 }
 
 func expectInspectionReport(

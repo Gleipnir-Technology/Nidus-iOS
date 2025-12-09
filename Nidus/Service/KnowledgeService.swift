@@ -62,7 +62,9 @@ func ExtractKnowledge(_ text: String) -> KnowledgeGraph {
 		fieldseeker: FieldseekerReportGraph(),
 		rootCause: RootCauseKnowledgeGraph(),
 		source: SourceKnowledgeGraph(volume: Volume()),
-		transcriptTags: []
+		transcriptTags: [],
+		userTags: Set<String>()
+
 	)
 	let sentences: [[Word]] = textToSentences(text)
 	debugLogWords(sentences)
@@ -235,6 +237,16 @@ private func extractViaGrams(
 				addTranscriptionTag(&result.transcriptTags, gram.At(0), .Source)
 				addTranscriptionTag(&result.transcriptTags, gram.At(1), .Source)
 			}
+		case "tag":
+			let used = maybeFindAny(gram, ["is", "tag", "this"], 0)
+			if used == -1 {
+				continue
+			}
+			result.userTags.insert(gram.At(used).text)
+			for i in 0...used {
+				addTranscriptionTag(&result.transcriptTags, gram.At(i), .Tag)
+			}
+
 		default:
 			continue
 		}

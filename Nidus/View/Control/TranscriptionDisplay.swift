@@ -13,6 +13,8 @@ func TranscriptTagTypeToColor(_ type: TranscriptTagType) -> Color {
 		return .green
 	case .Source:
 		return .purple
+	case .Tag:
+		return .yellow
 	}
 }
 

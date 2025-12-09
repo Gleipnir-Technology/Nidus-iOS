@@ -133,7 +133,7 @@ struct AudioDetailView_Previews: PreviewProvider {
 		).previewDisplayName("source empty")
 
 		AudioRecordingDetailViewPreview(
-			"Begin inspection report. Checking on 123 Main Street. 10 dips. 20 pupae. 40 eggs. second instar."
+			"Begin inspection report. Checking on 123 Main Street. 10 dips. Tag this safety. 20 pupae. 40 eggs. second instar. Tag this followup. Tag this awesome."
 		).previewDisplayName("inspection incomplete")
 
 		AudioRecordingDetailViewPreview(

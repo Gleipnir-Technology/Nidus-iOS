@@ -202,7 +202,9 @@ struct KnowledgeGraph {
 	var fieldseeker: FieldseekerReportGraph
 	var rootCause: RootCauseKnowledgeGraph
 	var source: SourceKnowledgeGraph
+
 	var transcriptTags: [TranscriptTag]
+	var userTags: Set<String>
 
 	var hasAdultProduction: Bool {
 		return adultProduction.adulticideTreatment != nil
@@ -288,8 +290,9 @@ struct KnowledgeGraph {
 
 enum TranscriptTagType {
 	case Action
-	case Source
 	case Measurement
+	case Source
+	case Tag
 }
 
 enum VolumeUnits {
@@ -357,6 +360,7 @@ func knowledgeForPreview(
 					width: nil,
 				)
 			),
-		transcriptTags: []
+		transcriptTags: [],
+		userTags: Set<String>(),
 	)
 }
