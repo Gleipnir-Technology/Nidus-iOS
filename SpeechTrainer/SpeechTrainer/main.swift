@@ -62,6 +62,15 @@ let data = SFCustomLanguageModelData(
 		]
 	)
 
+	SFCustomLanguageModelData.CustomPronunciation(
+		grapheme: "Instar",
+		// IPA: /ˈɪnstɑːr/
+		// X-SAMPA: /"InstA:r/
+		phonemes: [
+			"\"I n s t A r"
+		]
+	)
+
 	SFCustomLanguageModelData.PhraseCountsFromTemplates(classes: [
 		"thing": ["pupa", "pupae", "larva", "larvae", "dip", "dips"],
 		"number": [
@@ -82,6 +91,16 @@ let data = SFCustomLanguageModelData(
 	]) {
 		SFCustomLanguageModelData.TemplatePhraseCountGenerator.Template(
 			"<number> <thing>",
+			count: 1_000
+		)
+	}
+
+	SFCustomLanguageModelData.PhraseCountsFromTemplates(classes: [
+		"ordinal": ["first", "second", "third", "fourth"],
+		"identifier": ["stage", ""],
+	]) {
+		SFCustomLanguageModelData.TemplatePhraseCountGenerator.Template(
+			"<ordinal> Instar <identifier>",
 			count: 1_000
 		)
 	}

@@ -79,8 +79,8 @@ struct KnowledgePromptInspection: View {
 						KnowledgeField(
 							name: "Larva",
 							prompt: "# larva",
-							isDone: knowledge.hasEggCount,
-							value: knowledge.breeding.eggQuantity?
+							isDone: knowledge.hasLarvaeCount,
+							value: knowledge.breeding.larvaeQuantity?
 								.description
 								?? "nil"
 						),
@@ -102,8 +102,8 @@ struct KnowledgePromptInspection: View {
 						KnowledgeField(
 							name: "Fish",
 							prompt: "[no] fish present",
-							isDone: knowledge.hasConditions,
-							value: knowledge.breeding.conditions?
+							isDone: knowledge.source.hasFish != nil,
+							value: knowledge.source.hasFish?
 								.description
 								?? "nil"
 						),
@@ -111,9 +111,7 @@ struct KnowledgePromptInspection: View {
 							name: "Dimensions",
 							prompt: "x by y by z feet|meters",
 							isDone: knowledge.hasSurfaceArea,
-							value: knowledge.breeding.conditions?
-								.description
-								?? "nil"
+							value: knowledge.source.volume.description,
 						),
 					]
 				)
@@ -175,15 +173,6 @@ struct KnowledgePromptMosquitoSource: View {
 							promptChoices: ["Aedes", "Culex"],
 							isDone: knowledge.hasGenus,
 							value: knowledge.breeding.genus?.description
-								?? "nil"
-						),
-						KnowledgeField(
-							name: "Conditions",
-							prompt: "conditions",
-							promptChoices: BreedingConditions.prompts,
-							isDone: knowledge.hasConditions,
-							value: knowledge.breeding.conditions?
-								.description
 								?? "nil"
 						),
 					]

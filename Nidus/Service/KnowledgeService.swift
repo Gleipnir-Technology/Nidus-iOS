@@ -542,6 +542,8 @@ private func parseLifeStage(_ adjective: String) -> LifeStage? {
 		return .SecondInstar
 	case "3rd", "third":
 		return .ThirdInstar
+	case "4th", "fourth":
+		return .FourthInstar
 	default:
 		return nil
 	}
@@ -607,7 +609,7 @@ private func maybeExtractVolume(_ transcript: inout [TranscriptTag], _ gram: Gra
 	guard let dim1 = maybeExtractVolumeMeasurement(&transcript, gram, offset) else {
 		return nil
 	}
-	let sep1 = maybeFindAny(gram, [",", "and", "by"], offset + dim1.used)
+	let sep1 = maybeFindAny(gram, [",", "and", "by", "x"], offset + dim1.used)
 	if sep1 == -1 {
 		return nil
 	}
@@ -615,7 +617,11 @@ private func maybeExtractVolume(_ transcript: inout [TranscriptTag], _ gram: Gra
 	else {
 		return nil
 	}
-	let sep2 = maybeFindAny(gram, [",", "and", "by"], offset + dim1.used + sep1 + dim2.used)
+	let sep2 = maybeFindAny(
+		gram,
+		[",", "and", "by", "x"],
+		offset + dim1.used + sep1 + dim2.used
+	)
 	if sep2 == -1 {
 		return nil
 	}
@@ -750,9 +756,9 @@ private func maybeExtractVolumeMeasurement(
 }
 private func parseUnitLength(_ unitString: String) -> UnitLength? {
 	switch unitString {
-	case "feet":
+	case "'", "feet":
 		return .feet
-	case "inches":
+	case "\"", "inches":
 		return .inches
 	case "meters":
 		return .meters

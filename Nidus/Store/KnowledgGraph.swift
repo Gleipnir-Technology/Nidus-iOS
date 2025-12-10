@@ -301,11 +301,16 @@ enum VolumeUnits {
 	case meters
 }
 
-struct Volume: Equatable {
+struct Volume: Equatable, CustomStringConvertible {
+
 	var depth: Measurement<UnitLength>?
 	var length: Measurement<UnitLength>?
 	var width: Measurement<UnitLength>?
 
+	var description: String {
+		return
+			"\(length?.description ?? "?") x \(width?.description ?? "?") x \(depth?.description ?? "?")"
+	}
 	static func == (lhs: Volume, rhs: Volume) -> Bool {
 		return lhs.depth == rhs.depth && lhs.length == rhs.length
 			&& lhs.width == rhs.width

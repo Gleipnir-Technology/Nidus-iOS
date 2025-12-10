@@ -355,6 +355,26 @@ struct Nidus_Notes_Unit_Tests {
 			reportType: FieldseekerReportType.Inspection,
 		)
 	}
+	@Test func inspectionTest100() async throws {
+		let text =
+			"Begin inspection report I'm checking on 123 Main St. the house has a dog it seemed aggressive tag this safety the pool here is green I took 10 dips I counted 20 pupa and 40 larva at third instar stage. There are no fish present pool dimensions are 10' x 20' x 4' tag this followup."
+		let knowledge = ExtractKnowledge(text)
+		expectInspectionReport(
+			knowledge,
+			conditions: BreedingConditions.PoolGreen,
+			dipCount: 10,
+			fishPresence: false,
+			larvaeQuantity: 40,
+			pupaeQuantity: 20,
+			reportType: FieldseekerReportType.Inspection,
+			stage: .ThirdInstar,
+			volume: Volume(
+				depth: Measurement(value: 4, unit: .feet),
+				length: Measurement(value: 10, unit: .feet),
+				width: Measurement(value: 20, unit: .feet),
+			)
+		)
+	}
 	@Test func userTagTest() async throws {
 		let text =
 			"Begin inspection. Pool check. Tag this safety. This thing is on fire. Tag this followup."
