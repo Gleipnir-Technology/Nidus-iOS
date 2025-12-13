@@ -3,7 +3,7 @@ import MapKit
 import OSLog
 
 // Given a cell and a screen to fit it into, translate the cell's boundaries into the screen space
-func cellToHexagon(cell: H3Cell, region: MKCoordinateRegion, screenSize: CGSize) throws -> Shape {
+func cellToHexagon(cell: H3Cell, region: MKCoordinateRegion, screenSize: CGSize) throws -> Polygon {
 	var points: [CGPoint] = []
 	let boundary = try cellToBoundary(cell: cell)
 	for b in boundary {
@@ -15,13 +15,14 @@ func cellToHexagon(cell: H3Cell, region: MKCoordinateRegion, screenSize: CGSize)
 			)
 		)
 	}
-	return Shape(points: points)
+	return Polygon(points: points)
 }
 
-func cellToNeighbors(cell: H3Cell, region: MKCoordinateRegion, screenSize: CGSize) throws -> [Shape]
+func cellToNeighbors(cell: H3Cell, region: MKCoordinateRegion, screenSize: CGSize) throws
+	-> [Polygon]
 {
 	let ring = try gridRing(origin: cell, distance: 1)
-	var neighbors: [Shape] = []
+	var neighbors: [Polygon] = []
 	for r in ring {
 		neighbors.append(try cellToHexagon(cell: r, region: region, screenSize: screenSize))
 	}

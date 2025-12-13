@@ -68,6 +68,10 @@ enum BreedingConditions: CustomStringConvertible {
 		return BreedingConditions.all.map { $0.description }
 	}
 }
+let BREEDING_CONDITONS_NEEDING_TREATMENT: Set<BreedingConditions> = [
+	.AppearsVacant, .HighOrganic, .NeedsMonitoring, .PoolGreen, .PoolMurky, .PoolUnmaintained,
+	.Stagnant,
+]
 enum Genus: CustomStringConvertible {
 	case Aedes
 	case Culex
@@ -280,11 +284,23 @@ struct KnowledgeGraph {
 	var impliesSource: Bool {
 		return hasSource || hasFacilitator || hasBreeding
 	}
+	var impliesNeedsTreatment: Bool {
+		return breeding.conditions != nil
+			&& BREEDING_CONDITONS_NEEDING_TREATMENT.contains(breeding.conditions!)
+	}
 	var isReportComplete: Bool {
-		return fieldseeker.dipCount != nil && breeding.larvaeQuantity != nil
-			&& breeding.pupaeQuantity != nil && breeding.eggQuantity != nil
-			&& breeding.stage != nil && breeding.genus != nil
-			&& breeding.conditions != nil
+		switch fieldseeker.reportType {
+		case .MosquitoSource:
+			return fieldseeker.dipCount != nil && breeding.larvaeQuantity != nil
+				&& breeding.pupaeQuantity != nil && breeding.eggQuantity != nil
+				&& breeding.stage != nil && breeding.genus != nil
+				&& breeding.conditions != nil
+		case .Inspection:
+			return hasConditions && breeding.isBreedingExplicit != nil && hasDipCount
+				&& hasPupaeCount && hasLarvaeCount && hasStage && hasVolume
+		case .none:
+			return true
+		}
 	}
 }
 

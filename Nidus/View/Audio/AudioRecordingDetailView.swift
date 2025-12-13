@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AudioRecordingDetailView: View {
-	let controller: AudioRecordingController
+	let controller: RootController
 
 	private func timeString(_ timeInterval: TimeInterval) -> String {
 		let minutes = Int(timeInterval) / 60
@@ -11,9 +11,11 @@ struct AudioRecordingDetailView: View {
 
 	var body: some View {
 		VStack(alignment: .center, spacing: 20) {
-			if controller.store.isRecording {
+			if controller.audioRecording.store.isRecording {
 				VStack(alignment: .leading, spacing: 10) {
-					if controller.store.hasPermissionTranscription == nil {
+					if controller.audioRecording.store
+						.hasPermissionTranscription == nil
+					{
 						Text("Not sure if we'll get permission or not")
 						HStack {
 							Spacer()
@@ -22,20 +24,29 @@ struct AudioRecordingDetailView: View {
 						}
 					}
 					else {
-						if controller.store.hasPermissionTranscription! {
-							if controller.store.transcription == nil {
+						if controller.audioRecording.store
+							.hasPermissionTranscription!
+						{
+							if controller.audioRecording.store
+								.transcription == nil
+							{
 								Text("Waiting to transcribe...")
 							}
 							else {
 								TranscriptionDisplay(
 									knowledgeGraph: controller
+										.audioRecording
 										.store
 										.knowledgeGraph,
 									transcription: controller
+										.audioRecording
 										.store.transcription
 								)
 								KnowledgePrompt(
-									knowledge: controller.store
+									controller: controller,
+									knowledge: controller
+										.audioRecording
+										.store
 										.knowledgeGraph
 								)
 							}
@@ -59,8 +70,9 @@ struct AudioRecordingDetailView: View {
 	}
 
 	var navigationTitle: String {
-		if controller.store.isRecording {
-			return "Recording - \(timeString(controller.store.recordingDuration))"
+		if controller.audioRecording.store.isRecording {
+			return
+				"Recording - \(timeString(controller.audioRecording.store.recordingDuration))"
 		}
 		return "Not Recording"
 	}
@@ -86,15 +98,22 @@ struct AudioRecordingDetailViewPreview: View {
 			GeometryReader { geometry in
 				VStack {
 					AudioRecordingDetailView(
-						controller: AudioRecordingControllerPreview(
-							AudioRecordingStore(
-								hasPermissionTranscription: true,
-								isRecording: isRecording,
-								knowledgeGraph: knowledgeGraph,
-								recordingDuration:
-									recordingDuration,
-								transcription: transcription
-							)
+						controller: RootControllerPreview(
+							audioRecording:
+								AudioRecordingControllerPreview(
+									AudioRecordingStore(
+										hasPermissionTranscription:
+											true,
+										isRecording:
+											isRecording,
+										knowledgeGraph:
+											knowledgeGraph,
+										recordingDuration:
+											recordingDuration,
+										transcription:
+											transcription
+									)
+								)
 						)
 					)
 				}

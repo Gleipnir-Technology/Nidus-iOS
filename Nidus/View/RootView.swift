@@ -7,6 +7,8 @@ import SwiftUI
 enum ActiveView {
 	case audio
 	case breadcrumb
+	case inspectionSummary
+	case route
 }
 /*
  The root view of the app
@@ -77,6 +79,12 @@ struct RootView: View {
 		path.removeLast(path.count - 1)
 		path.append("note/\(id)")
 	}
+	func onRouteButtonLong() {
+		activeView = .inspectionSummary
+	}
+	func onRouteButtonShort() {
+		activeView = .route
+	}
 	func setTabNotes() {
 		selection = 0
 	}
@@ -89,7 +97,6 @@ struct RootView: View {
 						case .audio:
 							AudioRecordingDetailView(
 								controller: controller
-									.audioRecording
 							)
 						case .breadcrumb:
 							RootViewMap(
@@ -101,9 +108,146 @@ struct RootView: View {
 								onSelectCell: onMapSelectCell,
 								showsGrid: false
 							)
+						case .inspectionSummary:
+							InspectionSummaryView(
+								resident: Resident(
+									name: "Bob Marley",
+									phone: "420-123-4000",
+									email: "bob@marley.com",
+									notes: ("Chill dude, fun for a hang")
+								),
+								visitSource: .trapCount(counts: [
+									TrapCount(
+										date: Date()
+											.addingTimeInterval(
+												-21
+													* 24
+													* 60
+													* 60
+											),
+										count: 5
+									),
+									TrapCount(
+										date: Date()
+											.addingTimeInterval(
+												-14
+													* 24
+													* 60
+													* 60
+											),
+										count: 12
+									),
+									TrapCount(
+										date: Date()
+											.addingTimeInterval(
+												-7
+													* 24
+													* 60
+													* 60
+											),
+										count: 18
+									),
+								]),
+								timelineEvents: [
+									TimelineEvent(
+										date: Date()
+											.addingTimeInterval(
+												-30
+													* 24
+													* 60
+													* 60
+											),
+										title:
+											"Notice Posted",
+										description:
+											"Notice was posted to the resident's door",
+										type: .notice,
+										additionalContent:
+											.note(
+												"Door hanger was left with contact information and explanation of observed standing water in backyard."
+											)
+									),
+									TimelineEvent(
+										date: Date()
+											.addingTimeInterval(
+												-21
+													* 24
+													* 60
+													* 60
+											),
+										title:
+											"Drone Flyover",
+										description:
+											"A drone flyover was performed of the site",
+										type: .droneImage,
+										additionalContent:
+											.image(
+												UIImage(
+													systemName:
+														"photo"
+												)!
+											)
+									),
+									TimelineEvent(
+										date: Date()
+											.addingTimeInterval(
+												-14
+													* 24
+													* 60
+													* 60
+											),
+										title:
+											"Site Treatment",
+										description:
+											"A tech treated the site with larvicide",
+										type: .treatment,
+										additionalContent:
+											.note(
+												"Applied 3oz of Altosid to standing water in unused fountain. Recommended removal of fountain or regular maintenance."
+											)
+									),
+									TimelineEvent(
+										date: Date()
+											.addingTimeInterval(
+												-7
+													* 24
+													* 60
+													* 60
+											),
+										title:
+											"Mosquitofish Confirmation",
+										description:
+											"Mosquitofish were confirmed present in pond",
+										type: .fishPresence,
+										additionalContent:
+											nil
+									),
+								],
+							)
+						case .route:
+							RouteListView()
 						}
 						Spacer()
 						HStack {
+							ButtonWithLongPress(
+								actionLong: onRouteButtonLong,
+								actionShort: onRouteButtonShort,
+								label: {
+									Image(
+										systemName:
+											"list.clipboard"
+									).font(
+										.system(
+											size: 64,
+											weight:
+												.regular
+										)
+									).padding(20)
+								}
+							).foregroundColor(
+								activeView == .route
+									? Color.blue : .secondary
+							)
 							ButtonWithLongPress(
 								actionLong: onMapButtonLong,
 								actionShort: onMapButtonShort,

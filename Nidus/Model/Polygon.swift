@@ -2,9 +2,9 @@ import Foundation
 import SwiftUI
 
 /*
- Represents an arbitrary 2D shape
+ Represents an arbitrary 2D polygon
  */
-class Shape: Identifiable {
+class Polygon: Identifiable {
 	var points: [CGPoint]
 
 	init(points: [CGPoint]) {

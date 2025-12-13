@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct KnowledgePrompt: View {
+	let controller: RootController
 	let knowledge: KnowledgeGraph?
 
 	var body: some View {
@@ -25,7 +26,10 @@ struct KnowledgePrompt: View {
 				case .MosquitoSource:
 					KnowledgePromptMosquitoSource(knowledge: knowledge!)
 				case .Inspection:
-					KnowledgePromptInspection(knowledge: knowledge!)
+					KnowledgePromptInspection(
+						controller: controller,
+						knowledge: knowledge!
+					)
 				}
 			}
 		}
@@ -33,10 +37,42 @@ struct KnowledgePrompt: View {
 }
 
 struct KnowledgePromptInspection: View {
+	let controller: RootController
 	let knowledge: KnowledgeGraph
 
 	var body: some View {
 		VStack {
+			/*if knowledge.impliesNeedsTreatment {
+				NavigationLink(destination: TreatmentRecommendationView()) {
+                    Button(action: {
+                        // Handle alter treatment
+                    }) {
+                        HStack {
+                            Image(systemName: "syringe")
+                            Text("Recommended Treatment")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+				}
+             }
+			*/
+			NavigationLink(destination: TreatmentRecommendationView()) {
+				HStack {
+					Image(systemName: "syringe")
+					Text("Treatment").foregroundStyle(Color.white).font(.title)
+				}
+				.padding()
+				.foregroundColor(.white)
+				.background(
+					Color.orange.clipShape(
+						.rect(cornerRadius: 10)
+					)
+				)
+			}
 			if !knowledge.isReportComplete {
 				KnowledgeTable(
 					title: "Inspection",
@@ -110,7 +146,7 @@ struct KnowledgePromptInspection: View {
 						KnowledgeField(
 							name: "Dimensions",
 							prompt: "x by y by z feet|meters",
-							isDone: knowledge.hasSurfaceArea,
+							isDone: knowledge.hasVolume,
 							value: knowledge.source.volume.description,
 						),
 					]
@@ -188,16 +224,22 @@ struct KnowledgePromptPreview: View {
 		self.knowledge = knowledge
 	}
 	var body: some View {
-		KnowledgePrompt(knowledge: knowledge)
+		NavigationStack {
+			KnowledgePrompt(controller: RootControllerPreview(), knowledge: knowledge)
+		}
 	}
 }
 struct KnowledgePrompt_Previews: PreviewProvider {
-	static func makeKnowledge(breeding: BreedingKnowledgeGraph? = nil) -> KnowledgeGraph {
+	static func makeKnowledge(
+		breeding: BreedingKnowledgeGraph? = nil,
+		source: SourceKnowledgeGraph? = nil
+	) -> KnowledgeGraph {
 		return knowledgeForPreview(
 			breeding: breeding,
 			fieldseeker: FieldseekerReportGraph(
 				reportType: .Inspection,
-			)
+			),
+			source: source,
 		)
 	}
 	static var previews: some View {
@@ -210,5 +252,21 @@ struct KnowledgePrompt_Previews: PreviewProvider {
 				),
 			)
 		).previewDisplayName("partial")
+		KnowledgePromptPreview(
+			makeKnowledge(
+				breeding: BreedingKnowledgeGraph(
+					conditions: .PoolGreen,
+					genus: .Aedes,
+					stage: .SecondInstar
+				),
+				source: SourceKnowledgeGraph(
+					volume: Volume(
+						depth: Measurement(value: 4, unit: .feet),
+						length: Measurement(value: 10, unit: .feet),
+						width: Measurement(value: 20, unit: .feet),
+					)
+				)
+			)
+		).previewDisplayName("needs treatment")
 	}
 }
