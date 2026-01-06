@@ -186,6 +186,17 @@ class RootController {
 		}
 	}
 
+	// Marks all data that has been uploaded for re-upload and starts the reupload process
+	func reupload() {
+		do {
+			try database.service.clearUploadStatus()
+			network.Sync(settings.store, database)
+		}
+		catch {
+			handleError(error, "Failed to reupload")
+		}
+	}
+
 	func savePictureNote(_ picture: Photo, _ location: H3Cell?) throws -> PictureNote {
 		let uuid = UUID()
 		let url = PictureNote.url(uuid)

@@ -38,6 +38,12 @@ struct SettingView: View {
 		username = UserDefaults.standard.string(forKey: "username") ?? ""
 	}
 
+	private func reupload() {
+		controller.reupload()
+		alertMessage = "Re-upload started."
+		isShowingAlert = true
+	}
+
 	private func save() {
 		let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -177,6 +183,20 @@ struct SettingView: View {
 					}
 				} header: {
 					Text("Account Information")
+				}
+				Section {
+					HStack {
+						Button(action: { reupload() }) {
+							Label(
+								"Re-upload all data",
+								systemImage:
+									"arrow.2.circlepath.circle"
+							)
+						}
+
+					}
+				} header: {
+					Text("Data Tools")
 				}
 			}.navigationTitle("Settings")
 				.navigationBarTitleDisplayMode(.inline)

@@ -99,6 +99,13 @@ class DatabaseService: CustomStringConvertible {
 		return try BoundaryForNoteType(connection, noteType)
 	}
 
+	func clearUploadStatus() throws {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		try NoteAudioAllClearUploaded(connection)
+		try NotePictureAllClearUploaded(connection)
+	}
 	func noteAudio(_ uuid: UUID) throws -> AudioNote? {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected

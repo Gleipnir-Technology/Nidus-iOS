@@ -180,6 +180,19 @@ func MosquitoSourceUpsert(connection: SQLite.Connection, _ source: MosquitoSourc
 	try connection.run(upsert)
 }
 
+func NoteAudioAllClearUploaded(_ connection: SQLite.Connection) throws {
+	let update = schema.audioRecording.table.update(
+		schema.audioRecording.uploaded <- nil
+	)
+	try connection.run(update)
+}
+func NotePictureAllClearUploaded(_ connection: SQLite.Connection) throws {
+	let update = schema.picture.table.update(
+		schema.picture.uploaded <- nil
+	)
+	try connection.run(update)
+}
+
 func NotesCount(_ connection: SQLite.Connection) throws -> UInt {
 	let audioCount = try connection.scalar(schema.audioRecording.table.count)
 	let pictureCount = try connection.scalar(schema.picture.table.count)
