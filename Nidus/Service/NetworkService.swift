@@ -221,29 +221,6 @@ actor NetworkService {
 		}
 	}
 
-	func uploadNote(_ note: NidusNote) async throws {
-		guard let settings = self.settings else {
-			throw NetworkServiceError.settingsNotSet
-		}
-		let id: String = String(note.id.uuidString)
-		let updateURL: URL = URL(string: settings.URL + "/api/client/ios/note/" + id)!
-
-		// Create form-encoded POST request
-		var request = URLRequest(url: updateURL)
-		request.httpMethod = "PUT"
-		request.setValue(
-			"application/json",
-			forHTTPHeaderField: "Content-Type"
-		)
-
-		let encoder = JSONEncoder()
-		encoder.dateEncodingStrategy = .iso8601
-		let data = try encoder.encode(note.toPayload())
-		// Create json data
-		request.httpBody = data
-		_ = try await downloadWrapper.handle(with: request)
-	}
-
 	private func login(_ settings: SettingsStore) async throws {
 		let loginURL: URL = URL(string: settings.URL + "/signin")!
 
