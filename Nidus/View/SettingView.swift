@@ -55,7 +55,7 @@ struct SettingView: View {
 	}
 
 	private func testLogin() {
-		let loginURL = url + "/login"
+		let loginURL = url + "/signin"
 		guard let url = URL(string: loginURL) else {
 			alertMessage = "The sync server URL isn't valid"
 			isShowingAlert = true

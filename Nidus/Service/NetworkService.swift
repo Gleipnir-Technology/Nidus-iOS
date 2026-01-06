@@ -245,7 +245,7 @@ actor NetworkService {
 	}
 
 	private func login(_ settings: SettingsStore) async throws {
-		let loginURL: URL = URL(string: settings.URL + "/login")!
+		let loginURL: URL = URL(string: settings.URL + "/signin")!
 
 		// Create form-encoded POST request
 		var request = URLRequest(url: loginURL)
