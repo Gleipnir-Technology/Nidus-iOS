@@ -1,17 +1,4 @@
-//
-//  APIResponse.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 6/4/25.
-//
-
-struct LocationResponse: Codable {
-	let latitude: Double
-	let longitude: Double
-
-}
-
-final class NotesResponse: Codable {
+final class FieldseekerResponse: Codable {
 	enum CodingKeys: CodingKey {
 		case requests
 		case sources

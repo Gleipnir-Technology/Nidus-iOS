@@ -18,7 +18,7 @@ class NetworkController {
 		onSyncCompletedCallbacks.append(callback)
 	}
 
-	/// Test the new settings and save off the credentials if they work, then initiatek
+	/// Test the new settings and save off the credentials if they work, then initiate
 	func Sync(_ newSettings: SettingsStore, _ database: DatabaseController) {
 		if newSettings.username.isEmpty || newSettings.password.isEmpty {
 			setState(.notConfigured, 0.0)
@@ -125,19 +125,20 @@ class NetworkController {
 		let response = try await service.fetchNoteUpdates { progress in
 			self.setState(.downloading, progress)
 		}
+		let fs = response.fieldseeker
 		setState(.savingData, 0.0)
 		let totalRecords =
-			response.requests.count + response.sources.count
-			+ response.traps.count
+			fs.requests.count + fs.sources.count
+			+ fs.traps.count
 		var i = 0
-		for r in response.requests {
+		for r in fs.requests {
 			try database.service.upsertServiceRequest(r)
 			i += 1
 			if i % 100 == 0 {
 				setState(.savingData, Double(i) / Double(totalRecords))
 			}
 		}
-		for s in response.sources {
+		for s in fs.sources {
 			try database.service.upsertSource(s)
 			i += 1
 			if i % 100 == 0 {

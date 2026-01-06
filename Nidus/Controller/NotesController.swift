@@ -1,3 +1,4 @@
+import H3
 import MapKit
 import OSLog
 import SwiftUI
@@ -63,15 +64,6 @@ class NotesController {
 			self.store.filterInstances[filter.Name()] = filter
 		}
 	}
-	func handleNoteUpdates(_ response: NotesResponse) async {
-		/*
-        do {
-        }
-        catch {
-            Logger.background.error("Failed to handle API response: \(error)")
-        }
-        */
-	}
 
 	private func shouldShow(_ note: AnyNote) -> Bool {
 		for filter in store.filterInstances.values {
@@ -79,14 +71,21 @@ class NotesController {
 				return false
 			}
 		}
-		if note.coordinate.latitude < store.currentRegion.minLatitude
-			|| note.coordinate.longitude < store.currentRegion.minLongitude
-			|| note.coordinate.latitude > store.currentRegion.maxLatitude
-			|| note.coordinate.longitude > store.currentRegion.maxLongitude
-		{
+		do {
+			let coordinate = try cellToLatLng(cell: note.h3cell)
+			if coordinate.latitude < store.currentRegion.minLatitude
+				|| coordinate.longitude < store.currentRegion.minLongitude
+				|| coordinate.latitude > store.currentRegion.maxLatitude
+				|| coordinate.longitude > store.currentRegion.maxLongitude
+			{
+				return false
+			}
+			return true
+		}
+		catch {
+			Logger.background.error("Failed to convert H3 cell to lat/lng: \(error)")
 			return false
 		}
-		return true
 	}
 }
 

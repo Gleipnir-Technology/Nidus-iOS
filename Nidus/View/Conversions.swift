@@ -59,6 +59,16 @@ func cellToPolyline(_ cellSelection: CellSelection) -> MKPolyline {
 	}
 }
 
+func cellToLatLngOrBust(_ cell: H3Cell) -> CLLocationCoordinate2D {
+	do {
+		return try cellToLatLng(cell: cell)
+	}
+	catch {
+		Logger.background.error("Busted on cellToLatLng: \(cell) gave \(error)")
+		return CLLocationCoordinate2D(latitude: 0, longitude: 0)
+	}
+}
+
 // Given an H3 cell and a region of a map, determine if all the points of the cell are entirely within the region
 func isCellInRegion(
 	_ cell: H3Cell,

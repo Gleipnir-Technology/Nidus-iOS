@@ -1,11 +1,6 @@
-//
-//  FieldSeeker.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 5/30/25.
-//
 import CoreData
 import Foundation
+import H3
 import MapKit
 import SwiftUI
 
@@ -138,6 +133,12 @@ final class Location: Codable, Equatable, Hashable, Identifiable {
 	}
 }
 
+extension H3Cell {
+	public static var visalia: H3Cell {
+		0x892_9a84_51c3_ffff
+	}
+}
+
 final class MosquitoSource: Codable, Identifiable, Note {
 	enum CodingKeys: CodingKey {
 		case access
@@ -145,11 +146,11 @@ final class MosquitoSource: Codable, Identifiable, Note {
 		case comments
 		case created
 		case description
+		case h3cell
 		case habitat
 		case id
 		case inspections
 		case lastInspectionDate
-		case location
 		case name
 		case nextActionDateScheduled
 		case treatments
@@ -166,7 +167,7 @@ final class MosquitoSource: Codable, Identifiable, Note {
 	var id: UUID
 	var inspections: [Inspection]
 	var lastInspectionDate: Date
-	var location: Location
+	var h3cell: H3Cell
 	var name: String
 	var nextActionDateScheduled: Date
 	var treatments: [Treatment]
@@ -179,15 +180,6 @@ final class MosquitoSource: Codable, Identifiable, Note {
 	var categoryName: String { "Mosquito Source" }
 	var color: Color { category.color }
 	var content: String { name }
-	var coordinate: CLLocationCoordinate2D {
-		get {
-			location.coordinate()
-		}
-		set {
-			location.latitude = newValue.latitude
-			location.longitude = newValue.longitude
-		}
-	}
 	var timestamp: Date { created }
 	// end Note protocol
 
@@ -197,11 +189,11 @@ final class MosquitoSource: Codable, Identifiable, Note {
 		comments: String,
 		created: Date,
 		description: String,
+		h3cell: H3Cell,
 		habitat: String,
 		id: UUID,
 		inspections: [Inspection],
 		lastInspectionDate: Date,
-		location: Location,
 		name: String,
 		nextActionDateScheduled: Date,
 		treatments: [Treatment],
@@ -214,11 +206,11 @@ final class MosquitoSource: Codable, Identifiable, Note {
 		self.comments = comments
 		self.created = created
 		self.description = description
+		self.h3cell = h3cell
 		self.habitat = habitat
 		self.id = id
 		self.inspections = inspections
 		self.lastInspectionDate = lastInspectionDate
-		self.location = location
 		self.name = name
 		self.nextActionDateScheduled = nextActionDateScheduled
 		self.treatments = treatments
@@ -234,11 +226,11 @@ final class MosquitoSource: Codable, Identifiable, Note {
 		comments = try container.decode(String.self, forKey: .comments)
 		created = try container.decode(Date.self, forKey: .created)
 		description = try container.decode(String.self, forKey: .description)
+		h3cell = try container.decode(H3Cell.self, forKey: .h3cell)
 		habitat = try container.decode(String.self, forKey: .habitat)
 		id = try container.decode(UUID.self, forKey: .id)
 		inspections = try container.decode([Inspection].self, forKey: .inspections)
 		lastInspectionDate = try container.decode(Date.self, forKey: .lastInspectionDate)
-		location = try container.decode(Location.self, forKey: .location)
 		name = try container.decode(String.self, forKey: .name)
 		nextActionDateScheduled = try container.decode(
 			Date.self,
@@ -257,11 +249,11 @@ final class MosquitoSource: Codable, Identifiable, Note {
 		try container.encode(comments, forKey: .comments)
 		try container.encode(created, forKey: .created)
 		try container.encode(description, forKey: .description)
+		try container.encode(h3cell, forKey: .h3cell)
 		try container.encode(habitat, forKey: .habitat)
 		try container.encode(id, forKey: .id)
 		try container.encode(inspections, forKey: .inspections)
 		try container.encode(lastInspectionDate, forKey: .lastInspectionDate)
-		try container.encode(location, forKey: .location)
 		try container.encode(name, forKey: .name)
 		try container.encode(nextActionDateScheduled, forKey: .nextActionDateScheduled)
 		try container.encode(treatments, forKey: .treatments)
@@ -276,10 +268,10 @@ final class MosquitoSource: Codable, Identifiable, Note {
 			&& lhs.comments == rhs.comments
 			&& lhs.created == rhs.created
 			&& lhs.description == rhs.description
+			&& lhs.h3cell == rhs.h3cell
 			&& lhs.habitat == rhs.habitat
 			&& lhs.inspections == rhs.inspections
 			&& lhs.lastInspectionDate == rhs.lastInspectionDate
-			&& lhs.location == rhs.location
 			&& lhs.name == rhs.name
 			&& lhs.nextActionDateScheduled == rhs.nextActionDateScheduled
 			&& lhs.treatments == rhs.treatments
@@ -293,10 +285,10 @@ final class MosquitoSource: Codable, Identifiable, Note {
 		hasher.combine(comments)
 		hasher.combine(created)
 		hasher.combine(description)
+		hasher.combine(h3cell)
 		hasher.combine(habitat)
 		hasher.combine(inspections)
 		hasher.combine(lastInspectionDate)
-		hasher.combine(location)
 		hasher.combine(name)
 		hasher.combine(nextActionDateScheduled)
 		hasher.combine(treatments)
@@ -312,10 +304,10 @@ final class ServiceRequest: Codable, Identifiable, Note {
 		case assignedTechnician
 		case city
 		case created
+		case h3cell
 		case hasDog
 		case hasSpanishSpeaker
 		case id
-		case location
 		case priority
 		case source
 		case status
@@ -326,10 +318,10 @@ final class ServiceRequest: Codable, Identifiable, Note {
 	var assignedTechnician: String
 	var city: String
 	var created: Date
+	var h3cell: H3Cell
 	var hasDog: Bool?
 	var hasSpanishSpeaker: Bool?
 	var id: UUID
-	var location: Location
 	var priority: String
 	var source: String
 	var status: String
@@ -341,13 +333,6 @@ final class ServiceRequest: Codable, Identifiable, Note {
 	var categoryName: String { "Service Request" }
 	var color: Color { category.color }
 	var content: String { address }
-	var coordinate: CLLocationCoordinate2D {
-		get { location.coordinate() }
-		set {
-			location.latitude = newValue.latitude
-			location.longitude = newValue.longitude
-		}
-	}
 	var timestamp: Date { created }
 	// end Note protocol
 	init(
@@ -355,10 +340,10 @@ final class ServiceRequest: Codable, Identifiable, Note {
 		assignedTechnician: String,
 		city: String,
 		created: Date,
+		h3cell: H3Cell,
 		hasDog: Bool?,
 		hasSpanishSpeaker: Bool?,
 		id: UUID,
-		location: Location,
 		priority: String,
 		source: String,
 		status: String,
@@ -369,10 +354,10 @@ final class ServiceRequest: Codable, Identifiable, Note {
 		self.assignedTechnician = assignedTechnician
 		self.city = city
 		self.created = created
+		self.h3cell = h3cell
 		self.hasDog = hasDog
 		self.hasSpanishSpeaker = hasSpanishSpeaker
 		self.id = id
-		self.location = location
 		self.priority = priority
 		self.source = source
 		self.status = status
@@ -386,15 +371,24 @@ final class ServiceRequest: Codable, Identifiable, Note {
 		assignedTechnician = try container.decode(String.self, forKey: .assignedTechnician)
 		city = try container.decode(String.self, forKey: .city)
 		created = try container.decode(Date.self, forKey: .created)
+		h3cell = try container.decode(H3Cell.self, forKey: .h3cell)
 		hasDog = try container.decode(Bool?.self, forKey: .hasDog)
 		hasSpanishSpeaker = try container.decode(Bool?.self, forKey: .hasSpanishSpeaker)
 		id = try container.decode(UUID.self, forKey: .id)
-		location = try container.decode(Location.self, forKey: .location)
 		priority = try container.decode(String.self, forKey: .priority)
 		source = try container.decode(String.self, forKey: .source)
 		status = try container.decode(String.self, forKey: .status)
 		target = try container.decode(String.self, forKey: .target)
 		zip = try container.decode(String.self, forKey: .zip)
+	}
+
+	var coordinate: CLLocationCoordinate2D {
+		do {
+			return try cellToLatLng(cell: h3cell)
+		}
+		catch {
+			return CLLocationCoordinate2D(latitude: 0, longitude: 0)
+		}
 	}
 
 	func encode(to encoder: Encoder) throws {
@@ -403,10 +397,10 @@ final class ServiceRequest: Codable, Identifiable, Note {
 		try container.encode(assignedTechnician, forKey: .assignedTechnician)
 		try container.encode(city, forKey: .city)
 		try container.encode(created, forKey: .created)
+		try container.encode(h3cell, forKey: .h3cell)
 		try container.encode(hasDog, forKey: .hasDog)
 		try container.encode(hasSpanishSpeaker, forKey: .hasSpanishSpeaker)
 		try container.encode(id, forKey: .id)
-		try container.encode(location, forKey: .location)
 		try container.encode(priority, forKey: .priority)
 		try container.encode(source, forKey: .source)
 		try container.encode(status, forKey: .status)
@@ -419,9 +413,9 @@ final class ServiceRequest: Codable, Identifiable, Note {
 			&& lhs.assignedTechnician == rhs.assignedTechnician
 			&& lhs.city == rhs.city
 			&& lhs.created == rhs.created
+			&& lhs.h3cell == rhs.h3cell
 			&& lhs.hasDog == rhs.hasDog
 			&& lhs.hasSpanishSpeaker == rhs.hasSpanishSpeaker
-			&& lhs.location == rhs.location
 			&& lhs.priority == rhs.priority
 			&& lhs.source == rhs.source
 			&& lhs.status == rhs.status
@@ -433,9 +427,9 @@ final class ServiceRequest: Codable, Identifiable, Note {
 		hasher.combine(assignedTechnician)
 		hasher.combine(city)
 		hasher.combine(created)
+		hasher.combine(h3cell)
 		hasher.combine(hasDog)
 		hasher.combine(hasSpanishSpeaker)
-		hasher.combine(location)
 		hasher.combine(priority)
 		hasher.combine(source)
 		hasher.combine(status)
@@ -448,14 +442,14 @@ final class TrapData: Codable, Identifiable, Note {
 	enum CodingKeys: CodingKey {
 		case created
 		case description
+		case h3cell
 		case id
-		case location
 		case name
 	}
 	var created: Date
 	var description: String
+	var h3cell: H3Cell
 	var id: UUID
-	var location: Location
 	var name: String
 
 	// Note protocol
@@ -463,29 +457,20 @@ final class TrapData: Codable, Identifiable, Note {
 	var categoryName: String { "Trap Data" }
 	var color: Color { category.color }
 	var content: String { name }
-	var coordinate: CLLocationCoordinate2D {
-		get {
-			location.coordinate()
-		}
-		set {
-			location.latitude = newValue.latitude
-			location.longitude = newValue.longitude
-		}
-	}
 	var timestamp: Date { created }
 	// end Note protocol
 
 	init(
 		created: Date,
 		description: String,
+		h3cell: H3Cell,
 		id: UUID,
-		location: Location,
 		name: String
 	) {
 		self.created = created
 		self.description = description
+		self.h3cell = h3cell
 		self.id = id
-		self.location = location
 		self.name = name
 	}
 
@@ -493,30 +478,39 @@ final class TrapData: Codable, Identifiable, Note {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		created = try container.decode(Date.self, forKey: .created)
 		description = try container.decode(String.self, forKey: .description)
+		h3cell = try container.decode(H3Cell.self, forKey: .h3cell)
 		id = try container.decode(UUID.self, forKey: .id)
-		location = try container.decode(Location.self, forKey: .location)
 		name = try container.decode(String.self, forKey: .name)
+	}
+
+	var coordinate: CLLocationCoordinate2D {
+		do {
+			return try cellToLatLng(cell: h3cell)
+		}
+		catch {
+			return CLLocationCoordinate2D(latitude: 0, longitude: 0)
+		}
 	}
 
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(created, forKey: .created)
 		try container.encode(description, forKey: .description)
+		try container.encode(h3cell, forKey: .h3cell)
 		try container.encode(id, forKey: .id)
-		try container.encode(location, forKey: .location)
 		try container.encode(name, forKey: .name)
 	}
 	static func == (lhs: TrapData, rhs: TrapData) -> Bool {
 		return
 			(lhs.created == rhs.created
 			&& lhs.description == rhs.description
-			&& lhs.location == rhs.location
+			&& lhs.h3cell == rhs.h3cell
 			&& lhs.name == rhs.name)
 	}
 	func hash(into hasher: inout Hasher) {
 		hasher.combine(created)
 		hasher.combine(description)
-		hasher.combine(location)
+		hasher.combine(h3cell)
 		hasher.combine(name)
 	}
 }

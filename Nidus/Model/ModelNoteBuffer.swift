@@ -1,9 +1,4 @@
-//
-//  NewNote.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 7/4/25.
-//
+import H3
 import MapKit
 import SwiftUI
 
@@ -11,6 +6,7 @@ import SwiftUI
 class ModelNoteBuffer {
 	var dueDate: Date = Date()
 	var capturedImages: [UIImage] = []
+	var h3cell: H3Cell = 0
 	var location: CLLocation?
 	var text: String = ""
 
@@ -20,23 +16,48 @@ class ModelNoteBuffer {
 
 	var note: NidusNote? = nil
 
+	func cellOrZero(_ location: CLLocation?) -> H3Cell {
+		guard let location = location else {
+			return H3Cell()
+		}
+		do {
+			return try latLngToCell(latLng: location.coordinate, resolution: 15)
+		}
+		catch {
+			return H3Cell()
+		}
+	}
 	func toNote() -> NidusNote {
 		guard let result = note else {
 			return NidusNote(
+				h3cell: h3cell,
 				images: capturedImages.map { NoteImage($0) },
-				location: Location(location!),
 				text: text
 			)
 		}
 		result.images = capturedImages.map { NoteImage($0) }
-		result.location = Location(location!)
 		result.text = text
-		return result
+
+		guard let location = location else {
+			result.h3cell = h3cell
+			return result
+		}
+		// Capture any changes to the location
+		do {
+			let new_cell = try latLngToCell(latLng: location.coordinate, resolution: 15)
+			result.h3cell = new_cell
+			return result
+		}
+		catch {
+			result.h3cell = h3cell
+			return result
+		}
 	}
 
 	func Reset(_ note: NidusNote?) {
 		guard let note = note else {
 			self.capturedImages = []
+			self.h3cell = 0
 			self.location = nil
 			self.text = ""
 			return
@@ -44,10 +65,9 @@ class ModelNoteBuffer {
 		self.note = note
 		let maybeImages = note.images.map { $0.toUIImage() }
 		self.capturedImages = maybeImages.compactMap { $0 }
-		self.location = CLLocation(
-			latitude: note.location.latitude,
-			longitude: note.location.longitude
-		)
+		self.h3cell = note.h3cell
+		let l = cellToLatLngOrBust(note.h3cell)
+		self.location = CLLocation(latitude: l.latitude, longitude: l.longitude)
 		self.text = note.text
 	}
 }

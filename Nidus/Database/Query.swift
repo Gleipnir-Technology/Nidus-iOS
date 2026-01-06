@@ -149,12 +149,14 @@ func MosquitoSourceAsNotes(
 }
 
 func MosquitoSourceUpsert(connection: SQLite.Connection, _ source: MosquitoSource) throws {
+	let location = cellToLatLngOrBust(source.h3cell)
 	let upsert = schema.mosquitoSource.table.upsert(
 		schema.mosquitoSource.access <- SQLite.Expression<String>(source.access),
 		schema.mosquitoSource.active <- SQLite.Expression<Bool?>(value: source.active),
 		schema.mosquitoSource.comments <- SQLite.Expression<String>(source.comments),
 		schema.mosquitoSource.created <- SQLite.Expression<Date>(value: source.created),
 		schema.mosquitoSource.description <- SQLite.Expression<String>(source.description),
+		schema.mosquitoSource.h3cell <- SQLite.Expression<UInt64>(value: source.h3cell),
 		schema.mosquitoSource.habitat <- SQLite.Expression<String>(source.habitat),
 		schema.mosquitoSource.id <- SQLite.Expression<UUID>(value: source.id),
 		schema.mosquitoSource.lastInspectionDate
@@ -167,11 +169,11 @@ func MosquitoSourceUpsert(connection: SQLite.Connection, _ source: MosquitoSourc
 		schema.mosquitoSource.zone <- SQLite.Expression<String>(source.zone),
 		schema.mosquitoSource.latitude
 			<- SQLite.Expression<Double>(
-				value: source.location.latitude
+				value: location.latitude
 			),
 		schema.mosquitoSource.longitude
 			<- SQLite.Expression<Double>(
-				value: source.location.longitude
+				value: location.longitude
 			),
 		onConflictOf: schema.mosquitoSource.id
 	)
@@ -332,6 +334,7 @@ func ServiceRequestsAsNotes(
 }
 
 func ServiceRequestUpsert(connection: SQLite.Connection, _ serviceRequest: ServiceRequest) throws {
+	let location = cellToLatLngOrBust(serviceRequest.h3cell)
 	let upsert = schema.serviceRequest.table.upsert(
 		schema.serviceRequest.address <- SQLite.Expression<String>(serviceRequest.address),
 		schema.serviceRequest.assignedTechnician
@@ -352,11 +355,11 @@ func ServiceRequestUpsert(connection: SQLite.Connection, _ serviceRequest: Servi
 		schema.serviceRequest.zip <- SQLite.Expression<String>(serviceRequest.zip),
 		schema.serviceRequest.latitude
 			<- SQLite.Expression<Double>(
-				value: serviceRequest.location.latitude
+				value: location.latitude
 			),
 		schema.serviceRequest.longitude
 			<- SQLite.Expression<Double>(
-				value: serviceRequest.location.longitude
+				value: location.longitude
 			),
 		onConflictOf: schema.serviceRequest.id
 	)

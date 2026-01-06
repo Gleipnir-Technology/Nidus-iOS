@@ -32,7 +32,7 @@ class DatabaseService: CustomStringConvertible {
 		return [
 			Migration1(), Migration2(), Migration3(), Migration4(), Migration5(),
 			Migration6(), Migration7(), Migration8(), Migration9(), Migration10(),
-			Migration11(), Migration12(), Migration13(),
+			Migration11(), Migration12(), Migration13(), Migration14(),
 		]
 	}
 

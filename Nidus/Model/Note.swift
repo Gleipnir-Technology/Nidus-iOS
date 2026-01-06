@@ -88,7 +88,7 @@ protocol Note: Identifiable<UUID>, Hashable {
 	var categoryName: String { get }
 	var color: Color { get }
 	var content: String { get }
-	var coordinate: CLLocationCoordinate2D { get set }
+	var h3cell: H3Cell { get }
 	var id: UUID { get }
 	var timestamp: Date { get }
 }
@@ -103,14 +103,7 @@ struct AnyNote: Note {
 	var categoryName: String { innerNote.categoryName }
 	var color: Color { innerNote.color }
 	var content: String { innerNote.content }
-	var coordinate: CLLocationCoordinate2D {
-		get {
-			innerNote.coordinate
-		}
-		set {
-			innerNote.coordinate = newValue
-		}
-	}
+	var h3cell: H3Cell { innerNote.h3cell }
 	var id: UUID {
 		innerNote.id
 	}

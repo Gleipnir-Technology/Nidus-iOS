@@ -1,5 +1,6 @@
 import AVFoundation
 import CoreLocation
+import H3
 import OSLog
 import Speech
 import SwiftUI
@@ -41,19 +42,26 @@ struct EditNidusNoteView: View {
 	}
 
 	var locationDescription: String {
-		guard let location = noteBuffer.location else {
-			return "current location"
-		}
 		guard let userLocation = locationDataManager.location else {
 			return "...getting a fix"
 		}
-		let distance = Measurement(
-			value: location.distance(from: userLocation),
-			unit: UnitLength.meters
-		)
-		return distance.formatted(
-			.measurement(width: .abbreviated, usage: .road).locale(locale)
-		) + " away"
+		do {
+			let l = try cellToLatLng(cell: noteBuffer.h3cell)
+			let location = CLLocation(latitude: l.latitude, longitude: l.longitude)
+			let distance = Measurement(
+				value: location.distance(from: userLocation),
+				unit: UnitLength.meters
+			)
+			return distance.formatted(
+				.measurement(width: .abbreviated, usage: .road).locale(locale)
+			) + " away"
+		}
+		catch {
+			Logger.foreground.error(
+				"Failed to get location from cell \(noteBuffer.h3cell): \(error)"
+			)
+			return "error in calc"
+		}
 	}
 
 	private func deleteNote() {
@@ -66,7 +74,7 @@ struct EditNidusNoteView: View {
 			Form {
 				Section(header: Text("Location")) {
 					VStack(alignment: .leading, spacing: 8) {
-						if noteBuffer.location == nil {
+						if noteBuffer.h3cell == 0 {
 							ProgressView()
 								.progressViewStyle(
 									CircularProgressViewStyle()
@@ -170,7 +178,21 @@ struct EditNidusNoteView: View {
 			self.noteBuffer.Reset(note)
 			locationDataManager.onLocationAcquired({ userLocation in
 				if useLocationManagerWhenAvailable {
-					self.noteBuffer.location = userLocation
+					do {
+						let res = meterAccuracyToH3Resolution(
+							userLocation.horizontalAccuracy
+						)
+						let c = try latLngToCell(
+							latLng: userLocation.coordinate,
+							resolution: res
+						)
+						self.noteBuffer.h3cell = c
+					}
+					catch {
+						Logger.foreground.error(
+							"Failed to convert latlng to h3cell: \(error)"
+						)
+					}
 				}
 			})
 		}
@@ -208,7 +230,7 @@ struct AddNoteView_Previews: PreviewProvider {
 			locationDataManager: LocationDataManagerFake(
 				location: CLLocation(latitude: 33.0, longitude: -161.5)
 			),
-			note: NidusNote.forPreview(location: .visalia),
+			note: NidusNote.forPreview(h3cell: .visalia),
 			noteBuffer: $noteBuffer,
 			onDeleteNote: onDeleteNote,
 			onResetChanges: onResetChanges

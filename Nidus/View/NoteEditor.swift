@@ -1,10 +1,6 @@
-//
-//  NoteEditor.swift
-//  Nidus
-//
-//  Created by Eli Ribble on 3/12/25.
-//
 import CoreLocation
+import H3
+import OSLog
 import SwiftData
 import SwiftUI
 
@@ -14,6 +10,7 @@ struct NoteEditor: View {
 
 	@State private var content: String
 	@State private var category: NoteCategory
+	@State private var h3cell: H3Cell
 	@State private var location: CLLocation?
 	@State private var showSavedToast = false
 
@@ -24,10 +21,17 @@ struct NoteEditor: View {
 		self.note = note
 		self.content = note.content
 		self.category = NoteCategory.byNameOrDefault(note.categoryName)
-		self.location = CLLocation(
-			latitude: note.coordinate.latitude,
-			longitude: note.coordinate.longitude
-		)
+		self.h3cell = note.h3cell
+		do {
+			let l = try cellToLatLng(cell: h3cell)
+			self.location = CLLocation(
+				latitude: l.latitude,
+				longitude: l.longitude
+			)
+		}
+		catch {
+			self.location = nil
+		}
 	}
 
 	private func save() {
@@ -40,10 +44,14 @@ struct NoteEditor: View {
 	}
 
 	var locationDescription: String {
-		guard let location = location else {
-			return "none"
+		do {
+			let location = try cellToLatLng(cell: h3cell)
+			return "\(location.latitude), \(location.longitude)"
 		}
-		return "\(location.coordinate.latitude), \(location.coordinate.longitude)"
+		catch {
+			Logger.background.error("Failed to convert H3Cell to CLLocation: \(error)")
+			return "err"
+		}
 	}
 
 	var body: some View {
@@ -86,10 +94,10 @@ struct NoteEditor: View {
 			assignedTechnician: "Dude Guy",
 			city: "over there",
 			created: Date.now,
+			h3cell: .visalia,
 			hasDog: false,
 			hasSpanishSpeaker: false,
 			id: UUID(uuidString: "1846d421-f8ab-4e37-850a-b61bb8422453")!,
-			location: Location(latitude: 30, longitude: -111),
 			priority: "low",
 			source: "everywhere",
 			status: "bad",

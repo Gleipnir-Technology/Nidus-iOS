@@ -1,10 +1,3 @@
-//
-//  NidusNote.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 6/26/25.
-//
-
 import MapKit
 import SwiftUI
 
@@ -14,17 +7,7 @@ class NidusNote: Note {
 	var categoryName: String { return category.name }
 	var color: Color { return category.color }
 	var content: String { return text }
-	var coordinate: CLLocationCoordinate2D {
-		get {
-			return location.coordinate()
-		}
-		set {
-			location = Location(
-				latitude: newValue.latitude,
-				longitude: newValue.longitude
-			)
-		}
-	}
+	var h3cell: H3Cell
 	var id: UUID
 	var timestamp: Date
 	/* end Note protocol */
@@ -32,15 +15,14 @@ class NidusNote: Note {
 	var created: Date
 	var due: Date?
 	var images: [NoteImage]
-	var location: Location
 	var text: String
 	var uploaded: Date?
 
 	init(
 		created: Date = Date.now,
 		due: Date? = nil,
+		h3cell: H3Cell,
 		images: [NoteImage],
-		location: Location,
 		text: String,
 		uploaded: Date? = nil,
 		uuid: UUID = UUID()
@@ -48,35 +30,36 @@ class NidusNote: Note {
 		self.id = uuid
 		self.created = created
 		self.due = due
+		self.h3cell = h3cell
 		self.images = images
-		self.location = location
 		self.timestamp = Date.now
 		self.text = text
 		self.uploaded = uploaded
 	}
 
 	static func forPreview(
+		h3cell: H3Cell = .visalia,
 		images: [NoteImage] = [],
-		location: Location = .visalia,
 		text: String = "some text"
 	) -> NidusNote {
 		return NidusNote(
+			h3cell: h3cell,
 			images: images,
-			location: location,
 			text: text
 		)
 	}
 	static func == (lhs: NidusNote, rhs: NidusNote) -> Bool {
-		return lhs.location == rhs.location
+		return lhs.h3cell == rhs.h3cell
 	}
 
 	func hash(into hasher: inout Hasher) {
-		hasher.combine(location)
+		hasher.combine(h3cell)
 	}
 
 	func toPayload() -> NidusNotePayload {
 		return NidusNotePayload(
 			audio: [],
+			h3cell: h3cell,
 			images: images.map({ image in
 				ImagePayload(
 					created: image.created,
@@ -86,7 +69,6 @@ class NidusNote: Note {
 					uuid: image.uuid
 				)
 			}),
-			location: location,
 			text: text,
 			timestamp: timestamp,
 			uuid: id

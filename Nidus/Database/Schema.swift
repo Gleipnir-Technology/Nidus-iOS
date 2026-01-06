@@ -57,6 +57,7 @@ class MosquitoSourceTable {
 	let comments = SQLite.Expression<String>("comments")
 	let created = SQLite.Expression<Date>("created")
 	let description = SQLite.Expression<String>("description")
+	let h3cell = SQLite.Expression<UInt64>("h3cell")
 	let habitat = SQLite.Expression<String>("habitat")
 	let id = SQLite.Expression<UUID>("id")
 	let lastInspectionDate = SQLite.Expression<Date>("last_inspection_date")
@@ -65,9 +66,9 @@ class MosquitoSourceTable {
 	let useType = SQLite.Expression<String>("use_type")
 	let waterOrigin = SQLite.Expression<String>("water_origin")
 	let zone = SQLite.Expression<String>("zone")
+
 	let latitude = SQLite.Expression<Double>("latitude")
 	let longitude = SQLite.Expression<Double>("longitude")
-
 }
 
 /// A summary of all of the notes already grouped by cell
@@ -98,6 +99,7 @@ class ServiceRequestTable {
 	let assignedTechnician = SQLite.Expression<String>("assigned_technician")
 	let city = SQLite.Expression<String>("city")
 	let created = SQLite.Expression<Date>("created")
+	let h3cell = SQLite.Expression<UInt64>("h3cell")
 	let hasDog = SQLite.Expression<Bool?>("has_dog")
 	let hasSpanishSpeaker = SQLite.Expression<Bool?>("has_spanish_speaker")
 	let id = SQLite.Expression<UUID>("id")
@@ -106,9 +108,9 @@ class ServiceRequestTable {
 	let status = SQLite.Expression<String>("status")
 	let target = SQLite.Expression<String>("target")
 	let zip = SQLite.Expression<String>("zip")
+
 	let latitude = SQLite.Expression<Double>("latitude")
 	let longitude = SQLite.Expression<Double>("longitude")
-
 }
 
 class TreatmentTable {

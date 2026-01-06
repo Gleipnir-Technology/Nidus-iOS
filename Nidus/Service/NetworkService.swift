@@ -55,14 +55,14 @@ actor NetworkService {
 
 	// MARK - public interfaces
 	func fetchNoteUpdates(_ onProgress: @escaping (Double) -> Void) async throws
-		-> NotesResponse
+		-> IosClientResponse
 	{
 		guard let settings = self.settings else {
 			throw NetworkServiceError.settingsNotSet
 		}
 		let url = URL(string: settings.URL + "/api/client/ios")!
 		let request = URLRequest(url: url)
-		var response: NotesResponse?
+		var response: IosClientResponse?
 		let tempURL = try await downloadWrapper.handle(with: request) { progress in
 			onProgress(progress.progress)
 		}

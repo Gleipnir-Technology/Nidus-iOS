@@ -1,10 +1,3 @@
-//
-//  TrapDataDetail.swift
-//  Nidus Notes
-//
-//  Created by Eli Ribble on 6/22/25.
-//
-
 import CoreLocation
 import MapKit
 import SwiftData
@@ -61,8 +54,8 @@ struct TrapDataDetail_Previews: PreviewProvider {
 				trapData: TrapData(
 					created: Date.now.addingTimeInterval(-10000),
 					description: "a nice little trap",
+					h3cell: .visalia,
 					id: UUID(),
-					location: Location(latitude: 33.3, longitude: -111.1),
 					name: "the best trap"
 				)
 			)

@@ -1,10 +1,5 @@
-//
-//  NoteRow.swift
-//  Nidus
-//
-//  Created by Eli Ribble on 3/11/25.
-//
 import CoreLocation
+import H3
 import SwiftUI
 
 struct NoteRow: View {
@@ -15,19 +10,25 @@ struct NoteRow: View {
 
 	func distanceString() -> String {
 		if let ul = currentLocation {
-			let noteLocation = CLLocation(
-				latitude: note.coordinate.latitude,
-				longitude: note.coordinate.longitude
-			)
-			let distance = Measurement(
-				value: noteLocation.distance(from: ul),
-				unit: UnitLength.meters
-			)
-			return distance.formatted(
-				.measurement(width: .abbreviated, usage: .road).locale(
-					locale
+			do {
+				let l = try cellToLatLng(cell: note.h3cell)
+				let noteLocation = CLLocation(
+					latitude: l.latitude,
+					longitude: l.longitude
 				)
-			)
+				let distance = Measurement(
+					value: noteLocation.distance(from: ul),
+					unit: UnitLength.meters
+				)
+				return distance.formatted(
+					.measurement(width: .abbreviated, usage: .road).locale(
+						locale
+					)
+				)
+			}
+			catch {
+				return "?m"
+			}
 		}
 		else {
 			return "?m "
@@ -54,10 +55,10 @@ struct NoteRow: View {
 			assignedTechnician: "John Doe",
 			city: "over there",
 			created: Date.now,
+			h3cell: .visalia,
 			hasDog: false,
 			hasSpanishSpeaker: false,
 			id: UUID(uuidString: "1846d421-f8ab-4e37-850a-b61bb8422453")!,
-			location: Location(latitude: 30, longitude: -111),
 			priority: "low",
 			source: "everywhere",
 			status: "bad",
