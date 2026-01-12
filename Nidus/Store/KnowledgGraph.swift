@@ -285,8 +285,9 @@ struct KnowledgeGraph {
 		return hasSource || hasFacilitator || hasBreeding
 	}
 	var impliesNeedsTreatment: Bool {
-		return breeding.conditions != nil
-			&& BREEDING_CONDITONS_NEEDING_TREATMENT.contains(breeding.conditions!)
+		return false
+		//return breeding.conditions != nil
+		//&& BREEDING_CONDITONS_NEEDING_TREATMENT.contains(breeding.conditions!)
 	}
 	var isReportComplete: Bool {
 		switch fieldseeker.reportType {

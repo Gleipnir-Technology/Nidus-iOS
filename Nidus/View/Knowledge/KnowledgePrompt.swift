@@ -42,36 +42,22 @@ struct KnowledgePromptInspection: View {
 
 	var body: some View {
 		VStack {
-			/*if knowledge.impliesNeedsTreatment {
+			if knowledge.impliesNeedsTreatment {
 				NavigationLink(destination: TreatmentRecommendationView()) {
-                    Button(action: {
-                        // Handle alter treatment
-                    }) {
-                        HStack {
-                            Image(systemName: "syringe")
-                            Text("Recommended Treatment")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.orange)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                    }
-				}
-             }
-			*/
-			NavigationLink(destination: TreatmentRecommendationView()) {
-				HStack {
-					Image(systemName: "syringe")
-					Text("Treatment").foregroundStyle(Color.white).font(.title)
-				}
-				.padding()
-				.foregroundColor(.white)
-				.background(
-					Color.orange.clipShape(
-						.rect(cornerRadius: 10)
+					HStack {
+						Image(systemName: "syringe")
+						Text("Treatment").foregroundStyle(Color.white).font(
+							.title
+						)
+					}
+					.padding()
+					.foregroundColor(.white)
+					.background(
+						Color.orange.clipShape(
+							.rect(cornerRadius: 10)
+						)
 					)
-				)
+				}
 			}
 			if !knowledge.isReportComplete {
 				KnowledgeTable(
