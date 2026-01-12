@@ -27,6 +27,11 @@ func NoteSummaryByHexAll(_ connection: SQLite.Connection, cells: Set<H3Cell>, no
 	}
 }
 
+func NoteSummaryByHexDeleteAll(_ connection: SQLite.Connection) throws {
+	let update = schema.noteSummaryByHex.table.delete()
+	try connection.run(update)
+}
+
 func NoteSummaryByHexUpsert(
 	_ connection: SQLite.Connection,
 	cell: UInt64,

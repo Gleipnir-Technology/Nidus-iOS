@@ -8,6 +8,7 @@ struct SettingView: View {
 	@Environment(\.dismiss) private var dismiss
 	@State private var alertMessage = ""
 	@State private var isShowingAlert = false
+	@State private var isShowingDeleteConfirmation = false
 	@State private var password: String = ""
 	@State private var showPassword: Bool = false
 	@State private var url: String = "https://sync.nidus.cloud"
@@ -38,6 +39,12 @@ struct SettingView: View {
 		username = UserDefaults.standard.string(forKey: "username") ?? ""
 	}
 
+	private func confirmDeleteLocalData() {
+		isShowingDeleteConfirmation = true
+	}
+	private func deleteLocalData() {
+		controller.deleteLocalData()
+	}
 	private func reupload() {
 		controller.reupload()
 		alertMessage = "Re-upload started."
@@ -193,7 +200,14 @@ struct SettingView: View {
 									"arrow.2.circlepath.circle"
 							)
 						}
-
+					}
+					HStack {
+						Button(action: { confirmDeleteLocalData() }) {
+							Label(
+								"Delete local data",
+								systemImage: "trash"
+							).foregroundColor(.red)
+						}
 					}
 				} header: {
 					Text("Data Tools")
@@ -215,6 +229,18 @@ struct SettingView: View {
 				} message: {
 					Text(alertMessage)
 				}.textFieldStyle(.roundedBorder)
+				.confirmationDialog(
+					"Delete local data",
+					isPresented: $isShowingDeleteConfirmation,
+					actions: {
+						Button("Delete", role: .destructive) {
+							deleteLocalData()
+						}
+						Button("Cancel", role: .cancel) {
+							isShowingDeleteConfirmation = false
+						}
+					}
+				)
 		}
 	}
 }

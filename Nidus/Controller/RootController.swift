@@ -46,6 +46,15 @@ class RootController {
 		self.locationDataManager = LocationDataManager()
 	}
 
+	func deleteLocalData() {
+		do {
+			try database.service.deleteLocalData()
+			network.Sync(settings.store, database)
+		}
+		catch {
+			handleError(error, "Failed to delete local data")
+		}
+	}
 	@MainActor
 	func handleRegionChange(_ region: MKCoordinateRegion) {
 		TrackTime("root controller handleRegionChange") {

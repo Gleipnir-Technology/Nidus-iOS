@@ -67,17 +67,6 @@ class DatabaseService: CustomStringConvertible {
 	}
 
 	// MARK - public interface
-	func connect() throws {
-		let connection = try Connection(DatabaseService.storeURL().absoluteString)
-		self.connection = connection
-		self.migrationManager = SQLiteMigrationManager(
-			db: connection,
-			migrations: DatabaseService.migrations(),
-			bundle: nil
-		)
-
-	}
-
 	func audioThatNeedsUpload() throws -> [AudioNote] {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected
@@ -106,6 +95,30 @@ class DatabaseService: CustomStringConvertible {
 		try NoteAudioAllClearUploaded(connection)
 		try NotePictureAllClearUploaded(connection)
 	}
+
+	func connect() throws {
+		let connection = try Connection(DatabaseService.storeURL().absoluteString)
+		self.connection = connection
+		self.migrationManager = SQLiteMigrationManager(
+			db: connection,
+			migrations: DatabaseService.migrations(),
+			bundle: nil
+		)
+	}
+
+	func deleteLocalData() throws {
+		guard let connection = connection else {
+			throw DatabaseError.notConnected
+		}
+		try NoteAudioDeleteAll(connection)
+		try NotePictureDeleteAll(connection)
+		try MosquitoSourceDeleteAll(connection)
+		try InspectionDeleteAll(connection)
+		try ServiceRequestDeleteAll(connection)
+		try TreatmentDeleteAll(connection)
+		try NoteSummaryByHexDeleteAll(connection)
+	}
+
 	func noteAudio(_ uuid: UUID) throws -> AudioNote? {
 		guard let connection = connection else {
 			throw DatabaseError.notConnected

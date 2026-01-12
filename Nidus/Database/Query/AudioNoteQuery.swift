@@ -18,6 +18,21 @@ func NoteAudio(
 		query: schema.audioRecording.table.filter(schema.audioRecording.uuid == uuid)
 	).first
 }
+
+func NoteAudioAllClearUploaded(_ connection: SQLite.Connection) throws {
+	let update = schema.audioRecording.table.update(
+		schema.audioRecording.uploaded <- nil
+	)
+	try connection.run(update)
+}
+
+func NoteAudioDeleteAll(_ connection: SQLite.Connection) throws {
+	let update = schema.audioRecording.table.update(
+		schema.audioRecording.deleted <- Date()
+	)
+	try connection.run(update)
+}
+
 func NoteAudioInsert(
 	_ connection: SQLite.Connection,
 	_ audioNote: AudioNote

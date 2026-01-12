@@ -4,6 +4,11 @@ import OSLog
 import SQLite
 import SwiftUI
 
+func InspectionDeleteAll(_ connection: SQLite.Connection) throws {
+	let update = schema.inspection.table.delete()
+	try connection.run(update)
+}
+
 func InspectionUpsert(_ connection: SQLite.Connection, _ sID: UUID, _ inspection: Inspection) throws
 {
 	let upsert = schema.inspection.table.upsert(
@@ -41,36 +46,6 @@ func InspectionsForSources(_ connection: SQLite.Connection, _ sourceUUIDs: [UUID
 	}
 	//let end = Date.now
 	//Logger.background.info("Inspection query took \(end.timeIntervalSince(start)) seconds")
-	return results
-}
-
-func TreatmentsForSources(_ connection: SQLite.Connection, _ sourceUUIDs: [UUID]) throws -> [UUID:
-	[Treatment]]
-{
-	//let start = Date.now
-	var results: [UUID: [Treatment]] = [:]
-	let query = schema.treatment.table.filter(
-		sourceUUIDs.contains(schema.treatment.sourceID)
-	)
-	for row in try connection.prepare(query) {
-		results[row[schema.treatment.sourceID], default: []].append(
-			Treatment(
-				comments: row[schema.treatment.comments],
-				created: row[schema.treatment.created],
-				fieldTechnician: row[schema.treatment.fieldTechnician],
-				habitat: row[schema.treatment.habitat],
-				id: row[schema.treatment.id],
-				product: row[schema.treatment.product],
-				quantity: row[schema.treatment.quantity],
-				quantityUnit: row[schema.treatment.quantityUnit],
-				siteCondition: row[schema.treatment.siteCondition],
-				treatAcres: row[schema.treatment.treatAcres],
-				treatHectares: row[schema.treatment.treatHectares]
-			)
-		)
-	}
-	//let end = Date.now
-	//Logger.background.info("Treatment query took \(end.timeIntervalSince(start)) seconds")
 	return results
 }
 
@@ -148,6 +123,11 @@ func MosquitoSourceAsNotes(
      */
 }
 
+func MosquitoSourceDeleteAll(_ connection: SQLite.Connection) throws {
+	let update = schema.mosquitoSource.table.delete()
+	try connection.run(update)
+}
+
 func MosquitoSourceUpsert(connection: SQLite.Connection, _ source: MosquitoSource) throws {
 	let location = cellToLatLngOrBust(source.h3cell)
 	let upsert = schema.mosquitoSource.table.upsert(
@@ -179,94 +159,12 @@ func MosquitoSourceUpsert(connection: SQLite.Connection, _ source: MosquitoSourc
 	)
 	try connection.run(upsert)
 }
-
-func NoteAudioAllClearUploaded(_ connection: SQLite.Connection) throws {
-	let update = schema.audioRecording.table.update(
-		schema.audioRecording.uploaded <- nil
-	)
-	try connection.run(update)
-}
-func NotePictureAllClearUploaded(_ connection: SQLite.Connection) throws {
-	let update = schema.picture.table.update(
-		schema.picture.uploaded <- nil
-	)
-	try connection.run(update)
-}
-
 func NotesCount(_ connection: SQLite.Connection) throws -> UInt {
 	let audioCount = try connection.scalar(schema.audioRecording.table.count)
 	let pictureCount = try connection.scalar(schema.picture.table.count)
 	let mosquitoSourceCount = try connection.scalar(schema.mosquitoSource.table.count)
 	let serviceRequestCount = try connection.scalar(schema.serviceRequest.table.count)
 	return UInt(audioCount + pictureCount + mosquitoSourceCount + serviceRequestCount)
-}
-
-func PictureDelete(_ connection: SQLite.Connection, _ uuid: UUID) throws {
-	let delete = schema.picture.table.filter(
-		SQLite.Expression<UUID>(value: uuid) == schema.picture.uuid
-	).update(
-		schema.picture.deleted <- Date.now
-	)
-	try connection.run(delete)
-}
-
-func PictureInsert(_ connection: Connection, _ note: PictureNote) throws {
-	let insert = schema.picture.table.insert(
-		schema.picture.created
-			<- SQLite.Expression<Date>(value: note.created),
-		schema.picture.deleted
-			<- SQLite.Expression<Date?>(value: nil),
-		schema.picture.location
-			<- SQLite.Expression<UInt64?>(value: note.cell),
-		schema.picture.uploaded
-			<- SQLite.Expression<Date?>(value: nil),
-		schema.picture.uuid <- SQLite.Expression<UUID>(value: note.id)
-	)
-	try connection.run(insert)
-}
-
-func PicturesNeedingUpload(_ connection: Connection) throws -> [PictureNote] {
-	// Query for notes where uploaded is NULL
-	let query = schema.picture.table.filter(schema.picture.uploaded == nil)
-	return try PictureNoteFromRow(connection: connection, query: query)
-}
-
-func PictureNoteUpdate(_ connection: Connection, _ uuid: UUID, uploaded: Date) throws {
-	let update = schema.picture.table.filter(
-		SQLite.Expression<UUID>(value: uuid) == schema.picture.uuid
-	).update(
-		schema.picture.uploaded <- uploaded
-	)
-	try connection.run(update)
-}
-
-func PictureAsNotes(
-	_ connection: SQLite.Connection
-) throws -> [PictureNote] {
-	var results: [PictureNote] = []
-	let query = schema.picture.table.filter(
-		schema.picture.deleted == nil
-	)
-	let rows = try connection.prepare(query)
-	for row in rows {
-		results.append(
-			PictureNote(
-				id: row[schema.picture.uuid],
-				cell: row[schema.picture.location],
-				created: row[schema.picture.created]
-			)
-		)
-	}
-	return results
-}
-
-func PictureUploaded(_ connection: SQLite.Connection, _ uuid: UUID) throws {
-	let update = schema.picture.table.filter(
-		SQLite.Expression<UUID>(value: uuid) == schema.picture.uuid
-	).update(
-		schema.picture.uploaded <- Date.now
-	)
-	try connection.run(update)
 }
 
 func ServiceRequestAsNotes(_ connection: Connection) throws -> [ServiceRequestNote] {
@@ -346,6 +244,11 @@ func ServiceRequestsAsNotes(
 	return results
 }
 
+func ServiceRequestDeleteAll(_ connection: SQLite.Connection) throws {
+	let update = schema.serviceRequest.table.delete()
+	try connection.run(update)
+}
+
 func ServiceRequestUpsert(connection: SQLite.Connection, _ serviceRequest: ServiceRequest) throws {
 	let location = cellToLatLngOrBust(serviceRequest.h3cell)
 	let upsert = schema.serviceRequest.table.upsert(
@@ -377,6 +280,41 @@ func ServiceRequestUpsert(connection: SQLite.Connection, _ serviceRequest: Servi
 		onConflictOf: schema.serviceRequest.id
 	)
 	try connection.run(upsert)
+}
+
+func TreatmentDeleteAll(_ connection: SQLite.Connection) throws {
+	let update = schema.treatment.table.delete()
+	try connection.run(update)
+}
+
+func TreatmentsForSources(_ connection: SQLite.Connection, _ sourceUUIDs: [UUID]) throws -> [UUID:
+	[Treatment]]
+{
+	//let start = Date.now
+	var results: [UUID: [Treatment]] = [:]
+	let query = schema.treatment.table.filter(
+		sourceUUIDs.contains(schema.treatment.sourceID)
+	)
+	for row in try connection.prepare(query) {
+		results[row[schema.treatment.sourceID], default: []].append(
+			Treatment(
+				comments: row[schema.treatment.comments],
+				created: row[schema.treatment.created],
+				fieldTechnician: row[schema.treatment.fieldTechnician],
+				habitat: row[schema.treatment.habitat],
+				id: row[schema.treatment.id],
+				product: row[schema.treatment.product],
+				quantity: row[schema.treatment.quantity],
+				quantityUnit: row[schema.treatment.quantityUnit],
+				siteCondition: row[schema.treatment.siteCondition],
+				treatAcres: row[schema.treatment.treatAcres],
+				treatHectares: row[schema.treatment.treatHectares]
+			)
+		)
+	}
+	//let end = Date.now
+	//Logger.background.info("Treatment query took \(end.timeIntervalSince(start)) seconds")
+	return results
 }
 
 func TreatmentUpsert(_ connection: SQLite.Connection, _ sID: UUID, _ treatment: Treatment) throws {
