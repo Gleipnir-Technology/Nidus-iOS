@@ -229,7 +229,7 @@ struct RootView: View {
 						}
 						Spacer()
 						HStack {
-							ButtonWithLongPress(
+							/*ButtonWithLongPress(
 								actionLong: onRouteButtonLong,
 								actionShort: onRouteButtonShort,
 								label: {
@@ -247,7 +247,7 @@ struct RootView: View {
 							).foregroundColor(
 								activeView == .route
 									? Color.blue : .secondary
-							)
+							)*/
 							ButtonWithLongPress(
 								actionLong: onMapButtonLong,
 								actionShort: onMapButtonShort,
