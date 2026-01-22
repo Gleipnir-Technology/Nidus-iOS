@@ -32,9 +32,9 @@ class DatabaseController {
 		var currentWorkUnits: Double = 0
 		let partialProgress: (UInt) -> Void = { workUnits in
 			currentWorkUnits += Double(workUnits)
-			Logger.foreground.info(
+			/*Logger.foreground.info(
 				"Updated with \(workUnits) new work units, currently at \(currentWorkUnits) / \(totalWork) or \(currentWorkUnits / Double(totalWork) * 100)%)"
-			)
+			)*/
 			onProgress(currentWorkUnits / Double(totalWork))
 		}
 		TrackTime("database optimize") {
