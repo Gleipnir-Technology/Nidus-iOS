@@ -146,7 +146,9 @@ class NetworkController {
 			}
 		}
 		setState(.idle, 0.0)
-		Logger.background.info("Done saving API response")
+		Logger.background.info(
+			"Done saving API response with \(totalRecords) total records saved. \(fs.requests.count) service requests, \(fs.sources.count) mosquito sources, \(fs.traps.count) traps"
+		)
 	}
 	private func handleError(_ error: any Error) {
 		Logger.background.error("Network controller error: \(error)")
